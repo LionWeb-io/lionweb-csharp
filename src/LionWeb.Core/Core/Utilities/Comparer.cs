@@ -185,14 +185,14 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
                 if (leftSurplus != null)
                 {
                     _nodeMapping[leftSurplus] = null;
-                    result.Add(new LeftSurplusNodeDifference(leftOwner, link, leftSurplus));
+                    result.Add(new LeftSurplusNodeDifference(leftOwner, rightOwner, link, leftSurplus));
                 }
             }
         } else if (left.Count < right.Count)
         {
             result.Add(nodeCountDifference);
             result.AddRange(right.Skip(left.Count).Where(r => r != null)
-                .Select(n => new RightSurplusNodeDifference(rightOwner, link, n!)));
+                .Select(n => new RightSurplusNodeDifference(leftOwner, rightOwner, link, n!)));
         }
 
         return result;
@@ -216,11 +216,11 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
                 SetParent(result, new NodeDifference(left, right));
                 break;
             case (null, not null):
-                result.Add(new LeftNullNodeDifference(rightOwner, containment, right));
+                result.Add(new LeftNullNodeDifference(leftOwner, rightOwner, containment, right));
                 break;
 
             case (not null, null):
-                result.Add(new RightNullNodeDifference(leftOwner, containment, left));
+                result.Add(new RightNullNodeDifference(leftOwner, rightOwner, containment, left));
                 break;
         }
 
@@ -260,8 +260,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
                     RegisterSurplusFeature(left, right, leftFeature, true,
                         (leftP, feature, rightP, parent) =>
                             new UnsetFeatureRightDifference(leftP, feature, rightP) { Parent = parent },
-                        (owner, link, surplus, parent) =>
-                            new LeftSurplusNodeDifference(owner, link, surplus) { Parent = parent }));
+                        (leftOwner, rightOwner, link, surplus, parent) =>
+                            new LeftSurplusNodeDifference(leftOwner, rightOwner, link, surplus) { Parent = parent }));
             }
         }
 
@@ -271,8 +271,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
                 RegisterSurplusFeature(left, right, remainingRightFeature, false,
                     (leftP, feature, rightP, parent) =>
                         new UnsetFeatureLeftDifference(leftP, feature, rightP) { Parent = parent },
-                    (owner, link, surplus, parent) =>
-                        new RightSurplusNodeDifference(owner, link, surplus) { Parent = parent }));
+                    (leftOwner, rightOwner, link, surplus, parent) =>
+                        new RightSurplusNodeDifference(leftOwner, rightOwner, link, surplus) { Parent = parent }));
         }
 
         return result;
@@ -288,7 +288,7 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         Feature feature,
         bool useLeft,
         Func<IReadableNode, Feature, IReadableNode, IContainerDifference?, IUnsetFeatureDifference> unsetFactory,
-        Func<IReadableNode, Link, IReadableNode, IContainerDifference?, ISurplusNodeDifference> surplusFactory
+        Func<IReadableNode, IReadableNode, Link, IReadableNode, IContainerDifference?, ISurplusNodeDifference> surplusFactory
     )
     {
         List<IDifference> result = [];
@@ -317,7 +317,7 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
                 result.Add(new NodeCountDifference(left, leftCount, link, right, rightCount) { Parent = parent });
                 foreach (var entry in coll.OfType<IReadableNode>())
                 {
-                    result.Add(surplusFactory(owner, link, entry, parent));
+                    result.Add(surplusFactory(left, right, link, entry, parent));
                 }
             }
         }
@@ -513,13 +513,13 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         {
             result.Add(nodeCountDifference);
             result.AddRange(leftTargets.Skip(rightTargets.Count)
-                .Select(n => new LeftSurplusNodeDifference(leftOwner, reference, n)));
+                .Select(n => new LeftSurplusNodeDifference(leftOwner, rightOwner, reference, n)));
         } else if (leftTargets.Count < rightTargets.Count)
         {
             result.Add(nodeCountDifference);
             result.AddRange(
                 rightTargets.Skip(leftTargets.Count)
-                    .Select(n => new RightSurplusNodeDifference(rightOwner, reference, n)));
+                    .Select(n => new RightSurplusNodeDifference(leftOwner, rightOwner, reference, n)));
         }
 
         return result;

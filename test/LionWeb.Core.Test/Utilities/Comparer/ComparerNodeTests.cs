@@ -129,7 +129,7 @@ public class ComparerNodeTests : ComparerTestsBase
     {
         var right = rF.NewLine("b");
         AreDifferent(null, right,
-            new LeftNullNodeDifference(null, null, right)
+            new LeftNullNodeDifference(null, null, null, right)
         );
     }
 
@@ -138,7 +138,7 @@ public class ComparerNodeTests : ComparerTestsBase
     {
         var left = lF.NewLine("a");
         AreDifferent(left, null,
-            new RightNullNodeDifference(null, null, left)
+            new RightNullNodeDifference(null, null, null, left)
         );
     }
 
@@ -149,7 +149,7 @@ public class ComparerNodeTests : ComparerTestsBase
         var right0 = rF.NewCircle("b0");
         var right1 = rF.NewLine("b1");
         AreDifferent([null, left], [right0, right1],
-            new LeftNullNodeDifference(null, null, right0)
+            new LeftNullNodeDifference(null, null, null, right0)
         );
     }
 
@@ -160,7 +160,7 @@ public class ComparerNodeTests : ComparerTestsBase
         var left1 = lF.NewCircle("a");
         var right = rF.NewCircle("b0");
         AreDifferent([left0, left1], [null, right],
-            new RightNullNodeDifference(null, null, left0)
+            new RightNullNodeDifference(null, null, null, left0)
         );
     }
 
@@ -172,7 +172,7 @@ public class ComparerNodeTests : ComparerTestsBase
         var right = rF.NewLine("b0");
         AreDifferent([left0, left1], [right],
             new NodeCountDifference(null, 2, null, null, 1),
-            new LeftSurplusNodeDifference(null, null, left1)
+            new LeftSurplusNodeDifference(null, null, null, left1)
         );
     }
 
@@ -182,7 +182,7 @@ public class ComparerNodeTests : ComparerTestsBase
         var right = rF.NewLine("b0");
         AreDifferent([], [right],
             new NodeCountDifference(null, 0, null, null, 1),
-            new RightSurplusNodeDifference(null, null, right)
+            new RightSurplusNodeDifference(null, null, null, right)
         );
     }
 

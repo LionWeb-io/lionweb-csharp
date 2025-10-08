@@ -394,10 +394,16 @@ public record NodeCountDifference(
 /// <see cref="Node"/> is member of list <see cref="Link"/> of <see cref="Owner"/>, but missing on the other side.
 public interface ISurplusNodeDifference : IDifference
 {
-    /// Owner of surplus node
-    IReadableNode? Owner { get; init; }
+    /// Left owner of <see cref="Node"/>
+    IReadableNode? LeftOwner { get; init; }
 
-    /// Link containing surplus node
+    /// Right owner of <see cref="Node"/>
+    IReadableNode? RightOwner { get; init; }
+    
+    /// Actual owner of <see cref="Node"/>
+    IReadableNode? Owner { get; }
+
+    /// Link containing <see cref="Node"/>
     Link? Link { get; init; }
 
     /// surplus node
@@ -405,66 +411,86 @@ public interface ISurplusNodeDifference : IDifference
 }
 
 /// <summary>
-/// <paramref name="Node"/> is member of list <paramref name="Link"/> of left <paramref name="Owner"/>, but missing at right.
+/// <paramref name="Node"/> is member of list <paramref name="Link"/> of <paramref name="LeftOwner"/>, but missing at <paramref name="RightOwner"/>.
 /// </summary>
-/// <param name="Owner">Owner of the left list. Might be <c>null</c> if top-level list.</param>
+/// <param name="LeftOwner">Owner of the left list. Might be <c>null</c> if top-level list.</param>
+/// <param name="RightOwner">Owner of the right list. Might be <c>null</c> if top-level list.</param>
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Surplus node.</param>
 public record LeftSurplusNodeDifference(
-    IReadableNode? Owner,
+    IReadableNode? LeftOwner,
+    IReadableNode? RightOwner,
     Link? Link,
     IReadableNode Node
 ) : DifferenceBase, ISurplusNodeDifference
 {
+    /// <inheritdoc />
+    public IReadableNode? Owner => LeftOwner;
+
     /// <inheritdoc />
     protected override string Describe() =>
         $"Surplus: {LeftDescription()}: {NC(Node)}";
 }
 
 /// <summary>
-/// <paramref name="Node"/> is member of list <paramref name="Link"/> of right <paramref name="Owner"/>, but missing at left.
+/// <paramref name="Node"/> is member of list <paramref name="Link"/> of <paramref name="RightOwner"/> but missing at <paramref name="LeftOwner"/>.
 /// </summary>
-/// <param name="Owner">Owner of the right list. Might be <c>null</c> if top-level list.</param>
+/// <param name="LeftOwner">Owner of the left list. Might be <c>null</c> if top-level list.</param>
+/// <param name="RightOwner">Owner of the right list. Might be <c>null</c> if top-level list.</param>
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Surplus node.</param>
 public record RightSurplusNodeDifference(
-    IReadableNode? Owner,
+    IReadableNode? LeftOwner,
+    IReadableNode? RightOwner,
     Link? Link,
     IReadableNode Node) : DifferenceBase, ISurplusNodeDifference
 {
+    /// <inheritdoc />
+    public IReadableNode? Owner => RightOwner;
+
     /// <inheritdoc />
     protected override string Describe() =>
         $"Surplus: {RightDescription()}: {NC(Node)}";
 }
 
 /// <summary>
-/// <paramref name="Node"/> is member of list <paramref name="Link"/> of right <paramref name="Owner"/>, but null at left.
+/// <paramref name="Node"/> is member of list <paramref name="Link"/> of right <paramref name="RightOwner"/> but null at <paramref name="LeftOwner"/>.
 /// </summary>
-/// <param name="Owner">Owner of the right list. Might be <c>null</c> if top-level list.</param>
+/// <param name="LeftOwner">Owner of the left list. Might be <c>null</c> if top-level list.</param>
+/// <param name="RightOwner">Owner of the right list. Might be <c>null</c> if top-level list.</param>
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Non-null right node.</param>
 public record LeftNullNodeDifference(
-    IReadableNode? Owner,
+    IReadableNode? LeftOwner,
+    IReadableNode? RightOwner,
     Link? Link,
     IReadableNode Node
 ) : DifferenceBase, ISurplusNodeDifference
 {
+    /// <inheritdoc />
+    public IReadableNode? Owner => RightOwner;
+
     /// <inheritdoc />
     protected override string Describe() =>
         $"{LeftDescription()} null: {NC(Node)}";
 }
 
 /// <summary>
-/// <paramref name="Node"/> is member of list <paramref name="Link"/> of left <paramref name="Owner"/>, but null at left.
+/// <paramref name="Node"/> is member of list <paramref name="Link"/> of left <paramref name="LeftOwner"/> but null at <paramref name="RightOwner"/>.
 /// </summary>
-/// <param name="Owner">Owner of the left list. Might be <c>null</c> if top-level list.</param>
+/// <param name="LeftOwner">Owner of the left list. Might be <c>null</c> if top-level list.</param>
+/// <param name="RightOwner">Owner of the right list. Might be <c>null</c> if top-level list.</param>
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Non-null left node.</param>
 public record RightNullNodeDifference(
-    IReadableNode? Owner,
+    IReadableNode? LeftOwner,
+    IReadableNode? RightOwner,
     Link? Link,
     IReadableNode Node) : DifferenceBase, ISurplusNodeDifference
 {
+    /// <inheritdoc />
+    public IReadableNode? Owner => LeftOwner;
+
     /// <inheritdoc />
     protected override string Describe() =>
         $"{RightDescription()} null: {NC(Node)}";
