@@ -222,7 +222,7 @@ public class ComparerContainmentTests : ComparerTestsBase
             parentB,
             new UnsetFeatureRightDifference(left, leftGeometryShapes, right){Parent = parentB},
             new NodeCountDifference(left, 1, leftGeometryShapes, right, 0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, leftGeometryShapes, left0) { Parent = parentB }
+            new LeftSurplusNodeDifference(left, right, leftGeometryShapes, left0) { Parent = parentB }
         );
     }
 
@@ -243,7 +243,7 @@ public class ComparerContainmentTests : ComparerTestsBase
             parentA,
             parentB,
             new NodeCountDifference(left, 1, leftGeometryShapes, right, 2) { Parent = parentB },
-            new RightSurplusNodeDifference(right, leftGeometryShapes, right1) { Parent = parentB }
+            new RightSurplusNodeDifference(left, right, leftGeometryShapes, right1) { Parent = parentB }
         );
     }
 
@@ -262,7 +262,7 @@ public class ComparerContainmentTests : ComparerTestsBase
             parentB,
             new UnsetFeatureLeftDifference(left, rightGeometryShapes, right) { Parent = parentB },
             new NodeCountDifference(left, 0, rightGeometryShapes, right, 1) { Parent = parentB },
-            new RightSurplusNodeDifference(right, rightGeometryShapes, right0) { Parent = parentB }
+            new RightSurplusNodeDifference(left, right, rightGeometryShapes, right0) { Parent = parentB }
         );
     }
 
@@ -282,8 +282,8 @@ public class ComparerContainmentTests : ComparerTestsBase
             parentB,
             new UnsetFeatureRightDifference(left, leftGeometryShapes, right) { Parent = parentB },
             new NodeCountDifference(left, 2, leftGeometryShapes, right, 0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, leftGeometryShapes, left0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, leftGeometryShapes, left1) { Parent = parentB }
+            new LeftSurplusNodeDifference(left, right, leftGeometryShapes, left0) { Parent = parentB },
+            new LeftSurplusNodeDifference(left, right, leftGeometryShapes, left1) { Parent = parentB }
         );
     }
 }

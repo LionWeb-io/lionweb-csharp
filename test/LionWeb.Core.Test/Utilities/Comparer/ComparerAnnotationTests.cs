@@ -74,7 +74,7 @@ public class ComparerAnnotationTests : ComparerTestsBase
             parentA,
             parentB,
             new NodeCountDifference(left, 1, null, right, 0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, null, left0) { Parent = parentB }
+            new LeftSurplusNodeDifference(left, right, null, left0) { Parent = parentB }
         );
     }
 
@@ -95,7 +95,7 @@ public class ComparerAnnotationTests : ComparerTestsBase
             parentA,
             parentB,
             new NodeCountDifference(left, 1, null, right, 2) { Parent = parentB },
-            new RightSurplusNodeDifference(right, null, right1) { Parent = parentB }
+            new RightSurplusNodeDifference(left, right, null, right1) { Parent = parentB }
         );
     }
 
@@ -113,7 +113,7 @@ public class ComparerAnnotationTests : ComparerTestsBase
             parentA,
             parentB,
             new NodeCountDifference(left, 0, null, right, 1) { Parent = parentB },
-            new RightSurplusNodeDifference(right, null, right0) { Parent = parentB }
+            new RightSurplusNodeDifference(left, right, null, right0) { Parent = parentB }
         );
     }
 
@@ -132,8 +132,8 @@ public class ComparerAnnotationTests : ComparerTestsBase
             parentA,
             parentB,
             new NodeCountDifference(left, 2, null, right, 0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, null, left0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, null, left1) { Parent = parentB }
+            new LeftSurplusNodeDifference(left, right, null, left0) { Parent = parentB },
+            new LeftSurplusNodeDifference(left, right, null, left1) { Parent = parentB }
         );
     }
 }
