@@ -55,14 +55,14 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
         _replicator.ConnectTo(new LocalNotificationReceiver(name, this));
 
-        _connector.ReceiveFromClient += OnReceiveFromClient;
+        _connector.ReceivedFromClient += OnReceiveFromClient;
     }
 
     /// <inheritdoc />
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        _connector.ReceiveFromClient -= OnReceiveFromClient;
+        _connector.ReceivedFromClient -= OnReceiveFromClient;
         _replicator.Dispose();
         SharedNodeMap.Dispose();
     }

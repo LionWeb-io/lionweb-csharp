@@ -34,15 +34,15 @@ public abstract class RepositoryTestsBase
     
     private readonly IForest _repositoryForest;
     protected readonly LionWebTestRepository _repository;
-    private readonly RepositoryConnector _repositoryConnector;
+    private readonly DeltaRepositoryConnector _deltaRepositoryConnector;
 
     protected readonly IForest _aForest;
     protected readonly LionWebTestClient _aClient;
 
     protected readonly IForest _bForest;
     protected readonly LionWebTestClient _bClient;
-    private ClientConnector _aConnector;
-    private ClientConnector _bConnector;
+    private TestDeltaClientConnector _aConnector;
+    private TestDeltaClientConnector _bConnector;
     private readonly List<Language> _languages;
     private readonly IVersion2023_1 _lionWebVersion;
 
@@ -52,24 +52,24 @@ public abstract class RepositoryTestsBase
         _languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance];
 
         _repositoryForest = new Forest();
-        _repositoryConnector = new(_lionWebVersion);
+        _deltaRepositoryConnector = new(_lionWebVersion);
         _repository = new LionWebTestRepository(_lionWebVersion, _languages, "repository", _repositoryForest,
-            _repositoryConnector);
+            _deltaRepositoryConnector);
 
         _aClient = CreateClient("A", out _aForest, out _aConnector);
         _bClient = CreateClient("B", out _bForest, out _bConnector);
     }
 
-    private LionWebTestClient CreateClient(string name, out IForest forest, out ClientConnector connector)
+    private LionWebTestClient CreateClient(string name, out IForest forest, out TestDeltaClientConnector connector)
     {
         var clientId = $"{name}ClientId";
         forest = new Forest();
-        connector = new ClientConnector(_lionWebVersion);
+        connector = new TestDeltaClientConnector(_lionWebVersion);
         var client = new LionWebTestClient(_lionWebVersion, _languages, name, forest, connector)
         {
             ClientId = clientId
         };
-        connector.Connect(clientId, _repositoryConnector);
+        connector.Connect(clientId, _deltaRepositoryConnector);
         return client;
     }
 

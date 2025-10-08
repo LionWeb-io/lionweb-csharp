@@ -15,32 +15,35 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test.Client;
+namespace LionWeb.WebSocket;
 
 using Core;
 using Core.Notification;
-using Delta.Client;
-using Message;
+using Protocol.Delta.Client;
+using Protocol.Delta.Message;
 
-internal class DeltaClientConnector : IDeltaClientConnector
+public class WebSocketDeltaClientConnector : IDeltaClientConnector
 {
-    private readonly Action<IDeltaContent> _sender;
+    private readonly Func<IDeltaContent, Task> _sender;
     private readonly NotificationToDeltaCommandMapper _mapper;
 
-    public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
+    public WebSocketDeltaClientConnector(LionWebVersions lionWebVersion, Func<IDeltaContent, Task> sender)
     {
         _sender = sender;
-        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
+        _mapper = new(new CommandIdProvider(), lionWebVersion);
     }
 
-    public Task SendToRepository(IDeltaContent content)
-    {
-        _sender(content);
-        return Task.CompletedTask;
-    }
+    /// <inheritdoc />
+    public event EventHandler<IDeltaContent>? ReceivedFromRepository;
 
-    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
+    /// <inheritdoc />
+    public async Task SendToRepository(IDeltaContent content) =>
+        await _sender(content);
 
-    public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
-    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
+    /// <inheritdoc />
+    public IDeltaContent Convert(INotification notification)
+        => _mapper.Map(notification);
+
+    public void ReceiveFromRepository(IDeltaContent content) =>
+        ReceivedFromRepository?.Invoke(this, content);
 }

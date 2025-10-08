@@ -18,46 +18,31 @@
 namespace LionWeb.WebSocket;
 
 using Core;
-using Core.M3;
-using Core.Notification;
 using Protocol.Delta;
 using Protocol.Delta.Client;
 using Protocol.Delta.Message;
 using System.Net.WebSockets;
 using System.Text;
 
-public class WebSocketClient : IDeltaClientConnector
+public class WebSocketClient
 {
     private const int BufferSize = 0x10000;
 
     public const string ClientStartedMessage = "Client started.";
 
-    private static readonly IVersion2023_1 _lionWebVersion = LionWebVersions.v2023_1;
+    private readonly string _name;
+    private readonly ClientWebSocket _clientWebSocket;
+    private readonly DeltaSerializer _deltaSerializer;
+    private readonly WebSocketDeltaClientConnector _clientConnector;
 
-    private static readonly List<Language> _languages =
-        [_lionWebVersion.BuiltIns, _lionWebVersion.LionCore];
-
-    private readonly NotificationToDeltaCommandMapper _mapper;
-
-    public WebSocketClient(string name)
+    public WebSocketClient(string name, LionWebVersions lionWebVersion)
     {
         _name = name;
-        _mapper = new(new CommandIdProvider(), _lionWebVersion);
+        _clientWebSocket = new ClientWebSocket();
+        _deltaSerializer = new DeltaSerializer();
+        _clientConnector = new WebSocketDeltaClientConnector(lionWebVersion,
+            async content => await Send(_deltaSerializer.Serialize(content)));
     }
-
-    private async Task SignOn(LionWebTestClient lionWeb, RepositoryId repositoryId) =>
-        await lionWeb.SignOn(repositoryId);
-
-
-    private async Task SignOff(LionWebTestClient lionWeb) =>
-        await lionWeb.SignOff();
-
-    private readonly DeltaSerializer _deltaSerializer = new();
-    private readonly ClientWebSocket _clientWebSocket = new ClientWebSocket();
-    private readonly string _name;
-
-    /// <inheritdoc />
-    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
     public async Task ConnectToServer(string ipAddress, int port) =>
         await ConnectToServer($"ws://{ipAddress}:{port}");
@@ -82,24 +67,16 @@ public class WebSocketClient : IDeltaClientConnector
                     // Log($"XXClient: received message: {receivedMessage}");
                     var deserialized = _deltaSerializer.Deserialize<IDeltaContent>(receivedMessage);
                     // do NOT await
-                    Task.Run(() => ReceiveFromRepository?.Invoke(this, deserialized));
+                    Task.Run(() => _clientConnector.ReceiveFromRepository(deserialized));
                     // Log($"XXClient: processed message: {receivedMessage}");
                 }
             }
         });
     }
 
-    /// <inheritdoc />
-    public async Task SendToRepository(IDeltaContent content) =>
-        await Send(_deltaSerializer.Serialize(content));
-
-    public async Task Send(string msg) =>
+    protected async Task Send(string msg) =>
         await _clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text,
             true, CancellationToken.None);
-
-    /// <inheritdoc />
-    public IDeltaContent Convert(INotification notification)
-        => _mapper.Map(notification);
 
     private static void Log(string message, bool header = false) =>
         Console.WriteLine(header
