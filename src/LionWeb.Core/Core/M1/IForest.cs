@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1;
 using Notification;
 using Notification.Forest;
 using Notification.Pipe;
+using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// A collection of model trees, represented by each trees' <see cref="IPartitionInstance">partition</see> (aka root node).
@@ -30,6 +31,9 @@ public interface IForest
     /// <seealso cref="RemovePartitions"/>
     IReadOnlySet<IPartitionInstance> Partitions { get; }
 
+    /// Tries to find partition with <see cref="IReadableNode.GetId">node id</see> <paramref name="nodeId"/>.
+    bool TryGetPartition(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition);
+    
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
     void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
@@ -62,6 +66,13 @@ public class Forest : IForest
 
     /// <inheritdoc />
     public IReadOnlySet<IPartitionInstance> Partitions => _partitions;
+
+    /// <inheritdoc />
+    public bool TryGetPartition(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition)
+    {
+        partition = _partitions.FirstOrDefault(p => p.GetId() == nodeId);
+        return partition is not null;
+    }
 
     /// <inheritdoc />
     public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null)
