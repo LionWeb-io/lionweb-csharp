@@ -28,13 +28,12 @@ public record CommandSource(ParticipationId ParticipationId, CommandId CommandId
 public interface IDeltaEvent : IDeltaContent
 {
     public const EventSequenceNumber DefaultEventSequenceNumber = -1;
-    
+
     EventSequenceNumber SequenceNumber { get; set; }
 
     CommandSource[]? OriginCommands { get; }
-    
-    [JsonIgnore]
-    HashSet<TargetNode> AffectedNodes { get; }
+
+    [JsonIgnore] HashSet<TargetNode> AffectedNodes { get; }
 }
 
 public abstract record DeltaEventBase(
@@ -117,7 +116,7 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override HashSet<TargetNode> AffectedNodes => [];
+    public override HashSet<TargetNode> AffectedNodes => Parts.SelectMany(p => p.AffectedNodes).ToHashSet();
 
     public IDeltaEvent[] Parts { get; init; }
 
@@ -127,7 +126,7 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override CommandSource[]? OriginCommands => 
+    public override CommandSource[]? OriginCommands =>
         Parts.SelectMany(e => e.OriginCommands ?? []).ToArray();
 
     /// <inheritdoc />
@@ -163,11 +162,11 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
     protected override bool PrintMembers(StringBuilder builder)
     {
         // do NOT call base.PrintMembers(), as we omit OriginCommands
-        
+
         builder.Append(nameof(ProtocolMessages));
         builder.Append(" = ");
         builder.ArrayPrintMembers(ProtocolMessages);
-        
+
         builder.Append(", ");
 
         builder.Append(nameof(SequenceNumber));

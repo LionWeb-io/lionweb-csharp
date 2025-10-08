@@ -191,7 +191,7 @@ public record ChildMovedFromOtherContainmentNotification(
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
-    public override HashSet<IReadableNode> AffectedNodes => [OldParent, NewParent];
+    public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => NewParent.GetId();
@@ -258,7 +258,7 @@ public record ChildMovedAndReplacedFromOtherContainmentNotification(
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
-    public override HashSet<IReadableNode> AffectedNodes => [OldParent, NewParent];
+    public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => NewParent.GetId();
@@ -378,7 +378,7 @@ public record AnnotationMovedFromOtherParentNotification(
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
-    public override HashSet<IReadableNode> AffectedNodes => [OldParent, NewParent];
+    public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => NewParent.GetId();
@@ -417,7 +417,7 @@ public record AnnotationMovedAndReplacedFromOtherParentNotification(
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
-    public override HashSet<IReadableNode> AffectedNodes => [OldParent, NewParent];
+    public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => NewParent.GetId();
@@ -520,7 +520,7 @@ public record EntryMovedFromOtherReferenceNotification(
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
-    public override HashSet<IReadableNode> AffectedNodes => [OldParent, NewParent];
+    public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => NewParent.GetId();
@@ -587,7 +587,7 @@ public record EntryMovedAndReplacedFromOtherReferenceNotification(
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
-    public override HashSet<IReadableNode> AffectedNodes => [OldParent, NewParent];
+    public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => NewParent.GetId();
