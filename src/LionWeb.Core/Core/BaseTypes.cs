@@ -215,8 +215,29 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="IReadableNode.Get"/>
     public void Set(Feature feature, object? value);
 
+    /// <summary>
+    /// Adds nodes to the specified <paramref name="link"/> feature of this node.
+    /// </summary>
+    /// <param name="link">The link feature to which nodes will be added. If <c>null</c>, adds as annotations.</param>
+    /// <param name="nodes">The nodes to add to the link feature.</param>
+    /// <exception cref="UnknownFeatureException">Thrown if the specified <paramref name="link"/> is not recognized by this node.</exception>
     public void Add(Link? link, IEnumerable<IReadableNode> nodes);
+    
+    /// <summary>
+    /// Inserts nodes into the specified <paramref name="link"/> feature of this node at the given <paramref name="index"/>.
+    /// </summary>
+    /// <param name="link">The link feature to insert nodes into. If <c>null</c>, inserts as annotations.</param>
+    /// <param name="index">The position at which to insert the nodes.</param>
+    /// <param name="nodes">The nodes to insert into the link feature.</param>
+    /// <exception cref="UnknownFeatureException">Thrown if the specified <paramref name="link"/> is not recognized by this node.</exception>
     public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes);
+    
+    /// <summary>
+    /// Removes the specified nodes from the given <paramref name="link"/> feature of this node.
+    /// </summary>
+    /// <param name="link">The link feature from which nodes will be removed. If <c>null</c>, removes from annotations.</param>
+    /// <param name="nodes">The nodes to remove from the link feature.</param>
+    /// <exception cref="UnknownFeatureException">Thrown if the specified <paramref name="link"/> is not recognized by this node.</exception>
     public void Remove(Link? link, IEnumerable<IReadableNode> nodes);
 }
 
