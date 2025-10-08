@@ -109,7 +109,7 @@ public abstract class ClonerBase
                 throw new TypeExpectationFailedException(typeof(IList), featureValue);
             }
 
-            IEnumerable<IReadableNode> resolvedTargets = featureValues.OfType<IReadableNode>().Select(ResolveReference).OfType<IReadableNode>();
+            IEnumerable<IReadableNode> resolvedTargets = featureValues.Cast<IReadableNode>().Select(ResolveReference).Cast<IReadableNode>();
             result.Set(reference, resolvedTargets.ToList());
         } else if (featureValue is IReadableNode target)
         {
@@ -178,7 +178,7 @@ public abstract class ClonerBase
                                         throw new TypeExpectationFailedException(typeof(IList), featureValue);
                                     }
 
-                                    IEnumerable<INode> clonedTargets = featureValues.OfType<INode>().Select(CloneNode);
+                                    IEnumerable<INode> clonedTargets = featureValues.Cast<INode>().Select(CloneNode);
                                     result.Set(feature, clonedTargets.ToList());
                                 } else
                                 {

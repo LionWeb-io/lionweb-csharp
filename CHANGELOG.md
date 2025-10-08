@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
+* Added generic add/insert/remove node api for multiple `link` (references and containments) features.
 * Implemented delta protocol queries for both `LionWebClient` and `LionWebRepository`:
   * `SubscribeToChangingPartitions`
   * `SubscribeToPartitionContents`

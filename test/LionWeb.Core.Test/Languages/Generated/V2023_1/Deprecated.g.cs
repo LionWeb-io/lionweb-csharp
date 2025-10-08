@@ -373,6 +373,48 @@ public partial class DeprConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.AddInternal(link, nodes))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(link))
+		{
+			AddDeprChild(DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface>(nodes));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.InsertInternal(link, index, nodes))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(link))
+		{
+			InsertDeprChild(index, DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface>(nodes));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.RemoveInternal(link, nodes))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(link))
+		{
+			RemoveDeprChild(DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface>(nodes));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
         protected override bool DetachChild(INode child)
 	{
 		if (base.DetachChild(child))
