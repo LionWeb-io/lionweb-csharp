@@ -35,7 +35,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(line));
     }
-    
+
     #region Insert
 
     [TestMethod]
@@ -43,7 +43,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
     {
         var parent = new ReferenceGeometry("g");
         var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.ReferenceGeometry_shapes,0, [line]);
+        parent.Insert(ShapesLanguage.Instance.ReferenceGeometry_shapes, 0, [line]);
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(line));
     }
@@ -225,7 +225,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         var parent = new ReferenceGeometry("g");
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.ReferenceGeometry_shapes, [null]));
     }
-    
+
     [TestMethod]
     public void Null_Insert_Empty()
     {
@@ -246,7 +246,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         var parent = new ReferenceGeometry("g");
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.ReferenceGeometry_shapes, null));
     }
-    
+
     #endregion
 
     #region EmptyCollection
@@ -259,7 +259,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         parent.Add(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
         Assert.IsTrue(parent.Shapes.Count == 0);
     }
-    
+
     [TestMethod]
     public void Insert_EmptyArray()
     {
@@ -277,7 +277,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         parent.Remove(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
         Assert.IsTrue(parent.Shapes.Count == 0);
     }
-    
+
     #endregion
 
     #region NullCollection
@@ -290,7 +290,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
         Assert.IsTrue(parent.Shapes.Count == 0);
     }
-    
+
     [TestMethod]
     public void Insert_NullArray()
     {
@@ -308,8 +308,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
         Assert.IsTrue(parent.Shapes.Count == 0);
     }
-    
-    
+
     #endregion
 
     #region SingleCollection
@@ -324,7 +323,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.IsNull(value.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(value));
     }
-    
+
     [TestMethod]
     public void Insert_SingleArray()
     {
@@ -402,7 +401,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
     }
 
     #endregion
-    
+
     #endregion
 
     #region MultipleCollection
@@ -420,7 +419,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.IsNull(valueB.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(valueB));
     }
-    
+
     #region Insert
 
     [TestMethod]
@@ -753,7 +752,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
     }
 
     #endregion
-    
+
     [TestMethod]
     public void MultipleListMatchingType()
     {
@@ -767,7 +766,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.IsNull(valueB.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(valueB));
     }
-    
+
     [TestMethod]
     public void MultipleListSubtype()
     {
@@ -782,7 +781,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.IsTrue(parent.Shapes.Contains(valueB));
     }
 
-    
+
     [TestMethod]
     public void MultipleSet()
     {
@@ -796,7 +795,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.IsNull(valueB.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(valueB));
     }
-    
+
 
     [TestMethod]
     public void MultipleSingleEnumerable()
@@ -811,7 +810,7 @@ public class ReferenceTests_Multiple_Optional_GenericApi
         Assert.IsNull(valueB.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(valueB));
     }
-    
+
     #endregion
 
     #endregion
