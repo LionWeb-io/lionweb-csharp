@@ -48,13 +48,21 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         if (!FeaturesToImplement(classifier).Any())
             return [];
 
-        return
-        [
+        IEnumerable<MemberDeclarationSyntax> featureMethods = [
             GenGetInternal(),
             GenSetInternal(),
-            //GenAddInternal(),
             GenCollectAllSetFeatures()
         ];
+
+        if (!FeaturesToImplement(classifier).OfType<Link>().Any(link => link.Multiple))
+        {
+            return featureMethods;
+        }
+
+        var addInternal =  GenAddInternal();
+        featureMethods = featureMethods.Append(addInternal);
+
+        return featureMethods;
     }
 
     #region GetInternal
@@ -107,11 +115,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     {
         List<StatementSyntax> body = link switch
         {
-            Containment { Optional: true, Multiple: true } containment => GenAddInternalMultiOptionalContainment(containment, writeable: true),
-            Containment { Optional: false, Multiple: true } optContainment => GenAddInternalMultiRequiredContainment(optContainment, writeable: true),
-            Reference { Optional: true, Multiple: true } optReference => GenAddInternalMultiOptionalReference(optReference),
-            Reference { Optional: false, Multiple: true } reference => GenAddInternalMultiRequiredReference(reference),
-            _ => throw new ArgumentException($"unsupported feature: {link}", nameof(link))
+            Containment containment => GenAddInternalMultipleContainment(containment, writeable: true),
+            Reference reference => GenAddInternalMultipleReference(reference),
+            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
         };
 
         return IfStatement(
@@ -120,45 +126,22 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         );
     }
     
-    //TODO: not tested
-    private List<StatementSyntax> GenAddInternalMultiRequiredReference(Reference reference) =>
+    private List<StatementSyntax> GenAddInternalMultipleReference(Reference reference) =>
     [
         AsStatements([
             ExpressionStatement(
                 InvocationExpression(
-                    IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference, "nodes")]))),
+                    IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference, argument: "nodes")]))),
             ReturnTrue()
         ])
     ];
 
-    //TODO: not tested
-    private List<StatementSyntax> GenAddInternalMultiOptionalReference(Reference reference) =>
+    private List<StatementSyntax> GenAddInternalMultipleContainment(Containment containment, bool writeable) =>
     [
         AsStatements([
             ExpressionStatement(
                 InvocationExpression(
-                    IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference, "nodes")]))),
-            ReturnTrue()
-        ])
-    ];
-
-    //TODO: not tested
-    private List<StatementSyntax> GenAddInternalMultiRequiredContainment(Containment containment, bool writeable) =>
-    [
-        AsStatements([
-            ExpressionStatement(
-                InvocationExpression(
-                    IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, "nodes", writeable)]))),
-            ReturnTrue()
-        ])
-    ];
-
-    private List<StatementSyntax> GenAddInternalMultiOptionalContainment(Containment containment, bool writeable) =>
-    [
-        AsStatements([
-            ExpressionStatement(
-                InvocationExpression(
-                    IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, "nodes", writeable)]))),
+                    IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, argument: "nodes", writeable)]))),
             ReturnTrue()
         ])
     ];
