@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
+* Added generic add/insert/remove node api for multiple `link` (references and containments) features.
 * Added command line interface (CLI) for the LionWeb C# generator.
 * Added `JsonUtils.ReadNodesFromStream()` to load nodes from strings synchronously.
 * Added benchmarking project.
