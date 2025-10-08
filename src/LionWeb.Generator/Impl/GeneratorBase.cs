@@ -185,4 +185,8 @@ public abstract class GeneratorBase
     /// <returns><c>InsertLink</c></returns>
     protected string InsertLink(Link link) =>
         $"Insert{link.Name.ToFirstUpper()}";
+    
+    /// <returns><c>RemoveLink</c></returns>
+    protected string RemoveLink(Link link) =>
+        $"Remove{link.Name.ToFirstUpper()}";
 }

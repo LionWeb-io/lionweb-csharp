@@ -61,10 +61,12 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
         var addInternal =  GenAddInternal();
         var insertInternal = GenInsertInternal();
-        
+        var removeInternal = GenRemoveInternal();
+
         featureMethods = featureMethods
             .Append(addInternal)
-            .Append(insertInternal);
+            .Append(insertInternal)
+            .Append(removeInternal);
 
         return featureMethods;
     }
@@ -443,6 +445,58 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     ];
     
     #endregion
+
+    #region RemoveInternal
+
+    private MethodDeclarationSyntax GenRemoveInternal() =>
+        Method("RemoveInternal", AsType(typeof(bool)), [
+                Param("link", NullableType(AsType(typeof(Link)))),
+                Param("nodes", AsType(typeof(IEnumerable<IReadableNode>)))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(new List<StatementSyntax>
+                {
+                    IfStatement(ParseExpression("base.RemoveInternal(link, nodes)"),
+                        ReturnTrue())
+                }
+                .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenRemoveInternal))
+                .Append(ReturnStatement(false.AsLiteral()))
+            ));
+
+    #endregion
+    
+    private StatementSyntax GenRemoveInternal(Link link)
+    {
+        List<StatementSyntax> body = link switch
+        {
+            Containment containment => GenRemoveInternalMultipleContainment(containment, writeable: true),
+            Reference reference => GenRemoveInternalMultipleReference(reference),
+            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
+        };
+
+        return IfStatement(
+            GenEqualsIdentityLink(link),
+            AsStatements(body)
+        );
+    }
+
+    private List<StatementSyntax> GenRemoveInternalMultipleReference(Reference reference) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(RemoveLink(reference)), AsArguments([AsNodesCall(reference, argument: "nodes")]))),
+        ReturnTrue()
+    ];
+
+    private List<StatementSyntax> GenRemoveInternalMultipleContainment(Containment containment, bool writeable) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(RemoveLink(containment)),
+                AsArguments([AsNodesCall(containment, argument: "nodes", writeable)]))),
+        ReturnTrue()
+    ];
     
     #region CollectAllSetFeatures
 
