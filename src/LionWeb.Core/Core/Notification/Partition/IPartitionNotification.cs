@@ -29,6 +29,7 @@ public interface IPartitionNotification : INotification
 
 public abstract record APartitionNotification(INotificationId NotificationId) : IPartitionNotification
 {
+    /// <inheritdoc />
     public INotificationId NotificationId { get; set; } = NotificationId;
 
     /// <inheritdoc />

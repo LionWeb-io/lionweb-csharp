@@ -50,7 +50,7 @@ public record NumericNotificationId(string Base, int Id) : INotificationId
 
 public interface INotificationIdProvider
 {
-    INotificationId CreateNotificationId();
+    INotificationId Create();
 }
 
 public class NotificationIdProvider : INotificationIdProvider
@@ -66,6 +66,6 @@ public class NotificationIdProvider : INotificationIdProvider
     }
 
     /// <inheritdoc />
-    public virtual INotificationId CreateNotificationId() =>
+    public virtual INotificationId Create() =>
         new NumericNotificationId(_notificationIdBase, _nextId++);
 }

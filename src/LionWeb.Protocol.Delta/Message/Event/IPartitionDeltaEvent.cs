@@ -32,16 +32,22 @@ public record ClassifierChanged(
     MetaPointer NewClassifier,
     MetaPointer OldClassifier,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), INodeEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), INodeEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [Node];
+}
 
 #endregion
 
 public interface IFeatureEvent : IPartitionDeltaEvent
 {
     TargetNode Parent { get; }
-    
-    [JsonIgnore]
-    MetaPointer Feature { get; }
+
+    [JsonIgnore] HashSet<NodeId> IDeltaEvent.AffectedNodes => [Parent];
+
+    [JsonIgnore] MetaPointer Feature { get; }
 };
 
 #region Properties
@@ -66,14 +72,24 @@ public record PropertyAdded(
     MetaPointer Property,
     PropertyValue NewValue,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Node];
+}
 
 public record PropertyDeleted(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue OldValue,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Node];
+}
 
 public record PropertyChanged(
     TargetNode Node,
@@ -81,7 +97,12 @@ public record PropertyChanged(
     PropertyValue NewValue,
     PropertyValue OldValue,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Node];
+}
 
 #endregion
 
@@ -89,8 +110,7 @@ public record PropertyChanged(
 
 public interface IContainmentEvent : IFeatureEvent
 {
-    [JsonIgnore]
-    MetaPointer Containment { get; }
+    [JsonIgnore] MetaPointer Containment { get; }
 
     /// <inheritdoc />
     [JsonIgnore]
@@ -103,7 +123,12 @@ public record ChildAdded(
     MetaPointer Containment,
     Index Index,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ChildDeleted(
     TargetNode DeletedChild,
@@ -114,6 +139,10 @@ public record ChildDeleted(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
     /// <inheritdoc />
     public virtual bool Equals(ChildDeleted? other)
     {
@@ -192,6 +221,10 @@ public record ChildReplaced(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
     /// <inheritdoc />
     public virtual bool Equals(ChildReplaced? other)
     {
@@ -284,6 +317,10 @@ public record ChildMovedFromOtherContainment(
 
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [NewParent, OldParent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IContainmentEvent.Containment => NewContainment;
 }
 
@@ -299,6 +336,10 @@ public record ChildMovedFromOtherContainmentInSameParent(
 {
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IContainmentEvent.Containment => NewContainment;
 }
 
@@ -310,7 +351,12 @@ public record ChildMovedInSameContainment(
     Index OldIndex,
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages),
-    IContainmentEvent;
+    IContainmentEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ChildMovedAndReplacedFromOtherContainment(
     TargetNode NewParent,
@@ -328,6 +374,10 @@ public record ChildMovedAndReplacedFromOtherContainment(
     /// <inheritdoc />
     [JsonIgnore]
     public TargetNode Parent => NewParent;
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     [JsonIgnore]
@@ -439,6 +489,10 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
 {
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IContainmentEvent.Containment => NewContainment;
 
     /// <inheritdoc />
@@ -543,6 +597,10 @@ public record ChildMovedAndReplacedInSameContainment(
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
     public virtual bool Equals(ChildMovedAndReplacedInSameContainment? other)
     {
         if (other is null)
@@ -632,6 +690,8 @@ public record ChildMovedAndReplacedInSameContainment(
 public interface IAnnotationEvent : IPartitionDeltaEvent
 {
     TargetNode Parent { get; }
+
+    [JsonIgnore] HashSet<NodeId> IDeltaEvent.AffectedNodes => [Parent];
 };
 
 public record AnnotationAdded(
@@ -639,7 +699,12 @@ public record AnnotationAdded(
     DeltaSerializationChunk NewAnnotation,
     Index Index,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record AnnotationDeleted(
     TargetNode DeletedAnnotation,
@@ -649,6 +714,10 @@ public record AnnotationDeleted(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
     /// <inheritdoc />
     public virtual bool Equals(AnnotationDeleted? other)
     {
@@ -719,6 +788,10 @@ public record AnnotationReplaced(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
     /// <inheritdoc />
     public virtual bool Equals(AnnotationReplaced? other)
     {
@@ -793,6 +866,10 @@ public record AnnotationMovedFromOtherParent(
 {
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [NewParent, OldParent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     TargetNode IAnnotationEvent.Parent => NewParent;
 }
 
@@ -802,7 +879,12 @@ public record AnnotationMovedInSameParent(
     TargetNode Parent,
     Index OldIndex,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record AnnotationMovedAndReplacedFromOtherParent(
     TargetNode NewParent,
@@ -818,6 +900,10 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     /// <inheritdoc />
     [JsonIgnore]
     TargetNode IAnnotationEvent.Parent => NewParent;
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public virtual bool Equals(AnnotationMovedAndReplacedFromOtherParent? other)
@@ -912,6 +998,10 @@ public record AnnotationMovedAndReplacedInSameParent(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
     /// <inheritdoc />
     public virtual bool Equals(AnnotationMovedAndReplacedInSameParent? other)
     {
@@ -1008,7 +1098,12 @@ public record ReferenceAdded(
     TargetNode? NewTarget,
     ResolveInfo? NewResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ReferenceDeleted(
     TargetNode Parent,
@@ -1017,7 +1112,12 @@ public record ReferenceDeleted(
     TargetNode? DeletedTarget,
     ResolveInfo? DeletedResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ReferenceChanged(
     TargetNode Parent,
@@ -1028,7 +1128,12 @@ public record ReferenceChanged(
     TargetNode? OldTarget,
     ResolveInfo? OldResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record EntryMovedFromOtherReference(
     TargetNode NewParent,
@@ -1048,6 +1153,10 @@ public record EntryMovedFromOtherReference(
 
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1064,6 +1173,10 @@ public record EntryMovedFromOtherReferenceInSameParent(
 {
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1075,7 +1188,12 @@ public record EntryMovedInSameReference(
     TargetNode? MovedTarget,
     ResolveInfo? MovedResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record EntryMovedAndReplacedFromOtherReference(
     TargetNode NewParent,
@@ -1097,6 +1215,10 @@ public record EntryMovedAndReplacedFromOtherReference(
 
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [NewParent, OldParent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1115,6 +1237,10 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
 {
     /// <inheritdoc />
     [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1128,7 +1254,12 @@ public record EntryMovedAndReplacedInSameReference(
     TargetNode? ReplacedTarget,
     ResolveInfo? ReplacedResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ReferenceResolveInfoAdded(
     TargetNode Parent,
@@ -1137,7 +1268,12 @@ public record ReferenceResolveInfoAdded(
     ResolveInfo NewResolveInfo,
     TargetNode Target,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ReferenceResolveInfoDeleted(
     TargetNode Parent,
@@ -1146,7 +1282,12 @@ public record ReferenceResolveInfoDeleted(
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ReferenceResolveInfoChanged(
     TargetNode Parent,
@@ -1156,7 +1297,12 @@ public record ReferenceResolveInfoChanged(
     TargetNode? Target,
     ResolveInfo OldResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ReferenceTargetAdded(
     TargetNode Parent,
@@ -1165,7 +1311,12 @@ public record ReferenceTargetAdded(
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<NodeId> AffectedNodes => [Parent];
+}
 
 public record ReferenceTargetDeleted(
     TargetNode Parent,
@@ -1174,7 +1325,12 @@ public record ReferenceTargetDeleted(
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [Parent];
+}
 
 public record ReferenceTargetChanged(
     TargetNode Parent,
@@ -1184,7 +1340,11 @@ public record ReferenceTargetChanged(
     ResolveInfo? ResolveInfo,
     TargetNode ReplacedTarget,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [Parent];
+}
 
 #endregion
-

@@ -1,4 +1,4 @@
-// Copyright 2025 TRUMPF Laser SE and other contributors
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,21 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Repository;
+namespace LionWeb.Protocol.Delta.Client;
 
-using Message;
+using Core;
+using Core.M1;
+using Core.M3;
 
-public interface IDeltaRepositoryConnector : IRepositoryConnector<IDeltaContent>;
+internal class NoFeaturesDeserializationHandler : DeserializerExceptionHandler
+{
+    public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
+        null;
 
-public interface IDeltaMessageContext : IMessageContext<IDeltaContent>;
+    public override IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo,
+        Feature reference, IReadableNode node) =>
+        null;
 
-public record DeltaMessageContext(IClientInfo ClientInfo, IDeltaContent Content) : IDeltaMessageContext;
+    public override IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
+        null;
+}

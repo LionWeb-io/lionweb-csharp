@@ -15,20 +15,19 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test;
+namespace LionWeb.Protocol.Delta.Test.Client;
 
-using Client;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Notification;
 using Core.Notification.Pipe;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;
+using Delta.Client;
+using Delta.Repository;
 using Message;
 using Message.Event;
-using Repository;
 
 [TestClass]
 public class ClientTests
@@ -64,6 +63,7 @@ public class ClientTests
         _clientForest = new Forest();
         _clientPartition = new Geometry("partition");
         _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
+        _client.SignOn(_repositoryId);
         _client.ParticipationId = _clientInfo.ParticipationId;
         
         _clientForest.AddPartitions([_clientPartition]);
@@ -84,53 +84,11 @@ public class ClientTests
 
     [TestMethod]
     [Timeout(6000)]
-    public async Task SignOn()
-    {
-        var signOnResponse = await _client.SignOn(_repositoryId);
-
-        Assert.AreEqual("clientParticipation", signOnResponse.ParticipationId);
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task GetAvailableIds()
-    {
-        var availableIdsResponse = await _client.GetAvailableIds(11);
-
-        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
-        foreach (var freeId in availableIdsResponse.Ids)
-        {
-            Assert.IsTrue(IdUtils.IsValid(freeId));
-        }
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task GetAvailableIds_SomeAlreadyUsed()
-    {
-        await _client.SignOn(_repositoryId);
-
-        var usedNodeId = "repoProvidedId-6";
-        _clientPartition.Documentation = new Documentation(usedNodeId);
-
-        var availableIdsResponse = await _client.GetAvailableIds(11);
-
-        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
-        foreach (var freeId in availableIdsResponse.Ids)
-        {
-            Assert.IsTrue(IdUtils.IsValid(freeId));
-        }
-
-        Assert.IsFalse(availableIdsResponse.Ids.Contains(usedNodeId));
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
     public void InOrderEvents()
     {
-        _repositoryConnector.SendToAllClients(ChildAdded(0));
-        _repositoryConnector.SendToAllClients(PropertyAdded(1));
-        _repositoryConnector.SendToAllClients(PropertyChanged(2));
+        _repositoryConnector.SendToAllClients(ChildAdded(0), []);
+        _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
+        _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);
@@ -140,9 +98,9 @@ public class ClientTests
     [Timeout(6000)]
     public void OutOfOrderEvents()
     {
-        _repositoryConnector.SendToAllClients(PropertyAdded(1));
-        _repositoryConnector.SendToAllClients(PropertyChanged(2));
-        _repositoryConnector.SendToAllClients(ChildAdded(0));
+        _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
+        _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
+        _repositoryConnector.SendToAllClients(ChildAdded(0), []);
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);
@@ -197,55 +155,4 @@ public class ClientTests
         Assert.IsTrue(differences.Count == 0,
             differences.DescribeAll(new() { LeftDescription = "a", RightDescription = "b" }));
     }
-}
-
-internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
-{
-    private readonly NotificationToDeltaCommandMapper _mapper;
-
-    public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
-    {
-        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
-    }
-
-    public Action<IDeltaContent> Sender { get; set; }
-
-    public Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
-    {
-        Sender?.Invoke(content);
-        return Task.CompletedTask;
-    }
-
-    public Task SendToAllClients(IDeltaContent content)
-    {
-        Sender?.Invoke(content);
-        return Task.CompletedTask;
-    }
-
-    public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
-    public void ReceiveMessageFromClient(IDeltaMessageContext context) => ReceiveFromClient?.Invoke(null, context);
-    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
-}
-
-internal class DeltaClientConnector : IDeltaClientConnector
-{
-    private readonly Action<IDeltaContent> _sender;
-    private readonly NotificationToDeltaCommandMapper _mapper;
-
-    public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
-    {
-        _sender = sender;
-        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
-    }
-
-    public Task SendToRepository(IDeltaContent content)
-    {
-        _sender(content);
-        return Task.CompletedTask;
-    }
-
-    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
-
-    public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
-    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }

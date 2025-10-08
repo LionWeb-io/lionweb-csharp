@@ -19,13 +19,44 @@ namespace LionWeb.Protocol.Delta.Message.Event;
 
 using Core.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 public interface IForestDeltaEvent : IDeltaEvent;
 
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
+    TargetNode AffectedNode,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent
+{
+    /// <remarks>Don't delete: We need the <see cref="JsonIgnoreAttribute"/></remarks>
+    [JsonIgnore]
+    public TargetNode AffectedNode { get; init; } = AffectedNode;
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [AffectedNode];
+
+    /// <inheritdoc />
+    public virtual bool Equals(PartitionAdded? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return base.Equals(other) && NewPartition.Equals(other.NewPartition);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode() =>
+        HashCode.Combine(base.GetHashCode(), NewPartition);
+}
 
 public record PartitionDeleted(
     TargetNode DeletedPartition,
@@ -33,6 +64,10 @@ public record PartitionDeleted(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent
 {
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [DeletedPartition];
+
     /// <inheritdoc />
     public virtual bool Equals(PartitionDeleted? other)
     {

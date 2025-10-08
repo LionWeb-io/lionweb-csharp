@@ -65,7 +65,7 @@ internal class RewriteRemoteReplicator(
 
     protected override void SuppressNotificationForwarding(INotification forestNotification, Action action)
     {
-        var notificationId = _notificationIdProvider.CreateNotificationId();
+        var notificationId = _notificationIdProvider.Create();
         var originalNotificationId = forestNotification.NotificationId;
         replacingFilter.RegisterReplacementNotificationId(notificationId, originalNotificationId);
         Filter.RegisterNotificationId(notificationId);

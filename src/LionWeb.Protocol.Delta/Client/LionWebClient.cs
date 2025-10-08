@@ -20,16 +20,19 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core;
 using Core.M1;
 using Core.M3;
+using Core.Notification;
 using Core.Utilities;
 using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
     private readonly DeltaProtocolEventReceiver _eventReceiver;
+    private readonly DeserializerBuilder _deserializerBuilder;
 
     private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
@@ -37,7 +40,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     #region EventSequenceNumber
 
-    private EventSequenceNumber _nextEventSequenceNumber = 0;
+    protected EventSequenceNumber _nextEventSequenceNumber = 0;
     private void IncrementEventSequenceNumber() => Interlocked.Increment(ref _nextEventSequenceNumber);
     private EventSequenceNumber EventSequenceNumber => Interlocked.Read(ref _nextEventSequenceNumber);
 
@@ -51,19 +54,17 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         IClientConnector<IDeltaContent> connector
     ) : base(lionWebVersion, languages, name, forest, connector)
     {
-        DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
-                .WithLionWebVersion(lionWebVersion)
-                .WithLanguages(languages)
-                .WithHandler(new ReceiverDeserializerHandler())
-            ;
+        _deserializerBuilder = new DeserializerBuilder()
+            .WithLionWebVersion(lionWebVersion)
+            .WithLanguages(languages)
+            .WithHandler(new ReceiverDeserializerHandler());
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         _eventReceiver = new DeltaProtocolEventReceiver(
             SharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
-        );
+            _deserializerBuilder, name);
 
         _eventReceiver.ConnectTo(_replicator);
     }
@@ -89,23 +90,23 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             {
                 case IDeltaEvent deltaEvent:
                     ReceiveEvent(deltaEvent);
-
-                    break;
+                    return;
 
                 case IDeltaQueryResponse response:
                     Log($"received response: {response})");
                     if (_queryResponses.TryRemove(response.QueryId, out var tcs))
                     {
                         tcs.TrySetResult(response);
+                        return;
                     }
 
                     break;
-
-                default:
-                    Log(
-                        $"ignoring received: {content.GetType()}({content.InternalParticipationId})");
-                    break;
             }
+
+            if (content is IDeltaError e)
+                throw new DeltaException(e);
+
+            Log($"ignoring received: {content.GetType()}({content.InternalParticipationId})");
         } catch (Exception e)
         {
             Log(e.ToString());
@@ -140,6 +141,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     {
         IncrementEventSequenceNumber();
 
+        if (deltaEvent is Error e)
+            throw new DeltaException(e);
+
         var originCommands = deltaEvent.OriginCommands ?? [];
         var commandSource = originCommands.FirstOrDefault();
         if (originCommands.All(cmd =>
@@ -161,6 +165,48 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     #region Send
 
+    #region Subscription
+
+    /// <inheritdoc />
+    public override async Task<SubscribeToChangingPartitionsResponse> SubscribeToChangingPartitions(bool creation,
+        bool deletion, bool partitions) =>
+        await Query<SubscribeToChangingPartitionsResponse, SubscribeToChangingPartitionsRequest>(
+            new SubscribeToChangingPartitionsRequest(creation, deletion, partitions, QueryId(), null));
+
+
+    /// <inheritdoc />
+    public override async Task<IPartitionInstance> SubscribeToPartitionContents(TargetNode partition)
+    {
+        var response = await Query<SubscribeToPartitionContentsResponse, SubscribeToPartitionContentsRequest>(
+            new SubscribeToPartitionContentsRequest(partition, QueryId(), null));
+
+        var deserializer = _deserializerBuilder.Build();
+        deserializer.RegisterDependentNodes(_forest.Descendants(true));
+        var partitionInstances = deserializer
+            .Deserialize(response.Contents.Nodes)
+            .Cast<IPartitionInstance>()
+            .ToList();
+
+        Debug.Assert(partitionInstances.Count == 1);
+        var result = partitionInstances.First();
+
+        var notificationId = new NotificationIdProvider(this).Create();
+        _ownNotifications[notificationId] = true;
+
+        _forest.AddPartitions([result], notificationId);
+        return result;
+    }
+
+    /// <inheritdoc />
+    public override async Task<UnsubscribeFromPartitionContentsResponse> UnsubscribeFromPartitionContents(
+        TargetNode partition) =>
+        await Query<UnsubscribeFromPartitionContentsResponse, UnsubscribeFromPartitionContentsRequest>(
+            new UnsubscribeFromPartitionContentsRequest(partition, QueryId(), null));
+
+    #endregion
+
+    #region Participation
+
     /// <inheritdoc />
     public override async Task<SignOnResponse> SignOn(RepositoryId repositoryId)
     {
@@ -172,21 +218,62 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     }
 
     /// <inheritdoc />
-    public override async Task<SignOffResponse> SignOff() =>
-        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
+    public override async Task<SignOffResponse> SignOff()
+    {
+        var response = await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(QueryId(), null));
+        _participationId = null;
+        return response;
+    }
+
+    /// <inheritdoc />
+    public override async Task<ReconnectResponse> Reconnect(ParticipationId participationId)
+    {
+        if(SignedIn)
+            throw new DeltaException(DeltaErrorCode.AlreadySignedOn.AsErrorResponse(null, null));
+
+        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId, EventSequenceNumber, QueryId(), null));
+        ParticipationId = participationId;
+        return response;
+    }
+
+    #endregion
+
+    #region Miscellaneous
 
     /// <inheritdoc />
     public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) =>
         await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(
-            new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
+            new GetAvailableIdsRequest(count, QueryId(), null));
+
+    /// <inheritdoc />
+    public override async Task<List<IPartitionInstance>> ListPartitions()
+    {
+        var response =
+            await Query<ListPartitionsResponse, ListPartitionsRequest>(new ListPartitionsRequest(QueryId(), null));
+        Log($"ListPartitions response: {response}");
+        var deserializer = new DeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithLanguages(_languages)
+            .WithHandler(new NoFeaturesDeserializationHandler())
+            .Build();
+        return deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();
+    }
+
+    #endregion
 
     private async Task<TResponse> Query<TResponse, TRequest>(TRequest request)
         where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest
     {
+        if (request.RequiresParticipationId && !SignedIn)
+            throw new DeltaException(DeltaErrorCode.NotSignedOn.AsErrorResponse(request.QueryId, null));
+        
         var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
         _queryResponses[request.QueryId] = tcs;
         await Send(request);
         var response = await tcs.Task;
+        if (response is IDeltaError err)
+            throw new DeltaException(err);
+
         return response as TResponse ?? throw new ArgumentException(response.GetType().Name);
     }
 
@@ -211,12 +298,6 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     }
 
     #endregion
-}
 
-public class CommandIdProvider : ICommandIdProvider
-{
-    private int _nextId = 0;
-
-    /// <inheritdoc />
-    public string Create() => (++_nextId).ToString();
+    private NodeId QueryId() => IdUtils.NewId();
 }
