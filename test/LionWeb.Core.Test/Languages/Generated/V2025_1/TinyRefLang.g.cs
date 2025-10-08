@@ -295,4 +295,46 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 			result.Add(TinyRefLangLanguage.Instance.MyConcept_singularRef);
 		return result;
 	}
+
+	/// <inheritdoc/>
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.AddInternal(link, nodes))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(link))
+		{
+			AddMultivaluedRef(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(nodes));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.InsertInternal(link, index, nodes))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(link))
+		{
+			InsertMultivaluedRef(index, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(nodes));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.RemoveInternal(link, nodes))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(link))
+		{
+			RemoveMultivaluedRef(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(nodes));
+			return true;
+		}
+
+		return false;
+	}
 }
