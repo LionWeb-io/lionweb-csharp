@@ -83,22 +83,28 @@ public class WebSocketServer
         byte[] buffer = new byte[BufferSize];
         while (socket.State == WebSocketState.Open)
         {
-            WebSocketReceiveResult result =
-                await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            switch (result.MessageType)
+            try
             {
-                case WebSocketMessageType.Text:
+                WebSocketReceiveResult result =
+                    await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                switch (result.MessageType)
                 {
-                    string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    _repositoryConnector.ReceiveFromClient(new DeltaMessageContext(clientInfo,
-                            _deltaSerializer.Deserialize<IDeltaContent>(receivedMessage)));
-                    break;
+                    case WebSocketMessageType.Text:
+                        {
+                            string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                            _repositoryConnector.ReceiveFromClient(new DeltaMessageContext(clientInfo,
+                                _deltaSerializer.Deserialize<IDeltaContent>(receivedMessage)));
+                            break;
+                        }
+                    case WebSocketMessageType.Close:
+                        await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "",
+                            CancellationToken.None);
+                        _repositoryConnector.RemoveClient(clientInfo);
+                        break;
                 }
-                case WebSocketMessageType.Close:
-                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "",
-                        CancellationToken.None);
-                    _repositoryConnector.RemoveClient(clientInfo);
-                    break;
+            } catch (Exception e)
+            {
+                Log(e.ToString());
             }
         }
 

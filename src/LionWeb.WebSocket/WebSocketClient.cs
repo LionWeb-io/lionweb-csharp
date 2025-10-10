@@ -61,16 +61,23 @@ public class WebSocketClient
             byte[] receiveBuffer = new byte[BufferSize];
             while (_clientWebSocket.State == WebSocketState.Open)
             {
-                WebSocketReceiveResult result =
-                    await _clientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                if (result.MessageType == WebSocketMessageType.Text)
+                try
                 {
-                    string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, result.Count);
-                    // Log($"XXClient: received message: {receivedMessage}");
-                    var deserialized = _deltaSerializer.Deserialize<IDeltaContent>(receivedMessage);
-                    // do NOT await
-                    Task.Run(() => _clientConnector.ReceiveFromRepository(deserialized));
-                    // Log($"XXClient: processed message: {receivedMessage}");
+                    WebSocketReceiveResult result =
+                        await _clientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer),
+                            CancellationToken.None);
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, result.Count);
+                        // Log($"XXClient: received message: {receivedMessage}");
+                        var deserialized = _deltaSerializer.Deserialize<IDeltaContent>(receivedMessage);
+                        // do NOT await
+                        Task.Run(() => _clientConnector.ReceiveFromRepository(deserialized));
+                        // Log($"XXClient: processed message: {receivedMessage}");
+                    }
+                } catch (Exception e)
+                {
+                    Log(e.ToString());
                 }
             }
         });
