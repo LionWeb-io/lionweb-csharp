@@ -16,7 +16,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * `SignOff`
   * `Reconnect`
   * `ListPartitions`
-* Added command line interface (CLI) for the LionWeb C# generator.
+* Added command line interface (CLI) for the LionWeb C# generator, published as `LionWebGenerator` dotnet tool.
 * Added `JsonUtils.ReadNodesFromStream()` to load nodes from strings synchronously.
 * Added benchmarking project.
 * Introduced `INotifiableNode`. Represents nodes that support notifications.
