@@ -10,6 +10,8 @@
         <RootNamespace>LionWeb.Generator</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,10 +33,5 @@
         <PackagePath>/</PackagePath>
       </None>
     </ItemGroup>
-
-    <PropertyGroup>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    </PropertyGroup>
 
 </Project>
