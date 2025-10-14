@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.3.0] - tbd
+## [0.3.0] - 2025-10-13
 
 ### Added
 * Added generic add/insert/remove node api for multiple `link` (references and containments) features.
@@ -17,7 +17,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * `SignOff`
   * `Reconnect`
   * `ListPartitions`
-* Added command line interface (CLI) for the LionWeb C# generator.
+* Added command line interface (CLI) for the LionWeb C# generator, published as `LionWebGenerator` dotnet tool.
 * Added `JsonUtils.ReadNodesFromStream()` to load nodes from strings synchronously.
 * Added benchmarking project.
 * Introduced `INotifiableNode`. Represents nodes that support notifications.

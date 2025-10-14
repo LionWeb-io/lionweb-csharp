@@ -10,6 +10,10 @@
         <RootNamespace>LionWeb.Generator.Cli</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>LionWebGenerator</ToolCommandName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,14 +30,6 @@
             <Pack>true</Pack>
             <PackagePath>/</PackagePath>
         </None>
-        <None Update="LICENSE">
-          <Pack>true</Pack>
-          <PackagePath>\</PackagePath>
-        </None>
-        <None Update="README.md">
-          <Pack>true</Pack>
-          <PackagePath>\</PackagePath>
-        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -41,10 +37,5 @@
       <ProjectReference Include="..\LionWeb.Generator.MpsSpecific\LionWeb.Generator.MpsSpecific.csproj" />
       <ProjectReference Include="..\LionWeb.Generator\LionWeb.Generator.csproj" />
     </ItemGroup>
-
-    <PropertyGroup>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    </PropertyGroup>
 
 </Project>

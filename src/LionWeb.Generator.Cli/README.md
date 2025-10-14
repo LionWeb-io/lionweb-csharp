@@ -5,6 +5,12 @@ This project contains a command-line interface for the [LionWeb C# generator](ht
 We can configure the generator via command-line options, or a configuration file.
 If we provide both, command-line options override the corresponding setting in the configuration file.
 
+## Installation
+
+```
+dotnet tool install LionWeb-CSharp-Generator-Cli
+```
+
 ## Usage
 
 ```
