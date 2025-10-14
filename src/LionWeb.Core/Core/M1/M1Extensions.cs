@@ -19,7 +19,6 @@ namespace LionWeb.Core.M1;
 
 using M2;
 using M3;
-using Notification;
 using System.Collections;
 
 /// <summary>
@@ -54,8 +53,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node with no parent");
 
-        list.Insert(index, newPredecessor);
-        parent.Set(containment, list);
+        parent.Insert(containment, index, [newPredecessor]);
     }
 
     /// <summary>
@@ -85,8 +83,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node with no parent");
 
-        list.Insert(index + 1, newSuccessor);
-        parent.Set(containment, list);
+        parent.Insert(containment, index + 1, [newSuccessor]);
     }
 
     /// <summary>
@@ -128,16 +125,15 @@ public static class M1Extensions
 
     /// <summary>
     /// Replaces <paramref name="self"/> in its parent with <paramref name="replacement"/>.
-    /// 
+    ///
     /// Does <i>not</i> change references to <paramref name="self"/>.
     /// </summary>
     /// <param name="self">Base node, must have a parent.</param>
     /// <param name="replacement">Node that will replace <paramref name="self"/> in <paramref name="self"/>'s parent.</param>
-    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of <paramref name="replacement"/>.</typeparam>
     /// <returns><paramref name="replacement"/></returns>
     /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
-    public static T ReplaceWith<T>(this INode self, T replacement,  INotificationId? notificationId = null) where T : INode
+    public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
     {
         if (ReferenceEquals(self, replacement))
             return replacement;
@@ -145,7 +141,7 @@ public static class M1Extensions
         INode? parent = self.GetParent();
         if (parent == null)
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
-
+        
         if (replacement is null)
             throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
         
@@ -157,8 +153,8 @@ public static class M1Extensions
             if (index < 0)
                 // should not happen
                 throw new TreeShapeException(self, "Node not contained in its parent");
-            parent.InsertAnnotations(index, [replacement], notificationId);
-            parent.RemoveAnnotations([self], notificationId);
+            parent.Insert(containment, index, [replacement]);
+            parent.Remove(containment, [self]);
             
             return replacement;
         }
@@ -191,10 +187,11 @@ public static class M1Extensions
                 nodes.Remove(self);
             }
             
-            parent.Set(containment, nodes, notificationId);
+            parent.Insert(containment, index, [replacement]);
+            parent.Remove(containment, [self]);
         } else
         {
-            parent.Set(containment, replacement, notificationId);
+            parent.Set(containment, replacement);
         }
 
         return replacement;

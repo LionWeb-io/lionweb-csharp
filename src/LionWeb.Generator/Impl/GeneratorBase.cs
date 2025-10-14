@@ -177,4 +177,16 @@ public abstract class GeneratorBase
     /// <returns><c>SetMyFeature</c></returns>
     protected string FeatureSet(Feature feature) =>
         $"Set{feature.Name.ToFirstUpper()}";
+    
+    /// <returns><c>AddLink</c></returns>
+    protected string AddLink(Link link) =>
+        $"Add{link.Name.ToFirstUpper()}";
+    
+    /// <returns><c>InsertLink</c></returns>
+    protected string InsertLink(Link link) =>
+        $"Insert{link.Name.ToFirstUpper()}";
+    
+    /// <returns><c>RemoveLink</c></returns>
+    protected string RemoveLink(Link link) =>
+        $"Remove{link.Name.ToFirstUpper()}";
 }

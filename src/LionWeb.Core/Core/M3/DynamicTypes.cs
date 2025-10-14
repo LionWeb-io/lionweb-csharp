@@ -1148,7 +1148,15 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
     /// <inheritdoc cref="Entities"/>
     public void AddEntities(IEnumerable<LanguageEntity> entities) =>
         _entities.AddRange(SetSelfParent(entities?.ToList(), _m3.Language_entities));
-
+  
+    /// <inheritdoc cref="Entities"/>
+    public void InsertEntities(Index index, IEnumerable<LanguageEntity> entities) =>
+        _entities.InsertRange(index, SetSelfParent(entities?.ToList(), _m3.Language_entities));
+    
+    /// <inheritdoc cref="Entities"/>
+    public void RemoveEntities(IEnumerable<LanguageEntity> entities) =>
+        RemoveSelfParent(entities?.ToList(), _entities, _m3.Language_entities);
+    
     private readonly List<Language> _dependsOn = [];
 
     /// <inheritdoc />
@@ -1157,10 +1165,29 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
     /// <inheritdoc cref="DependsOn"/>
     public void AddDependsOn(IEnumerable<Language> languages)
     {
-        AssureNotNull(languages, _m3.Language_dependsOn);
         var safeNodes = languages.ToList();
+        AssureNotNull(languages, _m3.Language_dependsOn);
         AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
         _dependsOn.AddRange(safeNodes);
+    }
+
+    /// <inheritdoc cref="DependsOn"/>
+    public void InsertDependsOn(Index index, IEnumerable<Language> languages)
+    {
+        var safeNodes = languages.ToList();
+        AssureNotNull(languages, _m3.Language_dependsOn);
+        AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
+        _dependsOn.InsertRange(index, safeNodes);
+    }
+    
+    
+    /// <inheritdoc cref="DependsOn"/>
+    public void RemoveDependsOn(IEnumerable<Language> languages)
+    {
+        var safeNodes = languages.ToList();
+        AssureNotNull(languages, _m3.Language_dependsOn);
+        AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
+        RemoveAll(safeNodes, _dependsOn, null);
     }
 
     /// <inheritdoc cref="IConceptInstance.GetClassifier()" />
@@ -1280,6 +1307,70 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         return false;
     }
+    
+    /// <inheritdoc />
+    protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (base.AddInternal(link, nodes))
+            return true;
+
+        if (_m3.Language_entities.EqualsIdentity(link))
+        {
+            AddEntities(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
+            return true;
+        }
+
+        if (_m3.Language_dependsOn.EqualsIdentity(link))
+        {
+            AddDependsOn(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList());
+            return true;
+        }
+
+        return false;
+    }
+    
+    /// <inheritdoc />
+    protected override bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (base.InsertInternal(link, index, nodes))
+            return true;
+
+        if (_m3.Language_entities.EqualsIdentity(link))
+        {
+            InsertEntities(index, _m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
+            return true;
+        }
+        
+        if (_m3.Language_dependsOn.EqualsIdentity(link))
+        {
+            InsertDependsOn(index, _m3.Language_dependsOn.AsNodes<Language>(nodes).ToList());
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (base.RemoveInternal(link, nodes))
+            return true;
+        
+        if (_m3.Language_entities.EqualsIdentity(link))
+        {
+            RemoveEntities(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
+            return true;
+        }
+        
+        if (_m3.Language_dependsOn.EqualsIdentity(link))
+        {
+            RemoveDependsOn(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList());
+            return true;
+        }
+        
+        return false;
+    }
+    
 
     /// <inheritdoc cref="GetFactory"/>
     public INodeFactory? NodeFactory { private get; set; }
