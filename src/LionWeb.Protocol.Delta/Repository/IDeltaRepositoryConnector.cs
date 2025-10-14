@@ -1,4 +1,4 @@
-﻿// Copyright 2025 TRUMPF Laser SE and other contributors
+// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification;
+namespace LionWeb.Protocol.Delta.Repository;
 
-/// Any notification in the LionWeb notification system.
-public interface INotification
+using Message;
+
+public interface IDeltaRepositoryConnector : IRepositoryConnector<IDeltaContent>
 {
-    /// Globally unique id of this notification.
-    INotificationId NotificationId { get; set; }
-    
-    HashSet<IReadableNode> AffectedNodes { get; }
+    void AddClient(IClientInfo clientInfo, IDeltaRepositoryClient clientConnector);
+    void RemoveClient(ClientInfo clientInfo);
 }
 
-/// ID of a notification in the LionWeb notification system.
-public interface INotificationId;
+public interface IDeltaMessageContext : IMessageContext<IDeltaContent>;
+
+public record DeltaMessageContext(IClientInfo ClientInfo, IDeltaContent Content) : IDeltaMessageContext;

@@ -15,16 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification;
+namespace LionWeb.Protocol.Delta.Repository;
 
-/// Any notification in the LionWeb notification system.
-public interface INotification
+using Message;
+
+public interface IRepositoryClient<T>
 {
-    /// Globally unique id of this notification.
-    INotificationId NotificationId { get; set; }
-    
-    HashSet<IReadableNode> AffectedNodes { get; }
+    Task SendToClient(T content);
 }
 
-/// ID of a notification in the LionWeb notification system.
-public interface INotificationId;
+public interface IDeltaRepositoryClient : IRepositoryClient<IDeltaContent>;

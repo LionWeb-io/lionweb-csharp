@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>LionWeb-CSharp-WebSocket</AssemblyName>
+        <PackageTags>LionWeb</PackageTags>
+        <RootNamespace>LionWeb.WebSocket</RootNamespace>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LionWeb.Core\LionWeb.Core.csproj" />
+      <ProjectReference Include="..\LionWeb.Protocol.Delta\LionWeb.Protocol.Delta.csproj" />
+    </ItemGroup>
+
+</Project>

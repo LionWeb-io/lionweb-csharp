@@ -442,7 +442,7 @@ public class ComparerReferenceTests : ComparerTestsBase
             parentB,
             new UnsetFeatureRightDifference(left, leftBillOfMaterialsMaterials, right) { Parent = parentB },
             new NodeCountDifference(left, 1, leftBillOfMaterialsMaterials, right, 0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, leftBillOfMaterialsMaterials, left0) { Parent = parentB }
+            new LeftSurplusNodeDifference(left, right, leftBillOfMaterialsMaterials, left0) { Parent = parentB }
         );
     }
 
@@ -464,7 +464,7 @@ public class ComparerReferenceTests : ComparerTestsBase
             parentA,
             parentB,
             new NodeCountDifference(left, 1, leftBillOfMaterialsMaterials, right, 2) { Parent = parentB },
-            new RightSurplusNodeDifference(right, leftBillOfMaterialsMaterials, right1) { Parent = parentB }
+            new RightSurplusNodeDifference(left, right, leftBillOfMaterialsMaterials, right1) { Parent = parentB }
         );
     }
 
@@ -484,7 +484,7 @@ public class ComparerReferenceTests : ComparerTestsBase
             parentB,
             new UnsetFeatureLeftDifference(left, rightBillOfMaterialsMaterials, right) { Parent = parentB },
             new NodeCountDifference(left, 0, rightBillOfMaterialsMaterials, right, 1) { Parent = parentB },
-            new RightSurplusNodeDifference(right, rightBillOfMaterialsMaterials, right0) { Parent = parentB }
+            new RightSurplusNodeDifference(left, right, rightBillOfMaterialsMaterials, right0) { Parent = parentB }
         );
     }
 
@@ -506,8 +506,8 @@ public class ComparerReferenceTests : ComparerTestsBase
             parentB,
             new UnsetFeatureRightDifference(left, leftBillOfMaterialsMaterials, right) { Parent = parentB },
             new NodeCountDifference(left, 2, leftBillOfMaterialsMaterials, right, 0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, leftBillOfMaterialsMaterials, left0) { Parent = parentB },
-            new LeftSurplusNodeDifference(left, leftBillOfMaterialsMaterials, left1) { Parent = parentB }
+            new LeftSurplusNodeDifference(left, right, leftBillOfMaterialsMaterials, left0) { Parent = parentB },
+            new LeftSurplusNodeDifference(left, right, leftBillOfMaterialsMaterials, left1) { Parent = parentB }
         );
     }
 }

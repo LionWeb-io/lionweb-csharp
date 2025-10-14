@@ -72,14 +72,14 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
         _replicator.ConnectTo( new LocalNotificationReceiver(name, this));
 
-        _connector.ReceiveFromRepository += OnReceiveFromRepository;
+        _connector.ReceivedFromRepository += OnReceivedFromRepository;
     }
 
     /// <inheritdoc />
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        _connector.ReceiveFromRepository -= OnReceiveFromRepository;
+        _connector.ReceivedFromRepository -= OnReceivedFromRepository;
         _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
@@ -104,7 +104,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     protected abstract void Receive(T deltaContent);
 
-    private void OnReceiveFromRepository(object? _, T content) =>
+    private void OnReceivedFromRepository(object? _, T content) =>
         Receive(content);
 
     #endregion

@@ -22,8 +22,9 @@ using Message;
 
 public interface IClientConnector<T>
 {
+    event EventHandler<T> ReceivedFromRepository;
+    
     Task SendToRepository(T content);
-    event EventHandler<T> ReceiveFromRepository;
 
     T Convert(INotification notification);
 }

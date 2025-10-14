@@ -15,16 +15,23 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification;
+namespace LionWeb.WebSocket;
 
-/// Any notification in the LionWeb notification system.
-public interface INotification
+using Protocol.Delta;
+using Protocol.Delta.Message;
+using Protocol.Delta.Repository;
+using System.Net.WebSockets;
+using System.Text;
+
+public class WebSocketDeltaRepositoryClient(WebSocket webSocket) : IDeltaRepositoryClient
 {
-    /// Globally unique id of this notification.
-    INotificationId NotificationId { get; set; }
-    
-    HashSet<IReadableNode> AffectedNodes { get; }
-}
+    private readonly DeltaSerializer _deltaSerializer = new();
 
-/// ID of a notification in the LionWeb notification system.
-public interface INotificationId;
+    /// <inheritdoc />
+    public async Task SendToClient(IDeltaContent content) =>
+        await webSocket.SendAsync(Encode(_deltaSerializer.Serialize(content)), WebSocketMessageType.Text, true,
+            CancellationToken.None);
+    
+    private static byte[] Encode(string msg) =>
+        Encoding.UTF8.GetBytes(msg);
+}
