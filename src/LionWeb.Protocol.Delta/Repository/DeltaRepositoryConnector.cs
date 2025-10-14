@@ -47,7 +47,7 @@ public class DeltaRepositoryConnector : IDeltaRepositoryConnector
         _clients.Remove(clientInfo);
 
     /// <inheritdoc />
-    public async Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
+    public async Task SendToClient(IDeltaContent content, IClientInfo clientInfo)
     {
         if ((clientInfo.SignedOn || content is IDeltaError || !content.RequiresParticipationId) &&
             _clients.TryGetValue(clientInfo, out var clientConnector))

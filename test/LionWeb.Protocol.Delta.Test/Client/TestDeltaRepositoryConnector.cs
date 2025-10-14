@@ -34,7 +34,7 @@ internal class TestDeltaRepositoryConnector : IDeltaRepositoryConnector
 
     public Action<IDeltaContent> Sender { get; set; }
 
-    public Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
+    public Task SendToClient(IDeltaContent content, IClientInfo clientInfo)
     {
         Sender?.Invoke(content);
         return Task.CompletedTask;

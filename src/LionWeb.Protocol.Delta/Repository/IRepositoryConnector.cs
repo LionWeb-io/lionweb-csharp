@@ -26,7 +26,7 @@ public interface IRepositoryConnector<T>
     
     void ReceiveFromClient(IMessageContext<IDeltaContent> message);
     
-    Task SendToClient(IClientInfo clientInfo, T content);
+    Task SendToClient(T content, IClientInfo clientInfo);
     
     Task SendToAllClients(T content, HashSet<NodeId> affectedPartitions);
 

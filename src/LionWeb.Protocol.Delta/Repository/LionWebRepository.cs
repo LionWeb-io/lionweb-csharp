@@ -253,7 +253,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         try
         {
             Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
-            await _connector.SendToClient(clientInfo, deltaContent);
+            await _connector.SendToClient(deltaContent, clientInfo);
         } catch (Exception e)
         {
             OnCommunicationError(e);
