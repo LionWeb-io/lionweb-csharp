@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src/",
+          "files": [
+            "**/LionWeb.Core/bin/Debug/net8.0/LionWeb-CSharp.dll"
+          ]
+        }
+      ],
+      "output": "api/lionweb-core",
+      "outputFormat": "apiPage",
+      "namespaceLayout": "nested"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**"
+        ]
+      }
+
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "LionWeb-CSharp",
+      "_appTitle": "LionWeb-CSharp API Documentation",
+      "_enableSearch": true,
+      "pdf": false
+    }
+  }
+}
