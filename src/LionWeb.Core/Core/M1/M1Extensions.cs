@@ -50,7 +50,7 @@ public static class M1Extensions
         var index = enumerable.AsNodes<INode>().GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
-            throw new TreeShapeException(self, "Cannot insert before a node with no parent");
+            throw new TreeShapeException(self, $"Node with id {self.GetId()} is not found in its containment");
 
         parent.Insert(containment, index, [newPredecessor]);
     }
@@ -79,7 +79,7 @@ public static class M1Extensions
         var index = enumerable.AsNodes<INode>().GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
-            throw new TreeShapeException(self, "Cannot insert after a node with no parent");
+            throw new TreeShapeException(self, $"Node with id {self.GetId()} is not found in its containment");
 
         parent.Insert(containment, index + 1, [newSuccessor]);
     }
