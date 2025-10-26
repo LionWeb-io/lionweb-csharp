@@ -47,7 +47,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var index = enumerable.AsNodes<INode>().GetIndexOf(node => node == self);
+        var index = enumerable.Cast<INode>().GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
@@ -76,7 +76,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
-        var index = enumerable.AsNodes<INode>().GetIndexOf(node => node == self);
+        var index = enumerable.Cast<INode>().GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
