@@ -47,8 +47,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
-        var index = list.IndexOf(self);
+        var index = enumerable.AsNodes<INode>().GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node with no parent");
@@ -77,8 +76,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
-        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
-        var index = list.IndexOf(self);
+        var index = enumerable.AsNodes<INode>().GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node with no parent");
@@ -137,14 +135,14 @@ public static class M1Extensions
     {
         if (ReferenceEquals(self, replacement))
             return replacement;
-        
+
         INode? parent = self.GetParent();
         if (parent == null)
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
-        
+
         if (replacement is null)
             throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
-        
+
         Containment? containment = parent.GetContainmentOf(self);
 
         if (containment == null)
@@ -155,7 +153,7 @@ public static class M1Extensions
                 throw new TreeShapeException(self, "Node not contained in its parent");
             parent.Insert(containment, index, [replacement]);
             parent.Remove(containment, [self]);
-            
+
             return replacement;
         }
 
@@ -174,7 +172,7 @@ public static class M1Extensions
 
             var replacementParent = replacement.GetParent();
             var replacementContainment = replacementParent?.GetContainmentOf(replacement);
-            
+
             if (containment.Equals(replacementContainment))
             {
                 var replacementIndex = nodes.IndexOf(replacement);
@@ -186,7 +184,7 @@ public static class M1Extensions
                 nodes.Insert(index, replacement);
                 nodes.Remove(self);
             }
-            
+
             parent.Insert(containment, index, [replacement]);
             parent.Remove(containment, [self]);
         } else
@@ -254,7 +252,7 @@ public static class M1Extensions
     #endregion
 
     #region Children
-    
+
     /// <summary>
     /// Enumerates all direct children of <paramref name="self"/>.
     /// Optionally includes <paramref name="self"/> and/or directly contained annotations.
@@ -333,7 +331,7 @@ public static class M1Extensions
     }
 
     #endregion
-    
+
     /// <summary>
     /// Returns the first ancestor of <paramref name="self"/> that matches with type <typeparamref name="T"/>
     /// Optionally includes <paramref name="self"/>.
@@ -366,7 +364,7 @@ public static class M1Extensions
             return null;
         }
     }
-    
+
     /// <summary>
     /// Returns the highest ancestor that's a <see cref="IPartitionInstance"/>, might be <paramref name="self"/>.
     /// It's NOT guaranteed that the returned node is also the root,
@@ -374,7 +372,7 @@ public static class M1Extensions
     /// </summary>
     /// <param name="self">Base node to get partition of.</param>
     public static IPartitionInstance? GetPartition(this IReadableNode self) =>
-     self.GetParent()?.GetPartition() ?? self as IPartitionInstance;
+        self.GetParent()?.GetPartition() ?? self as IPartitionInstance;
 
     private static List<INode> GetContainmentNodes(INode self)
     {
@@ -392,5 +390,18 @@ public static class M1Extensions
             throw new TreeShapeException(self, "A single containment does not have siblings");
 
         return [..containment.AsNodes<INode>(enumerable)];
+    }
+
+    private static Index GetIndexOf<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
+    {
+        var index = 0;
+        foreach (var item in enumerable)
+        {
+            if (predicate(item))
+                return index;
+            index++;
+        }
+
+        return -1;
     }
 }
