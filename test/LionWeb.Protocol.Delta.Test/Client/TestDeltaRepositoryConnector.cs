@@ -20,27 +20,41 @@ namespace LionWeb.Protocol.Delta.Test.Client;
 using Core;
 using Core.Notification;
 using Delta.Client;
+using Delta.Repository;
 using Message;
 
-internal class DeltaClientConnector : IDeltaClientConnector
+internal class TestDeltaRepositoryConnector : IDeltaRepositoryConnector
 {
-    private readonly Action<IDeltaContent> _sender;
     private readonly NotificationToDeltaCommandMapper _mapper;
 
-    public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
+    public TestDeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
-        _sender = sender;
         _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
     }
 
-    public Task SendToRepository(IDeltaContent content)
+    public Action<IDeltaContent> Sender { get; set; }
+
+    public Task SendToClient(IDeltaContent content, IClientInfo clientInfo)
     {
-        _sender(content);
+        Sender?.Invoke(content);
         return Task.CompletedTask;
     }
 
-    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
+    public Task SendToAllClients(IDeltaContent content, HashSet<NodeId> affectedPartitions)
+    {
+        Sender?.Invoke(content);
+        return Task.CompletedTask;
+    }
 
-    public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
+    public void AddClient(IClientInfo clientInfo, IDeltaRepositoryClient clientConnector)
+    {
+    }
+
+    public void RemoveClient(ClientInfo clientInfo)
+    {
+    }
+
+    public event EventHandler<IMessageContext<IDeltaContent>>? ReceivedFromClient;
+    public void ReceiveFromClient(IMessageContext<IDeltaContent> message) => ReceivedFromClient?.Invoke(null, message);
     public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }

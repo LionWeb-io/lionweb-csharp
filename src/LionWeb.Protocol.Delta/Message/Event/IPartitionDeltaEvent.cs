@@ -1153,7 +1153,7 @@ public record EntryMovedFromOtherReference(
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override HashSet<NodeId> AffectedNodes => [Parent];
+    public override HashSet<NodeId> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     [JsonIgnore]
