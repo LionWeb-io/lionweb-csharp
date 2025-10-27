@@ -98,7 +98,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         );
 
     #endregion
-    
+
     #region SetInternal
 
     private MethodDeclarationSyntax GenSetInternal() =>
@@ -199,7 +199,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment, bool writeable = false) =>
     [
-        SafeNodesVar(containment, "value", writeable: writeable),
+        SafeNodesVar(containment, writeable: writeable),
         SetContainmentEmitterVariable(containment),
         EmitterCollectOldDataCall(),
         RemoveSelfParentCall(containment),
@@ -210,7 +210,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment, bool writeable = false) =>
     [
-        SafeNodesVar(containment, "value", writeable: writeable),
+        SafeNodesVar(containment, writeable: writeable),
         AssureNonEmptyCall(containment),
         SetContainmentEmitterVariable(containment),
         EmitterCollectOldDataCall(),
@@ -222,7 +222,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private List<StatementSyntax> GenSetInternalMultiOptionalReference(Reference reference) =>
     [
-        SafeNodesVar(reference, "value"),
+        SafeNodesVar(reference),
         AssureNotNullCall(reference),
         AssureNotNullMembersCall(reference),
         SetReferenceEmitterVariable(reference),
@@ -235,7 +235,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private List<StatementSyntax> GenSetInternalMultiRequiredReference(Reference reference) =>
     [
-        SafeNodesVar(reference, "value"),
+        SafeNodesVar(reference),
         AssureNonEmptyCall(reference),
         SetReferenceEmitterVariable(reference),
         EmitterCollectOldDataCall(),
@@ -292,16 +292,16 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         );
 
     private LocalDeclarationStatementSyntax EnumerableVar(Link link, bool writeable = false) =>
-        Variable("enumerable", Var(), AsNodesCall(link, "value", writeable: writeable));
+        Variable("enumerable", Var(), AsNodesCall(link, writeable: writeable));
 
     private LocalDeclarationStatementSyntax EnumerableToListVar(Link link, bool writeable = false) =>
         Variable("enumerable", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link, "value", writeable: writeable), IdentifierName("ToList")))
+            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
         );
 
-    private LocalDeclarationStatementSyntax SafeNodesVar(Link link, string argument, bool writeable = false) =>
+    private LocalDeclarationStatementSyntax SafeNodesVar(Link link, bool writeable = false) =>
         Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link, argument, writeable: writeable), IdentifierName("ToList")))
+            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
         );
 
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
@@ -327,13 +327,13 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) =>
         CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)), IdentifierName("value"));
 
-    private InvocationExpressionSyntax AsNodesCall(Link link, string argument, bool writeable = false)
+    private InvocationExpressionSyntax AsNodesCall(Link link, bool writeable = false)
     {
         var invocationExpressionSyntax = InvocationExpression(
             MemberAccess(MetaProperty(link),
                 Generic("AsNodes", AsType(link.Type, true, writeable: writeable))
             ),
-            AsArguments([IdentifierName(argument)])
+            AsArguments([IdentifierName("value")])
         );
 
         return invocationExpressionSyntax;
@@ -346,13 +346,13 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private MethodDeclarationSyntax GenAddInternal() =>
         Method("AddInternal", AsType(typeof(bool)), [
                 Param("link", NullableType(AsType(typeof(Link)))),
-                Param("nodes", AsType(typeof(IEnumerable<IReadableNode>)))
+                Param("value", AsType(typeof(IEnumerable<IReadableNode>)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.AddInternal(link, nodes)"),
+                    IfStatement(ParseExpression("base.AddInternal(link, value)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenAddInternal))
@@ -378,7 +378,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         ExpressionStatement(
             InvocationExpression(
-                IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference, argument: "nodes")]))),
+                IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference)]))),
         ReturnTrue()
     ];
 
@@ -386,7 +386,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         ExpressionStatement(
             InvocationExpression(
-                IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, argument: "nodes", writeable)]))),
+                IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
     
@@ -398,13 +398,13 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         Method("InsertInternal", AsType(typeof(bool)), [
                 Param("link", NullableType(AsType(typeof(Link)))),
                 Param("index", AsType(typeof(int))),
-                Param("nodes", AsType(typeof(IEnumerable<IReadableNode>)))
+                Param("value", AsType(typeof(IEnumerable<IReadableNode>)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.InsertInternal(link, index, nodes)"),
+                    IfStatement(ParseExpression("base.InsertInternal(link, index, value)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenInsertInternal))
@@ -431,7 +431,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         ExpressionStatement(
             InvocationExpression(
-                IdentifierName(InsertLink(reference)), AsArguments([IdentifierName("index"), AsNodesCall(reference, argument: "nodes")]))),
+                IdentifierName(InsertLink(reference)), AsArguments([IdentifierName("index"), AsNodesCall(reference)]))),
         ReturnTrue()
     ];
 
@@ -440,7 +440,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ExpressionStatement(
             InvocationExpression(
                 IdentifierName(InsertLink(containment)),
-                AsArguments([IdentifierName("index"), AsNodesCall(containment, argument: "nodes", writeable)]))),
+                AsArguments([IdentifierName("index"), AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
     
@@ -451,13 +451,13 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private MethodDeclarationSyntax GenRemoveInternal() =>
         Method("RemoveInternal", AsType(typeof(bool)), [
                 Param("link", NullableType(AsType(typeof(Link)))),
-                Param("nodes", AsType(typeof(IEnumerable<IReadableNode>)))
+                Param("value", AsType(typeof(IEnumerable<IReadableNode>)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.RemoveInternal(link, nodes)"),
+                    IfStatement(ParseExpression("base.RemoveInternal(link, value)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenRemoveInternal))
@@ -485,7 +485,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         ExpressionStatement(
             InvocationExpression(
-                IdentifierName(RemoveLink(reference)), AsArguments([AsNodesCall(reference, argument: "nodes")]))),
+                IdentifierName(RemoveLink(reference)), AsArguments([AsNodesCall(reference)]))),
         ReturnTrue()
     ];
 
@@ -494,7 +494,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ExpressionStatement(
             InvocationExpression(
                 IdentifierName(RemoveLink(containment)),
-                AsArguments([AsNodesCall(containment, argument: "nodes", writeable)]))),
+                AsArguments([AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
     
