@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.4.0] - tbd
 ### Added
 * Moved `WebSocketServer` and `WebSocketClient` to separate project in core repo for reuse.
+* Added generic add/insert/remove node api for multiple `link` (references and containments) features. 
 ### Fixed
 ### Removed
 ### Deprecated
@@ -17,7 +18,6 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - 2025-10-13
 
 ### Added
-* Added generic add/insert/remove node api for multiple `link` (references and containments) features.
 * Implemented delta protocol queries for both `LionWebClient` and `LionWebRepository`:
   * `SubscribeToChangingPartitions`
   * `SubscribeToPartitionContents`
