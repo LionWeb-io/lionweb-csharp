@@ -235,6 +235,7 @@ public interface IWritableNode : IReadableNode
     
     /// <summary>
     /// Removes the specified nodes from the given <paramref name="link"/> feature of this node.
+    /// If one of the node in <see cref="nodes"/> is not found in <paramref name="link"/> feature, it is simply ignored.
     /// </summary>
     /// <param name="link">The link feature from which nodes will be removed.</param>
     /// <param name="nodes">The nodes to remove from the link feature.</param>
