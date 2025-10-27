@@ -620,13 +620,13 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(link))
 		{
-			AddBooks(LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(nodes));
+			AddBooks(LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value));
 			return true;
 		}
 
@@ -634,13 +634,13 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(link))
 		{
-			InsertBooks(index, LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(nodes));
+			InsertBooks(index, LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value));
 			return true;
 		}
 
@@ -648,13 +648,13 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(link))
 		{
-			RemoveBooks(LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(nodes));
+			RemoveBooks(LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value));
 			return true;
 		}
 

@@ -373,13 +373,13 @@ public partial class DeprConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(link))
 		{
-			AddDeprChild(DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprIface>(nodes));
+			AddDeprChild(DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprIface>(value));
 			return true;
 		}
 
@@ -387,13 +387,13 @@ public partial class DeprConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(link))
 		{
-			InsertDeprChild(index, DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprIface>(nodes));
+			InsertDeprChild(index, DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprIface>(value));
 			return true;
 		}
 
@@ -401,13 +401,13 @@ public partial class DeprConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(link))
 		{
-			RemoveDeprChild(DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprIface>(nodes));
+			RemoveDeprChild(DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprIface>(value));
 			return true;
 		}
 

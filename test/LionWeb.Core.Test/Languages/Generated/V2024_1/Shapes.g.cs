@@ -610,25 +610,25 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(link))
 		{
-			AddAltGroups(ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(nodes));
+			AddAltGroups(ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(link))
 		{
-			AddGroups(ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(nodes));
+			AddGroups(ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(link))
 		{
-			AddMaterials(ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			AddMaterials(ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -636,25 +636,25 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(link))
 		{
-			InsertAltGroups(index, ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(nodes));
+			InsertAltGroups(index, ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(link))
 		{
-			InsertGroups(index, ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(nodes));
+			InsertGroups(index, ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(link))
 		{
-			InsertMaterials(index, ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			InsertMaterials(index, ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -662,25 +662,25 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(link))
 		{
-			RemoveAltGroups(ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(nodes));
+			RemoveAltGroups(ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(link))
 		{
-			RemoveGroups(ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(nodes));
+			RemoveGroups(ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(link))
 		{
-			RemoveMaterials(ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			RemoveMaterials(ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -1109,19 +1109,19 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(link))
 		{
-			AddDisabledParts(ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			AddDisabledParts(ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(link))
 		{
-			AddParts(ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			AddParts(ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -1129,19 +1129,19 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(link))
 		{
-			InsertDisabledParts(index, ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			InsertDisabledParts(index, ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(link))
 		{
-			InsertParts(index, ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			InsertParts(index, ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -1149,19 +1149,19 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(link))
 		{
-			RemoveDisabledParts(ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			RemoveDisabledParts(ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(link))
 		{
-			RemoveParts(ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			RemoveParts(ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -1639,13 +1639,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
 		{
-			AddShapes(ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			AddShapes(ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -1653,13 +1653,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
 		{
-			InsertShapes(index, ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			InsertShapes(index, ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -1667,13 +1667,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
 		{
-			RemoveShapes(ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			RemoveShapes(ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -2096,13 +2096,13 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(link))
 		{
-			AddMaterials(ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			AddMaterials(ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -2110,13 +2110,13 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(link))
 		{
-			InsertMaterials(index, ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			InsertMaterials(index, ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -2124,13 +2124,13 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(link))
 		{
-			RemoveMaterials(ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			RemoveMaterials(ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -2572,13 +2572,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(link))
 		{
-			AddShapes(ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			AddShapes(ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -2586,13 +2586,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(link))
 		{
-			InsertShapes(index, ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			InsertShapes(index, ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -2600,13 +2600,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(link))
 		{
-			RemoveShapes(ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
+			RemoveShapes(ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value));
 			return true;
 		}
 
@@ -2859,13 +2859,13 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(link))
 		{
-			AddFixpoints(ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord>(nodes));
+			AddFixpoints(ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord>(value));
 			return true;
 		}
 
@@ -2873,13 +2873,13 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(link))
 		{
-			InsertFixpoints(index, ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord>(nodes));
+			InsertFixpoints(index, ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord>(value));
 			return true;
 		}
 
@@ -2887,13 +2887,13 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(link))
 		{
-			RemoveFixpoints(ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord>(nodes));
+			RemoveFixpoints(ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord>(value));
 			return true;
 		}
 

@@ -196,13 +196,13 @@ public partial class Container : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(link))
 		{
-			AddLibraries(MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(nodes));
+			AddLibraries(MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(value));
 			return true;
 		}
 
@@ -210,13 +210,13 @@ public partial class Container : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(link))
 		{
-			InsertLibraries(index, MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(nodes));
+			InsertLibraries(index, MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(value));
 			return true;
 		}
 
@@ -224,13 +224,13 @@ public partial class Container : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(link))
 		{
-			RemoveLibraries(MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(nodes));
+			RemoveLibraries(MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(value));
 			return true;
 		}
 

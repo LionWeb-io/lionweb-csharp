@@ -297,13 +297,13 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.AddInternal(link, nodes))
+		if (base.AddInternal(link, value))
 			return true;
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(link))
 		{
-			AddMultivaluedRef(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(nodes));
+			AddMultivaluedRef(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(value));
 			return true;
 		}
 
@@ -311,13 +311,13 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
-		if (base.InsertInternal(link, index, nodes))
+		if (base.InsertInternal(link, index, value))
 			return true;
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(link))
 		{
-			InsertMultivaluedRef(index, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(nodes));
+			InsertMultivaluedRef(index, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(value));
 			return true;
 		}
 
@@ -325,13 +325,13 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
-		if (base.RemoveInternal(link, nodes))
+		if (base.RemoveInternal(link, value))
 			return true;
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(link))
 		{
-			RemoveMultivaluedRef(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(nodes));
+			RemoveMultivaluedRef(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(value));
 			return true;
 		}
 
