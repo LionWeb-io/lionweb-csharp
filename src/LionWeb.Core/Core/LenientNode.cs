@@ -20,8 +20,8 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using Notification;
-using Notification.Pipe;
 using Notification.Partition;
+using Notification.Pipe;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
@@ -189,9 +189,9 @@ public class LenientNode : NodeBase, INode
     {
         if (feature == null)
         {
-            var enumerable = M2Extensions.AsNodes<INode>(value).ToList();
+            var annotations = M2Extensions.AsNodes<INode>(value).ToList();
             RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
-            AddAnnotations(enumerable);
+            AddAnnotations(annotations);
             return true;
         }
 
@@ -262,8 +262,8 @@ public class LenientNode : NodeBase, INode
     {
         if (link == null)
         {
-            var enumerable = M2Extensions.AsNodes<INode>(nodes).ToList();
-            AddAnnotations(enumerable);
+            var annotations = M2Extensions.AsNodes<INode>(nodes).ToList();
+            AddAnnotations(annotations);
             return true;
         }
         
@@ -304,8 +304,8 @@ public class LenientNode : NodeBase, INode
     {
         if (link == null)
         {
-            var enumerable = M2Extensions.AsNodes<INode>(nodes).ToList();
-            InsertAnnotations(index, enumerable);
+            var annotations = M2Extensions.AsNodes<INode>(nodes).ToList();
+            InsertAnnotations(index, annotations);
             return true;
         }
 
@@ -319,8 +319,8 @@ public class LenientNode : NodeBase, INode
     {
         if (link is null)
         {
-            var enumerable= M2Extensions.AsNodes<INode>(nodes).ToList();
-            RemoveAnnotations(enumerable);
+            var annotations= M2Extensions.AsNodes<INode>(nodes).ToList();
+            RemoveAnnotations(annotations);
             return true;
         }
 
