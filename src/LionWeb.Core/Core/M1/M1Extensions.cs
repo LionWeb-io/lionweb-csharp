@@ -43,11 +43,11 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
         var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
+        if (value is not IEnumerable)
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var index = enumerable.Cast<INode>().GetIndexOf(node => node == self);
+        var index = M2Extensions.AsNodes<INode>(value).GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
@@ -72,11 +72,11 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
         var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
+        if (value is not IEnumerable)
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
-        var index = enumerable.Cast<INode>().GetIndexOf(node => node == self);
+        var index = M2Extensions.AsNodes<INode>(value).GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
@@ -159,11 +159,11 @@ public static class M1Extensions
         if (containment.Multiple)
         {
             var value = parent.Get(containment);
-            if (value is not IEnumerable enumerable)
+            if (value is not IEnumerable)
                 // should not happen
                 throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
 
-            var nodes = enumerable.Cast<INode>().ToList();
+            var nodes = M2Extensions.AsNodes<INode>(value).ToList();
             var index = nodes.IndexOf(self);
             if (index < 0)
                 // should not happen
@@ -282,7 +282,7 @@ public static class M1Extensions
                     $"{self.GetId()} contains itself as child"));
 
         if (includeAnnotations)
-            result = result.Concat(self.GetAnnotations().Cast<T>());
+            result = result.Concat(M2Extensions.AsNodes<T>(self.GetAnnotations()));
 
         if (includeSelf)
             result = result.Prepend(self);

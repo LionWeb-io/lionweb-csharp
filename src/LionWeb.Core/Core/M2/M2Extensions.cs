@@ -375,17 +375,6 @@ public static class M2Extensions
             var (_, v) => throw new InvalidValueException(link, v)
         };
 
-    public static IEnumerable<T> AsNodes<T>(this IEnumerable enumerable) where T : IReadableNode
-    {
-        try
-        {
-            return enumerable.Cast<T>();
-        } catch (InvalidCastException _)
-        {
-            throw new InvalidValueException(null, enumerable);
-        }
-    }
-
     /// <summary>
     /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;
     /// </summary>
