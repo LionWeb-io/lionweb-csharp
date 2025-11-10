@@ -39,6 +39,10 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
     /// Collects <see cref="OldContainmentInfo"/> from <paramref name="value"/>, to be used in <see cref="PartitionNotificationEmitterBase{T}.CollectOldData"/>
     protected OldContainmentInfo? Collect(T value)
     {
+        var oldPartition = value.GetPartition();
+        if (oldPartition == null)
+            return null;
+        
         var oldParent = value.GetParent();
         if (oldParent == null)
             return null;
@@ -50,8 +54,6 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
         var oldIndex = oldContainment.Multiple
             ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(value)
             : 0;
-
-        var oldPartition = value.GetPartition();
 
         return new OldContainmentInfo(oldParent, oldContainment, oldIndex, oldPartition);
     }

@@ -799,8 +799,9 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     #endregion
 
     /// <summary>
-    /// A floating node is not part of a partition, and when it is contained in a partition
-    /// it should be perceived as a new node 
+    /// A floating node is not part of any partition, and when it is contained in a partition
+    /// it should be perceived as a new node. In the test below, replacement node is a floating node,
+    /// Therefore; as a result of replacement, <see cref="ChildReplacedNotification"/> is emitted. 
     /// </summary>
     [TestMethod]
     public void ChildReplaced_floating_node_replaces_existing_node()
@@ -831,6 +832,42 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }   
+    
+    /// <summary>
+    /// Replaced and replacement nodes are part of a (same) partition.
+    /// Therefore <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/> ie emitted.
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_nodes_are_in_same_partition()
+    {
+        var replaced = new Circle("replaced")
+        {
+            Center = new Coord("cc") { X = 2 }
+        };
+
+        var replacement = new Line("replacement")
+        {
+            Start = new Coord("sc") { X = 1 }
+        };
+
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [replacement, replaced]
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        replaced.Center = replacement.Start;
+
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
     }
 }
