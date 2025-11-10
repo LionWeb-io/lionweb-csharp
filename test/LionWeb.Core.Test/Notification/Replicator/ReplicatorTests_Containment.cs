@@ -798,5 +798,39 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
     #endregion
 
-    
+    /// <summary>
+    /// A floating node is not part of a partition, and when it is contained in a partition
+    /// it should be perceived as a new node 
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_floating_node_replaces_existing_node()
+    {
+        var replaced = new Circle("replaced")
+        {
+            Center = new Coord("cc") { X = 2 }
+        };
+
+        var replacement = new Line("replacement")
+        {
+            Start = new Coord("sc") { X = 1 }
+        };
+
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [new Circle("child"), replaced]
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        replaced.Center = replacement.Start;
+
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
 }
