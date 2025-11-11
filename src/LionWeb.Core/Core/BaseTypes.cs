@@ -25,6 +25,7 @@ using Notification.Partition;
 using Notification.Partition.Emitter;
 using Notification.Pipe;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -630,7 +631,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c>, contains any <c>null</c> members,
     /// or both <paramref name="list"/> and <paramref name="storage"/> are empty.</exception>
-    protected void AssureNonEmpty<T>([NotNull] List<T>? list, List<T> storage, Link link)
+    protected void AssureNonEmpty<T>([NotNull] List<T>? list, IList storage, Link link)
     {
         if (list == null || (list.Count == 0 && storage.Count == 0))
             throw new InvalidValueException(link, list);
@@ -696,7 +697,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Link of <paramref name="storage"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> were empty after removing all of <paramref name="safeNodes"/>.</exception>
-    protected void AssureNotClearing<T>(List<T> safeNodes, List<T> storage, Link link) where T : IReadableNode
+    protected void AssureNotClearing<T>(List<T> safeNodes, IList<T> storage, Link link) where T : IReadableNode
     {
         var copy = new List<T>(storage);
         RemoveAll(safeNodes, copy, null);
@@ -783,9 +784,14 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns>Non-empty, read-only view of <paramref name="storage"/>.</returns>
     /// <exception cref="UnsetFeatureException">If <paramref name="storage"/> is empty.</exception>
-    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T> storage, Link link) =>
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T> storage, Link link) where T : IReadableNode =>
         storage.Count != 0
             ? storage.AsReadOnly()
+            : throw new UnsetFeatureException(link);
+
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<ReferenceInfo<T>> storage, Link link) where T : IReadableNode =>
+        storage.Count != 0
+            ? storage.Select(r => r.Target).Where(t => t is not null).ToImmutableList()
             : throw new UnsetFeatureException(link);
 
     /// <summary>
@@ -920,6 +926,26 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
+    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceInfo<T>> storage,
+        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
+        INotificationId? notificationId = null)
+        where T : IReadableNode
+    {
+        var partitionProducer = GetPartitionNotificationProducer();
+
+        foreach (var node in safeNodes)
+        {
+            var index = storage.FindIndex(r => Equals(node, r.Target));
+            if (index < 0)
+                continue;
+
+            storage.RemoveAt(index);
+            if (partitionProducer != null && remover != null)
+                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
+        }
+    }
+
+
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
     protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
         ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
@@ -987,3 +1013,5 @@ public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionIns
     /// <inheritdoc cref="IPartitionInstance.GetNotificationProducer"/>
     protected internal abstract IPartitionNotificationProducer? GetNotificationProducer();
 }
+
+public record struct ReferenceInfo<T>(ResolveInfo? ResolveInfo, NodeId? TargetId, T? Target) where T : IReadableNode;

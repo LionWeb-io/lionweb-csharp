@@ -35,7 +35,7 @@ public interface IListComparer
         new MoveDetector<T>(new ListComparer<T>(left, right));
 
     /// <inheritdoc cref="Create{T}"/>
-    static IListComparer<T> CreateForNodes<T>(List<T> left, List<T> right) where T : IReadableNode =>
+    static IListComparer<T> CreateForNodes<T>(IList<T> left, List<T> right) where T : IReadableNode =>
         new MoveDetector<T>(new ListComparer<T>(left, right, new NodeIdComparer<T>()));
 }
 

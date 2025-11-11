@@ -25,11 +25,16 @@ using Test.Languages.Generated.V2024_1.Shapes.M2;
 public class SerializerBenchmarkBase
 {
     protected readonly Language _language;
-    protected readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    protected readonly LionWebVersions _lionWebVersion;
 
-    public SerializerBenchmarkBase()
+    public SerializerBenchmarkBase() : this(ShapesLanguage.Instance, LionWebVersions.Current)
     {
-        _language = ShapesLanguage.Instance;
+    }
+
+    public SerializerBenchmarkBase(Language language, LionWebVersions lionWebVersion)
+    {
+        _language = language;
+        _lionWebVersion = lionWebVersion;
     }
 
     // private const long _maxSize = 1_500_000L;

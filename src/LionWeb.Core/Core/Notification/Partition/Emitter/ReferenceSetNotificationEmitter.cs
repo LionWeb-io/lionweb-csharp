@@ -31,7 +31,7 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
     /// <param name="safeNodes">Newly added values.</param>
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<T> safeNodes, List<T> storage,
+    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<T> safeNodes, IList<T> storage,
         INotificationId? notificationId = null) :
         base(reference, destinationParent, safeNodes, notificationId)
     {
