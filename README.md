@@ -59,7 +59,12 @@ You find [these settings here](https://github.com/LionWeb-io/lionweb-csharp/sett
 
 ## Development
 
-Run the `make.ps1` PowerShell script to generate all required source files, build all projects, and run all unit tests.
+Run the `make.ps1` PowerShell script to:
+
+* generate all required source files,
+* download the required JSON Schema for the delta protocol into the `LionWeb.Protocol.Delta.Test` project,
+* build all projects,
+* and run all unit tests.
 
 
 ## License

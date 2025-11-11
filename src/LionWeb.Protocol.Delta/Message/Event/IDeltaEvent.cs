@@ -191,7 +191,7 @@ public record NoOpEvent(
     public override HashSet<TargetNode> AffectedNodes => [];
 }
 
-public record Error(
+public record ErrorEvent(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[]? OriginCommands,

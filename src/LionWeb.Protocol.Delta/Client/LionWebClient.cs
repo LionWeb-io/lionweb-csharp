@@ -141,7 +141,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     {
         IncrementEventSequenceNumber();
 
-        if (deltaEvent is Error e)
+        if (deltaEvent is ErrorEvent e)
             throw new DeltaException(e);
 
         var originCommands = deltaEvent.OriginCommands ?? [];
