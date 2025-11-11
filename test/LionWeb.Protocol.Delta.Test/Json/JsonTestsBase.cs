@@ -557,7 +557,7 @@ public abstract class JsonTestsBase
     protected static NoOpEvent CreateNoOpEvent() =>
         new(Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
-    protected static Error CreateError() =>
+    protected static ErrorEvent CreateError() =>
         new("myError", "very nice message", Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     #endregion

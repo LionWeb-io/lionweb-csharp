@@ -45,9 +45,9 @@ public static class DeltaErrorCodeExtensions
         DeltaErrorCode.NotSubscribed => "Not subscribed to partition '{0}'",
     }, args);
 
-    public static Error AsError(this DeltaErrorCode errorCode, CommandSource[]? originCommands,
+    public static ErrorEvent AsError(this DeltaErrorCode errorCode, CommandSource[]? originCommands,
         ProtocolMessage[]? protocolMessages, params object[] args) =>
-        new Error(errorCode.ToString(), GetMessage(errorCode, args), originCommands, protocolMessages);
+        new ErrorEvent(errorCode.ToString(), GetMessage(errorCode, args), originCommands, protocolMessages);
 
     public static ErrorResponse AsErrorResponse(this DeltaErrorCode errorCode, QueryId queryId,
         ProtocolMessage[]? protocolMessages, params object[] args) =>
