@@ -39,14 +39,14 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
     /// Collects <see cref="OldContainmentInfo"/> from <paramref name="value"/>, to be used in <see cref="PartitionNotificationEmitterBase{T}.CollectOldData"/>
     protected OldContainmentInfo? Collect(T value)
     {
-        var oldPartition = value.GetPartition();
-        if (oldPartition == null)
-            return null;
-        
         var oldParent = value.GetParent();
         if (oldParent == null)
             return null;
 
+        var oldPartition = value.GetPartition();
+        if (oldPartition == null)
+            return null;
+        
         var oldContainment = oldParent.GetContainmentOf(value);
         if (oldContainment == null)
             return null;
