@@ -799,7 +799,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     #endregion
 
     /// <summary>
-    /// A floating node is a node which is not part of any partition (in a forest).
+    /// A floating node is a node which is not part of any partition.
     /// In the test below, replacement node is a floating node,
     /// therefore; as a result of replacement, <see cref="ChildReplacedNotification"/> is emitted.  
     /// </summary>
@@ -830,7 +830,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         replaced.Center = replacement.Start;
 
-        AssertUniqueNodeIds([originalPartition, replacement]);
+        AssertUniqueNodeIds(originalPartition, replacement);
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
@@ -838,7 +838,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     
     /// <summary>
     /// Replaced and replacement nodes are part of a (same) partition.
-    /// Therefore <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/> ie emitted.
+    /// Therefore <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/> is emitted.
     /// </summary>
     [TestMethod]
     public void ChildReplaced_nodes_are_in_same_partition()
@@ -867,7 +867,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         replaced.Center = replacement.Start;
 
-        AssertUniqueNodeIds([originalPartition]);
+        AssertUniqueNodeIds(originalPartition);
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
@@ -908,7 +908,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
         
         replaced.Center = replacement.Start;
 
-        AssertUniqueNodeIds([originPartition, destinationPartition]);
+        AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
         AssertEquals(originalForest.Partitions, clonedForest.Partitions);
@@ -917,6 +917,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     /// <summary>
     /// Partitions do not know about their forests. That's why test below emits
     /// <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/>
+    /// The correct notification would be <see cref="ChildReplacedNotification"/>.
     /// </summary>
     [TestMethod]
     public void ChildReplaced_origin_partition_is_not_in_any_forest()
@@ -949,7 +950,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         replaced.Center = replacement.Start;
 
-        AssertUniqueNodeIds([originPartition, destinationPartition]);
+        AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
     }  
@@ -957,6 +958,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     /// <summary>
     /// Partitions do not know about their forests. That's why test below emits
     /// <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/>
+    /// The correct notification would be <see cref="ChildReplacedNotification"/>.
     /// </summary>
     [TestMethod]
     public void ChildReplaced_origin_partition_is_in_different_forest()
@@ -992,7 +994,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         replaced.Center = replacement.Start;
 
-        AssertUniqueNodeIds([originPartition, destinationPartition]);
+        AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
     }

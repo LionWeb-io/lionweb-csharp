@@ -40,7 +40,7 @@ public abstract class NotificationTestsBase
         Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
     
-    protected static void AssertUniqueNodeIds(IEnumerable<INode> nodes)
+    protected static void AssertUniqueNodeIds(params INode[] nodes)
     {
         var nodeIds = new HashSet<NodeId>();
         foreach (INode node in nodes)
