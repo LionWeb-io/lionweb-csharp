@@ -14,8 +14,10 @@ using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Notification.Pipe;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
+using M1;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "TestLanguage", Version = "0")]
@@ -786,39 +788,44 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-	private LinkTestConcept? _reference_0_1 = null;
+	private ReferenceInfo<LinkTestConcept>? _reference_0_1 = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_0_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public LinkTestConcept? Reference_0_1 { get => _reference_0_1; set => SetReference_0_1(value); }
+	public LinkTestConcept? Reference_0_1 { get => _reference_0_1?.Target; set => SetReference_0_1(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetReference_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_0_1)
 	{
-		reference_0_1 = _reference_0_1;
+		reference_0_1 = _reference_0_1?.Target;
 		return _reference_0_1 != null;
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
         public LinkTestConcept SetReference_0_1(LinkTestConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
+		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1?.Target, notificationId);
 		emitter.CollectOldData();
-		_reference_0_1 = value;
+		_reference_0_1 = value is not null ? AsReferenceInfo(value) : null;
 		emitter.Notify();
 		return this;
 	}
 
-	private readonly List<LinkTestConcept> _reference_0_n = [];
+    private ReferenceInfo<T> AsReferenceInfo<T>(T node) where T : IReadableNode =>
+        new ReferenceInfo<T>(node.GetNodeName(), node.GetId(), node); 
+
+	private readonly List<ReferenceInfo<LinkTestConcept>> _reference_0_n = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_0_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Reference_0_n { get => _reference_0_n.AsReadOnly(); init => AddReference_0_n(value); }
+	public IReadOnlyList<LinkTestConcept> Reference_0_n { get => Reference_0_nTargets(); init => AddReference_0_n(value); }
 
-	/// <remarks>Optional Multiple Reference</remarks>
+    private ImmutableList<LinkTestConcept> Reference_0_nTargets() => _reference_0_n.Select(r => r.Target).Where(t => t is not null).ToImmutableList()!;
+
+    /// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_0_n)
 	{
-		reference_0_n = _reference_0_n;
+		reference_0_n = Reference_0_nTargets();
 		return _reference_0_n.Count != 0;
 	}
 
@@ -830,7 +837,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n.Count, notificationId);
 		emitter.CollectOldData();
-		_reference_0_n.AddRange(safeNodes);
+		_reference_0_n.AddRange(safeNodes.Select(AsReferenceInfo));
 		emitter.Notify();
 		return this;
 	}
@@ -844,7 +851,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, index, notificationId);
 		emitter.CollectOldData();
-		_reference_0_n.InsertRange(index, safeNodes);
+		_reference_0_n.InsertRange(index, safeNodes.Select(AsReferenceInfo));
 		emitter.Notify();
 		return this;
 	}
@@ -859,18 +866,18 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-	private LinkTestConcept? _reference_1 = null;
+	private ReferenceInfo<LinkTestConcept>? _reference_1 = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Reference_1 has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public LinkTestConcept Reference_1 { get => _reference_1 ?? throw new UnsetFeatureException(TestLanguageLanguage.Instance.LinkTestConcept_reference_1); set => SetReference_1(value); }
+	public LinkTestConcept Reference_1 { get => _reference_1?.Target ?? throw new UnsetFeatureException(TestLanguageLanguage.Instance.LinkTestConcept_reference_1); set => SetReference_1(value); }
 
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
-		reference_1 = _reference_1;
+		reference_1 = _reference_1?.Target;
 		return _reference_1 != null;
 	}
 
@@ -879,24 +886,26 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public LinkTestConcept SetReference_1(LinkTestConcept value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
-		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1, notificationId);
+		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1?.Target, notificationId);
 		emitter.CollectOldData();
-		_reference_1 = value;
+		_reference_1 = AsReferenceInfo(value);
 		emitter.Notify();
 		return this;
 	}
 
-	private readonly List<LinkTestConcept> _reference_1_n = [];
+	private readonly List<ReferenceInfo<LinkTestConcept>> _reference_1_n = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Reference_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_1_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<LinkTestConcept> Reference_1_n { get => AsNonEmptyReadOnly(_reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value); }
 
-	/// <remarks>Required Multiple Reference</remarks>
+    private ImmutableList<LinkTestConcept> Reference_1_nTargets() => _reference_1_n.Select(r => r.Target).Where(t => t is not null).ToImmutableList()!;
+
+    /// <remarks>Required Multiple Reference</remarks>
         public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_1_n)
 	{
-		reference_1_n = _reference_1_n;
+		reference_1_n = Reference_1_nTargets();
 		return _reference_1_n.Count != 0;
 	}
 
@@ -909,7 +918,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n.Count, notificationId);
 		emitter.CollectOldData();
-		_reference_1_n.AddRange(safeNodes);
+		_reference_1_n.AddRange(safeNodes.Select(AsReferenceInfo));
 		emitter.Notify();
 		return this;
 	}
@@ -925,7 +934,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, index, notificationId);
 		emitter.CollectOldData();
-		_reference_1_n.InsertRange(index, safeNodes);
+		_reference_1_n.InsertRange(index, safeNodes.Select(AsReferenceInfo));
 		emitter.Notify();
 		return this;
 	}
@@ -937,7 +946,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNotClearing(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
+		AssureNotClearing(safeNodes, Reference_1_nTargets(), TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		RemoveAll(safeNodes, _reference_1_n, ReferenceRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n));
 		return this;
 	}
@@ -1092,10 +1101,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 			AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n, notificationId);
+			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, Reference_0_nTargets(), notificationId);
 			emitter.CollectOldData();
 			_reference_0_n.Clear();
-			_reference_0_n.AddRange(safeNodes);
+			_reference_0_n.AddRange(safeNodes.Select(AsReferenceInfo));
 			emitter.Notify();
 			return true;
 		}
@@ -1115,10 +1124,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		{
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNonEmpty(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n, notificationId);
+			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, Reference_1_nTargets(), notificationId);
 			emitter.CollectOldData();
 			_reference_1_n.Clear();
-			_reference_1_n.AddRange(safeNodes);
+			_reference_1_n.AddRange(safeNodes.Select(AsReferenceInfo));
 			emitter.Notify();
 			return true;
 		}
