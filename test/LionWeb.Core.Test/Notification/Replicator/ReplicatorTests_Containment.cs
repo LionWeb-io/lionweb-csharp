@@ -798,5 +798,205 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
     #endregion
 
+    /// <summary>
+    /// A floating node is a node which is not part of any partition.
+    /// In the test below, replacement node is a floating node,
+    /// therefore; as a result of replacement, <see cref="ChildReplacedNotification"/> is emitted.  
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_floating_node_replaces_existing_node()
+    {
+        var replaced = new Circle("replaced")
+        {
+            Center = new Coord("cc") { X = 2 }
+        };
+
+        var replacement = new Line("replacement")
+        {
+            Start = new Coord("sc") { X = 1 }
+        };
+
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [new Circle("child"), replaced]
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        replaced.Center = replacement.Start;
+
+        AssertUniqueNodeIds(originalPartition, replacement);
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }   
     
+    /// <summary>
+    /// Replaced and replacement nodes are part of a (same) partition.
+    /// Therefore <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/> is emitted.
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_nodes_are_in_same_partition()
+    {
+        var replaced = new Circle("replaced")
+        {
+            Center = new Coord("cc") { X = 2 }
+        };
+
+        var replacement = new Line("replacement")
+        {
+            Start = new Coord("sc") { X = 1 }
+        };
+
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [replacement, replaced]
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        replaced.Center = replacement.Start;
+
+        AssertUniqueNodeIds(originalPartition);
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainment_partitions_are_in_same_forest()
+    {
+        var replaced = new Circle("replaced")
+        {
+            Center = new Coord("cc") { X = 2 }
+        };
+        
+        var destinationPartition = new Geometry("a")
+        {
+            Shapes = [replaced]
+        };
+        
+        var replacement = new Line("replacement")
+        {
+            Start = new Coord("sc") { X = 1 }
+        };
+        
+        var originPartition = new Geometry("b")
+        {
+            Shapes = [replacement]
+        };
+        
+        var originalForest = new Forest();
+        var clonedForest = new Forest();
+        
+        CreateForestReplicator(clonedForest, originalForest);
+       
+        originalForest.AddPartitions([originPartition, destinationPartition]);
+        
+        var notificationObserver = new NotificationObserver();
+        destinationPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+        
+        replaced.Center = replacement.Start;
+
+        AssertUniqueNodeIds(originPartition, destinationPartition);
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        AssertEquals(originalForest.Partitions, clonedForest.Partitions);
+    }
+
+    /// <summary>
+    /// Partitions do not know about their forests. That's why test below emits
+    /// <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/>
+    /// The correct notification would be <see cref="ChildReplacedNotification"/>.
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_origin_partition_is_not_in_any_forest()
+    {
+        var replaced = new Circle("replaced")
+        {
+            Center = new Coord("cc") { X = 2 }
+        };
+        
+        var destinationPartition = new Geometry("a")
+        {
+            Shapes = [replaced]
+        };
+        
+        var replacement = new Line("replacement")
+        {
+            Start = new Coord("sc") { X = 1 }
+        };
+        
+        var originPartition = new Geometry("b")
+        {
+            Shapes = [replacement]
+        };
+        
+        var originalForest = new Forest();
+        originalForest.AddPartitions([destinationPartition]);
+        
+        var notificationObserver = new NotificationObserver();
+        destinationPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        replaced.Center = replacement.Start;
+
+        AssertUniqueNodeIds(originPartition, destinationPartition);
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+    }  
+    
+    /// <summary>
+    /// Partitions do not know about their forests. That's why test below emits
+    /// <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/>
+    /// The correct notification would be <see cref="ChildReplacedNotification"/>.
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_origin_partition_is_in_different_forest()
+    {
+        var replaced = new Circle("replaced")
+        {
+            Center = new Coord("cc") { X = 2 }
+        };
+        
+        var destinationPartition = new Geometry("a")
+        {
+            Shapes = [replaced]
+        };
+        
+        var replacement = new Line("replacement")
+        {
+            Start = new Coord("sc") { X = 1 }
+        };
+        
+        var originPartition = new Geometry("b")
+        {
+            Shapes = [replacement]
+        };
+
+        var otherForest = new Forest();
+        otherForest.AddPartitions([originPartition]);
+
+        var originalForest = new Forest();
+        originalForest.AddPartitions([destinationPartition]);
+        
+        var notificationObserver = new NotificationObserver();
+        destinationPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        replaced.Center = replacement.Start;
+
+        AssertUniqueNodeIds(originPartition, destinationPartition);
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+    }
+
 }

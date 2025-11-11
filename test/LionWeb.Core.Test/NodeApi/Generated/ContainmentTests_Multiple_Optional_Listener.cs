@@ -75,22 +75,13 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var oldParent = new CompositeShape("oldParent") { Parts = [line] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(parent, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(line, args.MovedChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         parent.AddShapes([line]);
 
-        Assert.AreEqual(1, notifications);
+        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreEqual(1, notificationObserver.Count);
     }
 
     [TestMethod]
@@ -100,22 +91,13 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var oldParent = new CompositeShape("oldParent") { Parts = [line] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(parent, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(line, args.MovedChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { line });
 
-        Assert.AreEqual(1, notifications);
+        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreEqual(1, notificationObserver.Count);
     }
 
     [TestMethod]

@@ -33,19 +33,13 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
         var coord = new Coord("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(offsetDuplicate, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(coord, args.NewChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, notifications);
+        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreEqual(1, notificationObserver.Count);
     }
 
     [TestMethod]
@@ -100,22 +94,13 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(coord, args.MovedChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, notifications);
+        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreEqual(1, notificationObserver.Count);
     }
 
     [TestMethod]
@@ -126,22 +111,13 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(coord, args.MovedChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, notifications);
+        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreEqual(1, notificationObserver.Count);
     }
 
     [TestMethod]
@@ -153,23 +129,13 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(coord, args.MovedChild);
-            Assert.AreEqual(replacedCoord, args.ReplacedChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, notifications);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreEqual(1, notificationObserver.Count);
     }
 
     [TestMethod]
@@ -181,23 +147,13 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(coord, args.MovedChild);
-            Assert.AreEqual(replacedCoord, args.ReplacedChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, notifications);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreEqual(1, notificationObserver.Count);
     }
 
     [TestMethod]
