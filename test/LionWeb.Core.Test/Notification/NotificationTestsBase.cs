@@ -21,6 +21,7 @@ using Core.Notification;
 using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1;
 
 public abstract class NotificationTestsBase
 {
@@ -37,6 +38,22 @@ public abstract class NotificationTestsBase
     {
         List<IDifference> differences = new IdComparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.HasCount(0, differences, differences.DescribeAll(new()));
+    }
+    
+    protected static void AssertUniqueNodeIds(IEnumerable<INode> nodes)
+    {
+        var nodeIds = new HashSet<NodeId>();
+        foreach (INode node in nodes)
+        {
+            foreach (INode descendant in node.Descendants(true, true))
+            {
+                var nodeId = descendant.GetId();
+                if (!nodeIds.Add(nodeId))
+                {
+                    Assert.Fail($"Duplicate node id found: {nodeId}");
+                }
+            }
+        }
     }
 }
 
