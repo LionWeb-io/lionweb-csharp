@@ -195,6 +195,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = (INotifiableNode)notification.Parent;
+            var deletedNodeId = notification.DeletedChild.GetId();
 
             object? newValue = null;
             if (notification.Containment.Multiple)
@@ -203,8 +204,23 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 if (existingChildren is IList l)
                 {
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    var actualNodeId = children[notification.Index].GetId();
+                    if (deletedNodeId != actualNodeId)
+                    {
+                        throw new InvalidNotificationException(notification,
+                            $"Deleted node with id {deletedNodeId} does not match with actual node with id {actualNodeId}");
+                    }
+
                     children.RemoveAt(notification.Index);
                     newValue = children;
+                }
+            } else
+            {
+                var existingNode = localParent.Get(notification.Containment);
+                if (existingNode is IWritableNode node && deletedNodeId != node.GetId())
+                {
+                    throw new InvalidNotificationException(notification,
+                        $"Deleted node with id {deletedNodeId} does not match with actual node with id {node.GetId()}");
                 }
             }
 

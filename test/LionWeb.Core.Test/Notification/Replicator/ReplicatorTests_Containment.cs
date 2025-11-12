@@ -164,6 +164,46 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
+    
+    [TestMethod]
+    public void ChildDeleted_Multiple_not_matching_node_id()
+    {
+        var deleted = new Circle("deleted");
+        var nodeWithAnotherId = new Circle("node-with-another-id");
+        var originalPartition = new Geometry("a") { Shapes = [deleted, nodeWithAnotherId, new Line("l")] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var notification = new ChildDeletedNotification(nodeWithAnotherId, originalPartition,
+            ShapesLanguage.Instance.Geometry_shapes, 0, new NumericNotificationId("childDeletedNotificationMultiple", 0));
+
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification);
+        });
+    }
+
+    [TestMethod]
+    public void ChildDeleted_Single_not_matching_node_id()
+    {
+        var deleted = new Documentation("deleted");
+        var nodeWithAnotherId = new Documentation("node-with-another-id");
+        var originalPartition = new Geometry("a")
+        {
+            Documentation = deleted
+        };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var sharedNodeMap = new SharedNodeMap();
+        sharedNodeMap.RegisterNode(nodeWithAnotherId);
+
+        var notification = new ChildDeletedNotification(nodeWithAnotherId, originalPartition,
+            ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("childDeletedNotificationSingle", 0));
+        
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+        });
+    }
 
     #endregion
 
