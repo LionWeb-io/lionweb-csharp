@@ -208,7 +208,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                     if (deletedNodeId != actualNodeId)
                     {
                         throw new InvalidNotificationException(notification,
-                            $"Deleted node with id {deletedNodeId} does not match with actual node with id {actualNodeId}");
+                            $"Deleted node with id {deletedNodeId} does not match with actual node with id {actualNodeId} " +
+                            $"in containment {notification.Containment} at index {notification.Index}");
                     }
 
                     children.RemoveAt(notification.Index);
@@ -217,10 +218,11 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             } else
             {
                 var existingNode = localParent.Get(notification.Containment);
-                if (existingNode is IWritableNode node && deletedNodeId != node.GetId())
+                if (existingNode is IReadableNode node && deletedNodeId != node.GetId())
                 {
                     throw new InvalidNotificationException(notification,
-                        $"Deleted node with id {deletedNodeId} does not match with actual node with id {node.GetId()}");
+                        $"Deleted node with id {deletedNodeId} does not match with actual node with id {node.GetId()} " +
+                        $"in containment {notification.Containment} at index {notification.Index}");
                 }
             }
 
