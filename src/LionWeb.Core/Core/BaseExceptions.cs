@@ -231,7 +231,7 @@ public class VersionMismatchException(LionWebVersions versionA, LionWebVersions 
                            (message != null ? $": {message}" : string.Empty));
 
 /// <summary>
-/// Trying to execute an invalid notification
+/// Trying to apply an invalid notification
 /// </summary>
 /// <param name="notification">The invalid notification</param>
 /// <param name="message">Additional message</param>
