@@ -348,6 +348,18 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var localParent = (INotifiableNode)notification.Parent;
             var localDeleted = notification.DeletedAnnotation;
+            
+            var annotations = localParent.GetAnnotations().ToList();
+            var deletedNodeId = localDeleted.GetId();
+            var actualNodeId = annotations[notification.Index].GetId();
+            
+            if (deletedNodeId != actualNodeId)
+            {
+                throw new InvalidNotificationException(notification,
+                    $"Deleted annotation node with id {deletedNodeId} does not match with actual node with id {actualNodeId} " +
+                    $"at index {notification.Index}");
+            }
+            
             localParent.RemoveAnnotations([localDeleted], notification.NotificationId);
         });
 

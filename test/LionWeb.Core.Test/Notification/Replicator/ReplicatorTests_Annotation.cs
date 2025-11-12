@@ -139,6 +139,26 @@ public class ReplicatorTests_Annotation : ReplicatorTestsBase
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
+    
+    [TestMethod]
+    public void AnnotationDeleted_Multiple_not_matching_node_ids()
+                   {
+        var deleted = new BillOfMaterials("deleted");
+        var nodeWithAnotherId = new BillOfMaterials("node-with-another-id");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("bof"), deleted, nodeWithAnotherId]);
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var notification = new AnnotationDeletedNotification(nodeWithAnotherId, originalPartition, 1, 
+            new NumericNotificationId("annotationDeletedNotification", 0));
+
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification);
+        });
+
+    }
 
     #endregion
 
