@@ -75,7 +75,7 @@ public class InsertAfterTests
         var circle = new Circle("circ0");
         var line = new Line("line");
 
-        Assert.ThrowsException<TreeShapeException>(() => circle.InsertAfter(line));
+        Assert.ThrowsExactly<TreeShapeException>(() => circle.InsertAfter(line));
     }
 
     [TestMethod]
@@ -86,7 +86,7 @@ public class InsertAfterTests
 
         var line = new Line("line");
 
-        Assert.ThrowsException<TreeShapeException>(() => coord.InsertAfter(line));
+        Assert.ThrowsExactly<TreeShapeException>(() => coord.InsertAfter(line));
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public class InsertAfterTests
             ]
         };
         var coord = new Coord("coord");
-        Assert.ThrowsException<InvalidValueException>(() => circle.InsertAfter(coord));
+        Assert.ThrowsExactly<InvalidValueException>(() => circle.InsertAfter(coord));
     }
 
     [TestMethod]
@@ -117,6 +117,6 @@ public class InsertAfterTests
                 circle
             ]
         };
-        Assert.ThrowsException<InvalidValueException>(() => circle.InsertAfter(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => circle.InsertAfter(null));
     }
 }

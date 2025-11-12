@@ -216,7 +216,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var newChild = (INode)notification.NewChild;
             var replacedChild = (INode)notification.ReplacedChild;
-            replacedChild.ReplaceWith(newChild, notification.NotificationId);
+            replacedChild.ReplaceWith(newChild);
         });
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification notification) =>
@@ -236,7 +236,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedChild = (INode)notification.MovedChild;
             var replacedChild = (INode)notification.ReplacedChild;
-            replacedChild.ReplaceWith(movedChild, notification.NotificationId);
+            replacedChild.ReplaceWith(movedChild);
         });
 
     private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(
@@ -245,7 +245,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedChild = (INode)notification.MovedChild;
             var replacedChild = (INode)notification.ReplacedChild;
-            replacedChild.ReplaceWith(movedChild, notification.NotificationId);
+            replacedChild.ReplaceWith(movedChild);
         });
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(
@@ -283,7 +283,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedChild = (INode)notification.MovedChild;
             var replacedChild = (INode)notification.ReplacedChild;
-            replacedChild.ReplaceWith(movedChild, notification.NotificationId);
+            replacedChild.ReplaceWith(movedChild);
         });
 
     private static object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
@@ -338,7 +338,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var newAnnotation = (INode)notification.NewAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-            replacedAnnotation.ReplaceWith(newAnnotation, notification.NotificationId);
+            replacedAnnotation.ReplaceWith(newAnnotation);
         });
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification notification) =>
@@ -355,7 +355,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedAnnotation = (INode)notification.MovedAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-            replacedAnnotation.ReplaceWith(movedAnnotation, notification.NotificationId);
+            replacedAnnotation.ReplaceWith(movedAnnotation);
         });
 
     private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification notification) =>
@@ -372,7 +372,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedAnnotation = (INode)notification.MovedAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-            replacedAnnotation.ReplaceWith(movedAnnotation, notification.NotificationId);
+            replacedAnnotation.ReplaceWith(movedAnnotation);
         });
 
     #endregion

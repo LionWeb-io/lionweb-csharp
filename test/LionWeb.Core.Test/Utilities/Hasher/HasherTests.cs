@@ -507,6 +507,11 @@ public class HasherTests
         public void DetachFromParent() { }
 
         public void Set(Feature feature, object? value, INotificationId? notificationId = null) { }
+        public void Add(Link? link, IEnumerable<IReadableNode> nodes) {}
+
+        public void Insert(Link? link, int index, IEnumerable<IReadableNode> nodes) {}
+
+        public void Remove(Link? link, IEnumerable<IReadableNode> nodes) {}
 
         public void SetParent(INode? parent) { }
 

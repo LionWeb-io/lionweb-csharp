@@ -375,7 +375,6 @@ public static class M2Extensions
             var (_, v) => throw new InvalidValueException(link, v)
         };
 
-
     /// <summary>
     /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;
     /// </summary>

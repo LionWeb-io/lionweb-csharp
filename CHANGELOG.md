@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.4.0] - tbd
 ### Added
 * Moved `WebSocketServer` and `WebSocketClient` to separate project in core repo for reuse.
+* Added generic add/insert/remove node api for multiple `link` (references and containments) features. 
 ### Fixed
 ### Removed
 ### Deprecated

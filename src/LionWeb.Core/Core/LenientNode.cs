@@ -20,8 +20,8 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using Notification;
-using Notification.Pipe;
 using Notification.Partition;
+using Notification.Pipe;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
@@ -189,9 +189,9 @@ public class LenientNode : NodeBase, INode
     {
         if (feature == null)
         {
-            var enumerable = M2Extensions.AsNodes<INode>(value).ToList();
+            var annotations = M2Extensions.AsNodes<INode>(value).ToList();
             RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
-            AddAnnotations(enumerable);
+            AddAnnotations(annotations);
             return true;
         }
 
@@ -255,6 +255,78 @@ public class LenientNode : NodeBase, INode
                 SetFeature(feature, value);
                 return true;
         }
+    }
+
+    /// <inheritdoc />
+    protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            var annotations = M2Extensions.AsNodes<INode>(nodes).ToList();
+            AddAnnotations(annotations);
+            return true;
+        }
+        
+        //TODO: the code block below is this method is not tested properly 
+        
+        var oldValue = TryGetFeature(link, out var old) ? old : null;
+        
+        var readableNodes = M2Extensions.AsNodes<IReadableNode>(nodes).ToList();
+        if (readableNodes.Count == 0)
+        {
+            if (RemoveFeature(link))
+                return true;
+            if (_classifier != null && _classifier.AllFeatures().Contains(link))
+                return true;
+            return false;
+        }
+
+        if (link is Containment cont)
+        {
+            RemoveExistingChildren(cont, oldValue);
+            var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
+            foreach (var newChild in newChildren)
+            {
+                AttachChild(newChild);
+            }
+
+            SetFeature(link, newChildren.ToList());
+        } else
+        {
+            SetFeature(link, readableNodes);
+        }
+        
+        return true;
+    }
+    
+    /// <inheritdoc />
+    protected override bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            var annotations = M2Extensions.AsNodes<INode>(nodes).ToList();
+            InsertAnnotations(index, annotations);
+            return true;
+        }
+
+        //TODO: not complete
+        
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link is null)
+        {
+            var annotations= M2Extensions.AsNodes<INode>(nodes).ToList();
+            RemoveAnnotations(annotations);
+            return true;
+        }
+
+        //TODO: not complete
+        
+        return true;
     }
 
     private void RemoveExistingChildren(Containment c, object? oldValue)

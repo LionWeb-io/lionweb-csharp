@@ -19,7 +19,6 @@ namespace LionWeb.Core.M1;
 
 using M2;
 using M3;
-using Notification;
 using System.Collections;
 
 /// <summary>
@@ -44,18 +43,16 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
         var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
+        if (value is not IEnumerable)
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
-        var index = list.IndexOf(self);
+        var index = M2Extensions.AsNodes<INode>(value).GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
-            throw new TreeShapeException(self, "Cannot insert before a node with no parent");
+            throw new TreeShapeException(self, "Node not contained in its parent");
 
-        list.Insert(index, newPredecessor);
-        parent.Set(containment, list);
+        parent.Insert(containment, index, [newPredecessor]);
     }
 
     /// <summary>
@@ -75,18 +72,16 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
         var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
+        if (value is not IEnumerable)
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
-        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
-        var index = list.IndexOf(self);
+        var index = M2Extensions.AsNodes<INode>(value).GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
-            throw new TreeShapeException(self, "Cannot insert after a node with no parent");
+            throw new TreeShapeException(self, "Node not contained in its parent");
 
-        list.Insert(index + 1, newSuccessor);
-        parent.Set(containment, list);
+        parent.Insert(containment, index + 1, [newSuccessor]);
     }
 
     /// <summary>
@@ -128,27 +123,26 @@ public static class M1Extensions
 
     /// <summary>
     /// Replaces <paramref name="self"/> in its parent with <paramref name="replacement"/>.
-    /// 
+    ///
     /// Does <i>not</i> change references to <paramref name="self"/>.
     /// </summary>
     /// <param name="self">Base node, must have a parent.</param>
     /// <param name="replacement">Node that will replace <paramref name="self"/> in <paramref name="self"/>'s parent.</param>
-    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of <paramref name="replacement"/>.</typeparam>
     /// <returns><paramref name="replacement"/></returns>
     /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
-    public static T ReplaceWith<T>(this INode self, T replacement,  INotificationId? notificationId = null) where T : INode
+    public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
     {
         if (ReferenceEquals(self, replacement))
             return replacement;
-        
+
         INode? parent = self.GetParent();
         if (parent == null)
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
 
         if (replacement is null)
             throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
-        
+
         Containment? containment = parent.GetContainmentOf(self);
 
         if (containment == null)
@@ -157,20 +151,19 @@ public static class M1Extensions
             if (index < 0)
                 // should not happen
                 throw new TreeShapeException(self, "Node not contained in its parent");
-            parent.InsertAnnotations(index, [replacement], notificationId);
-            parent.RemoveAnnotations([self], notificationId);
-            
+            parent.InsertAnnotations(index, [replacement]);
+            parent.RemoveAnnotations([self]);
             return replacement;
         }
 
         if (containment.Multiple)
         {
             var value = parent.Get(containment);
-            if (value is not IEnumerable enumerable)
+            if (value is not IEnumerable)
                 // should not happen
                 throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
 
-            var nodes = enumerable.Cast<INode>().ToList();
+            var nodes = M2Extensions.AsNodes<INode>(value).ToList();
             var index = nodes.IndexOf(self);
             if (index < 0)
                 // should not happen
@@ -178,7 +171,7 @@ public static class M1Extensions
 
             var replacementParent = replacement.GetParent();
             var replacementContainment = replacementParent?.GetContainmentOf(replacement);
-            
+
             if (containment.Equals(replacementContainment))
             {
                 var replacementIndex = nodes.IndexOf(replacement);
@@ -190,11 +183,12 @@ public static class M1Extensions
                 nodes.Insert(index, replacement);
                 nodes.Remove(self);
             }
-            
-            parent.Set(containment, nodes, notificationId);
+
+            parent.Insert(containment, index, [replacement]);
+            parent.Remove(containment, [self]);
         } else
         {
-            parent.Set(containment, replacement, notificationId);
+            parent.Set(containment, replacement);
         }
 
         return replacement;
@@ -257,7 +251,7 @@ public static class M1Extensions
     #endregion
 
     #region Children
-    
+
     /// <summary>
     /// Enumerates all direct children of <paramref name="self"/>.
     /// Optionally includes <paramref name="self"/> and/or directly contained annotations.
@@ -288,7 +282,7 @@ public static class M1Extensions
                     $"{self.GetId()} contains itself as child"));
 
         if (includeAnnotations)
-            result = result.Concat(self.GetAnnotations().Cast<T>());
+            result = result.Concat(M2Extensions.AsNodes<T>(self.GetAnnotations()));
 
         if (includeSelf)
             result = result.Prepend(self);
@@ -336,7 +330,7 @@ public static class M1Extensions
     }
 
     #endregion
-    
+
     /// <summary>
     /// Returns the first ancestor of <paramref name="self"/> that matches with type <typeparamref name="T"/>
     /// Optionally includes <paramref name="self"/>.
@@ -369,7 +363,7 @@ public static class M1Extensions
             return null;
         }
     }
-    
+
     /// <summary>
     /// Returns the highest ancestor that's a <see cref="IPartitionInstance"/>, might be <paramref name="self"/>.
     /// It's NOT guaranteed that the returned node is also the root,
@@ -377,7 +371,7 @@ public static class M1Extensions
     /// </summary>
     /// <param name="self">Base node to get partition of.</param>
     public static IPartitionInstance? GetPartition(this IReadableNode self) =>
-     self.GetParent()?.GetPartition() ?? self as IPartitionInstance;
+        self.GetParent()?.GetPartition() ?? self as IPartitionInstance;
 
     private static List<INode> GetContainmentNodes(INode self)
     {
@@ -395,5 +389,18 @@ public static class M1Extensions
             throw new TreeShapeException(self, "A single containment does not have siblings");
 
         return [..containment.AsNodes<INode>(enumerable)];
+    }
+
+    private static Index GetIndexOf<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
+    {
+        var index = 0;
+        foreach (var item in enumerable)
+        {
+            if (predicate(item))
+                return index;
+            index++;
+        }
+
+        return -1;
     }
 }

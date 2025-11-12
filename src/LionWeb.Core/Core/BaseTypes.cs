@@ -214,6 +214,33 @@ public interface IWritableNode : IReadableNode
     /// <exception cref="InvalidValueException">If <paramref name="value"/> does not adhere to <paramref name="feature"/>'s type or constraints</exception>
     /// <seealso cref="IReadableNode.Get"/>
     public void Set(Feature feature, object? value);
+
+    /// <summary>
+    /// Adds nodes to the specified <paramref name="link"/> feature of this node.
+    /// </summary>
+    /// <param name="link">The link feature to which nodes will be added.</param>
+    /// <param name="nodes">The nodes to add to the link feature.</param>
+    /// <exception cref="UnknownFeatureException">Thrown if the specified <paramref name="link"/> is not recognized by this node.</exception>
+    public void Add(Link? link, IEnumerable<IReadableNode> nodes);
+    
+    /// <summary>
+    /// Inserts nodes into the specified <paramref name="link"/> feature of this node at the given <paramref name="index"/>.
+    /// </summary>
+    /// <param name="link">The link feature to insert nodes into.</param>
+    /// <param name="index">The position at which to insert the nodes.</param>
+    /// <param name="nodes">The nodes to insert into the link feature.</param>
+    /// <exception cref="UnknownFeatureException">Thrown if the specified <paramref name="link"/> is not recognized by this node.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="index"/> is in out of range.</exception>
+    public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes);
+    
+    /// <summary>
+    /// Removes the specified nodes from the given <paramref name="link"/> feature of this node.
+    /// If one of the node in <see cref="nodes"/> is not found in <paramref name="link"/> feature, it is simply ignored.
+    /// </summary>
+    /// <param name="link">The link feature from which nodes will be removed.</param>
+    /// <param name="nodes">The nodes to remove from the link feature.</param>
+    /// <exception cref="UnknownFeatureException">Thrown if the specified <paramref name="link"/> is not recognized by this node.</exception>
+    public void Remove(Link? link, IEnumerable<IReadableNode> nodes);
 }
 
 /// The type-parametrized twin of the non-generic <see cref="IWritableNode"/> interface.
@@ -485,6 +512,69 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             RemoveSelfParent(_annotations.ToList(), _annotations, null);
             _annotations.AddRange(SetSelfParent(safeNodes, null));
             notification.Notify();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public void Add(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (AddInternal(link, nodes))
+            return;
+
+        throw new UnknownFeatureException(GetClassifier(), link);
+    }
+
+    /// <inheritdoc cref="Add"/>
+    protected virtual bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            AddAnnotations(nodes.Cast<INode>());
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (InsertInternal(link, index, nodes))
+            return;
+
+        throw new UnknownFeatureException(GetClassifier(), link);
+    }
+
+    /// <inheritdoc cref="Insert"/>
+    protected virtual bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            InsertAnnotations(index, nodes.Cast<INode>());
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public void Remove(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (RemoveInternal(link, nodes))
+            return;
+
+        throw new UnknownFeatureException(GetClassifier(), link);
+    }
+
+    /// <inheritdoc cref="Insert"/>
+    protected virtual bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            RemoveAnnotations(nodes.Cast<INode>());
             return true;
         }
 

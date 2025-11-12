@@ -620,6 +620,48 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.AddInternal(link, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(link))
+		{
+			AddBooks(LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
+	{
+		if (base.InsertInternal(link, index, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(link))
+		{
+			InsertBooks(index, LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.RemoveInternal(link, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(link))
+		{
+			RemoveBooks(LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
         protected override bool DetachChild(INode child)
 	{
 		if (base.DetachChild(child))

@@ -34,6 +34,9 @@ using Property = Core.M3.Property;
 /// Covers members:
 /// - GetInternal()
 /// - SetInternal()
+/// - AddInternal()
+/// - InsertInternal()
+/// - RemoveInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
 public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
@@ -45,12 +48,27 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         if (!FeaturesToImplement(classifier).Any())
             return [];
 
-        return
-        [
+        IEnumerable<MemberDeclarationSyntax> featureMethods = [
             GenGetInternal(),
             GenSetInternal(),
             GenCollectAllSetFeatures()
         ];
+
+        if (!FeaturesToImplement(classifier).OfType<Link>().Any(link => link.Multiple))
+        {
+            return featureMethods;
+        }
+
+        var addInternal =  GenAddInternal();
+        var insertInternal = GenInsertInternal();
+        var removeInternal = GenRemoveInternal();
+
+        featureMethods = featureMethods
+            .Append(addInternal)
+            .Append(insertInternal)
+            .Append(removeInternal);
+
+        return featureMethods;
     }
 
     #region GetInternal
@@ -323,6 +341,163 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     #endregion
 
+    #region AddInternal
+
+    private MethodDeclarationSyntax GenAddInternal() =>
+        Method("AddInternal", AsType(typeof(bool)), [
+                Param("link", NullableType(AsType(typeof(Link)))),
+                Param("value", AsType(typeof(IEnumerable<IReadableNode>)))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(new List<StatementSyntax>
+                {
+                    IfStatement(ParseExpression("base.AddInternal(link, value)"),
+                        ReturnTrue())
+                }
+                .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenAddInternal))
+                .Append(ReturnStatement(false.AsLiteral()))
+            ));
+
+    private StatementSyntax GenAddInternal(Link link)
+    {
+        List<StatementSyntax> body = link switch
+        {
+            Containment containment => GenAddInternalMultipleContainment(containment, writeable: true),
+            Reference reference => GenAddInternalMultipleReference(reference),
+            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
+        };
+
+        return IfStatement(
+            GenEqualsIdentityLink(link),
+            AsStatements(body)
+        );
+    }
+
+    private List<StatementSyntax> GenAddInternalMultipleReference(Reference reference) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference)]))),
+        ReturnTrue()
+    ];
+
+    private List<StatementSyntax> GenAddInternalMultipleContainment(Containment containment, bool writeable) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, writeable)]))),
+        ReturnTrue()
+    ];
+    
+    #endregion
+
+    #region InsertInternal
+
+    private MethodDeclarationSyntax GenInsertInternal() =>
+        Method("InsertInternal", AsType(typeof(bool)), [
+                Param("link", NullableType(AsType(typeof(Link)))),
+                Param("index", AsType(typeof(int))),
+                Param("value", AsType(typeof(IEnumerable<IReadableNode>)))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(new List<StatementSyntax>
+                {
+                    IfStatement(ParseExpression("base.InsertInternal(link, index, value)"),
+                        ReturnTrue())
+                }
+                .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenInsertInternal))
+                .Append(ReturnStatement(false.AsLiteral()))
+            ));
+
+    
+    private StatementSyntax GenInsertInternal(Link link)
+    {
+        List<StatementSyntax> body = link switch
+        {
+            Containment containment => GenInsertInternalMultipleContainment(containment, writeable: true),
+            Reference reference => GenInsertInternalMultipleReference(reference),
+            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
+        };
+
+        return IfStatement(
+            GenEqualsIdentityLink(link),
+            AsStatements(body)
+        );
+    }
+
+    private List<StatementSyntax> GenInsertInternalMultipleReference(Reference reference) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(InsertLink(reference)), AsArguments([IdentifierName("index"), AsNodesCall(reference)]))),
+        ReturnTrue()
+    ];
+
+    private List<StatementSyntax> GenInsertInternalMultipleContainment(Containment containment, bool writeable) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(InsertLink(containment)),
+                AsArguments([IdentifierName("index"), AsNodesCall(containment, writeable)]))),
+        ReturnTrue()
+    ];
+    
+    #endregion
+
+    #region RemoveInternal
+
+    private MethodDeclarationSyntax GenRemoveInternal() =>
+        Method("RemoveInternal", AsType(typeof(bool)), [
+                Param("link", NullableType(AsType(typeof(Link)))),
+                Param("value", AsType(typeof(IEnumerable<IReadableNode>)))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(new List<StatementSyntax>
+                {
+                    IfStatement(ParseExpression("base.RemoveInternal(link, value)"),
+                        ReturnTrue())
+                }
+                .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenRemoveInternal))
+                .Append(ReturnStatement(false.AsLiteral()))
+            ));
+
+    #endregion
+    
+    private StatementSyntax GenRemoveInternal(Link link)
+    {
+        List<StatementSyntax> body = link switch
+        {
+            Containment containment => GenRemoveInternalMultipleContainment(containment, writeable: true),
+            Reference reference => GenRemoveInternalMultipleReference(reference),
+            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
+        };
+
+        return IfStatement(
+            GenEqualsIdentityLink(link),
+            AsStatements(body)
+        );
+    }
+
+    private List<StatementSyntax> GenRemoveInternalMultipleReference(Reference reference) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(RemoveLink(reference)), AsArguments([AsNodesCall(reference)]))),
+        ReturnTrue()
+    ];
+
+    private List<StatementSyntax> GenRemoveInternalMultipleContainment(Containment containment, bool writeable) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(RemoveLink(containment)),
+                AsArguments([AsNodesCall(containment, writeable)]))),
+        ReturnTrue()
+    ];
+    
     #region CollectAllSetFeatures
 
     private MethodDeclarationSyntax GenCollectAllSetFeatures() =>
@@ -359,5 +534,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private InvocationExpressionSyntax GenEqualsIdentityFeature(Feature feature) =>
         InvocationExpression(MemberAccess(MetaProperty(feature), IdentifierName("EqualsIdentity")),
             AsArguments([IdentifierName("feature")])
+        );
+    private InvocationExpressionSyntax GenEqualsIdentityLink(Link link) =>
+        InvocationExpression(MemberAccess(MetaProperty(link), IdentifierName("EqualsIdentity")),
+            AsArguments([IdentifierName("link")])
         );
 }

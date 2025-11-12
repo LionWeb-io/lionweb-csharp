@@ -1148,6 +1148,102 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	}
 
 	/// <inheritdoc/>
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.AddInternal(link, value))
+			return true;
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(link))
+		{
+			AddContainment_0_n(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(link))
+		{
+			AddContainment_1_n(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(link))
+		{
+			AddReference_0_n(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(link))
+		{
+			AddReference_1_n(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
+	{
+		if (base.InsertInternal(link, index, value))
+			return true;
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(link))
+		{
+			InsertContainment_0_n(index, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(link))
+		{
+			InsertContainment_1_n(index, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(link))
+		{
+			InsertReference_0_n(index, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(link))
+		{
+			InsertReference_1_n(index, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.RemoveInternal(link, value))
+			return true;
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(link))
+		{
+			RemoveContainment_0_n(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(link))
+		{
+			RemoveContainment_1_n(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(link))
+		{
+			RemoveReference_0_n(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(link))
+		{
+			RemoveReference_1_n(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
         protected override bool DetachChild(INode child)
 	{
 		if (base.DetachChild(child))

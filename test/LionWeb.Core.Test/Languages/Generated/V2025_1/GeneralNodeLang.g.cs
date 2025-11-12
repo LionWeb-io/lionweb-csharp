@@ -618,6 +618,102 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.AddInternal(link, value))
+			return true;
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(link))
+		{
+			AddMultipleContainment(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.AsNodes<INode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(link))
+		{
+			AddMultipleOptionalContainment(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.AsNodes<INode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.EqualsIdentity(link))
+		{
+			AddMultipleOptionalRef(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.EqualsIdentity(link))
+		{
+			AddMultipleRef(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
+	{
+		if (base.InsertInternal(link, index, value))
+			return true;
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(link))
+		{
+			InsertMultipleContainment(index, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.AsNodes<INode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(link))
+		{
+			InsertMultipleOptionalContainment(index, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.AsNodes<INode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.EqualsIdentity(link))
+		{
+			InsertMultipleOptionalRef(index, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.EqualsIdentity(link))
+		{
+			InsertMultipleRef(index, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.RemoveInternal(link, value))
+			return true;
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(link))
+		{
+			RemoveMultipleContainment(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.AsNodes<INode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(link))
+		{
+			RemoveMultipleOptionalContainment(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.AsNodes<INode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.EqualsIdentity(link))
+		{
+			RemoveMultipleOptionalRef(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.EqualsIdentity(link))
+		{
+			RemoveMultipleRef(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
         protected override bool DetachChild(INode child)
 	{
 		if (base.DetachChild(child))
