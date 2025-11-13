@@ -22,7 +22,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, ResolveInfo?)>);
+using CompressedReference = (CompressedMetaPointer, List<(ICompressedId? compressedId, ResolveInfo? resolveInfo)>);
 
 /// <inheritdoc />
 /// <typeparam name="T">Type of node to return</typeparam>
@@ -261,19 +261,23 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             if (reference == null)
                 continue;
 
-            List<IReadableNode> targets = targetEntries
-                .Select(target => FindReferenceTarget(node, reference, target.Item1, target.Item2))
-                .Where(c => c != null)
+            List<IReferenceDescriptor> targets = targetEntries
+                .Select(target => FindReferenceTarget(node, reference, target.compressedId, target.resolveInfo))
                 .ToList()!;
 
-            SetLink(targets, writable, reference);
+            SetReference(targets, writable, reference);
         }
     }
 
-    private IReadableNode? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
-        ResolveInfo? resolveInfo) =>
-        FindReferenceTarget(targetId, resolveInfo) ??
-        _handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
+    private IReferenceDescriptor? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
+        ResolveInfo? resolveInfo)
+    {
+        var target = FindReferenceTarget(targetId, resolveInfo);
+        if (target is not null)
+            return new ReferenceDescriptor<IReadableNode>(resolveInfo, target?.GetId() ?? targetId?.Original, target);
+
+        return _handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
+    }
 
     /// Compresses <paramref name="r"/>.
     protected CompressedReference Compress(SerializedReference r) =>
@@ -287,27 +291,50 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     #endregion
 
-    /// Sets <paramref name="link"/> inside <paramref name="node"/> to <paramref name="children"/>, if possible.
-    /// Uses only the first entry of <paramref name="children"/> if <paramref name="link"/> is single.
+    /// Sets <paramref name="containment"/> inside <paramref name="node"/> to <paramref name="children"/>, if possible.
+    /// Uses only the first entry of <paramref name="children"/> if <paramref name="containment"/> is single.
     ///
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    protected void SetLink<TChild>(List<TChild> children, IWritableNode node, Feature link)
+    protected void SetContainment<TChild>(List<TChild> children, IWritableNode node, Feature containment)
         where TChild : class, IReadableNode
     {
         if (children.Count == 0)
             return;
 
-        var single = link is Link { Multiple: false };
+        var single = containment is Containment { Multiple: false };
         try
         {
-            node.Set(link, single && children.Count == 1 ? children[0] : children);
+            node.Set(containment, single && children.Count == 1 ? children[0] : children);
         } catch (InvalidValueException)
         {
-            List<TChild>? replacement = _handler.InvalidLinkValue(children, link, node);
+            List<TChild>? replacement = _handler.InvalidLinkValue(children, containment, node);
             if (replacement != null)
-                node.Set(link, single ? replacement.FirstOrDefault() : replacement);
+                node.Set(containment, single ? replacement.FirstOrDefault() : replacement);
+        }
+    }
+
+    /// Sets <paramref name="reference"/> inside <paramref name="node"/> to <paramref name="descriptors"/>, if possible.
+    /// Uses only the first entry of <paramref name="descriptors"/> if <paramref name="reference"/> is single.
+    ///
+    /// <para>
+    /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
+    /// </para>
+    protected void SetReference(List<IReferenceDescriptor> descriptors, IWritableNode node, Feature reference)
+    {
+        if (descriptors.Count == 0)
+            return;
+
+        var single = reference is Reference { Multiple: false };
+        try
+        {
+            node.Set(reference, single && descriptors.Count == 1 ? descriptors[0] : descriptors);
+        } catch (InvalidValueException)
+        {
+            List<IReadableNode>? replacement = _handler.InvalidLinkValue(descriptors.Select(r => r?.Target).ToList(), reference, node);
+            if (replacement != null)
+                node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
         }
     }
 

@@ -391,6 +391,7 @@ public static class M2Extensions
             {
                 T tt => ReferenceDescriptor.FromNode(tt),
                 ReferenceDescriptor<T> ri => ri,
+                IReferenceDescriptor r => r.Specialize<T>(),
                 _ => throw new InvalidValueException(reference, obj)
             };
         }

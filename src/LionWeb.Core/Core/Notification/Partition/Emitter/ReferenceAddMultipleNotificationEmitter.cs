@@ -23,6 +23,8 @@ public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotif
 {
     private readonly Index _startIndex;
 
+    public ReferenceAddMultipleNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<ReferenceDescriptor<T>> safeNodes,
+        Index startIndex, INotificationId? notificationId = null) : this(reference, destinationParent, safeNodes.Cast<IReferenceDescriptor>().ToList(), startIndex, notificationId){}
     /// Raises <see cref="ReferenceAddedNotification"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
     /// <param name="reference">Reference to raise notifications for.</param>
     /// <param name="destinationParent">Owner of the represented <paramref name="reference"/> </param>
@@ -30,7 +32,7 @@ public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotif
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    public ReferenceAddMultipleNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<ReferenceDescriptor<T>> safeNodes,
+    public ReferenceAddMultipleNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<IReferenceDescriptor> safeNodes,
         Index startIndex, INotificationId? notificationId = null) : base(reference, destinationParent, safeNodes, notificationId)
     {
         _startIndex = startIndex;

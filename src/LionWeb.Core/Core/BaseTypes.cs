@@ -1026,13 +1026,36 @@ public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionIns
     protected internal abstract IPartitionNotificationProducer? GetNotificationProducer();
 }
 
-public record struct ReferenceDescriptor<T>(ResolveInfo? ResolveInfo, NodeId? TargetId, T? Target)
+public interface IReferenceDescriptor
+{
+    ResolveInfo? ResolveInfo { get; }
+    NodeId? TargetId { get; }
+    IReadableNode? Target { get; }
+}
+
+public interface IReferenceDescriptor<T> :  IReferenceDescriptor    where T : IReadableNode
+{
+    IReadableNode? IReferenceDescriptor.Target => Target;
+
+    new T? Target { get; }
+}
+
+public record struct ReferenceDescriptor<T>(ResolveInfo? ResolveInfo, NodeId? TargetId, T? Target) : IReferenceDescriptor<T>
     where T : IReadableNode
 {
 };
 
 public static class ReferenceDescriptor
 {
+    public static ReferenceDescriptor<R> Specialize<R>(this IReferenceDescriptor descriptor) where R : IReadableNode =>
+        descriptor switch
+        {
+            ReferenceDescriptor<R> r => r,
+            { Target: null } => new ReferenceDescriptor<R>(descriptor.ResolveInfo, descriptor.TargetId, (R?)descriptor.Target),
+            { Target: R t } => new ReferenceDescriptor<R>(descriptor.ResolveInfo, descriptor.TargetId, t),
+            _ => throw new InvalidValueException(null, descriptor)
+        };
+
     public static ReferenceDescriptor<R> FromNode<R>(R node) where R : IReadableNode =>
         node is not null
             ? new ReferenceDescriptor<R>(node?.GetNodeName(), node?.GetId(), node)
@@ -1041,15 +1064,14 @@ public static class ReferenceDescriptor
     public static ReferenceDescriptor<R>? FromNodeOptional<R>(R? node) where R : IReadableNode =>
         node is null ? null : new ReferenceDescriptor<R>(node.GetNodeName(), node.GetId(), node);
 
-    public static ReferenceTarget ToReferenceTarget<R>(this ReferenceDescriptor<R> referenceDescriptor)
-        where R : IReadableNode =>
+    public static ReferenceTarget ToReferenceTarget(this IReferenceDescriptor referenceDescriptor) =>
         new ReferenceTarget(referenceDescriptor.ResolveInfo, referenceDescriptor.Target);
 }
 
-public class ReferenceDescriptorIdComparer<T> : IEqualityComparer<ReferenceDescriptor<T>> where T : IReadableNode
+public class ReferenceDescriptorIdComparer : IEqualityComparer<IReferenceDescriptor>
 {
     /// <inheritdoc />
-    public bool Equals(ReferenceDescriptor<T> x, ReferenceDescriptor<T> y)
+    public bool Equals(IReferenceDescriptor x, IReferenceDescriptor y)
     {
         if (x.Target is not null && y.Target is not null)
             return x.Target.GetId() == y.Target.GetId();
@@ -1061,7 +1083,7 @@ public class ReferenceDescriptorIdComparer<T> : IEqualityComparer<ReferenceDescr
     }
 
     /// <inheritdoc />
-    public int GetHashCode(ReferenceDescriptor<T> obj)
+    public int GetHashCode(IReferenceDescriptor obj)
     {
         if (obj.Target is not null)
             return obj.Target.GetId().GetHashCode();

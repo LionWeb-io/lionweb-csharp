@@ -126,13 +126,16 @@ public record ChildAddedNotification(
     IWritableNode NewChild,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId) : APartitionNotification(NotificationId), INewNodeNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => Parent.GetId();
+
+    /// <inheritdoc />
+    public IReadableNode NewNode => NewChild;
 }
 
 /// <param name="DeletedChild"></param>
@@ -164,13 +167,16 @@ public record ChildReplacedNotification(
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId) : APartitionNotification(NotificationId), INewNodeNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => Parent.GetId();
+
+    /// <inheritdoc />
+    public IReadableNode NewNode =>  NewChild;
 }
 
 /// <param name="NewParent"></param>
@@ -320,13 +326,16 @@ public record AnnotationAddedNotification(
     IWritableNode NewAnnotation,
     Index Index,
     INotificationId NotificationId)
-    : APartitionNotification(NotificationId)
+    : APartitionNotification(NotificationId), INewNodeNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => Parent.GetId();
+
+    /// <inheritdoc />
+    public IReadableNode NewNode => NewNode;
 }
 
 /// <param name="DeletedAnnotation"></param>
@@ -355,13 +364,16 @@ public record AnnotationReplacedNotification(
     IWritableNode ReplacedAnnotation,
     IWritableNode Parent,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId) : APartitionNotification(NotificationId), INewNodeNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override NodeId ContextNodeId => Parent.GetId();
+
+    /// <inheritdoc />
+    public IReadableNode NewNode => NewAnnotation;
 }
 
 /// <param name="NewParent"></param>
