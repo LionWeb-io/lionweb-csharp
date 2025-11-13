@@ -1,5 +1,7 @@
 ﻿namespace LionWeb.Core.Test.Notification;
 
+using Core.Notification;
+using Core.Notification.Partition;
 using Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
@@ -47,6 +49,32 @@ public class ReplicatorTests_Property : ReplicatorTestsBase
         docs.Text = null;
 
         AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    [TestMethod]
+    public void PropertyDeleted_required_single_containment()
+    {
+        const int x = 1;
+        var coord = new Coord("coord")
+        {
+            X = x, Y = 2, Z = 3
+        };
+        var circle = new Circle("circle")
+        {
+            Center = coord
+        };
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [circle]
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var notification = new PropertyDeletedNotification(coord, ShapesLanguage.Instance.Coord_x, x, 
+            new NumericNotificationId("propertyDeletedNotification", 0));
+
+        Assert.ThrowsExactly<InvalidValueException>(() => CreatePartitionReplicator(clonedPartition, notification));
+
     }
 
     #endregion
