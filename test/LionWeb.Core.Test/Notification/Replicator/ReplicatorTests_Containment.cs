@@ -397,6 +397,58 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
         
         Assert.AreEqual(2, clonedPartition.Shapes.Count);
         Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[^1].GetId());
+    } 
+    
+    [TestMethod]
+    public void ChildReplaced_Multiple_not_matching_node_ids()
+    {
+        var replaced = new Circle("replaced");
+        var replacement = new Line("replacement");
+        var nodeWithAnotherId = new Circle("node-with-another-id");
+        
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [new Circle("child"), replaced, nodeWithAnotherId]
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var notification = new ChildReplacedNotification(replacement, nodeWithAnotherId, originalPartition, 
+            ShapesLanguage.Instance.Geometry_shapes, 1, new NumericNotificationId("childReplacedNotification", 0));
+        
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification);
+        });
+        
+    }
+    
+    [TestMethod]
+    public void ChildReplaced_Single_not_matching_node_ids()
+    {
+        var replaced = new Documentation("replaced") { Text = "replaced" };
+        var originalPartition = new Geometry("a")
+        {
+            Documentation = replaced
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var added = new Documentation("added") { Text = "added" };
+        var nodeWithAnotherId = new Documentation("node-with-another-id") { Text = "another node" };
+        
+        var sharedNodeMap = new SharedNodeMap();
+        sharedNodeMap.RegisterNode(added);
+        sharedNodeMap.RegisterNode(nodeWithAnotherId);
+
+        var notification = new ChildReplacedNotification(added, nodeWithAnotherId, originalPartition, ShapesLanguage.Instance.Geometry_documentation, 
+            0, new NumericNotificationId("childReplacedNotification", 0));
+
+        AssertUniqueNodeIds(originalPartition, added, nodeWithAnotherId);
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+        });
     }
     
     #endregion

@@ -195,7 +195,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = (INotifiableNode)notification.Parent;
-            var deletedNodeId = notification.DeletedChild.GetId();
+            var deletedChildId = notification.DeletedChild.GetId();
 
             object? newValue = null;
             if (notification.Containment.Multiple)
@@ -204,11 +204,11 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 if (existingChildren is IList l)
                 {
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    var actualNodeId = children[notification.Index].GetId();
-                    if (deletedNodeId != actualNodeId)
+                    var actualChildId = children[notification.Index].GetId();
+                    if (deletedChildId != actualChildId)
                     {
                         throw new InvalidNotificationException(notification,
-                            $"Deleted node with id {deletedNodeId} does not match with actual node with id {actualNodeId} " +
+                            $"Deleted node with id {deletedChildId} does not match with actual node with id {actualChildId} " +
                             $"in containment {notification.Containment} at index {notification.Index}");
                     }
 
@@ -218,10 +218,10 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             } else
             {
                 var existingNode = localParent.Get(notification.Containment);
-                if (existingNode is IReadableNode node && deletedNodeId != node.GetId())
+                if (existingNode is IReadableNode node && deletedChildId != node.GetId())
                 {
                     throw new InvalidNotificationException(notification,
-                        $"Deleted node with id {deletedNodeId} does not match with actual node with id {node.GetId()} " +
+                        $"Deleted node with id {deletedChildId} does not match with actual node with id {node.GetId()} " +
                         $"in containment {notification.Containment} at index {notification.Index}");
                 }
             }
@@ -234,6 +234,34 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var newChild = (INode)notification.NewChild;
             var replacedChild = (INode)notification.ReplacedChild;
+            
+            var replacedChildId = replacedChild.GetId();
+            var localParent = notification.Parent;
+            if (notification.Containment.Multiple)
+            {
+                var existingChildren = localParent.Get(notification.Containment);
+                if (existingChildren is IList l)
+                {
+                    var children = new List<IReadableNode>(l.Cast<IReadableNode>());
+                    var actualChildId = children[notification.Index].GetId();
+                    if (replacedChildId != actualChildId)
+                    {
+                        throw new InvalidNotificationException(notification,
+                            $"Replaced node with id {replacedChildId} does not match with actual node with id {actualChildId} " +
+                            $"in containment {notification.Containment} at index {notification.Index}");
+                    }
+                }
+            } else
+            {
+                var existingChild = localParent.Get(notification.Containment);
+                if (existingChild is IReadableNode node && replacedChildId != node.GetId())
+                {
+                    throw new InvalidNotificationException(notification,
+                        $"Replaced node with id {replacedChildId} does not match with actual node with id {node.GetId()} " +
+                        $"at index {notification.Index}");
+                }
+            }
+            
             replacedChild.ReplaceWith(newChild);
         });
 
