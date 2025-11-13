@@ -30,6 +30,12 @@ using Message.Command;
 
 public abstract class DeltaTestsBase: NotificationTestsBase
 {
+    /// <summary>
+    /// This replicator exercises the following path:
+    /// notification ->  notificationToDeltaCommandMapper -> commandToEventMapper -> deltaProtocolEventReceiver
+    /// -> deltaEventToNotificationMapper -> forestReplicator
+    /// ForestReplicator replicates notifications on clone partitions
+    /// </summary>
     protected Geometry CreateDeltaReplicator(Geometry node)
     {
         var clone = ClonePartition(node);
@@ -71,6 +77,13 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         return clone;
     }
     
+    /// <summary>
+    /// This replicator exercises the following path:
+    /// notification ->  notificationToDeltaCommandMapper -> commandToEventMapper -> deltaProtocolEventReceiver
+    /// -> deltaEventToNotificationMapper -> forestReplicator
+    /// ForestReplicator replicates notifications on clone partitions
+    /// Different from <see cref="CreateDeltaReplicator"/> this replicator serialize and deserialize delta commands
+    /// </summary>
     protected Geometry CreateDeltaReplicatorWithJson(Geometry node)
     {
         var clone = ClonePartition(node);
