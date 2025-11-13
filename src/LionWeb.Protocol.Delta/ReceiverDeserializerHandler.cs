@@ -21,8 +21,5 @@ using Core.M1;
 
 internal class ReceiverDeserializerHandler : DeserializerExceptionHandler
 {
-    public override bool SkipDeserializingDependentNode(ICompressedId id)
-    {
-        return false;
-    }
+    public override bool SkipDeserializingDependentNode(ICompressedId id) => false;
 }
