@@ -17,56 +17,46 @@
 
 namespace LionWeb.Protocol.Delta.Test.Pipe;
 
-using Core;
-using Core.M1;
-using Core.M3;
-using Core.Notification;
-using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
-using Delta.Client;
 
 [TestClass]
-public class NotificationsTestSerialized : NotificationTestsBase, IReplicatorCreator
+public class NotificationsTestSerialized : DeltaTestsBase
 {
-    public Geometry CreateReplicator(Geometry node)
+    [TestMethod]
+    public void PropertyAdded()
     {
-        var clone = ClonePartition(node);
+        var circle = new Circle("c");
+        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
 
-        var lionWebVersion = LionWebVersions.v2024_1;
-        List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
+        circle.Name = "Hello";
 
-        PartitionSharedNodeMap sharedNodeMap = new();
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<PropertyAddedNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
 
-        var deserializerBuilder = new DeserializerBuilder()
-                .WithLionWebVersion(lionWebVersion)
-                .WithLanguages(languages)
-            ;
+    [TestMethod]
+    public void ChildReplaced_Single_with_same_node_id()
+    {
+        var documentation = new Documentation("doc") { Text = "a" };
+        var originalPartition = new Geometry("a") { Documentation = documentation };
 
-        var cloneForest = new Forest();
-        cloneForest.AddPartitions([clone]);
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
 
-        var replicator = ForestReplicator.Create(cloneForest, sharedNodeMap, "cloneReplicator");
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        var eventReceiver = new DeltaProtocolEventReceiver(
-            sharedNodeMap,
-            sharedKeyedMap,
-            deserializerBuilder, "clone");
+        var documentation2 = new Documentation("doc") { Text = "b" };
+        originalPartition.Documentation = documentation2;
 
-        eventReceiver.ConnectTo(replicator);
-
-        var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetNotificationSender()?.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
-        {
-            var deltaCommand =
-                new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion)
-                    .Map(partitionNotification);
-            eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
-        });
-
-        return clone;
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 }

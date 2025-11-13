@@ -20,7 +20,6 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Pipe;
 using Core.Utilities;
-using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 public abstract class NotificationTestsBase
@@ -39,7 +38,7 @@ public abstract class NotificationTestsBase
         List<IDifference> differences = new IdComparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
-    
+
     protected static void AssertUniqueNodeIds(params INode[] nodes)
     {
         var nodeIds = new HashSet<NodeId>();
@@ -60,11 +59,6 @@ public abstract class NotificationTestsBase
 internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
 {
     public void ProduceNotification(INotification notification) => Send(notification);
-}
-
-public interface IReplicatorCreator
-{
-    Geometry CreateReplicator(Geometry node);
 }
 
 public class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
