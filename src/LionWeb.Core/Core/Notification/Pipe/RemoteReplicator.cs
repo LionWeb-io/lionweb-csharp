@@ -362,16 +362,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             var localParent = (INotifiableNode)notification.Parent;
             var localDeleted = notification.DeletedAnnotation;
 
-            var annotations = localParent.GetAnnotations().ToList();
-            var deletedNodeId = localDeleted.GetId();
-            var actualNodeId = annotations[notification.Index].GetId();
-
-            if (deletedNodeId != actualNodeId)
-            {
-                throw new InvalidNotificationException(notification,
-                    $"Deleted annotation node with id {deletedNodeId} does not match with actual node with id {actualNodeId} " +
-                    $"at index {notification.Index}");
-            }
+            CheckMatchingNodeIdForDeletedNode(notification);
 
             localParent.RemoveAnnotations([localDeleted], notification.NotificationId);
         });
@@ -381,6 +372,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var newAnnotation = (INode)notification.NewAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
+
+            CheckMatchingNodeIdForReplacedNode(notification);
+            
             replacedAnnotation.ReplaceWith(newAnnotation);
         });
 
@@ -537,6 +531,37 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             Filter.UnregisterNotificationId(notificationId);
         }
     }
+    
+    private void CheckMatchingNodeIdForDeletedNode(AnnotationDeletedNotification notification)
+    {
+        var localParent = notification.Parent;
+        var deletedNodeId = notification.DeletedAnnotation.GetId();
+        var annotations = localParent.GetAnnotations().ToList();
+        var actualNodeId = annotations[notification.Index].GetId();
+
+        if (deletedNodeId != actualNodeId)
+        {
+            throw new InvalidNotificationException(notification,
+                $"Deleted annotation node with id {deletedNodeId} does not match with actual node with id {actualNodeId} " +
+                $"at index {notification.Index}");
+        }
+    }
+
+    private void CheckMatchingNodeIdForReplacedNode(AnnotationReplacedNotification notification)
+    {
+        var localParent = notification.Parent;
+        var replacedNodeId = notification.ReplacedAnnotation.GetId();
+        var annotations = localParent.GetAnnotations().ToList();
+        var actualNodeId = annotations[notification.Index].GetId();
+
+        if (replacedNodeId != actualNodeId)
+        {
+            throw new InvalidNotificationException(notification,
+                $"Replaced annotation node with id {replacedNodeId} does not match with actual node with id {actualNodeId} " +
+                $"at index {notification.Index}");
+        }
+    }
+
 
     private void CheckMatchingNodeIdForReplacedNode(ChildReplacedNotification notification)
     {
