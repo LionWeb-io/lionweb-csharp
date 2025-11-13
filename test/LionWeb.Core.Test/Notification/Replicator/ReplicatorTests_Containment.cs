@@ -205,6 +205,25 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         Assert.ThrowsExactly<UnsetFeatureException>(() => ((Circle)clonedPartition.Shapes[0]).Center);
     }
+    
+    /// <summary>
+    /// This test confirms that no notification is generated from DetachFromParent method
+    /// </summary>
+    [TestMethod]
+    public void ChildDeleted_Single_uses_detach_from_parent()
+    {
+        var deleted = new Coord("deleted");
+        var circle = new Circle("c") { Center = deleted };
+
+        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+        
+        deleted.DetachFromParent();
+
+        Assert.AreEqual(0, notificationObserver.Notifications.Count);
+    }
 
     #endregion
 
