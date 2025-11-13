@@ -269,6 +269,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedChild = (INode)notification.MovedChild;
             var replacedChild = (INode)notification.ReplacedChild;
+            
+            CheckMatchingNodeIdForReplacedNode(notification);
+            
             replacedChild.ReplaceWith(movedChild);
         });
 
@@ -566,6 +569,35 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     {
         var replacedChildId = notification.ReplacedChild.GetId();
         var localParent = notification.NewParent;
+        if (notification.NewContainment.Multiple)
+        {
+            var existingChildren = localParent.Get(notification.NewContainment);
+            if (existingChildren is IList l)
+            {
+                var children = new List<IReadableNode>(l.Cast<IReadableNode>());
+                var actualChildId = children[notification.NewIndex].GetId();
+                if (replacedChildId != actualChildId)
+                {
+                    throw new InvalidNotificationException(notification,
+                        $"Replaced node with id {replacedChildId} does not match with actual node with id {actualChildId} " +
+                        $"in containment {notification.NewContainment} at index {notification.NewIndex}");
+                }
+            }
+        } else
+        {
+            var existingChild = localParent.Get(notification.NewContainment);
+            if (existingChild is IReadableNode node && replacedChildId != node.GetId())
+            {
+                throw new InvalidNotificationException(notification,
+                    $"Replaced node with id {replacedChildId} does not match with actual node with id {node.GetId()} " +
+                    $"at index {notification.NewIndex}");
+            }
+        }
+    }
+    private void CheckMatchingNodeIdForReplacedNode(ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification)
+    {
+        var replacedChildId = notification.ReplacedChild.GetId();
+        var localParent = notification.Parent;
         if (notification.NewContainment.Multiple)
         {
             var existingChildren = localParent.Get(notification.NewContainment);

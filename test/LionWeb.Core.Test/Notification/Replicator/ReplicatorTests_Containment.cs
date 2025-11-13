@@ -750,7 +750,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     }
     
     [TestMethod]
-    public void ChildMovedAndReplacedFromOtherContainment_not_matching_node_ids()
+    public void ChildMovedAndReplacedFromOtherContainment_Single_not_matching_node_ids()
     {
         var moved = new Documentation("moved");
         var replaced = new Documentation("replaced");
@@ -831,6 +831,34 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(notificationObserver.Notifications[0]);
 
         AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainmentInSameParent_Single_not_matching_node_ids()
+    {
+        var moved = new Coord("moved");
+        var replaced = new Coord("replaced");
+        var line = new Line("l")
+        {
+            Start = moved, 
+            End = replaced
+        };
+        
+        var originalPartition = new Geometry("a") { Shapes = [line] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var nodeWithAnotherId = new Coord("node-with-another-id");
+        var sharedNodeMap = new SharedNodeMap();
+        sharedNodeMap.RegisterNode(nodeWithAnotherId);
+
+        var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(ShapesLanguage.Instance.Geometry_shapes, 0, 
+            moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 0, nodeWithAnotherId, 
+            new NumericNotificationId("childMovedAndReplacedFromOtherContainmentInSameParentNotification", 0));
+        
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+        });
     }
 
     #endregion
