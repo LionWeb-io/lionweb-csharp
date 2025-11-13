@@ -395,17 +395,25 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// <inheritdoc />
     public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 
-    protected IImmutableList<R> ReferenceInfoResolvedTargets<R>(List<ReferenceDescriptor<R>> storage)
+    protected IImmutableList<R?> ReferenceDescriptorNullableTargets<R>(List<IReferenceDescriptor> storage)
         where R : IReadableNode =>
-        storage.Select(r => r.Target).Where(t => t is not null).ToImmutableList()!;
+        M2Extensions.AsNodes<R>(storage.Select(r => r.Target).Where(t => t is not null)).ToImmutableList()!;
 
-    protected IImmutableList<R> ReferenceInfoAllTargets<R>(List<ReferenceDescriptor<R>> storage, Reference reference,
+    protected R? ReferenceDescriptorNullableTarget<R>(IReferenceDescriptor? storage) where R : class, IReadableNode =>
+        storage?.Target as R; 
+
+    protected IImmutableList<R> ReferenceDescriptorNonNullTargets<R>(List<IReferenceDescriptor> storage, Reference reference,
         IReadableNode parent) where R : IReadableNode =>
-        storage
-            .Select(r =>
-                r.Target ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, r.ResolveInfo,
-                    r.TargetId))
+        M2Extensions.AsNodes<R>(storage
+                .Select(r =>
+                    r.Target ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, r.ResolveInfo,
+                        r.TargetId)))
             .ToImmutableList();
+
+    protected R ReferenceDescriptorNonNullTarget<R>(IReferenceDescriptor storage, Reference reference,
+        IReadableNode parent) where R : class, IReadableNode =>
+        storage.Target as R ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, storage.ResolveInfo,
+            storage.TargetId); 
 }
 
 /// Base implementation of <see cref="INode"/>.
@@ -938,7 +946,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceDescriptor<T>> storage,
+    protected void RemoveAll<T>(List<T> safeNodes, List<IReferenceDescriptor> storage,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
         INotificationId? notificationId = null)
         where T : IReadableNode
@@ -1033,36 +1041,28 @@ public interface IReferenceDescriptor
     IReadableNode? Target { get; }
 }
 
-public interface IReferenceDescriptor<T> :  IReferenceDescriptor    where T : IReadableNode
-{
-    IReadableNode? IReferenceDescriptor.Target => Target;
+public record struct ReferenceDescriptor(ResolveInfo? ResolveInfo, NodeId? TargetId, IReadableNode Target)
+    : IReferenceDescriptor;
 
-    new T? Target { get; }
-}
-
-public record struct ReferenceDescriptor<T>(ResolveInfo? ResolveInfo, NodeId? TargetId, T? Target) : IReferenceDescriptor<T>
-    where T : IReadableNode
+public static class ReferenceDescriptorExtensions
 {
-};
-
-public static class ReferenceDescriptor
-{
-    public static ReferenceDescriptor<R> Specialize<R>(this IReferenceDescriptor descriptor) where R : IReadableNode =>
+    public static ReferenceDescriptor Specialize<R>(this IReferenceDescriptor descriptor) where R : IReadableNode =>
         descriptor switch
         {
-            ReferenceDescriptor<R> r => r,
-            { Target: null } => new ReferenceDescriptor<R>(descriptor.ResolveInfo, descriptor.TargetId, (R?)descriptor.Target),
-            { Target: R t } => new ReferenceDescriptor<R>(descriptor.ResolveInfo, descriptor.TargetId, t),
+            ReferenceDescriptor r => r,
+            { Target: null } => new ReferenceDescriptor(descriptor.ResolveInfo, descriptor.TargetId,
+                (R?)descriptor.Target),
+            { Target: R t } => new ReferenceDescriptor(descriptor.ResolveInfo, descriptor.TargetId, t),
             _ => throw new InvalidValueException(null, descriptor)
         };
 
-    public static ReferenceDescriptor<R> FromNode<R>(R node) where R : IReadableNode =>
+    public static IReferenceDescriptor FromNode(IReadableNode node) =>
         node is not null
-            ? new ReferenceDescriptor<R>(node?.GetNodeName(), node?.GetId(), node)
+            ? new ReferenceDescriptor(node?.GetNodeName(), node?.GetId(), node)
             : throw new InvalidValueException(null, node);
 
-    public static ReferenceDescriptor<R>? FromNodeOptional<R>(R? node) where R : IReadableNode =>
-        node is null ? null : new ReferenceDescriptor<R>(node.GetNodeName(), node.GetId(), node);
+    public static IReferenceDescriptor? FromNodeOptional(IReadableNode? node) =>
+        node is null ? null : new ReferenceDescriptor(node.GetNodeName(), node.GetId(), node);
 
     public static ReferenceTarget ToReferenceTarget(this IReferenceDescriptor referenceDescriptor) =>
         new ReferenceTarget(referenceDescriptor.ResolveInfo, referenceDescriptor.Target);

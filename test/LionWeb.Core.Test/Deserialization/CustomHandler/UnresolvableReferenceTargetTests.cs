@@ -35,7 +35,7 @@ public class UnresolvableReferenceTargetTests
     {
         public override IReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
             ResolveInfo? resolveInfo, Feature reference, IReadableNode node) =>
-            new ReferenceDescriptor<IReadableNode>(resolveInfo, targetId?.Original, heal(targetId, resolveInfo, reference, (IWritableNode)node));
+            new ReferenceDescriptor(resolveInfo, targetId?.Original, heal(targetId, resolveInfo, reference, (IWritableNode)node));
     }
 
     [TestMethod]

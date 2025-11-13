@@ -124,12 +124,12 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         {
             Property { Optional: false } reqProp => GenSetInternalRequiredProperty(reqProp),
             Property { Optional: true } reqProp => GenSetInternalOptionalProperty(reqProp),
-            Containment { Optional: false, Multiple: false } singleReqContainment => GenSetInternalSingleRequiredLink(singleReqContainment, writeable: true),
-            Containment { Optional: true, Multiple: false } singleOptContainment => GenSetInternalSingleOptionalLink(singleOptContainment, writeable: true),
-            Reference { Optional: false, Multiple: false } singleReqReference => GenSetInternalSingleRequiredLink(singleReqReference),
-            Reference { Optional: true, Multiple: false } singleOptReference => GenSetInternalSingleOptionalLink(singleOptReference),
-            Containment { Optional: true, Multiple: true } multiCont => GenSetInternalMultiOptionalContainment(multiCont, writeable: true),
-            Containment { Optional: false, Multiple: true } multiCont => GenSetInternalMultiRequiredContainment(multiCont, writeable: true),
+            Containment { Optional: false, Multiple: false } singleReqContainment => GenSetInternalSingleRequiredContainment(singleReqContainment),
+            Containment { Optional: true, Multiple: false } singleOptContainment => GenSetInternalSingleOptionalContainment(singleOptContainment),
+            Reference { Optional: false, Multiple: false } singleReqReference => GenSetInternalSingleRequiredReference(singleReqReference),
+            Reference { Optional: true, Multiple: false } singleOptReference => GenSetInternalSingleOptionalReference(singleOptReference),
+            Containment { Optional: true, Multiple: true } multiCont => GenSetInternalMultiOptionalContainment(multiCont),
+            Containment { Optional: false, Multiple: true } multiCont => GenSetInternalMultiRequiredContainment(multiCont),
             Reference { Optional: true, Multiple: true } multiRef => GenSetInternalMultiOptionalReference(multiRef),
             Reference { Optional: false, Multiple: true } multiRef => GenSetInternalMultiRequiredReference(multiRef),
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
@@ -169,37 +169,75 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         GenThrowInvalidValueException()
     ];
 
-    private List<StatementSyntax> GenSetInternalSingleRequiredLink(Link link, bool writeable = false) =>
+    private List<StatementSyntax> GenSetInternalSingleRequiredContainment(Containment containment) =>
     [
+        GenSetInternalSingleRequiredLink(containment, true),
+        GenThrowInvalidValueException()
+    ];
+
+    private List<StatementSyntax> GenSetInternalSingleRequiredReference(Reference reference) =>
+    [
+        GenSetInternalSingleRequiredLink(reference, false),
+        GenSetInternalSingleReference(reference),
+        GenThrowInvalidValueException()
+    ];
+
+    private IfStatementSyntax GenSetInternalSingleRequiredLink(Link link, bool writeable) =>
         IfStatement(
             IsPatternExpression(IdentifierName("value"), AsTypePattern(link, writeable: writeable)),
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
+                        IdentifierName(FeatureSet(link)),
+                        AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
-        ),
+        );
+
+    private IfStatementSyntax GenSetInternalSingleReference(Reference reference) =>
+        IfStatement(
+            IsPatternExpression(IdentifierName("value"), DeclarationPattern(
+                    AsType(typeof(IReferenceDescriptor)),
+                    SingleVariableDesignation(Identifier("descriptor"))
+                )
+            ),
+            AsStatements([
+                ExpressionStatement(
+                    InvocationExpression(
+                        IdentifierName(FeatureSet(reference)),
+                        AsArguments([IdentifierName("descriptor"), IdentifierName("notificationId")]))),
+                ReturnTrue()
+            ])
+        );
+
+    private List<StatementSyntax> GenSetInternalSingleOptionalContainment(Containment containment) =>
+    [
+        GenSetInternalSingleOptionalLink(containment, true),
         GenThrowInvalidValueException()
     ];
 
-    private List<StatementSyntax> GenSetInternalSingleOptionalLink(Link link, bool writeable = false) =>
+    private List<StatementSyntax> GenSetInternalSingleOptionalReference(Reference reference) =>
     [
+        GenSetInternalSingleOptionalLink(reference, false),
+        GenSetInternalSingleReference(reference),
+        GenThrowInvalidValueException()
+    ];
+
+    private IfStatementSyntax GenSetInternalSingleOptionalLink(Link link, bool writeable) =>
         IfStatement(
             IsPatternExpression(IdentifierName("value"), NullOrTypePattern(link, writeable: writeable)),
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link, writeable: writeable), IdentifierName("notificationId")]))),
+                        IdentifierName(FeatureSet(link)),
+                        AsArguments([CastValueType(link, writeable: writeable), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
-        ),
-        GenThrowInvalidValueException()
-    ];
+        );
 
-    private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment, bool writeable = false) =>
+    private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
-        SafeNodesVar(containment, writeable: writeable),
+        SafeNodesVar(containment, writeable: true),
         SetContainmentEmitterVariable(containment),
         EmitterCollectOldDataCall(),
         RemoveSelfParentCall(containment),
@@ -208,9 +246,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ReturnTrue()
     ];
 
-    private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment, bool writeable = false) =>
+    private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment) =>
     [
-        SafeNodesVar(containment, writeable: writeable),
+        SafeNodesVar(containment, writeable: true),
         AssureNonEmptyCall(containment),
         SetContainmentEmitterVariable(containment),
         EmitterCollectOldDataCall(),

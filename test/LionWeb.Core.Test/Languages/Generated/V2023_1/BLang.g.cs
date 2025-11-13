@@ -136,13 +136,13 @@ public partial class BConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private ReferenceDescriptor<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept>? _aRef = null;
+	private IReferenceDescriptor? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? ARef { get => ARefTarget(); set => SetARef(value); }
 
-	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? ARefTarget() => _aRef?.Target;
+	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? ARefTarget() => ReferenceDescriptorNullableTarget<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept>(_aRef);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetARef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? aRef)
 	{
@@ -150,14 +150,19 @@ public partial class BConcept : ConceptInstanceBase
 		return aRef != null;
 	}
 
+	private BConcept SetARef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	{
+		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
+		emitter.CollectOldData();
+		_aRef = value;
+		emitter.Notify();
+		return this;
+	}
+
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, ReferenceDescriptor.FromNodeOptional(value), _aRef, notificationId);
-		emitter.CollectOldData();
-		_aRef = ReferenceDescriptor.FromNodeOptional(value);
-		emitter.Notify();
-		return this;
+		return SetARef(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
 	}
 
 	public BConcept(string id) : base(id)
@@ -207,6 +212,12 @@ public partial class BConcept : ConceptInstanceBase
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept)
 			{
 				SetARef((LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept?)value, notificationId);
+				return true;
+			}
+
+			if (value is IReferenceDescriptor descriptor)
+			{
+				SetARef(descriptor, notificationId);
 				return true;
 			}
 

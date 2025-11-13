@@ -89,7 +89,7 @@ public class DeadReferenceSerializationTests
             ResolveInfo? resolveInfo,
             Feature reference, IReadableNode node) =>
             unresolvedReferencesManager.RegisterUnresolvedReference((IWritableNode)node, reference,
-                new ReferenceDescriptor<IReadableNode>(resolveInfo, targetId?.Original, null));
+                new ReferenceDescriptor(resolveInfo, targetId?.Original, null));
     }
 }
 
@@ -111,7 +111,7 @@ public class UnresolvedReferencesManager : INotificationReceiver
         if (e.descriptor.TargetId != newNodeNotification.NewNode.GetId())
             return false;
 
-        var descriptor = new ReferenceDescriptor<IReadableNode>(e.descriptor.ResolveInfo, e.descriptor.TargetId, newNodeNotification.NewNode);
+        var descriptor = new ReferenceDescriptor(e.descriptor.ResolveInfo, e.descriptor.TargetId, newNodeNotification.NewNode);
 
         if (!e.parent.TryGet(e.reference, out var value))
         {
@@ -126,7 +126,7 @@ public class UnresolvedReferencesManager : INotificationReceiver
         {
             if (value is IList list)
             {
-                value = (List<IReferenceDescriptor>)[..list.Cast<IReadableNode>().Select(ReferenceDescriptor.FromNode), descriptor];
+                value = (List<IReferenceDescriptor>)[..list.Cast<IReadableNode>().Select(ReferenceDescriptorExtensions.FromNode), descriptor];
             } else
             {
                 value = descriptor;

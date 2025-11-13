@@ -450,7 +450,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 		return this;
 	}
 
-	private ReferenceDescriptor<@record>? _ref = null;
+	private IReferenceDescriptor? _ref = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -458,7 +458,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public @record Ref { get => RefTarget() ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
 
-	private @record? RefTarget() => _ref?.Target;
+	private @record? RefTarget() => ReferenceDescriptorNullableTarget<@record>(_ref);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetRef([NotNullWhenAttribute(true)] out @record? @ref)
 	{
@@ -466,16 +466,21 @@ public partial class @struct : ConceptInstanceBase, @interface
 		return @ref != null;
 	}
 
+	private @struct SetRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	{
+		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
+		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
+		emitter.CollectOldData();
+		_ref = value;
+		emitter.Notify();
+		return this;
+	}
+
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public @struct SetRef(@record value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
-		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, ReferenceDescriptor.FromNodeOptional(value), _ref, notificationId);
-		emitter.CollectOldData();
-		_ref = ReferenceDescriptor.FromNodeOptional(value);
-		emitter.Notify();
-		return this;
+		return SetRef(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
 	}
 
 	public @struct(string id) : base(id)
@@ -525,6 +530,12 @@ public partial class @struct : ConceptInstanceBase, @interface
 			if (value is @namespace.@int.@public.V2025_1.@record v)
 			{
 				SetRef(v, notificationId);
+				return true;
+			}
+
+			if (value is IReferenceDescriptor descriptor)
+			{
+				SetRef(descriptor, notificationId);
 				return true;
 			}
 

@@ -208,7 +208,7 @@ public partial class MYConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private ReferenceDescriptor<IReadableNode>? _mYReference = null;
+	private IReferenceDescriptor? _mYReference = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MYReference has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -216,7 +216,7 @@ public partial class MYConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public IReadableNode MYReference { get => MYReferenceTarget() ?? throw new UnsetFeatureException(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference); set => SetMYReference(value); }
 
-	private IReadableNode? MYReferenceTarget() => _mYReference?.Target;
+	private IReadableNode? MYReferenceTarget() => ReferenceDescriptorNullableTarget<IReadableNode>(_mYReference);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetMYReference([NotNullWhenAttribute(true)] out IReadableNode? mYReference)
 	{
@@ -224,16 +224,21 @@ public partial class MYConcept : ConceptInstanceBase
 		return mYReference != null;
 	}
 
+	private MYConcept SetMYReference(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	{
+		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference, notificationId);
+		emitter.CollectOldData();
+		_mYReference = value;
+		emitter.Notify();
+		return this;
+	}
+
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public MYConcept SetMYReference(IReadableNode value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
-		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, ReferenceDescriptor.FromNodeOptional(value), _mYReference, notificationId);
-		emitter.CollectOldData();
-		_mYReference = ReferenceDescriptor.FromNodeOptional(value);
-		emitter.Notify();
-		return this;
+		return SetMYReference(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
 	}
 
 	public MYConcept(string id) : base(id)
@@ -300,6 +305,12 @@ public partial class MYConcept : ConceptInstanceBase
 			if (value is IReadableNode v)
 			{
 				SetMYReference(v, notificationId);
+				return true;
+			}
+
+			if (value is IReferenceDescriptor descriptor)
+			{
+				SetMYReference(descriptor, notificationId);
 				return true;
 			}
 

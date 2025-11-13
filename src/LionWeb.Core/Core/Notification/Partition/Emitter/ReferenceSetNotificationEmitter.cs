@@ -26,11 +26,6 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
 {
     private readonly List<IListChange<IReferenceDescriptor>> _changes = [];
 
-    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent,
-        List<ReferenceDescriptor<T>> safeNodes, IList<ReferenceDescriptor<T>> storage,
-        INotificationId? notificationId = null) :
-        this(reference, destinationParent, safeNodes.Cast<IReferenceDescriptor>().ToList(), storage.Cast<IReferenceDescriptor>().ToList(), notificationId) {}
-
     /// <param name="reference">Represented <see cref="Reference"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="reference"/>.</param>
     /// <param name="safeNodes">Newly added values.</param>

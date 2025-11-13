@@ -263,6 +263,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
             List<IReferenceDescriptor> targets = targetEntries
                 .Select(target => FindReferenceTarget(node, reference, target.compressedId, target.resolveInfo))
+                .Where(d => d is  not null)
                 .ToList()!;
 
             SetReference(targets, writable, reference);
@@ -274,7 +275,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     {
         var target = FindReferenceTarget(targetId, resolveInfo);
         if (target is not null)
-            return new ReferenceDescriptor<IReadableNode>(resolveInfo, target?.GetId() ?? targetId?.Original, target);
+            return new ReferenceDescriptor(resolveInfo, target?.GetId() ?? targetId?.Original, target);
 
         return _handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
     }
@@ -332,7 +333,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             node.Set(reference, single && descriptors.Count == 1 ? descriptors[0] : descriptors);
         } catch (InvalidValueException)
         {
-            List<IReadableNode>? replacement = _handler.InvalidLinkValue(descriptors.Select(r => r?.Target).ToList(), reference, node);
+            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(descriptors.Select(r => r?.Target).Where(t => t is not null)).ToList(), reference, node);
             if (replacement != null)
                 node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
         }

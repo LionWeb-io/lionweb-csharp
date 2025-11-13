@@ -21,14 +21,14 @@ using M3;
 
 public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitterBase<INode> where T : IReadableNode
 {
-    private readonly ReferenceDescriptor<T>? _newTarget;
-    private readonly ReferenceDescriptor<T>? _oldTarget;
+    private readonly IReferenceDescriptor? _newTarget;
+    private readonly IReferenceDescriptor? _oldTarget;
 
     /// Raises either <see cref="ReferenceAddedNotification"/>, <see cref="ReferenceDeletedNotification"/> or
     /// <see cref="ReferenceChangedNotification"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, ReferenceDescriptor<T>? newTarget,
-        ReferenceDescriptor<T>? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
+    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, IReferenceDescriptor? newTarget,
+        IReferenceDescriptor? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
@@ -43,7 +43,7 @@ public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitte
         if (!IsActive())
             return;
 
-        if (_oldTarget == _newTarget || ReferenceEquals(_oldTarget.GetValueOrDefault().Target, _newTarget.GetValueOrDefault().Target))
+        if (_oldTarget == _newTarget || ReferenceEquals(_oldTarget?.Target, _newTarget?.Target))
             return;
         
         switch (_oldTarget, _newTarget)
