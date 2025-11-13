@@ -203,7 +203,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 var existingChildren = localParent.Get(notification.Containment);
                 if (existingChildren is IList l)
                 {
-                    var children = new List<IReadableNode>(l.Cast<IReadableNode>());
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                     var actualNodeId = children[notification.Index].GetId();
                     if (deletedNodeId != actualNodeId)
                     {
@@ -281,12 +281,13 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = (INotifiableNode)notification.Parent;
-            var nodeToInsert = (IReadableNode)notification.MovedChild;
+            var nodeToInsert = notification.MovedChild;
             object newValue = nodeToInsert;
+            
             var existingChildren = localParent.Get(notification.Containment);
             if (existingChildren is IList l)
             {
-                var children = new List<IReadableNode>(l.Cast<IReadableNode>());
+                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                 children.RemoveAt(notification.OldIndex);
                 children.Insert(notification.NewIndex, nodeToInsert);
                 newValue = children;
@@ -312,10 +313,10 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             switch (existingChildren)
             {
                 case IList l:
-                    var children = new List<IReadableNode>(l.Cast<IReadableNode>());
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                     children.Insert(index, nodeToInsert);
                     return children;
-                case IReadableNode _:
+                case IWritableNode _:
                     return nodeToInsert;
                 default:
                     // when containment data is corrupted or assigned to an invalid value after its creation 
@@ -325,7 +326,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
         if (containment.Multiple)
         {
-            return new List<IReadableNode> { nodeToInsert };
+            return new List<IWritableNode> { nodeToInsert };
         }
 
         return nodeToInsert;
