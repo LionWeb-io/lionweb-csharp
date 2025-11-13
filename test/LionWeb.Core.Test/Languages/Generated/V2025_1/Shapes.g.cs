@@ -16,6 +16,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Time = string;
 
@@ -341,7 +342,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
         public bool TryGetAltGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> altGroups)
 	{
 		altGroups = _altGroups;
-		return _altGroups.Count != 0;
+		return altGroups.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -389,7 +390,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
         public bool TryGetDefaultGroup([NotNullWhenAttribute(true)] out MaterialGroup? defaultGroup)
 	{
 		defaultGroup = _defaultGroup;
-		return _defaultGroup != null;
+		return defaultGroup != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -414,7 +415,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
         public bool TryGetGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> groups)
 	{
 		groups = _groups;
-		return _groups.Count != 0;
+		return groups.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -452,23 +453,24 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<IShape> _materials = [];
+	private readonly List<ReferenceDescriptor<IShape>> _materials = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Materials { get => _materials.AsReadOnly(); init => AddMaterials(value); }
+	public IReadOnlyList<IShape> Materials { get => MaterialsTargets(); init => AddMaterials(value); }
 
+	private IImmutableList<IShape> MaterialsTargets() => ReferenceInfoResolvedTargets(_materials);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
 	{
-		materials = _materials;
-		return _materials.Count != 0;
+		materials = MaterialsTargets();
+		return materials.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count, notificationId);
@@ -482,7 +484,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
         public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _materials);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index, notificationId);
@@ -580,7 +582,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
 		{
-			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsReferenceDescriptors<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials, notificationId);
@@ -745,7 +747,7 @@ public partial class Circle : Shape
         public bool TryGetCenter([NotNullWhenAttribute(true)] out Coord? center)
 	{
 		center = _center;
-		return _center != null;
+		return center != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -773,7 +775,7 @@ public partial class Circle : Shape
         public bool TryGetR([NotNullWhenAttribute(true)] out int? r)
 	{
 		r = _r;
-		return _r != null;
+		return r != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -894,7 +896,7 @@ public partial class CompositeShape : Shape
         public bool TryGetDisabledParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> disabledParts)
 	{
 		disabledParts = _disabledParts;
-		return _disabledParts.Count != 0;
+		return disabledParts.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -949,7 +951,7 @@ public partial class CompositeShape : Shape
         public bool TryGetEvilPart([NotNullWhenAttribute(true)] out IShape? evilPart)
 	{
 		evilPart = _evilPart;
-		return _evilPart != null;
+		return evilPart != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -977,7 +979,7 @@ public partial class CompositeShape : Shape
         public bool TryGetParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> parts)
 	{
 		parts = _parts;
-		return _parts.Count != 0;
+		return parts.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -1225,7 +1227,7 @@ public partial class Coord : ConceptInstanceBase
         public bool TryGetX([NotNullWhenAttribute(true)] out int? x)
 	{
 		x = _x;
-		return _x != null;
+		return x != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -1249,7 +1251,7 @@ public partial class Coord : ConceptInstanceBase
         public bool TryGetY([NotNullWhenAttribute(true)] out int? y)
 	{
 		y = _y;
-		return _y != null;
+		return y != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -1273,7 +1275,7 @@ public partial class Coord : ConceptInstanceBase
         public bool TryGetZ([NotNullWhenAttribute(true)] out int? z)
 	{
 		z = _z;
-		return _z != null;
+		return z != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -1386,7 +1388,7 @@ public partial class Documentation : AnnotationInstanceBase
         public bool TryGetTechnical([NotNullWhenAttribute(true)] out bool? technical)
 	{
 		technical = _technical;
-		return _technical != null;
+		return technical != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -1409,7 +1411,7 @@ public partial class Documentation : AnnotationInstanceBase
         public bool TryGetText([NotNullWhenAttribute(true)] out string? text)
 	{
 		text = _text;
-		return _text != null;
+		return text != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -1503,7 +1505,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
         public bool TryGetDocumentation([NotNullWhenAttribute(true)] out Documentation? documentation)
 	{
 		documentation = _documentation;
-		return _documentation != null;
+		return documentation != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -1528,7 +1530,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
 	{
 		shapes = _shapes;
-		return _shapes.Count != 0;
+		return shapes.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -1753,7 +1755,7 @@ public partial class Line : Shape, INamedWritable
         public bool TryGetEnd([NotNullWhenAttribute(true)] out Coord? end)
 	{
 		end = _end;
-		return _end != null;
+		return end != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -1782,7 +1784,7 @@ public partial class Line : Shape, INamedWritable
         public bool TryGetStart([NotNullWhenAttribute(true)] out Coord? start)
 	{
 		start = _start;
-		return _start != null;
+		return start != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -1914,7 +1916,7 @@ public partial class MaterialGroup : ConceptInstanceBase
         public bool TryGetDefaultShape([NotNullWhenAttribute(true)] out IShape? defaultShape)
 	{
 		defaultShape = _defaultShape;
-		return _defaultShape != null;
+		return defaultShape != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -1929,25 +1931,26 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<IShape> _materials = [];
+	private readonly List<ReferenceDescriptor<IShape>> _materials = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly(_materials, ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
+	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly<IShape>(MaterialsTargets(), ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
 
+	private IImmutableList<IShape> MaterialsTargets() => ReferenceInfoResolvedTargets(_materials);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
 	{
-		materials = _materials;
-		return _materials.Count != 0;
+		materials = MaterialsTargets();
+		return materials.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
         public MaterialGroup AddMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
 		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count, notificationId);
@@ -1963,7 +1966,7 @@ public partial class MaterialGroup : ConceptInstanceBase
         public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _materials);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
 		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index, notificationId);
@@ -1980,7 +1983,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		AssureNotClearing(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		AssureNotClearing(safeNodes, MaterialsTargets(), ShapesLanguage.Instance.MaterialGroup_materials);
 		RemoveAll(safeNodes, _materials, ReferenceRemover<IShape>(ShapesLanguage.Instance.MaterialGroup_materials));
 		return this;
 	}
@@ -1995,7 +1998,7 @@ public partial class MaterialGroup : ConceptInstanceBase
         public bool TryGetMatterState([NotNullWhenAttribute(true)] out MatterState? matterState)
 	{
 		matterState = _matterState;
-		return _matterState != null;
+		return matterState != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -2058,7 +2061,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
 		{
-			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsReferenceDescriptors<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials, notificationId);
 			emitter.CollectOldData();
@@ -2167,25 +2170,26 @@ public partial class MaterialGroup : ConceptInstanceBase
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-OffsetDuplicate")]
 public partial class OffsetDuplicate : Shape
 {
-	private Shape? _altSource = null;
+	private ReferenceDescriptor<Shape>? _altSource = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-source")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public Shape? AltSource { get => _altSource; set => SetAltSource(value); }
+	public Shape? AltSource { get => AltSourceTarget(); set => SetAltSource(value); }
 
+	private Shape? AltSourceTarget() => _altSource?.Target;
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetAltSource([NotNullWhenAttribute(true)] out Shape? altSource)
 	{
-		altSource = _altSource;
-		return _altSource != null;
+		altSource = AltSourceTarget();
+		return altSource != null;
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
         public OffsetDuplicate SetAltSource(Shape? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter emitter = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource, notificationId);
+		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, ReferenceDescriptor.FromNodeOptional(value), _altSource, notificationId);
 		emitter.CollectOldData();
-		_altSource = value;
+		_altSource = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}
@@ -2200,7 +2204,7 @@ public partial class OffsetDuplicate : Shape
         public bool TryGetDocs([NotNullWhenAttribute(true)] out Documentation? docs)
 	{
 		docs = _docs;
-		return _docs != null;
+		return docs != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -2227,7 +2231,7 @@ public partial class OffsetDuplicate : Shape
         public bool TryGetOffset([NotNullWhenAttribute(true)] out Coord? offset)
 	{
 		offset = _offset;
-		return _offset != null;
+		return offset != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -2254,7 +2258,7 @@ public partial class OffsetDuplicate : Shape
         public bool TryGetSecretDocs([NotNullWhenAttribute(true)] out Documentation? secretDocs)
 	{
 		secretDocs = _secretDocs;
-		return _secretDocs != null;
+		return secretDocs != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -2269,19 +2273,20 @@ public partial class OffsetDuplicate : Shape
 		return this;
 	}
 
-	private Shape? _source = null;
+	private ReferenceDescriptor<Shape>? _source = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Source has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-source")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public Shape Source { get => _source ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
+	public Shape Source { get => SourceTarget() ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
 
+	private Shape? SourceTarget() => _source?.Target;
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSource([NotNullWhenAttribute(true)] out Shape? source)
 	{
-		source = _source;
-		return _source != null;
+		source = SourceTarget();
+		return source != null;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
@@ -2289,9 +2294,9 @@ public partial class OffsetDuplicate : Shape
         public OffsetDuplicate SetSource(Shape value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
-		ReferenceSingleNotificationEmitter emitter = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source, notificationId);
+		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, ReferenceDescriptor.FromNodeOptional(value), _source, notificationId);
 		emitter.CollectOldData();
-		_source = value;
+		_source = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}
@@ -2466,23 +2471,24 @@ public partial class OffsetDuplicate : Shape
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-ReferenceGeometry")]
 public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance<INode>
 {
-	private readonly List<IShape> _shapes = [];
+	private readonly List<ReferenceDescriptor<IShape>> _shapes = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
+	public IReadOnlyList<IShape> Shapes { get => ShapesTargets(); init => AddShapes(value); }
 
+	private IImmutableList<IShape> ShapesTargets() => ReferenceInfoResolvedTargets(_shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
 	{
-		shapes = _shapes;
-		return _shapes.Count != 0;
+		shapes = ShapesTargets();
+		return shapes.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count, notificationId);
@@ -2496,7 +2502,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
         public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _shapes);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index, notificationId);
@@ -2548,7 +2554,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
-			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsReferenceDescriptors<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes, notificationId);
@@ -2630,7 +2636,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -2657,7 +2663,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public bool TryGetFixpoints([NotNullWhenAttribute(true)] out IReadOnlyList<Coord> fixpoints)
 	{
 		fixpoints = _fixpoints;
-		return _fixpoints.Count != 0;
+		return fixpoints.Count != 0;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
  IShape IShape.AddFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null) => AddFixpoints(nodes);
@@ -2711,7 +2717,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public bool TryGetUuid([NotNullWhenAttribute(true)] out string? uuid)
 	{
 		uuid = _uuid;
-		return _uuid != null;
+		return uuid != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -2738,7 +2744,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public bool TryGetShapeDocs([NotNullWhenAttribute(true)] out Documentation? shapeDocs)
 	{
 		shapeDocs = _shapeDocs;
-		return _shapeDocs != null;
+		return shapeDocs != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>

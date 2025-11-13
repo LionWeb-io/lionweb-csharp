@@ -119,7 +119,7 @@ public partial class EnumHolder : ConceptInstanceBase
         public bool TryGetEnumValue([NotNullWhenAttribute(true)] out MyEnum? enumValue)
 	{
 		enumValue = _enumValue;
-		return _enumValue != null;
+		return enumValue != null;
 	}
 
 	/// <remarks>Required Property</remarks>

@@ -103,7 +103,7 @@ public partial class Container : ConceptInstanceBase
         public bool TryGetLibraries([NotNullWhenAttribute(true)] out IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> libraries)
 	{
 		libraries = _libraries;
-		return _libraries.Count != 0;
+		return libraries.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>

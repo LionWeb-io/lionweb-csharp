@@ -163,7 +163,7 @@ public partial class myConcept : ConceptInstanceBase
         public bool TryGetMyContainment([NotNullWhenAttribute(true)] out INode? myContainment)
 	{
 		myContainment = _myContainment;
-		return _myContainment != null;
+		return myContainment != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -193,7 +193,7 @@ public partial class myConcept : ConceptInstanceBase
         public bool TryGetMyProperty([NotNullWhenAttribute(true)] out string? myProperty)
 	{
 		myProperty = _myProperty;
-		return _myProperty != null;
+		return myProperty != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -208,19 +208,20 @@ public partial class myConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private IReadableNode? _myReference = null;
+	private ReferenceDescriptor<IReadableNode>? _myReference = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MyReference has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(MyLowerCaseLangLanguage), Key = "key-reference")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadableNode MyReference { get => _myReference ?? throw new UnsetFeatureException(MyLowerCaseLangLanguage.Instance.myConcept_myReference); set => SetMyReference(value); }
+	public IReadableNode MyReference { get => MyReferenceTarget() ?? throw new UnsetFeatureException(MyLowerCaseLangLanguage.Instance.myConcept_myReference); set => SetMyReference(value); }
 
+	private IReadableNode? MyReferenceTarget() => _myReference?.Target;
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetMyReference([NotNullWhenAttribute(true)] out IReadableNode? myReference)
 	{
-		myReference = _myReference;
-		return _myReference != null;
+		myReference = MyReferenceTarget();
+		return myReference != null;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
@@ -228,9 +229,9 @@ public partial class myConcept : ConceptInstanceBase
         public myConcept SetMyReference(IReadableNode value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, MyLowerCaseLangLanguage.Instance.myConcept_myReference);
-		ReferenceSingleNotificationEmitter emitter = new(MyLowerCaseLangLanguage.Instance.myConcept_myReference, this, value, _myReference, notificationId);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MyLowerCaseLangLanguage.Instance.myConcept_myReference, this, ReferenceDescriptor.FromNodeOptional(value), _myReference, notificationId);
 		emitter.CollectOldData();
-		_myReference = value;
+		_myReference = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}

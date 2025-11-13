@@ -189,7 +189,7 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -271,7 +271,7 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -353,7 +353,7 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -451,7 +451,7 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -533,7 +533,7 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>

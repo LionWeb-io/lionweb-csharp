@@ -222,7 +222,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private List<StatementSyntax> GenSetInternalMultiOptionalReference(Reference reference) =>
     [
-        SafeNodesVar(reference),
+        SafeNodesVarReference(reference),
         AssureNotNullCall(reference),
         AssureNotNullMembersCall(reference),
         SetReferenceEmitterVariable(reference),
@@ -233,9 +233,19 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ReturnTrue()
     ];
 
+    private LocalDeclarationStatementSyntax SafeNodesVarReference(Reference reference) =>
+        Variable("safeNodes", Var(),
+            InvocationExpression(MemberAccess(InvocationExpression(
+                MemberAccess(MetaProperty(reference),
+                    Generic("AsReferenceDescriptors", AsType(reference.Type, true))
+                ),
+                AsArguments([IdentifierName("value")])
+            ), IdentifierName("ToList")))
+        );
+
     private List<StatementSyntax> GenSetInternalMultiRequiredReference(Reference reference) =>
     [
-        SafeNodesVar(reference),
+        SafeNodesVarReference(reference),
         AssureNonEmptyCall(reference),
         SetReferenceEmitterVariable(reference),
         EmitterCollectOldDataCall(),

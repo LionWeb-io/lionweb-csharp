@@ -394,6 +394,18 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
 
     /// <inheritdoc />
     public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
+
+    protected IImmutableList<R> ReferenceInfoResolvedTargets<R>(List<ReferenceDescriptor<R>> storage)
+        where R : IReadableNode =>
+        storage.Select(r => r.Target).Where(t => t is not null).ToImmutableList()!;
+
+    protected IImmutableList<R> ReferenceInfoAllTargets<R>(List<ReferenceDescriptor<R>> storage, Reference reference,
+        IReadableNode parent) where R : IReadableNode =>
+        storage
+            .Select(r =>
+                r.Target ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, r.ResolveInfo,
+                    r.TargetId))
+            .ToImmutableList();
 }
 
 /// Base implementation of <see cref="INode"/>.
@@ -697,7 +709,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Link of <paramref name="storage"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> were empty after removing all of <paramref name="safeNodes"/>.</exception>
-    protected void AssureNotClearing<T>(List<T> safeNodes, IList<T> storage, Link link) where T : IReadableNode
+    protected void AssureNotClearing<T>(List<T> safeNodes, IEnumerable<T> storage, Link link) where T : IReadableNode
     {
         var copy = new List<T>(storage);
         RemoveAll(safeNodes, copy, null);
@@ -789,9 +801,9 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             ? storage.AsReadOnly()
             : throw new UnsetFeatureException(link);
 
-    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<ReferenceInfo<T>> storage, Link link) where T : IReadableNode =>
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(IReadOnlyList<T> storage, Link link) where T : IReadableNode =>
         storage.Count != 0
-            ? storage.Select(r => r.Target).Where(t => t is not null).ToImmutableList()
+            ? storage
             : throw new UnsetFeatureException(link);
 
     /// <summary>
@@ -926,7 +938,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceInfo<T>> storage,
+    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceDescriptor<T>> storage,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
         INotificationId? notificationId = null)
         where T : IReadableNode
@@ -1014,4 +1026,52 @@ public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionIns
     protected internal abstract IPartitionNotificationProducer? GetNotificationProducer();
 }
 
-public record struct ReferenceInfo<T>(ResolveInfo? ResolveInfo, NodeId? TargetId, T? Target) where T : IReadableNode;
+public record struct ReferenceDescriptor<T>(ResolveInfo? ResolveInfo, NodeId? TargetId, T? Target)
+    where T : IReadableNode
+{
+};
+
+public static class ReferenceDescriptor
+{
+    public static ReferenceDescriptor<R> FromNode<R>(R node) where R : IReadableNode =>
+        node is not null
+            ? new ReferenceDescriptor<R>(node?.GetNodeName(), node?.GetId(), node)
+            : throw new InvalidValueException(null, node);
+
+    public static ReferenceDescriptor<R>? FromNodeOptional<R>(R? node) where R : IReadableNode =>
+        node is null ? null : new ReferenceDescriptor<R>(node.GetNodeName(), node.GetId(), node);
+
+    public static ReferenceTarget ToReferenceTarget<R>(this ReferenceDescriptor<R> referenceDescriptor)
+        where R : IReadableNode =>
+        new ReferenceTarget(referenceDescriptor.ResolveInfo, referenceDescriptor.Target);
+}
+
+public class ReferenceDescriptorIdComparer<T> : IEqualityComparer<ReferenceDescriptor<T>> where T : IReadableNode
+{
+    /// <inheritdoc />
+    public bool Equals(ReferenceDescriptor<T> x, ReferenceDescriptor<T> y)
+    {
+        if (x.Target is not null && y.Target is not null)
+            return x.Target.GetId() == y.Target.GetId();
+
+        if (x.TargetId is not null && y.TargetId is not null)
+            return x.TargetId == y.TargetId;
+
+        return x.ResolveInfo == y.ResolveInfo;
+    }
+
+    /// <inheritdoc />
+    public int GetHashCode(ReferenceDescriptor<T> obj)
+    {
+        if (obj.Target is not null)
+            return obj.Target.GetId().GetHashCode();
+
+        if (obj.TargetId is not null)
+            return obj.TargetId.GetHashCode();
+
+        if (obj.ResolveInfo is not null)
+            return obj.ResolveInfo.GetHashCode();
+
+        return 0;
+    }
+}

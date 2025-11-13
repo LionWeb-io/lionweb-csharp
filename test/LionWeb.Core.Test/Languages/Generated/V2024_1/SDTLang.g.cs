@@ -261,7 +261,7 @@ public partial class SDTConcept : ConceptInstanceBase
         public bool TryGetA([NotNullWhenAttribute(true)] out A? a)
 	{
 		a = _a;
-		return _a != null;
+		return a != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -289,7 +289,7 @@ public partial class SDTConcept : ConceptInstanceBase
         public bool TryGetAmount([NotNullWhenAttribute(true)] out Amount? amount)
 	{
 		amount = _amount;
-		return _amount != null;
+		return amount != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -317,7 +317,7 @@ public partial class SDTConcept : ConceptInstanceBase
         public bool TryGetComplex([NotNullWhenAttribute(true)] out ComplexNumber? complex)
 	{
 		complex = _complex;
-		return _complex != null;
+		return complex != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -342,7 +342,7 @@ public partial class SDTConcept : ConceptInstanceBase
         public bool TryGetDecimal([NotNullWhenAttribute(true)] out Decimal? @decimal)
 	{
 		@decimal = _decimal;
-		return _decimal != null;
+		return @decimal != null;
 	}
 
 	/// <remarks>Optional Property</remarks>

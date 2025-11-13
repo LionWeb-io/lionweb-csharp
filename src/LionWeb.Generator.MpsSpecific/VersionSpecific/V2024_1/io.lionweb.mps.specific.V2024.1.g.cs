@@ -14,6 +14,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "2024.1")]
@@ -459,23 +460,25 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<IReadableNode> _seeAlso = [];
+	private readonly List<ReferenceDescriptor<IReadableNode>> _seeAlso = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IReadableNode> SeeAlso { get => _seeAlso.AsReadOnly(); init => AddSeeAlso(value); }
+	public IReadOnlyList<IReadableNode> SeeAlso { get => SeeAlsoTargets(); init => AddSeeAlso(value); }
+
+    private IImmutableList<IReadableNode> SeeAlsoTargets() => ReferenceInfoResolvedTargets(_seeAlso);
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso)
 	{
-		seeAlso = _seeAlso;
+		seeAlso = SeeAlsoTargets();
 		return _seeAlso.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso.Count, notificationId);
@@ -489,7 +492,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
         public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _seeAlso);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, index, notificationId);
@@ -553,7 +556,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value).ToList();
+			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsReferenceDescriptors<IReadableNode>(value).ToList();
 			AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 			AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, notificationId);

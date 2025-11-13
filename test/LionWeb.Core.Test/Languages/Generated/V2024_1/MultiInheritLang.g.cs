@@ -122,7 +122,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
         public bool TryGetIfaceContainment([NotNullWhenAttribute(true)] out INode? ifaceContainment)
 	{
 		ifaceContainment = _ifaceContainment;
-		return _ifaceContainment != null;
+		return ifaceContainment != null;
 	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
