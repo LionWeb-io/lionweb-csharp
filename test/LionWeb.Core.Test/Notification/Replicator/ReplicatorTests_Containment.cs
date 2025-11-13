@@ -164,6 +164,47 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
+    
+    /// <summary>
+    /// This test confirms that remote replicator is able to detach child from its parent
+    /// which is a required multiple containment.
+    /// </summary>
+    [TestMethod]
+    public void ChildDeleted_Multiple_required_containment()
+    {
+        var deleted = new Circle("deleted");
+        var origin = new CompositeShape("origin") { Parts = [deleted] };
+        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var notification = new ChildDeletedNotification(deleted, origin, ShapesLanguage.Instance.CompositeShape_parts, 0,
+            new NumericNotificationId("childDeletedNotification", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.ThrowsExactly<UnsetFeatureException>(() => ((CompositeShape)clonedPartition.Shapes[0]).Parts);
+    }
+    
+    /// <summary>
+    /// This test confirms that remote replicator is able to detach child from its parent
+    /// which is a required single containment.
+    /// </summary>
+    [TestMethod]
+    public void ChildDeleted_Single_required_containment()
+    {
+        var deleted = new Coord("deleted");
+        var circle = new Circle("c") { Center = deleted };
+
+        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var notification = new ChildDeletedNotification(deleted, circle, ShapesLanguage.Instance.Circle_center, 0,
+            new NumericNotificationId("childDeletedNotification", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.ThrowsExactly<UnsetFeatureException>(() => ((Circle)clonedPartition.Shapes[0]).Center);
+    }
 
     #endregion
 
