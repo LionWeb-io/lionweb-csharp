@@ -67,7 +67,7 @@ public interface IReplicatorCreator
     Geometry CreateReplicator(Geometry node);
 }
 
-internal class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
+public class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
 {
     public int Count => Notifications.Count;
 
