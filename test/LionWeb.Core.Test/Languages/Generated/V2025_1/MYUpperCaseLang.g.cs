@@ -163,7 +163,7 @@ public partial class MYConcept : ConceptInstanceBase
         public bool TryGetMYContainment([NotNullWhenAttribute(true)] out INode? mYContainment)
 	{
 		mYContainment = _mYContainment;
-		return _mYContainment != null;
+		return mYContainment != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -193,7 +193,7 @@ public partial class MYConcept : ConceptInstanceBase
         public bool TryGetMYProperty([NotNullWhenAttribute(true)] out string? mYProperty)
 	{
 		mYProperty = _mYProperty;
-		return _mYProperty != null;
+		return mYProperty != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -208,19 +208,20 @@ public partial class MYConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private IReadableNode? _mYReference = null;
+	private ReferenceDescriptor<IReadableNode>? _mYReference = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MYReference has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(MYUpperCaseLangLanguage), Key = "key-reference")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadableNode MYReference { get => _mYReference ?? throw new UnsetFeatureException(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference); set => SetMYReference(value); }
+	public IReadableNode MYReference { get => MYReferenceTarget() ?? throw new UnsetFeatureException(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference); set => SetMYReference(value); }
 
+	private IReadableNode? MYReferenceTarget() => _mYReference?.Target;
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetMYReference([NotNullWhenAttribute(true)] out IReadableNode? mYReference)
 	{
-		mYReference = _mYReference;
-		return _mYReference != null;
+		mYReference = MYReferenceTarget();
+		return mYReference != null;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
@@ -228,9 +229,9 @@ public partial class MYConcept : ConceptInstanceBase
         public MYConcept SetMYReference(IReadableNode value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
-		ReferenceSingleNotificationEmitter emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference, notificationId);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, ReferenceDescriptor.FromNodeOptional(value), _mYReference, notificationId);
 		emitter.CollectOldData();
-		_mYReference = value;
+		_mYReference = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}

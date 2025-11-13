@@ -189,7 +189,7 @@ public partial class DeprConcept : ConceptInstanceBase
 	public bool TryGetDeprChild([NotNullWhenAttribute(true)] out IReadOnlyList<DeprIface> deprChild)
 	{
 		deprChild = _deprChild;
-		return _deprChild.Count != 0;
+		return deprChild.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -244,7 +244,7 @@ public partial class DeprConcept : ConceptInstanceBase
 	public bool TryGetDeprProp([NotNullWhenAttribute(true)] out string? deprProp)
 	{
 		deprProp = _deprProp;
-		return _deprProp != null;
+		return deprProp != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -258,21 +258,22 @@ public partial class DeprConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private DeprAnnotation? _deprRef = null;
+	private ReferenceDescriptor<DeprAnnotation>? _deprRef = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If DeprRef has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	[Obsolete("deprRef comment")]
-	public DeprAnnotation DeprRef { get => _deprRef ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
+	public DeprAnnotation DeprRef { get => DeprRefTarget() ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
 
+	private DeprAnnotation? DeprRefTarget() => _deprRef?.Target;
 	/// <remarks>Required Single Reference</remarks>
         [Obsolete("deprRef comment")]
 	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)
 	{
-		deprRef = _deprRef;
-		return _deprRef != null;
+		deprRef = DeprRefTarget();
+		return deprRef != null;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
@@ -281,9 +282,9 @@ public partial class DeprConcept : ConceptInstanceBase
 	public DeprConcept SetDeprRef(DeprAnnotation value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
-		ReferenceSingleNotificationEmitter emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef, notificationId);
+		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, ReferenceDescriptor.FromNodeOptional(value), _deprRef, notificationId);
 		emitter.CollectOldData();
-		_deprRef = value;
+		_deprRef = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}

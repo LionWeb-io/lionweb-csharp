@@ -14,6 +14,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-GeneralNodeLang", Version = "1")]
@@ -131,7 +132,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
         public bool TryGetMultipleContainment([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleContainment)
 	{
 		multipleContainment = _multipleContainment;
-		return _multipleContainment.Count != 0;
+		return multipleContainment.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -186,7 +187,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
         public bool TryGetMultipleOptionalContainment([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalContainment)
 	{
 		multipleOptionalContainment = _multipleOptionalContainment;
-		return _multipleOptionalContainment.Count != 0;
+		return multipleOptionalContainment.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -226,23 +227,24 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<IReadableNode> _multipleOptionalRef = [];
+	private readonly List<ReferenceDescriptor<IReadableNode>> _multipleOptionalRef = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IReadableNode> MultipleOptionalRef { get => _multipleOptionalRef.AsReadOnly(); init => AddMultipleOptionalRef(value); }
+	public IReadOnlyList<IReadableNode> MultipleOptionalRef { get => MultipleOptionalRefTargets(); init => AddMultipleOptionalRef(value); }
 
+	private IImmutableList<IReadableNode> MultipleOptionalRefTargets() => ReferenceInfoResolvedTargets(_multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMultipleOptionalRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalRef)
 	{
-		multipleOptionalRef = _multipleOptionalRef;
-		return _multipleOptionalRef.Count != 0;
+		multipleOptionalRef = MultipleOptionalRefTargets();
+		return multipleOptionalRef.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept AddMultipleOptionalRef(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNodes, _multipleOptionalRef.Count, notificationId);
@@ -256,7 +258,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
         public GeneralNodeConcept InsertMultipleOptionalRef(int index, IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _multipleOptionalRef);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNodes, index, notificationId);
@@ -276,25 +278,26 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<IReadableNode> _multipleRef = [];
+	private readonly List<ReferenceDescriptor<IReadableNode>> _multipleRef = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultipleRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<IReadableNode> MultipleRef { get => AsNonEmptyReadOnly(_multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef); init => AddMultipleRef(value); }
+	public IReadOnlyList<IReadableNode> MultipleRef { get => AsNonEmptyReadOnly<IReadableNode>(MultipleRefTargets(), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef); init => AddMultipleRef(value); }
 
+	private IImmutableList<IReadableNode> MultipleRefTargets() => ReferenceInfoResolvedTargets(_multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultipleRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleRef)
 	{
-		multipleRef = _multipleRef;
-		return _multipleRef.Count != 0;
+		multipleRef = MultipleRefTargets();
+		return multipleRef.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultipleRef and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleRef(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNodes, _multipleRef.Count, notificationId);
@@ -310,7 +313,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
         public GeneralNodeConcept InsertMultipleRef(int index, IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _multipleRef);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceDescriptor.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNodes, index, notificationId);
@@ -327,7 +330,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		AssureNotClearing(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
+		AssureNotClearing(safeNodes, MultipleRefTargets(), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		RemoveAll(safeNodes, _multipleRef, ReferenceRemover<IReadableNode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef));
 		return this;
 	}
@@ -344,7 +347,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
         public bool TryGetSingleContainment([NotNullWhenAttribute(true)] out INode? singleContainment)
 	{
 		singleContainment = _singleContainment;
-		return _singleContainment != null;
+		return singleContainment != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -371,7 +374,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
         public bool TryGetSingleOptionalContainment([NotNullWhenAttribute(true)] out INode? singleOptionalContainment)
 	{
 		singleOptionalContainment = _singleOptionalContainment;
-		return _singleOptionalContainment != null;
+		return singleOptionalContainment != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -386,42 +389,44 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private IReadableNode? _singleOptionalRef = null;
+	private ReferenceDescriptor<IReadableNode>? _singleOptionalRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-singleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public IReadableNode? SingleOptionalRef { get => _singleOptionalRef; set => SetSingleOptionalRef(value); }
+	public IReadableNode? SingleOptionalRef { get => SingleOptionalRefTarget(); set => SetSingleOptionalRef(value); }
 
+	private IReadableNode? SingleOptionalRefTarget() => _singleOptionalRef?.Target;
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetSingleOptionalRef([NotNullWhenAttribute(true)] out IReadableNode? singleOptionalRef)
 	{
-		singleOptionalRef = _singleOptionalRef;
-		return _singleOptionalRef != null;
+		singleOptionalRef = SingleOptionalRefTarget();
+		return singleOptionalRef != null;
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
         public GeneralNodeConcept SetSingleOptionalRef(IReadableNode? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef, this, value, _singleOptionalRef, notificationId);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef, this, ReferenceDescriptor.FromNodeOptional(value), _singleOptionalRef, notificationId);
 		emitter.CollectOldData();
-		_singleOptionalRef = value;
+		_singleOptionalRef = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}
 
-	private IReadableNode? _singleRef = null;
+	private ReferenceDescriptor<IReadableNode>? _singleRef = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If SingleRef has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-singleRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadableNode SingleRef { get => _singleRef ?? throw new UnsetFeatureException(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef); set => SetSingleRef(value); }
+	public IReadableNode SingleRef { get => SingleRefTarget() ?? throw new UnsetFeatureException(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef); set => SetSingleRef(value); }
 
+	private IReadableNode? SingleRefTarget() => _singleRef?.Target;
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSingleRef([NotNullWhenAttribute(true)] out IReadableNode? singleRef)
 	{
-		singleRef = _singleRef;
-		return _singleRef != null;
+		singleRef = SingleRefTarget();
+		return singleRef != null;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
@@ -429,9 +434,9 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
         public GeneralNodeConcept SetSingleRef(IReadableNode value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef);
-		ReferenceSingleNotificationEmitter emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef, this, value, _singleRef, notificationId);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef, this, ReferenceDescriptor.FromNodeOptional(value), _singleRef, notificationId);
 		emitter.CollectOldData();
-		_singleRef = value;
+		_singleRef = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}
@@ -528,7 +533,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.EqualsIdentity(feature))
 		{
-			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.AsNodes<IReadableNode>(value).ToList();
+			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.AsReferenceDescriptors<IReadableNode>(value).ToList();
 			AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 			AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNodes, _multipleOptionalRef, notificationId);
@@ -541,7 +546,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.EqualsIdentity(feature))
 		{
-			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.AsNodes<IReadableNode>(value).ToList();
+			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.AsReferenceDescriptors<IReadableNode>(value).ToList();
 			AssureNonEmpty(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNodes, _multipleRef, notificationId);
 			emitter.CollectOldData();

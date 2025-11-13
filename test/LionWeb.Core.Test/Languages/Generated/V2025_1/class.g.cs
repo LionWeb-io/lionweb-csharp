@@ -192,7 +192,7 @@ public partial class @out : @struct
         public bool TryGetDefault([NotNullWhenAttribute(true)] out @if? @default)
 	{
 		@default = _default;
-		return _default != null;
+		return @default != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -277,7 +277,7 @@ public partial class @record : AnnotationInstanceBase, @interface
         public bool TryGetString([NotNullWhenAttribute(true)] out @enum? @string)
 	{
 		@string = _string;
-		return _string != null;
+		return @string != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -306,7 +306,7 @@ public partial class @record : AnnotationInstanceBase, @interface
         public bool TryGetDouble([NotNullWhenAttribute(true)] out @interface? @double)
 	{
 		@double = _double;
-		return _double != null;
+		return @double != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -433,7 +433,7 @@ public partial class @struct : ConceptInstanceBase, @interface
         public bool TryGetString([NotNullWhenAttribute(true)] out @enum? @string)
 	{
 		@string = _string;
-		return _string != null;
+		return @string != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -450,19 +450,20 @@ public partial class @struct : ConceptInstanceBase, @interface
 		return this;
 	}
 
-	private @record? _ref = null;
+	private ReferenceDescriptor<@record>? _ref = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-reference")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public @record Ref { get => _ref ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
+	public @record Ref { get => RefTarget() ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
 
+	private @record? RefTarget() => _ref?.Target;
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetRef([NotNullWhenAttribute(true)] out @record? @ref)
 	{
-		@ref = _ref;
-		return _ref != null;
+		@ref = RefTarget();
+		return @ref != null;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
@@ -470,9 +471,9 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetRef(@record value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
-		ReferenceSingleNotificationEmitter emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
+		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, ReferenceDescriptor.FromNodeOptional(value), _ref, notificationId);
 		emitter.CollectOldData();
-		_ref = value;
+		_ref = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}

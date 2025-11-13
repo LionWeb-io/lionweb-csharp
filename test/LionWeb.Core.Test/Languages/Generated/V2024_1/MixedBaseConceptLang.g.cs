@@ -102,7 +102,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public bool TryGetEnumProp([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? enumProp)
 	{
 		enumProp = _enumProp;
-		return _enumProp != null;
+		return enumProp != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -130,7 +130,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public bool TryGetSdtProp([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt? sdtProp)
 	{
 		sdtProp = _sdtProp;
-		return _sdtProp != null;
+		return sdtProp != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -157,7 +157,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public bool TryGetCont([NotNullWhenAttribute(true)] out INode? cont)
 	{
 		cont = _cont;
-		return _cont != null;
+		return cont != null;
 	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -189,7 +189,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public bool TryGetProp([NotNullWhenAttribute(true)] out string? prop)
 	{
 		prop = _prop;
-		return _prop != null;
+		return prop != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -206,19 +206,20 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		return this;
 	}
 
-	private IReadableNode? _ref = null;
+	private ReferenceDescriptor<IReadableNode>? _ref = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage), Key = "key-baseReferenceIface-ref")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadableNode Ref { get => _ref ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
+	public IReadableNode Ref { get => RefTarget() ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
 
+	private IReadableNode? RefTarget() => _ref?.Target;
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetRef([NotNullWhenAttribute(true)] out IReadableNode? @ref)
 	{
-		@ref = _ref;
-		return _ref != null;
+		@ref = RefTarget();
+		return @ref != null;
 	}
 /// <remarks>Required Single Reference</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -228,9 +229,9 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetRef(IReadableNode value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
-		ReferenceSingleNotificationEmitter emitter = new(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref, notificationId);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, ReferenceDescriptor.FromNodeOptional(value), _ref, notificationId);
 		emitter.CollectOldData();
-		_ref = value;
+		_ref = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}

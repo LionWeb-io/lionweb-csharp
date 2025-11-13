@@ -118,7 +118,7 @@ public partial class BConcept : ConceptInstanceBase
         public bool TryGetAEnumProp([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum? aEnumProp)
 	{
 		aEnumProp = _aEnumProp;
-		return _aEnumProp != null;
+		return aEnumProp != null;
 	}
 
 	/// enum desc
@@ -136,25 +136,26 @@ public partial class BConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? _aRef = null;
+	private ReferenceDescriptor<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
+	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => ARefTarget(); set => SetARef(value); }
 
+	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARefTarget() => _aRef?.Target;
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetARef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? aRef)
 	{
-		aRef = _aRef;
-		return _aRef != null;
+		aRef = ARefTarget();
+		return aRef != null;
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
+		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, ReferenceDescriptor.FromNodeOptional(value), _aRef, notificationId);
 		emitter.CollectOldData();
-		_aRef = value;
+		_aRef = ReferenceDescriptor.FromNodeOptional(value);
 		emitter.Notify();
 		return this;
 	}
