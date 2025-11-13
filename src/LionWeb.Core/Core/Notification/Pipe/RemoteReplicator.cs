@@ -234,7 +234,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var newChild = (INode)notification.NewChild;
             var replacedChild = (INode)notification.ReplacedChild;
-            
+
             CheckMatchingNodeIdForReplacedNode(notification);
 
             replacedChild.ReplaceWith(newChild);
@@ -257,9 +257,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedChild = (INode)notification.MovedChild;
             var replacedChild = (INode)notification.ReplacedChild;
-            
+
             CheckMatchingNodeIdForReplacedNode(notification);
-            
+
             replacedChild.ReplaceWith(movedChild);
         });
 
@@ -269,9 +269,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedChild = (INode)notification.MovedChild;
             var replacedChild = (INode)notification.ReplacedChild;
-            
+
             CheckMatchingNodeIdForReplacedNode(notification);
-            
+
             replacedChild.ReplaceWith(movedChild);
         });
 
@@ -292,7 +292,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             var localParent = (INotifiableNode)notification.Parent;
             var nodeToInsert = notification.MovedChild;
             object newValue = nodeToInsert;
-            
+
             var existingChildren = localParent.Get(notification.Containment);
             if (existingChildren is IList l)
             {
@@ -311,6 +311,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedChild = (INode)notification.MovedChild;
             var replacedChild = (INode)notification.ReplacedChild;
+
+            CheckMatchingNodeIdForReplacedNode(notification);
+
             replacedChild.ReplaceWith(movedChild);
         });
 
@@ -358,18 +361,18 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var localParent = (INotifiableNode)notification.Parent;
             var localDeleted = notification.DeletedAnnotation;
-            
+
             var annotations = localParent.GetAnnotations().ToList();
             var deletedNodeId = localDeleted.GetId();
             var actualNodeId = annotations[notification.Index].GetId();
-            
+
             if (deletedNodeId != actualNodeId)
             {
                 throw new InvalidNotificationException(notification,
                     $"Deleted annotation node with id {deletedNodeId} does not match with actual node with id {actualNodeId} " +
                     $"at index {notification.Index}");
             }
-            
+
             localParent.RemoveAnnotations([localDeleted], notification.NotificationId);
         });
 
@@ -534,7 +537,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             Filter.UnregisterNotificationId(notificationId);
         }
     }
-    
+
     private void CheckMatchingNodeIdForReplacedNode(ChildReplacedNotification notification)
     {
         var replacedChildId = notification.ReplacedChild.GetId();
@@ -564,7 +567,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             }
         }
     }
-    
+
     private void CheckMatchingNodeIdForReplacedNode(ChildMovedAndReplacedFromOtherContainmentNotification notification)
     {
         var replacedChildId = notification.ReplacedChild.GetId();
@@ -594,6 +597,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             }
         }
     }
+
     private void CheckMatchingNodeIdForReplacedNode(ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification)
     {
         var replacedChildId = notification.ReplacedChild.GetId();
@@ -624,4 +628,32 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
     }
 
+    /// <summary>
+    /// Applicable to only multiple containments
+    /// </summary>
+    private void CheckMatchingNodeIdForReplacedNode(ChildMovedAndReplacedInSameContainmentNotification notification)
+    {
+        var replacedChildId = notification.ReplacedChild.GetId();
+        var localParent = notification.Parent;
+        
+        if (!notification.Containment.Multiple)
+        {
+            return;
+        }
+
+        var existingChildren = localParent.Get(notification.Containment);
+        if (existingChildren is not IList l)
+        {
+            return;
+        }
+
+        var children = new List<IReadableNode>(l.Cast<IReadableNode>());
+        var actualChildId = children[notification.NewIndex].GetId();
+        if (replacedChildId != actualChildId)
+        {
+            throw new InvalidNotificationException(notification,
+                $"Replaced node with id {replacedChildId} does not match with actual node with id {actualChildId} " +
+                $"in containment {notification.Containment} at index {notification.NewIndex}");
+        }
+    }
 }

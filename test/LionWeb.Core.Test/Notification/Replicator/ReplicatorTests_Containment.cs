@@ -592,6 +592,27 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
         Assert.AreEqual(5, clonedPartition.Shapes.Count);
         Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[^2].GetId());
     }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedInSameContainment_not_matching_node_ids()
+    {
+        var moved = new Circle("moved");
+        var replaced = new Line("replaced");
+        var nodeWithAnotherId = new Line("node-with-another-id");
+        var originalPartition = new Geometry("a") { Shapes = [moved, replaced, nodeWithAnotherId] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 1;
+        var oldIndex = 0;
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            nodeWithAnotherId, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification);
+        });
+    }
+    
 
     #endregion
 
