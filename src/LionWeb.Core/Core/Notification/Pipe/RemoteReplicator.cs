@@ -392,6 +392,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedAnnotation = (INode)notification.MovedAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
+            
+            CheckMatchingNodeIdForReplacedNode(notification);
+            
             replacedAnnotation.ReplaceWith(movedAnnotation);
         });
 
@@ -529,6 +532,21 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         } finally
         {
             Filter.UnregisterNotificationId(notificationId);
+        }
+    }
+    
+    private void CheckMatchingNodeIdForReplacedNode(AnnotationMovedAndReplacedFromOtherParentNotification notification)
+    {
+        var localParent = notification.NewParent;
+        var replacedNodeId = notification.ReplacedAnnotation.GetId();
+        var annotations = localParent.GetAnnotations().ToList();
+        var actualNodeId = annotations[notification.NewIndex].GetId();
+
+        if (replacedNodeId != actualNodeId)
+        {
+            throw new InvalidNotificationException(notification,
+                $"Replaced annotation node with id {replacedNodeId} does not match with actual node with id {actualNodeId} " +
+                $"at index {notification.NewIndex}");
         }
     }
     

@@ -428,6 +428,32 @@ public class ReplicatorTests_Annotation : ReplicatorTestsBase
         Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[1].GetAnnotations()[^1].GetId());
     }
 
+    [TestMethod]
+    public void AnnotationMovedAndReplacedFromOtherParent_not_matching_node_ids()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var nodeWithAnotherId = new BillOfMaterials("node-with-another-id");
+        var line = new Line("line");
+        line.AddAnnotations([new BillOfMaterials("bof"), replaced, nodeWithAnotherId]);
+        
+        var origin = new CompositeShape("origin");
+        var moved = new BillOfMaterials("moved");
+        origin.AddAnnotations([moved]);
+        var originalPartition = new Geometry("a") { Shapes = [origin, line] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newIndex = 1;
+        var oldIndex = 0;
+        var notification = new AnnotationMovedAndReplacedFromOtherParentNotification(line, newIndex, moved, origin, oldIndex, nodeWithAnotherId, 
+            new NumericNotificationId("AnnotationMovedAndReplacedFromOtherParent", 0));
+        
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification);
+        });
+    }
+
     #endregion 
 
     #endregion
