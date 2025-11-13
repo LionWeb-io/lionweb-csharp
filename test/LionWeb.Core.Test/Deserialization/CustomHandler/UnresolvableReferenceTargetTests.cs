@@ -33,8 +33,9 @@ public class UnresolvableReferenceTargetTests
     private class DeserializerHealingHandler(Func<ICompressedId?, string?, Feature, IWritableNode, IReadableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo,
-            Feature reference, IReadableNode node) => heal(targetId, resolveInfo, reference, (IWritableNode)node);
+        public override IReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
+            ResolveInfo? resolveInfo, Feature reference, IReadableNode node) =>
+            new ReferenceDescriptor<IReadableNode>(resolveInfo, targetId?.Original, heal(targetId, resolveInfo, reference, (IWritableNode)node));
     }
 
     [TestMethod]

@@ -109,7 +109,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new DeserializerException($"On node with id={node.GetId()}: couldn't find child with id={childId}");
 
     /// <inheritdoc />
-    public virtual IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId,
+    public virtual IReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
         ResolveInfo? resolveInfo,
         Feature reference,
         IReadableNode node) =>

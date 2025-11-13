@@ -60,7 +60,7 @@ public partial class Deserializer
                 .Where(c => c != null)
                 .ToList()!;
 
-            SetLink(children, node, containment);
+            SetContainment(children, node, containment);
         }
     }
 

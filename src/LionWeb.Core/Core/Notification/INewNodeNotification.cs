@@ -1,6 +1,6 @@
-// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
@@ -15,10 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-global using Microsoft.VisualStudio.TestTools.UnitTesting;
-global using NodeId = string;
-global using PropertyValue = string;
-global using ResolveInfo = string;
-global using MetaPointerKey = string;
-global using Index = int;
-global using NotificationId = string;
+namespace LionWeb.Core.Notification;
+
+/// Implementers create a new node.
+public interface INewNodeNotification : INotification
+{
+    /// The newly created node.
+    IReadableNode NewNode { get; }
+}

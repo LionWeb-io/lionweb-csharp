@@ -801,12 +801,16 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return reference_0_1 != null;
 	}
 
+    /// <remarks>Optional Single Reference</remarks>
+    public LinkTestConcept SetReference_0_1(LinkTestConcept? value, INotificationId? notificationId = null) =>
+        SetReference_0_1(ReferenceDescriptor.FromNodeOptional<LinkTestConcept>(value), notificationId);
+
 	/// <remarks>Optional Single Reference</remarks>
-        public LinkTestConcept SetReference_0_1(LinkTestConcept? value, INotificationId? notificationId = null)
+        public LinkTestConcept SetReference_0_1(ReferenceDescriptor<LinkTestConcept>? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, ReferenceDescriptor.FromNodeOptional(value), _reference_0_1, notificationId);
+		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
 		emitter.CollectOldData();
-		_reference_0_1 = ReferenceDescriptor.FromNodeOptional(value);
+		_reference_0_1 = value;
 		emitter.Notify();
 		return this;
 	}
@@ -1089,6 +1093,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 				return true;
 			}
 
+            if (value is IReferenceDescriptor descriptor)
+            {
+                SetReference_0_1(descriptor.Specialize<LinkTestConcept>(), notificationId);
+                return true;
+            }
+            
 			throw new InvalidValueException(feature, value);
 		}
 

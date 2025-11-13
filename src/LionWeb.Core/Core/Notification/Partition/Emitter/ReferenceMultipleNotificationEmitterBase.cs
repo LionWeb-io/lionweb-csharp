@@ -21,9 +21,9 @@ using M3;
 
 public abstract class ReferenceMultipleNotificationEmitterBase<T> : ReferenceNotificationEmitterBase<T> where T : IReadableNode
 {
-    protected readonly List<ReferenceDescriptor<T>> SafeNodes;
+    protected readonly List<IReferenceDescriptor> SafeNodes;
 
-    protected ReferenceMultipleNotificationEmitterBase(Reference reference, INotifiableNode destinationParent, List<ReferenceDescriptor<T>> safeNodes,
+    protected ReferenceMultipleNotificationEmitterBase(Reference reference, INotifiableNode destinationParent, List<IReferenceDescriptor> safeNodes,
         INotificationId? notificationId) : base(reference, destinationParent, notificationId)
     {
         SafeNodes = safeNodes;
