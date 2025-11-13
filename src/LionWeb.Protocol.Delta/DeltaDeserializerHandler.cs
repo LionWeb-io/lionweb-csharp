@@ -19,7 +19,11 @@ namespace LionWeb.Protocol.Delta;
 
 using Core.M1;
 
-internal class ReceiverDeserializerHandler : DeserializerExceptionHandler
+/// <summary>
+/// Do not skip node with id that appears both in deserialized nodes and dependent nodes.
+/// </summary>
+public class DeltaDeserializerHandler : DeserializerExceptionHandler
 {
+    /// <inheritdoc/>
     public override bool SkipDeserializingDependentNode(ICompressedId id) => false;
 }

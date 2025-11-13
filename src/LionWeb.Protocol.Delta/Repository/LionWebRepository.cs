@@ -43,7 +43,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
                 .WithLanguages(languages)
-                .WithHandler(new ReceiverDeserializerHandler())
+                .WithHandler(new DeltaDeserializerHandler())
             ;
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);

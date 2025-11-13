@@ -44,7 +44,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var deserializerBuilder = new DeserializerBuilder()
             .WithLionWebVersion(lionWebVersion)
             .WithLanguages(languages)
-            .WithHandler(new ReceiverDeserializerHandler());
+            .WithHandler(new DeltaDeserializerHandler());
 
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
@@ -85,7 +85,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
                 .WithLanguages(languages)  
-                .WithHandler(new ReceiverDeserializerHandler());
+                .WithHandler(new DeltaDeserializerHandler());
 
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
