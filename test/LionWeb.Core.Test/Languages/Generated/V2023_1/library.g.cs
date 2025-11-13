@@ -178,7 +178,7 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]
 public partial class Book : ConceptInstanceBase
 {
-	private ReferenceDescriptor<Writer>? _author = null;
+	private IReferenceDescriptor? _author = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Author has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -186,7 +186,7 @@ public partial class Book : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public Writer Author { get => AuthorTarget() ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
-	private Writer? AuthorTarget() => _author?.Target;
+	private Writer? AuthorTarget() => ReferenceDescriptorNullableTarget<Writer>(_author);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetAuthor([NotNullWhenAttribute(true)] out Writer? author)
 	{
@@ -194,16 +194,21 @@ public partial class Book : ConceptInstanceBase
 		return author != null;
 	}
 
+	private Book SetAuthor(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
+		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
+		emitter.CollectOldData();
+		_author = value;
+		emitter.Notify();
+		return this;
+	}
+
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Book SetAuthor(Writer value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
-		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, ReferenceDescriptor.FromNodeOptional(value), _author, notificationId);
-		emitter.CollectOldData();
-		_author = ReferenceDescriptor.FromNodeOptional(value);
-		emitter.Notify();
-		return this;
+		return SetAuthor(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
 	}
 
 	private int? _pages = null;
@@ -329,6 +334,12 @@ public partial class Book : ConceptInstanceBase
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Writer v)
 			{
 				SetAuthor(v, notificationId);
+				return true;
+			}
+
+			if (value is IReferenceDescriptor descriptor)
+			{
+				SetAuthor(descriptor, notificationId);
 				return true;
 			}
 

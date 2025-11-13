@@ -20,6 +20,7 @@ namespace LionWeb.Generator.Impl;
 using Core;
 using Core.M2;
 using Core.M3;
+using Core.Notification;
 using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -36,46 +37,41 @@ public partial class FeatureGenerator
                 SingleRequiredFeatureProperty(InvocationExpression(ReferenceTarget(reference)))
                     .Xdoc(XdocThrowsIfSetToNull()),
                 SingleReferenceTargetMethod(reference),
-                TryGet(InvocationExpression(ReferenceTarget(reference)))
+                TryGet(InvocationExpression(ReferenceTarget(reference))),
+                SingleReferenceSetter([
+                        AsureNotNullCall(),
+                        ReferenceEmitterVariable(),
+                        EmitterCollectOldDataCall(),
+                        AssignFeatureField(),
+                        EmitterNotifyCall(),
+                        ReturnStatement(This())
+                    ])
             }
             .Concat(RequiredFeatureSetter([
-                    AsureNotNullCall(),
-                    ReferenceEmitterVariable(),
-                    EmitterCollectOldDataCall(),
-                    AssignFeatureField(FromNodeOptionalValue()),
-                    EmitterNotifyCall(),
-                    ReturnStatement(This())
+                    SingleReferenceSetterForwarder()
                 ])
                 .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
             );
 
+    private ReturnStatementSyntax SingleReferenceSetterForwarder() =>
+        ReturnStatement(Call(FeatureSet().ToString(), FromNodeOptional(IdentifierName("value")),
+            IdentifierName("notificationId")));
+
     private FieldDeclarationSyntax SingleReferenceField() =>
         Field(FeatureField(feature).ToString(),
-                NullableType(AsType(typeof(ReferenceDescriptor<>), AsType(feature.GetFeatureType()))),
+                NullableType(AsType(typeof(IReferenceDescriptor))),
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private LocalDeclarationStatementSyntax ReferenceEmitterVariable()
-    {
-        ExpressionSyntax value = IdentifierName("value");
-        return Variable(
+    private LocalDeclarationStatementSyntax ReferenceEmitterVariable() =>
+        Variable(
             "emitter",
             AsType(typeof(ReferenceSingleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
-                MetaProperty(feature), This(), InvocationExpression(
-                        MemberAccess(
-                            IdentifierName("ReferenceDescriptor"),
-                            IdentifierName("FromNodeOptional")
-                        )
-                    )
-                    .WithArgumentList(AsArguments([
-                            value
-                        ])
-                    ),
+                MetaProperty(feature), This(), IdentifierName("value"),
                 FeatureField(feature), IdentifierName("notificationId")
             ])
         );
-    }
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
@@ -83,23 +79,36 @@ public partial class FeatureGenerator
                 SingleReferenceField(),
                 SingleOptionalFeatureProperty(InvocationExpression(ReferenceTarget(reference))),
                 SingleReferenceTargetMethod(reference),
-                TryGet(InvocationExpression(ReferenceTarget(reference)))
+                TryGet(InvocationExpression(ReferenceTarget(reference))),
+                SingleReferenceSetter([
+                    ReferenceEmitterVariable(),
+                    EmitterCollectOldDataCall(),
+                    AssignFeatureField(),
+                    EmitterNotifyCall(),
+                    ReturnStatement(This())
+                ])
             }
             .Concat(OptionalFeatureSetter([
-                ReferenceEmitterVariable(),
-                EmitterCollectOldDataCall(),
-                AssignFeatureField(FromNodeOptionalValue()),
-                EmitterNotifyCall(),
-                ReturnStatement(This())
+                SingleReferenceSetterForwarder()
             ]));
+
+    private MethodDeclarationSyntax SingleReferenceSetter(List<StatementSyntax> body) =>
+        Method(FeatureSet().ToString(), AsType(classifier),
+                [
+                    Param("value", NullableType(AsType(typeof(IReferenceDescriptor)))),
+                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                ]
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
+            .WithBody(AsStatements(body));
 
     private static InvocationExpressionSyntax FromNodeOptionalValue() =>
         FromNodeOptional(IdentifierName("value"));
 
-    private static InvocationExpressionSyntax FromNodeOptional(ExpressionSyntax  value) =>
+    private static InvocationExpressionSyntax FromNodeOptional(ExpressionSyntax value) =>
         InvocationExpression(
                 MemberAccess(
-                    IdentifierName("ReferenceDescriptor"),
+                    IdentifierName("ReferenceDescriptorExtensions"),
                     IdentifierName("FromNodeOptional")
                 )
             )
@@ -243,7 +252,7 @@ public partial class FeatureGenerator
     private FieldDeclarationSyntax MultipleReferenceField(Reference reference) =>
         Field(FeatureField(reference).ToString(),
                 AsType(typeof(List<>),
-                    AsType(typeof(ReferenceDescriptor<>), AsType(reference.Type))),
+                    AsType(typeof(IReferenceDescriptor))),
                 Collection([]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
@@ -274,8 +283,8 @@ public partial class FeatureGenerator
         Method(ReferenceTarget(reference).ToString(),
                 NullableType(AsType(reference.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
-            .WithExpressionBody(ArrowExpressionClause(ConditionalAccessExpression(FeatureField(reference),
-                MemberBindingExpression(IdentifierName("Target")))))
+            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceDescriptorNullableTarget",
+                AsType(reference.Type), FeatureField(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
     private ExpressionSyntax ReferenceTarget(Reference reference) =>
@@ -285,7 +294,8 @@ public partial class FeatureGenerator
         Method(ReferenceTargets(reference).ToString(),
                 AsType(typeof(IImmutableList<>), AsType(reference.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
-            .WithExpressionBody(ArrowExpressionClause(Call("ReferenceInfoResolvedTargets", FeatureField(reference))))
+            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceDescriptorNullableTargets",
+                AsType(reference.GetFeatureType()), FeatureField(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
     private ExpressionSyntax ReferenceTargets(Reference reference) =>
@@ -306,7 +316,7 @@ public partial class FeatureGenerator
                                 AsArguments([
                                     MemberAccessExpression(
                                         SyntaxKind.SimpleMemberAccessExpression,
-                                        IdentifierName("ReferenceDescriptor"),
+                                        IdentifierName("ReferenceDescriptorExtensions"),
                                         IdentifierName("FromNode")
                                     )
                                 ])

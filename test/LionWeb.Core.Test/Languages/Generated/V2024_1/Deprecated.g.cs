@@ -258,7 +258,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private ReferenceDescriptor<DeprAnnotation>? _deprRef = null;
+	private IReferenceDescriptor? _deprRef = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If DeprRef has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -267,7 +267,7 @@ public partial class DeprConcept : ConceptInstanceBase
 	[Obsolete("deprRef comment")]
 	public DeprAnnotation DeprRef { get => DeprRefTarget() ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
 
-	private DeprAnnotation? DeprRefTarget() => _deprRef?.Target;
+	private DeprAnnotation? DeprRefTarget() => ReferenceDescriptorNullableTarget<DeprAnnotation>(_deprRef);
 	/// <remarks>Required Single Reference</remarks>
         [Obsolete("deprRef comment")]
 	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)
@@ -276,17 +276,22 @@ public partial class DeprConcept : ConceptInstanceBase
 		return deprRef != null;
 	}
 
+	private DeprConcept SetDeprRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	{
+		AssureNotNull(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
+		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef, notificationId);
+		emitter.CollectOldData();
+		_deprRef = value;
+		emitter.Notify();
+		return this;
+	}
+
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [Obsolete("deprRef comment")]
 	public DeprConcept SetDeprRef(DeprAnnotation value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
-		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, ReferenceDescriptor.FromNodeOptional(value), _deprRef, notificationId);
-		emitter.CollectOldData();
-		_deprRef = ReferenceDescriptor.FromNodeOptional(value);
-		emitter.Notify();
-		return this;
+		return SetDeprRef(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
 	}
 
 	public DeprConcept(string id) : base(id)
@@ -353,6 +358,12 @@ public partial class DeprConcept : ConceptInstanceBase
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprAnnotation v)
 			{
 				SetDeprRef(v, notificationId);
+				return true;
+			}
+
+			if (value is IReferenceDescriptor descriptor)
+			{
+				SetDeprRef(descriptor, notificationId);
 				return true;
 			}
 
