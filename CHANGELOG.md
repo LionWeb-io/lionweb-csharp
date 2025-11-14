@@ -11,7 +11,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Moved `WebSocketServer` and `WebSocketClient` to separate project in core repo for reuse.
 * Added generic add/insert/remove node api for multiple `link` (references and containments) features. 
 ### Fixed
-* Bugfix: `DeltaDeserializerHandler` is made public. This handler enables deserializer to accept node id that appears both in deserialized and dependent (nodes that are referencable by deserialized) nodes. In the context of delta protocol, this enables replacing a node in a model with a new node with the same id, which results in a valid model.
+* Bugfix: `DeltaDeserializerHandler` is made public. This handler enables deserializer to accept node id that appears both in received delta(s) and local nodes. In the context of delta protocol, this enables replacing a node in a model with a new node with the same id, which results in a valid model.
 ### Removed
 ### Deprecated
 ### Security
