@@ -21,7 +21,7 @@ using Core.M1;
 
 /// <summary>
 /// This handler enables deserializer to accept node id that appears
-/// both in deserialized nodes and dependent nodes.
+/// both in received delta(s) and local nodes. 
 /// </summary>
 /// <remarks> In the context of delta protocol, this enables replacing a node in a model
 /// with a new node with the same id, which results in a valid model.</remarks>
