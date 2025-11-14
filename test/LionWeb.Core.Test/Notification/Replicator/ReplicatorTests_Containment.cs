@@ -193,12 +193,12 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     public void ChildDeleted_Single_required_containment()
     {
         var deleted = new Coord("deleted");
-        var circle = new Circle("c") { Center = deleted };
+        var origin = new Circle("c") { Center = deleted };
 
-        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var originalPartition = new Geometry("a") { Shapes = [origin] };
         var clonedPartition = ClonePartition(originalPartition);
         
-        var notification = new ChildDeletedNotification(deleted, circle, ShapesLanguage.Instance.Circle_center, 0,
+        var notification = new ChildDeletedNotification(deleted, origin, ShapesLanguage.Instance.Circle_center, 0,
             new NumericNotificationId("childDeletedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
@@ -208,14 +208,15 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
     
     /// <summary>
     /// This test confirms that no notification is generated from DetachFromParent method
+    /// TODO: This is a known bug, we want to have a notification emitted.
     /// </summary>
     [TestMethod]
     public void ChildDeleted_Single_uses_detach_from_parent()
     {
         var deleted = new Coord("deleted");
-        var circle = new Circle("c") { Center = deleted };
+        var origin = new Circle("c") { Center = deleted };
 
-        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var originalPartition = new Geometry("a") { Shapes = [origin] };
         
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);

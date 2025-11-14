@@ -140,6 +140,25 @@ public class ReplicatorTests_Annotation : ReplicatorTestsBase
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
+    /// <summary>
+    /// This test confirms that no notification is generated from DetachFromParent method
+    /// TODO: This is a known bug, we want to have a notification emitted.
+    /// </summary>
+    [TestMethod]
+    public void AnnotationDeleted_uses_detach_from_parent()
+    {
+        var deleted = new BillOfMaterials("deleted");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("bof"), deleted]);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+        
+        deleted.DetachFromParent();
+
+        Assert.AreEqual(0, notificationObserver.Notifications.Count);
+    }
+    
     #endregion
 
     #region AnnotationReplaced
