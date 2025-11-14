@@ -1535,6 +1535,8 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
         public Geometry AddShapes(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
+        if (_shapes.SequenceEqual(safeNodes))
+            return this; 
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, null, notificationId);
