@@ -943,6 +943,31 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
             CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
         });
     }
+    
+     
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainmentInSameParentNotification_not_matching_node_ids()
+    {
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
+        var originalPartition = new LinkTestConcept("a")
+        {
+            Containment_0_n = [moved],
+            Containment_1_n = [replaced, nodeWithAnotherId]
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 
+            0, moved, originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, nodeWithAnotherId, 
+            new NumericNotificationId("childMovedAndReplacedFromOtherContainmentInSameParentNotification", 0));
+
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            CreatePartitionReplicator(clonedPartition, notification);
+        });
+    }
 
     #endregion
 
