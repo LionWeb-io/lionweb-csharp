@@ -194,21 +194,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteChildDeleted(ChildDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = (INotifiableNode)notification.Parent;
-
-            object? newValue = null;
-            if (notification.Containment.Multiple)
-            {
-                var existingChildren = localParent.Get(notification.Containment);
-                if (existingChildren is IList l)
-                {
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.RemoveAt(notification.Index);
-                    newValue = children;
-                }
-            }
-
-            localParent.Set(notification.Containment, newValue, notification.NotificationId);
+            notification.DeletedChild.DetachFromParent();
         });
 
     private void OnRemoteChildReplaced(ChildReplacedNotification notification) =>
@@ -328,9 +314,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = (INotifiableNode)notification.Parent;
-            var localDeleted = (INotifiableNode)notification.DeletedAnnotation;
-            localParent.RemoveAnnotations([localDeleted], notification.NotificationId);
+            notification.DeletedAnnotation.DetachFromParent();
         });
 
     private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>
