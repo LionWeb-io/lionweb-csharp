@@ -11,6 +11,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Moved `WebSocketServer` and `WebSocketClient` to separate project in core repo for reuse.
 * Added generic add/insert/remove node api for multiple `link` (references and containments) features. 
 ### Fixed
+* Bug fix: Introduce check to validate that the deleted node's ID matches the actual node's ID during child deletion notification.
+* Bug fix: Notification emitter now checks whether a moved node is part of partition of not. If the moved node is a floating node – i.e. not part of a partition – and it replaces another node, then `ChildReplacedNotification` is emitted. If there is no replacement, then `ChildAddedNotification` is emitted.
 * Bugfix: `DeltaDeserializerHandler` is made public. This handler enables deserializer to accept node id that appears both in received delta(s) and local nodes. In the context of delta protocol, this enables replacing a node in a model with a new node with the same id, which results in a valid model.
 ### Removed
 ### Deprecated

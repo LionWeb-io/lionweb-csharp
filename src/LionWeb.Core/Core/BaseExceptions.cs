@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M1;
 using M2;
 using M3;
+using Notification;
 using Serialization;
 
 /// <summary>
@@ -228,3 +229,11 @@ public class UnsupportedVersionException : LionWebExceptionBase
 public class VersionMismatchException(LionWebVersions versionA, LionWebVersions versionB, string? message = null)
     : LionWebExceptionBase($"Mismatched LionWeb versions: {versionA} vs. {versionB}" +
                            (message != null ? $": {message}" : string.Empty));
+
+/// <summary>
+/// Trying to apply an invalid notification
+/// </summary>
+/// <param name="notification">The invalid notification</param>
+/// <param name="message">Additional message</param>
+public class InvalidNotificationException(INotification notification, string message): 
+    LionWebExceptionBase($"Invalid notification: {message}. Notification: {notification}");
