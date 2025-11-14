@@ -453,7 +453,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<IReferenceDescriptor> _materials = [];
+	private readonly List<ReferenceDescriptor> _materials = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -1931,7 +1931,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<IReferenceDescriptor> _materials = [];
+	private readonly List<ReferenceDescriptor> _materials = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
@@ -2170,7 +2170,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-OffsetDuplicate")]
 public partial class OffsetDuplicate : Shape
 {
-	private IReferenceDescriptor? _altSource = null;
+	private ReferenceDescriptor? _altSource = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-source")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
@@ -2184,7 +2184,7 @@ public partial class OffsetDuplicate : Shape
 		return altSource != null;
 	}
 
-	private OffsetDuplicate SetAltSource(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private OffsetDuplicate SetAltSource(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource, notificationId);
 		emitter.CollectOldData();
@@ -2278,7 +2278,7 @@ public partial class OffsetDuplicate : Shape
 		return this;
 	}
 
-	private IReferenceDescriptor? _source = null;
+	private ReferenceDescriptor? _source = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Source has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -2294,7 +2294,7 @@ public partial class OffsetDuplicate : Shape
 		return source != null;
 	}
 
-	private OffsetDuplicate SetSource(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private OffsetDuplicate SetSource(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
 		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source, notificationId);
@@ -2368,7 +2368,7 @@ public partial class OffsetDuplicate : Shape
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetAltSource(descriptor, notificationId);
 				return true;
@@ -2418,7 +2418,7 @@ public partial class OffsetDuplicate : Shape
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetSource(descriptor, notificationId);
 				return true;
@@ -2493,7 +2493,7 @@ public partial class OffsetDuplicate : Shape
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-ReferenceGeometry")]
 public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance<INode>
 {
-	private readonly List<IReferenceDescriptor> _shapes = [];
+	private readonly List<ReferenceDescriptor> _shapes = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]

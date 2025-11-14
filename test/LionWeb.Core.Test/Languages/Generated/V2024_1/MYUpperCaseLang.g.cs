@@ -208,7 +208,7 @@ public partial class MYConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private IReferenceDescriptor? _mYReference = null;
+	private ReferenceDescriptor? _mYReference = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MYReference has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -224,7 +224,7 @@ public partial class MYConcept : ConceptInstanceBase
 		return mYReference != null;
 	}
 
-	private MYConcept SetMYReference(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private MYConcept SetMYReference(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference, notificationId);
@@ -308,7 +308,7 @@ public partial class MYConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetMYReference(descriptor, notificationId);
 				return true;

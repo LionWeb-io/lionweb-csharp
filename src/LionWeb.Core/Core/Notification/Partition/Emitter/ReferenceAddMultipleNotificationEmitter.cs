@@ -30,7 +30,7 @@ public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotif
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    public ReferenceAddMultipleNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<IReferenceDescriptor> safeNodes,
+    public ReferenceAddMultipleNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<ReferenceDescriptor> safeNodes,
         Index startIndex, INotificationId? notificationId = null) : base(reference, destinationParent, safeNodes, notificationId)
     {
         _startIndex = startIndex;

@@ -450,7 +450,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 		return this;
 	}
 
-	private IReferenceDescriptor? _ref = null;
+	private ReferenceDescriptor? _ref = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -466,7 +466,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 		return @ref != null;
 	}
 
-	private @struct SetRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private @struct SetRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
 		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
@@ -533,7 +533,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetRef(descriptor, notificationId);
 				return true;

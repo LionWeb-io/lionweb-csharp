@@ -136,7 +136,7 @@ public partial class BConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private IReferenceDescriptor? _aRef = null;
+	private ReferenceDescriptor? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
@@ -150,7 +150,7 @@ public partial class BConcept : ConceptInstanceBase
 		return aRef != null;
 	}
 
-	private BConcept SetARef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private BConcept SetARef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
 		emitter.CollectOldData();
@@ -215,7 +215,7 @@ public partial class BConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetARef(descriptor, notificationId);
 				return true;

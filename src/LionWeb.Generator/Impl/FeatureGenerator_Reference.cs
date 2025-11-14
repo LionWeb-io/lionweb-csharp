@@ -59,7 +59,7 @@ public partial class FeatureGenerator
 
     private FieldDeclarationSyntax SingleReferenceField() =>
         Field(FeatureField(feature).ToString(),
-                NullableType(AsType(typeof(IReferenceDescriptor))),
+                NullableType(AsType(typeof(ReferenceDescriptor))),
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
@@ -95,7 +95,7 @@ public partial class FeatureGenerator
     private MethodDeclarationSyntax SingleReferenceSetter(List<StatementSyntax> body) =>
         Method(FeatureSet().ToString(), AsType(classifier),
                 [
-                    Param("value", NullableType(AsType(typeof(IReferenceDescriptor)))),
+                    Param("value", NullableType(AsType(typeof(ReferenceDescriptor)))),
                     ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
                 ]
             )
@@ -252,7 +252,7 @@ public partial class FeatureGenerator
     private FieldDeclarationSyntax MultipleReferenceField(Reference reference) =>
         Field(FeatureField(reference).ToString(),
                 AsType(typeof(List<>),
-                    AsType(typeof(IReferenceDescriptor))),
+                    AsType(typeof(ReferenceDescriptor))),
                 Collection([]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
