@@ -328,12 +328,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = (INotifiableNode)notification.Parent;
-            var localDeleted = notification.DeletedAnnotation;
-
             CheckMatchingNodeIdForDeletedNode(notification);
 
-            localParent.RemoveAnnotations([localDeleted], notification.NotificationId);
+            notification.DeletedAnnotation.DetachFromParent();
         });
 
     private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>

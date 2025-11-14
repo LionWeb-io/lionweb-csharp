@@ -19,10 +19,14 @@ namespace LionWeb.Protocol.Delta;
 
 using Core.M1;
 
-internal class ReceiverDeserializerHandler : DeserializerExceptionHandler
+/// <summary>
+/// This handler enables deserializer to accept node id that appears
+/// both in received delta(s) and local nodes. 
+/// </summary>
+/// <remarks> In the context of delta protocol, this enables replacing a node in a model
+/// with a new node with the same id, which results in a valid model.</remarks>
+public class DeltaDeserializerHandler : DeserializerExceptionHandler
 {
-    public override bool SkipDeserializingDependentNode(ICompressedId id)
-    {
-        return false;
-    }
+    /// <inheritdoc/>
+    public override bool SkipDeserializingDependentNode(ICompressedId id) => false;
 }

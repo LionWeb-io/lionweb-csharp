@@ -25,6 +25,12 @@ using Replicator;
 
 public abstract class ReplicatorTestsBase: NotificationTestsBase
 {
+    /// <summary>
+    /// This replicator exercises the following path:
+    /// change on <paramref name="originalForest"/> -> notification -> notificationToNotificationMapper -> notification ->
+    /// forestReplicator -> change applied on <paramref name="clonedForest"/>
+    /// </summary>
+    /// <seealso cref="NotificationToNotificationMapper"/>
     protected static void CreateForestReplicator(IForest clonedForest, IForest originalForest)
     {
         var sharedNodeMap = new SharedNodeMap();
@@ -35,6 +41,12 @@ public abstract class ReplicatorTestsBase: NotificationTestsBase
         notificationMapper.ConnectTo(replicator);
     }
     
+    /// <summary>
+    /// This replicator exercises the following path:
+    /// change on <paramref name="originalPartition"/> -> notification -> notificationToNotificationMapper -> notification ->
+    /// partitionReplicator -> change applied on <paramref name="clonedPartition"/>
+    /// </summary>
+    /// <seealso cref="NotificationToNotificationMapper"/>
     protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
     {
         var sharedNodeMap = new SharedNodeMap();
@@ -45,6 +57,16 @@ public abstract class ReplicatorTestsBase: NotificationTestsBase
         notificationMapper.ConnectTo(replicator);
     }
     
+    /// <summary>
+    /// This replicator exercises the following path:
+    /// <paramref name="notification"/> -> notificationForwarder -> notificationToNotificationMapper -> notification ->
+    /// partitionReplicator -> change applied on <paramref name="clonedPartition"/>
+    /// Different from the <see cref="CreatePartitionReplicator(LionWeb.Core.IPartitionInstance,LionWeb.Core.IPartitionInstance)"/>, this method
+    /// does not receive notifications triggered by a change on a partition, but it directly accepts (e.g. a manually created notification) notifications.
+    /// If there are nodes which are not part of the <paramref name="clonedPartition"/>, <paramref name="sharedNodeMap"/> can be used to add those nodes. 
+    /// </summary>
+    /// <seealso cref="NotificationToNotificationMapper"/>
+    /// <seealso cref="NotificationForwarder"/>
     protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, INotification notification, SharedNodeMap? sharedNodeMap = null)
     {
         sharedNodeMap ??= new SharedNodeMap();

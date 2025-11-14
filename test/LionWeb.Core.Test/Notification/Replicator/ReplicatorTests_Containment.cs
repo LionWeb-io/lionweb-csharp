@@ -181,6 +181,68 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
             CreatePartitionReplicator(clonedPartition, notification);
         });
     }
+    
+        
+    /// <summary>
+    /// This test confirms that remote replicator is able to detach child from its parent
+    /// which is a required multiple containment.
+    /// </summary>
+    [TestMethod]
+    public void ChildDeleted_Multiple_required_containment()
+    {
+        var deleted = new Circle("deleted");
+        var origin = new CompositeShape("origin") { Parts = [deleted] };
+        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var notification = new ChildDeletedNotification(deleted, origin, ShapesLanguage.Instance.CompositeShape_parts, 0,
+            new NumericNotificationId("childDeletedNotification", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.ThrowsExactly<UnsetFeatureException>(() => ((CompositeShape)clonedPartition.Shapes[0]).Parts);
+    }
+    
+    /// <summary>
+    /// This test confirms that remote replicator is able to detach child from its parent
+    /// which is a required single containment.
+    /// </summary>
+    [TestMethod]
+    public void ChildDeleted_Single_required_containment()
+    {
+        var deleted = new Coord("deleted");
+        var origin = new Circle("c") { Center = deleted };
+
+        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var notification = new ChildDeletedNotification(deleted, origin, ShapesLanguage.Instance.Circle_center, 0,
+            new NumericNotificationId("childDeletedNotification", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.ThrowsExactly<UnsetFeatureException>(() => ((Circle)clonedPartition.Shapes[0]).Center);
+    }
+    
+    /// <summary>
+    /// This test confirms that no notification is generated from DetachFromParent method
+    /// TODO: This is a known bug, we want to have a notification emitted.
+    /// </summary>
+    [TestMethod]
+    public void ChildDeleted_Single_uses_detach_from_parent()
+    {
+        var deleted = new Coord("deleted");
+        var origin = new Circle("c") { Center = deleted };
+
+        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+        
+        deleted.DetachFromParent();
+
+        Assert.AreEqual(0, notificationObserver.Notifications.Count);
+    }
 
     [TestMethod]
     public void ChildDeleted_Single_not_matching_node_id()
@@ -397,7 +459,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
         
         Assert.AreEqual(2, clonedPartition.Shapes.Count);
         Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[^1].GetId());
-    } 
+    }
     
     [TestMethod]
     public void ChildReplaced_Multiple_not_matching_node_ids()

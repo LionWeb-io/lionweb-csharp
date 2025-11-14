@@ -57,7 +57,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         _deserializerBuilder = new DeserializerBuilder()
             .WithLionWebVersion(lionWebVersion)
             .WithLanguages(languages)
-            .WithHandler(new ReceiverDeserializerHandler());
+            .WithHandler(new DeltaDeserializerHandler());
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
