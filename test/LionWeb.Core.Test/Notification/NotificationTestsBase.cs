@@ -57,6 +57,9 @@ public abstract class NotificationTestsBase
     }
 }
 
+/// <summary>
+/// Forwards the notification to the following pipe 
+/// </summary>
 internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
 {
     public void ProduceNotification(INotification notification) => Send(notification);
