@@ -197,7 +197,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private IfStatementSyntax GenSetInternalSingleReference(Reference reference) =>
         IfStatement(
             IsPatternExpression(IdentifierName("value"), DeclarationPattern(
-                    AsType(typeof(IReferenceDescriptor)),
+                    AsType(typeof(ReferenceDescriptor)),
                     SingleVariableDesignation(Identifier("descriptor"))
                 )
             ),

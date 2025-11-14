@@ -227,7 +227,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<IReferenceDescriptor> _multipleOptionalRef = [];
+	private readonly List<ReferenceDescriptor> _multipleOptionalRef = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -278,7 +278,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<IReferenceDescriptor> _multipleRef = [];
+	private readonly List<ReferenceDescriptor> _multipleRef = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultipleRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleRef")]
@@ -389,7 +389,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private IReferenceDescriptor? _singleOptionalRef = null;
+	private ReferenceDescriptor? _singleOptionalRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-singleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
@@ -403,7 +403,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return singleOptionalRef != null;
 	}
 
-	private GeneralNodeConcept SetSingleOptionalRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private GeneralNodeConcept SetSingleOptionalRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef, this, value, _singleOptionalRef, notificationId);
 		emitter.CollectOldData();
@@ -418,7 +418,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return SetSingleOptionalRef(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
 	}
 
-	private IReferenceDescriptor? _singleRef = null;
+	private ReferenceDescriptor? _singleRef = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If SingleRef has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -434,7 +434,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return singleRef != null;
 	}
 
-	private GeneralNodeConcept SetSingleRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private GeneralNodeConcept SetSingleRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef, this, value, _singleRef, notificationId);
@@ -596,7 +596,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetSingleOptionalRef(descriptor, notificationId);
 				return true;
@@ -613,7 +613,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetSingleRef(descriptor, notificationId);
 				return true;

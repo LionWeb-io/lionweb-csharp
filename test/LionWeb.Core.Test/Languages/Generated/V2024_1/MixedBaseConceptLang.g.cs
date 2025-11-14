@@ -206,7 +206,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		return this;
 	}
 
-	private IReferenceDescriptor? _ref = null;
+	private ReferenceDescriptor? _ref = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -222,7 +222,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		return @ref != null;
 	}
 
-	private BaseConcept SetRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private BaseConcept SetRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref, notificationId);
@@ -342,7 +342,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetRef(descriptor, notificationId);
 				return true;

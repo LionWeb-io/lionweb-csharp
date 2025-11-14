@@ -127,7 +127,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return this;
 	}
 
-	private readonly List<IReferenceDescriptor> _multivaluedRef = [];
+	private readonly List<ReferenceDescriptor> _multivaluedRef = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultivaluedRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-multivaluedRef")]
@@ -184,7 +184,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return this;
 	}
 
-	private IReferenceDescriptor? _singularRef = null;
+	private ReferenceDescriptor? _singularRef = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If SingularRef has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -200,7 +200,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return singularRef != null;
 	}
 
-	private MyConcept SetSingularRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private MyConcept SetSingularRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
 		ReferenceSingleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_singularRef, this, value, _singularRef, notificationId);
@@ -285,7 +285,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetSingularRef(descriptor, notificationId);
 				return true;

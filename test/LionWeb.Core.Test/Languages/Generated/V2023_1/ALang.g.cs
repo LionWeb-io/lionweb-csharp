@@ -113,7 +113,7 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
 public partial class AConcept : ConceptInstanceBase
 {
-	private IReferenceDescriptor? _bRef = null;
+	private ReferenceDescriptor? _bRef = null;
 	/// bRef desc
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
@@ -133,7 +133,7 @@ public partial class AConcept : ConceptInstanceBase
 		return bRef != null;
 	}
 
-	private AConcept SetBRef(IReferenceDescriptor? value, INotificationId? notificationId = null)
+	private AConcept SetBRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
 		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept> emitter = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, notificationId);
 		emitter.CollectOldData();
@@ -184,7 +184,7 @@ public partial class AConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is IReferenceDescriptor descriptor)
+			if (value is ReferenceDescriptor descriptor)
 			{
 				SetBRef(descriptor, notificationId);
 				return true;

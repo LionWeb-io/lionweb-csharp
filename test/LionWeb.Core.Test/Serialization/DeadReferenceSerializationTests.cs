@@ -23,7 +23,6 @@ using Core.Serialization;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M3;
-using System.Collections;
 
 [TestClass]
 public class DeadReferenceSerializationTests
@@ -85,7 +84,7 @@ public class DeadReferenceSerializationTests
         public override bool SkipDeserializingDependentNode(ICompressedId id) =>
             false;
 
-        public override IReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
+        public override ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
             ResolveInfo? resolveInfo,
             Feature reference, IReadableNode node) =>
             unresolvedReferencesManager.RegisterUnresolvedReference((IWritableNode)node, reference,
@@ -95,7 +94,7 @@ public class DeadReferenceSerializationTests
 
 public class UnresolvedReferencesManager : INotificationReceiver
 {
-    private readonly List<(IWritableNode parent, Feature reference, IReferenceDescriptor descriptor)>
+    private readonly List<(IWritableNode parent, Feature reference, ReferenceDescriptor descriptor)>
         _unresolvedReferences = [];
     
     public void Receive(INotificationSender correspondingSender, INotification notification)
@@ -106,38 +105,16 @@ public class UnresolvedReferencesManager : INotificationReceiver
         _unresolvedReferences.RemoveAll(e => RemoveMatchingReferences(newNodeNotification, e));
     }
 
-    private bool RemoveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, IReferenceDescriptor descriptor) e)
+    private bool RemoveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, ReferenceDescriptor descriptor) e)
     {
         if (e.descriptor.TargetId != newNodeNotification.NewNode.GetId())
             return false;
 
-        var descriptor = new ReferenceDescriptor(e.descriptor.ResolveInfo, e.descriptor.TargetId, newNodeNotification.NewNode);
-
-        if (!e.parent.TryGet(e.reference, out var value))
-        {
-            if (e.reference is Reference { Multiple: true })
-            {
-                value = new List<IReferenceDescriptor> { descriptor };
-            } else
-            {
-                value = descriptor;
-            }
-        } else
-        {
-            if (value is IList list)
-            {
-                value = (List<IReferenceDescriptor>)[..list.Cast<IReadableNode>().Select(ReferenceDescriptorExtensions.FromNode), descriptor];
-            } else
-            {
-                value = descriptor;
-            }
-        }
-
-        e.parent.Set(e.reference, value);
+        e.descriptor.Target = newNodeNotification.NewNode;
         return true;
     }
 
-    public IReferenceDescriptor RegisterUnresolvedReference(IWritableNode parent, Feature reference, IReferenceDescriptor descriptor)
+    public ReferenceDescriptor RegisterUnresolvedReference(IWritableNode parent, Feature reference, ReferenceDescriptor descriptor)
     {
         _unresolvedReferences.Add((parent, reference, descriptor));
         return descriptor;

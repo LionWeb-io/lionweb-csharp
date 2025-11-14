@@ -460,7 +460,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<IReferenceDescriptor> _seeAlso = [];
+	private readonly List<ReferenceDescriptor> _seeAlso = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]

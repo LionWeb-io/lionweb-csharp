@@ -261,16 +261,16 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             if (reference == null)
                 continue;
 
-            List<IReferenceDescriptor> targets = targetEntries
+            List<ReferenceDescriptor> targets = targetEntries
                 .Select(target => FindReferenceTarget(node, reference, target.compressedId, target.resolveInfo))
-                .Where(d => d is  not null)
-                .ToList()!;
+                .Where(d => d is not null)
+                .ToList();
 
             SetReference(targets, writable, reference);
         }
     }
 
-    private IReferenceDescriptor? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
+    private ReferenceDescriptor? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
         ResolveInfo? resolveInfo)
     {
         var target = FindReferenceTarget(targetId, resolveInfo);
@@ -322,7 +322,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    protected void SetReference(List<IReferenceDescriptor> descriptors, IWritableNode node, Feature reference)
+    protected void SetReference(List<ReferenceDescriptor> descriptors, IWritableNode node, Feature reference)
     {
         if (descriptors.Count == 0)
             return;
@@ -333,7 +333,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             node.Set(reference, single && descriptors.Count == 1 ? descriptors[0] : descriptors);
         } catch (InvalidValueException)
         {
-            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(descriptors.Select(r => r?.Target).Where(t => t is not null)).ToList(), reference, node);
+            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(descriptors.Select(r => r.Target).Where(t => t is not null)).ToList(), reference, node);
             if (replacement != null)
                 node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
         }
