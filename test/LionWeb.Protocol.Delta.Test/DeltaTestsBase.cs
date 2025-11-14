@@ -79,8 +79,8 @@ public abstract class DeltaTestsBase: NotificationTestsBase
     
     /// <summary>
     /// This replicator exercises the following path:
-    /// notification ->  notificationToDeltaCommandMapper -> commandToEventMapper -> deltaProtocolEventReceiver
-    /// -> deltaEventToNotificationMapper -> forestReplicator
+    /// notification -> notificationToDeltaCommandMapper -> deltaSerializer -> json -> deltaDeserializer
+    /// -> commandToEventMapper -> deltaProtocolEventReceiver -> deltaEventToNotificationMapper -> forestReplicator
     /// ForestReplicator replicates notifications on clone partitions
     /// Different from <see cref="CreateDeltaReplicator"/> this replicator serialize and deserialize delta commands
     /// </summary>
