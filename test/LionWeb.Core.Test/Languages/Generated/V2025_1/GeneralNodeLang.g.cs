@@ -140,6 +140,8 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
+		if (_multipleContainment.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, safeNodes, _multipleContainment, null, notificationId);
 		emitter.CollectOldData();
 		_multipleContainment.AddRange(SetSelfParent(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment));
@@ -193,6 +195,8 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
 		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
+		if (_multipleOptionalContainment.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, safeNodes, _multipleOptionalContainment, null, notificationId);
 		emitter.CollectOldData();
 		_multipleOptionalContainment.AddRange(SetSelfParent(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment));

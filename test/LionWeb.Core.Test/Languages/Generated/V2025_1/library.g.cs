@@ -489,6 +489,8 @@ public partial class Library : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		if (_books.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null, notificationId);
 		emitter.CollectOldData();
 		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
