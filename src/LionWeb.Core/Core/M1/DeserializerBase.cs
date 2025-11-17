@@ -140,9 +140,52 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     #region Containment
 
+    protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNode node, Feature containment)
+    {
+        List<IWritableNode> children = compressedChildrenIds
+            .Select<ICompressedId, IWritableNode?>(childId => FindChild(node, containment, childId))
+            .Where(c => c != null)
+            .ToList()!;
+
+        SetContainment(children, node, containment);
+    }
+
+    /// Sets <paramref name="containment"/> inside <paramref name="node"/> to <paramref name="children"/>, if possible.
+    /// Uses only the first entry of <paramref name="children"/> if <paramref name="containment"/> is single.
+    ///
+    /// <para>
+    /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
+    /// </para>
+    private void SetContainment<TChild>(List<TChild> children, IWritableNode node, Feature containment)
+        where TChild : class, IReadableNode
+    {
+        if (children.Count == 0)
+            return;
+
+        var single = containment is Containment { Multiple: false };
+        try
+        {
+            node.Set(containment, single && children.Count == 1 ? children[0] : children);
+        } catch (InvalidValueException)
+        {
+            List<TChild>? replacement = _handler.InvalidLinkValue(children, containment, node);
+            if (replacement != null)
+                node.Set(containment, single ? replacement.FirstOrDefault() : replacement);
+        }
+    }
+
+    private IWritableNode? FindChild(IWritableNode node, Feature containment, ICompressedId childId)
+    {
+        IWritableNode? result = _deserializedNodesById.TryGetValue(childId, out var existingChild)
+            ? existingChild as IWritableNode
+            : _handler.UnresolvableChild(childId, containment, node);
+
+        return PreventCircularContainment(node, result);
+    }
+
     /// Takes care of <see cref="IDeserializerHandler.CircularContainment"/>
     /// and <see cref="IDeserializerHandler.DuplicateContainment"/>.
-    protected IWritableNode? PreventCircularContainment(T node, IWritableNode? result)
+    protected IWritableNode? PreventCircularContainment(IWritableNode node, IWritableNode? result)
     {
         if (result == null)
             return null;
@@ -257,16 +300,56 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
         foreach (var (compressedMetaPointer, targetEntries) in references)
         {
-            var reference = _deserializerMetaInfo.FindFeature<Reference>(node, compressedMetaPointer);
-            if (reference == null)
-                continue;
+            var feature = _deserializerMetaInfo.FindFeature<Reference>(node, compressedMetaPointer);
+            switch (feature)
+            {
+                case null:
+                    continue;
+                case Containment c:
+                    InstallContainment(
+                        targetEntries
+                            .Select(e => e.compressedId)
+                            .Where(i => i is not null)
+                            .ToList()!,
+                        writable,
+                        c
+                    );
+                    continue;
+                default:
+                    {
+                        List<ReferenceDescriptor> targets = targetEntries
+                            .Select(target =>
+                                FindReferenceTarget(node, feature, target.compressedId, target.resolveInfo))
+                            .Where(d => d is not null)
+                            .ToList()!;
 
-            List<ReferenceDescriptor> targets = targetEntries
-                .Select(target => FindReferenceTarget(node, reference, target.compressedId, target.resolveInfo))
-                .Where(d => d is not null)
-                .ToList();
+                        SetReference(targets, writable, feature);
+                        break;
+                    }
+            }
+        }
+    }
 
-            SetReference(targets, writable, reference);
+    /// Sets <paramref name="reference"/> inside <paramref name="node"/> to <paramref name="descriptors"/>, if possible.
+    /// Uses only the first entry of <paramref name="descriptors"/> if <paramref name="reference"/> is single.
+    ///
+    /// <para>
+    /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
+    /// </para>
+    private void SetReference(List<ReferenceDescriptor> descriptors, IWritableNode node, Feature reference)
+    {
+        if (descriptors.Count == 0)
+            return;
+
+        var single = reference is Reference { Multiple: false };
+        try
+        {
+            node.Set(reference, single && descriptors.Count == 1 ? descriptors[0] : descriptors);
+        } catch (InvalidValueException)
+        {
+            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(descriptors.Select(r => r.Target).Where(t => t is not null)).ToList(), reference, node);
+            if (replacement != null)
+                node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
         }
     }
 
@@ -291,53 +374,6 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     );
 
     #endregion
-
-    /// Sets <paramref name="containment"/> inside <paramref name="node"/> to <paramref name="children"/>, if possible.
-    /// Uses only the first entry of <paramref name="children"/> if <paramref name="containment"/> is single.
-    ///
-    /// <para>
-    /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
-    /// </para>
-    protected void SetContainment<TChild>(List<TChild> children, IWritableNode node, Feature containment)
-        where TChild : class, IReadableNode
-    {
-        if (children.Count == 0)
-            return;
-
-        var single = containment is Containment { Multiple: false };
-        try
-        {
-            node.Set(containment, single && children.Count == 1 ? children[0] : children);
-        } catch (InvalidValueException)
-        {
-            List<TChild>? replacement = _handler.InvalidLinkValue(children, containment, node);
-            if (replacement != null)
-                node.Set(containment, single ? replacement.FirstOrDefault() : replacement);
-        }
-    }
-
-    /// Sets <paramref name="reference"/> inside <paramref name="node"/> to <paramref name="descriptors"/>, if possible.
-    /// Uses only the first entry of <paramref name="descriptors"/> if <paramref name="reference"/> is single.
-    ///
-    /// <para>
-    /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
-    /// </para>
-    protected void SetReference(List<ReferenceDescriptor> descriptors, IWritableNode node, Feature reference)
-    {
-        if (descriptors.Count == 0)
-            return;
-
-        var single = reference is Reference { Multiple: false };
-        try
-        {
-            node.Set(reference, single && descriptors.Count == 1 ? descriptors[0] : descriptors);
-        } catch (InvalidValueException)
-        {
-            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(descriptors.Select(r => r.Target).Where(t => t is not null)).ToList(), reference, node);
-            if (replacement != null)
-                node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
-        }
-    }
 
     /// Compresses <paramref name="id"/>.
     protected internal ICompressedId Compress(NodeId id) =>

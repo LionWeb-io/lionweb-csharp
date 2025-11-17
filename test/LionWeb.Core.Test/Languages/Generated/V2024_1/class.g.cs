@@ -468,7 +468,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 
 	private @struct SetRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
+		AssureNotNullInstance<@record>(value, ClassLanguage.Instance.struct_ref);
 		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
 		emitter.CollectOldData();
 		_ref = value;

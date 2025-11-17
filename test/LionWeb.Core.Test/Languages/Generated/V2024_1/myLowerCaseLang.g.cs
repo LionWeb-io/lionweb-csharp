@@ -226,7 +226,7 @@ public partial class myConcept : ConceptInstanceBase
 
 	private myConcept SetMyReference(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, MyLowerCaseLangLanguage.Instance.myConcept_myReference);
+		AssureNotNullInstance<IReadableNode>(value, MyLowerCaseLangLanguage.Instance.myConcept_myReference);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MyLowerCaseLangLanguage.Instance.myConcept_myReference, this, value, _myReference, notificationId);
 		emitter.CollectOldData();
 		_myReference = value;

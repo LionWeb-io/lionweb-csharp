@@ -375,22 +375,27 @@ public static class M2Extensions
             var (_, v) => throw new InvalidValueException(link, v)
         };
 
-    public static IEnumerable<ReferenceDescriptor> AsReferenceDescriptors<T>(this Reference reference, object? value) where T : IReadableNode
-        => (reference.Multiple, value) switch
+    public static IEnumerable<ReferenceDescriptor> AsReferenceDescriptors<T>(this Reference reference, object? value)
+        where T : IReadableNode =>
+        (reference.Multiple, value) switch
         {
             (true, IEnumerable e) => CastReferenceDescriptorIterator<T>(reference, e),
             (false, T n) => [ReferenceDescriptorExtensions.FromNode(n)],
+            (false, ReferenceDescriptor { Target: null } r) => [r],
+            (false, ReferenceDescriptor { Target: T } r) => [r],
             var (_, v) => throw new InvalidValueException(reference, v)
         };
 
-    private static IEnumerable<ReferenceDescriptor> CastReferenceDescriptorIterator<T>(Reference reference, IEnumerable source) where T : IReadableNode
+    private static IEnumerable<ReferenceDescriptor> CastReferenceDescriptorIterator<T>(Reference reference,
+        IEnumerable source) where T : IReadableNode
     {
         foreach (var obj in source)
         {
             yield return obj switch
             {
                 T tt => ReferenceDescriptorExtensions.FromNode(tt),
-                ReferenceDescriptor r => r,
+                ReferenceDescriptor { Target: null } r => r,
+                ReferenceDescriptor { Target: T } r => r,
                 _ => throw new InvalidValueException(reference, obj)
             };
         }

@@ -2196,6 +2196,7 @@ public partial class OffsetDuplicate : Shape
 
 	private OffsetDuplicate SetAltSource(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
+		AssureNullableInstance<Shape>(value, ShapesLanguage.Instance.OffsetDuplicate_altSource);
 		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource, notificationId);
 		emitter.CollectOldData();
 		_altSource = value;
@@ -2306,7 +2307,7 @@ public partial class OffsetDuplicate : Shape
 
 	private OffsetDuplicate SetSource(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
+		AssureNotNullInstance<Shape>(value, ShapesLanguage.Instance.OffsetDuplicate_source);
 		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source, notificationId);
 		emitter.CollectOldData();
 		_source = value;

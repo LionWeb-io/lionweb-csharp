@@ -224,7 +224,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	private BaseConcept SetRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
+		AssureNotNullInstance<IReadableNode>(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref, notificationId);
 		emitter.CollectOldData();
 		_ref = value;

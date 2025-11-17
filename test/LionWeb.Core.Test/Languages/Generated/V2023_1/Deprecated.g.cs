@@ -278,7 +278,7 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	private DeprConcept SetDeprRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
+		AssureNotNullInstance<DeprAnnotation>(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef, notificationId);
 		emitter.CollectOldData();
 		_deprRef = value;

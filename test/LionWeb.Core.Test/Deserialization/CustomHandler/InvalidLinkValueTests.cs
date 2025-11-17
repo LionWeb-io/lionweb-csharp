@@ -23,6 +23,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2024_1.TinyRefLang;
 using M1;
 using M3;
+using System.Collections;
 
 /// <summary>
 /// Tests for <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>
@@ -33,10 +34,15 @@ public class InvalidLinkValueTests
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     private class DeserializerHealingHandler(
-        Func<List<IReadableNode>, Feature, IWritableNode, List<IReadableNode>?> heal) : DeserializerExceptionHandler
+        Func<List<IReadableNode>, Feature, IWritableNode, IList?> heal) : DeserializerExceptionHandler
     {
-        public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IReadableNode node) =>
-            heal([..value], link, (IWritableNode)node)?.Cast<T>().ToList();
+        public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IReadableNode node)
+        {
+            IEnumerable healed = heal([..value], link, (IWritableNode)node);
+            if (healed is List<ReferenceDescriptor> rl)
+                healed = rl.Select(r => r.Target);
+            return healed?.Cast<T>().ToList();
+        }
     }
 
     [TestMethod]
@@ -503,7 +509,7 @@ public class InvalidLinkValueTests
 
         var writer = new Writer("new-author");
         var deserializerHealingHandler =
-            new DeserializerHealingHandler((list, feature, arg3) => new List<IReadableNode>() { writer });
+            new DeserializerHealingHandler((list, feature, arg3) => new List<ReferenceDescriptor>() { ReferenceDescriptorExtensions.FromNode(writer) });
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(LibraryLanguage.Instance)

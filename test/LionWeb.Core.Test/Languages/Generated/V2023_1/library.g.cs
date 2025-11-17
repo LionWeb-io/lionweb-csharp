@@ -196,7 +196,7 @@ public partial class Book : ConceptInstanceBase
 
 	private Book SetAuthor(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
+		AssureNotNullInstance<Writer>(value, LibraryLanguage.Instance.Book_author);
 		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
 		emitter.CollectOldData();
 		_author = value;

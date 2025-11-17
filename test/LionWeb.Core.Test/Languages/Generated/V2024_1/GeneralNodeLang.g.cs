@@ -405,6 +405,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private GeneralNodeConcept SetSingleOptionalRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
+		AssureNullableInstance<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef, this, value, _singleOptionalRef, notificationId);
 		emitter.CollectOldData();
 		_singleOptionalRef = value;
@@ -436,7 +437,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private GeneralNodeConcept SetSingleRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef);
+		AssureNotNullInstance<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef, this, value, _singleRef, notificationId);
 		emitter.CollectOldData();
 		_singleRef = value;

@@ -202,7 +202,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	private MyConcept SetSingularRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
+		AssureNotNullInstance<INamed>(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
 		ReferenceSingleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_singularRef, this, value, _singularRef, notificationId);
 		emitter.CollectOldData();
 		_singularRef = value;

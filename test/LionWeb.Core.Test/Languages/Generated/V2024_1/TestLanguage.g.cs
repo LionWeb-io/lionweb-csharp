@@ -803,6 +803,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 	private LinkTestConcept SetReference_0_1(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
+		AssureNullableInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
 		emitter.CollectOldData();
 		_reference_0_1 = value;
@@ -885,7 +886,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 	private LinkTestConcept SetReference_1(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
+		AssureNotNullInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
 		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1, notificationId);
 		emitter.CollectOldData();
 		_reference_1 = value;

@@ -623,6 +623,22 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             throw new InvalidValueException(feature, value);
     }
 
+    protected void AssureNotNullInstance<T>([NotNull] ReferenceDescriptor? value, Feature? feature)
+    {
+        if (value is { Target: null or T })
+            return;
+
+        throw new InvalidValueException(feature, value);
+    }
+
+    protected void AssureNullableInstance<T>(ReferenceDescriptor? value, Feature? feature)
+    {
+        if (value is null or { Target: null or T })
+            return;
+
+        throw new InvalidValueException(feature, value);
+    }
+
     /// <summary>
     /// Assures none of <paramref name="safeNodes">list's</paramref> members are <c>null</c>.
     /// </summary>

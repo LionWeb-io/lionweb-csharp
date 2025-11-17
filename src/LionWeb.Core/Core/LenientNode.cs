@@ -23,6 +23,7 @@ using Notification;
 using Notification.Partition;
 using Notification.Pipe;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -145,7 +146,10 @@ public class LenientNode : NodeBase, INode
                 case Containment { Multiple: true } when value is INode node:
                     value = new List<INode> { node }.AsReadOnly();
                     break;
-                case Reference { Multiple: true }:
+                case Reference { Multiple:false} when value is ReferenceDescriptor descriptor:
+                    value =  descriptor.Target;
+                    break;
+                case Reference { Multiple: true } reference:
                     switch (value)
                     {
                         case INode iNode:
@@ -153,6 +157,19 @@ public class LenientNode : NodeBase, INode
                             break;
                         case IReadableNode readableNode:
                             value = new List<IReadableNode> { readableNode }.AsReadOnly();
+                            break;
+                        case ReferenceDescriptor { Target: not null } descriptor:
+                            value = new List<IReadableNode> { descriptor.Target }.AsReadOnly();
+                            break;
+                        case ReferenceDescriptor { Target: null }:
+                            value = new List<IReadableNode>().AsReadOnly();
+                            break;
+                        case IEnumerable e:
+                            value = reference
+                                .AsReferenceDescriptors<IReadableNode>(e)
+                                .Select(r => r.Target)
+                                .Where(t => t is not null)
+                                .ToImmutableList();
                             break;
                     }
 
@@ -213,13 +230,36 @@ public class LenientNode : NodeBase, INode
                     AttachChild(node);
                 }
 
+                if (feature is Reference)
+                {
+                    SetFeature(feature, ReferenceDescriptorExtensions.FromNode(readableNode));
+                    return true;
+                }
+
                 SetFeature(feature, readableNode);
+                return true;
+            
+            case ReferenceDescriptor descriptor when feature is Reference:
+                SetFeature(feature, descriptor);
                 return true;
 
             case string:
                 SetFeature(feature, value);
                 return true;
 
+            case IEnumerable e when feature is Reference reference:
+                var descriptors = reference.AsReferenceDescriptors<IReadableNode>(e).ToList();
+                if (descriptors.Count == 0)
+                {
+                    if (RemoveFeature(feature))
+                        return true;
+                    if (_classifier != null && _classifier.AllFeatures().Contains(feature))
+                        return true;
+                    return false;
+                }
+                SetFeature(feature, descriptors);
+                return true;
+                
             case IEnumerable:
                 var readableNodes = M2Extensions.AsNodes<IReadableNode>(value).ToList();
                 if (readableNodes.Count == 0)
@@ -231,22 +271,27 @@ public class LenientNode : NodeBase, INode
                     return false;
                 }
 
-                if (feature is Containment cont)
+                switch (feature)
                 {
-                    RemoveExistingChildren(cont, oldValue);
-                    var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
-                    foreach (var newChild in newChildren)
-                    {
-                        AttachChild(newChild);
-                    }
+                    case Containment cont:
+                        {
+                            RemoveExistingChildren(cont, oldValue);
+                            var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
+                            foreach (var newChild in newChildren)
+                            {
+                                AttachChild(newChild);
+                            }
 
-                    SetFeature(feature, newChildren.ToList());
-                } else
-                {
-                    SetFeature(feature, readableNodes);
+                            SetFeature(feature, newChildren.ToList());
+                            return true;
+                        }
+                    case Reference reference:
+                        SetFeature(feature, readableNodes.Select(ReferenceDescriptorExtensions.FromNode));
+                        return true;
+                    default:
+                        SetFeature(feature, readableNodes);
+                        return true;
                 }
-
-                return true;
 
             case { } v:
                 if (!v.GetType().IsValueType)
@@ -403,6 +448,16 @@ public class LenientNode : NodeBase, INode
     private bool TryGetFeature(Feature featureToFind, out object? value)
     {
         var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
+        if (result.value is ReferenceDescriptor descriptor)
+        {
+            value = descriptor.Target;
+            return true;
+        }
+        if (result.value is List<ReferenceDescriptor> referenceDescriptors)
+        {
+            value =  referenceDescriptors.Select(d => d.Target).Where(t => t is not null).ToList();
+            return true;
+        }
         if (result != default)
         {
             value = result.value;

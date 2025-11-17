@@ -152,6 +152,7 @@ public partial class BConcept : ConceptInstanceBase
 
 	private BConcept SetARef(ReferenceDescriptor? value, INotificationId? notificationId = null)
 	{
+		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AConcept>(value, BLangLanguage.Instance.BConcept_ARef);
 		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
 		emitter.CollectOldData();
 		_aRef = value;

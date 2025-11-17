@@ -39,7 +39,11 @@ public partial class FeatureGenerator
                 SingleReferenceTargetMethod(reference),
                 TryGet(InvocationExpression(ReferenceTarget(reference))),
                 SingleReferenceSetter([
-                        AsureNotNullCall(),
+                        ExpressionStatement(CallGeneric("AssureNotNullInstance",
+                            AsType(reference.GetFeatureType()),
+                            IdentifierName("value"),
+                            MetaProperty(feature)
+                        )),
                         ReferenceEmitterVariable(),
                         EmitterCollectOldDataCall(),
                         AssignFeatureField(),
@@ -81,6 +85,11 @@ public partial class FeatureGenerator
                 SingleReferenceTargetMethod(reference),
                 TryGet(InvocationExpression(ReferenceTarget(reference))),
                 SingleReferenceSetter([
+                    ExpressionStatement(CallGeneric("AssureNullableInstance",
+                        AsType(reference.GetFeatureType()),
+                        IdentifierName("value"),
+                        MetaProperty(feature)
+                    )),
                     ReferenceEmitterVariable(),
                     EmitterCollectOldDataCall(),
                     AssignFeatureField(),
