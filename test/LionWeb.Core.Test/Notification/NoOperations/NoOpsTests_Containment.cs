@@ -30,11 +30,51 @@ public class NoOpsTests_Containment
         {
             Documentation = documentation
         };
-        
+
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
-        
+
         originalPartition.Documentation = documentation;
+
+        Assert.AreEqual(0, notificationObserver.Count);
+    }
+
+    [TestMethod]
+    public void ChildAdded_Multiple_adds_the_same_list_of_children()
+    {
+        var a = new Circle("a");
+        var b = new Circle("b");
+        var c = new Circle("c");
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo")
+        {
+            Shapes = [a, b, c, d]
+        };
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        originalPartition.AddShapes([a, b, c, d]);
+
+        Assert.AreEqual(0, notificationObserver.Count);
+    }  
+    
+    [TestMethod]
+    public void ChildAdded_Multiple_adds_empty_list()
+    {
+        var a = new Circle("a");
+        var b = new Circle("b");
+        var c = new Circle("c");
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo")
+        {
+            Shapes = [a, b, c, d]
+        };
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        originalPartition.AddShapes([]);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }

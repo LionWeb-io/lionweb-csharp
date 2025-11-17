@@ -350,6 +350,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		if (_altGroups.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, null, notificationId);
 		emitter.CollectOldData();
 		_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
@@ -423,6 +425,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		if (_groups.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, null, notificationId);
 		emitter.CollectOldData();
 		_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
@@ -903,6 +907,8 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		if (_disabledParts.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, null, notificationId);
 		emitter.CollectOldData();
 		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
@@ -986,6 +992,8 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		if (_parts.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, null, notificationId);
 		emitter.CollectOldData();
 		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
@@ -1537,6 +1545,8 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		if (_shapes.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, null, notificationId);
 		emitter.CollectOldData();
 		_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
@@ -2667,6 +2677,8 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		if (_fixpoints.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, null, notificationId);
 		emitter.CollectOldData();
 		_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));

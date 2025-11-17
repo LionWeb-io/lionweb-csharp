@@ -670,6 +670,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
+		if (_containment_0_n.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, null, notificationId);
 		emitter.CollectOldData();
 		_containment_0_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
@@ -748,6 +750,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
+		if (_containment_1_n.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, null, notificationId);
 		emitter.CollectOldData();
 		_containment_1_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));

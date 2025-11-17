@@ -112,6 +112,8 @@ public partial class Container : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
+		if (_libraries.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, null, notificationId);
 		emitter.CollectOldData();
 		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));

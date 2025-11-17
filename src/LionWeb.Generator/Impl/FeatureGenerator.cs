@@ -285,6 +285,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             LinkAdder(containment, [
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
+                    ReturnIfAddedNodesAreEqualToExistingNodes(containment),
                     AddMultipleContainmentEmitterVariable(Null()),
                     EmitterCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
@@ -349,6 +350,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
+                ReturnIfAddedNodesAreEqualToExistingNodes(containment),
                 AddMultipleContainmentEmitterVariable(Null()),
                 EmitterCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
@@ -374,6 +376,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ReturnStatement(This())
             ], writeable: true)
         );
+    
+    private StatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes(Containment containment) =>
+        IfStatement(InvocationExpression(
+            MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),
+            AsArguments([IdentifierName("safeNodes")])
+        ), ReturnStatement(This()));
 
     private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index) =>
         Variable(

@@ -199,6 +199,8 @@ public partial class DeprConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+		if (_deprChild.SequenceEqual(safeNodes))
+			return this;
 		ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, null, notificationId);
 		emitter.CollectOldData();
 		_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
