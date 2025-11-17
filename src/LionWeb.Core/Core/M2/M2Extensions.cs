@@ -379,7 +379,7 @@ public static class M2Extensions
         where T : IReadableNode =>
         (reference.Multiple, value) switch
         {
-            (true, IEnumerable e) => CastReferenceDescriptorIterator<T>(reference, e),
+            (_, IEnumerable e) => CastReferenceDescriptorIterator<T>(reference, e),
             (false, T n) => [ReferenceDescriptorExtensions.FromNode(n)],
             (false, ReferenceDescriptor { Target: null } r) => [r],
             (false, ReferenceDescriptor { Target: T } r) => [r],

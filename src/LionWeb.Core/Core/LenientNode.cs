@@ -164,6 +164,9 @@ public class LenientNode : NodeBase, INode
                         case ReferenceDescriptor { Target: null }:
                             value = new List<IReadableNode>().AsReadOnly();
                             break;
+                        case String s:
+                            value = s;
+                            break;
                         case IEnumerable e:
                             value = reference
                                 .AsReferenceDescriptors<IReadableNode>(e)
@@ -224,16 +227,15 @@ public class LenientNode : NodeBase, INode
                 return false;
 
             case IReadableNode readableNode:
-                if (feature is Containment c && readableNode is INode node)
+                switch (feature)
                 {
-                    RemoveExistingChildren(c, oldValue);
-                    AttachChild(node);
-                }
-
-                if (feature is Reference)
-                {
-                    SetFeature(feature, ReferenceDescriptorExtensions.FromNode(readableNode));
-                    return true;
+                    case Containment c when readableNode is INode node:
+                        RemoveExistingChildren(c, oldValue);
+                        AttachChild(node);
+                        break;
+                    case Reference:
+                        SetFeature(feature, ReferenceDescriptorExtensions.FromNode(readableNode));
+                        return true;
                 }
 
                 SetFeature(feature, readableNode);
