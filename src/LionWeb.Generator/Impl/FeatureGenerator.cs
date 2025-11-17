@@ -285,7 +285,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             LinkAdder(containment, [
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
-                    AssureSequenceNotEqual(containment),
+                    CheckSequenceEquality(containment),
                     AddMultipleContainmentEmitterVariable(Null()),
                     EmitterCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
@@ -350,7 +350,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
-                AssureSequenceNotEqual(containment),
+                CheckSequenceEquality(containment),
                 AddMultipleContainmentEmitterVariable(Null()),
                 EmitterCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
@@ -377,7 +377,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ], writeable: true)
         );
     
-    private StatementSyntax AssureSequenceNotEqual(Containment containment) =>
+    private StatementSyntax CheckSequenceEquality(Containment containment) =>
         IfStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),
             AsArguments([IdentifierName("safeNodes")])
