@@ -45,8 +45,8 @@ public class NoOpsTests_Containment
         var a = new Circle("a");
         var b = new Circle("b");
         var c = new Circle("c");
-        var d = new Circle("c");
-        var originalPartition = new Geometry("a")
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo")
         {
             Shapes = [a, b, c, d]
         };
@@ -65,8 +65,8 @@ public class NoOpsTests_Containment
         var a = new Circle("a");
         var b = new Circle("b");
         var c = new Circle("c");
-        var d = new Circle("c");
-        var originalPartition = new Geometry("a")
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo")
         {
             Shapes = [a, b, c, d]
         };
