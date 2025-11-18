@@ -140,6 +140,12 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     #region Containment
 
+    /// Sets <paramref name="containment"/> inside <paramref name="node"/> to <paramref name="compressedChildrenIds"/>, if possible.
+    /// Uses only the first entry of <paramref name="compressedChildrenIds"/> if <paramref name="containment"/> is single.
+    ///
+    /// <para>
+    /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
+    /// </para>
     protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNode node, Feature containment)
     {
         List<IWritableNode> children = compressedChildrenIds
@@ -150,12 +156,6 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         SetContainment(children, node, containment);
     }
 
-    /// Sets <paramref name="containment"/> inside <paramref name="node"/> to <paramref name="children"/>, if possible.
-    /// Uses only the first entry of <paramref name="children"/> if <paramref name="containment"/> is single.
-    ///
-    /// <para>
-    /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
-    /// </para>
     private void SetContainment<TChild>(List<TChild> children, IWritableNode node, Feature containment)
         where TChild : class, IReadableNode
     {
@@ -306,6 +306,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
                 case null:
                     continue;
                 case Containment c:
+                    // required if FindFeature() "heals" the reference into a containment.
                     InstallContainment(
                         targetEntries
                             .Select(e => e.compressedId)

@@ -17,16 +17,27 @@
 
 namespace LionWeb.Protocol.Delta;
 
+using Core;
 using Core.M1;
+using Core.M3;
 
 /// <summary>
 /// This handler enables deserializer to accept node id that appears
 /// both in received delta(s) and local nodes. 
 /// </summary>
-/// <remarks> In the context of delta protocol, this enables replacing a node in a model
+/// <remarks>In the context of delta protocol, this enables replacing a node in a model
 /// with a new node with the same id, which results in a valid model.</remarks>
-public class DeltaDeserializerHandler : DeserializerExceptionHandler
+/// <param name="unresolvedReferencesManager">Optional <see cref="UnresolvedReferencesManager"/> to report unresolved references to.</param>
+public class DeltaDeserializerHandler(UnresolvedReferencesManager? unresolvedReferencesManager = null) : DeserializerExceptionHandler
 {
     /// <inheritdoc/>
-    public override bool SkipDeserializingDependentNode(ICompressedId id) => false;
+    public override bool SkipDeserializingDependentNode(ICompressedId id) =>
+        false;
+
+    /// <inheritdoc />
+    public override ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
+        ResolveInfo? resolveInfo,
+        Feature reference, IReadableNode node) =>
+        unresolvedReferencesManager?.RegisterUnresolvedReference((IWritableNode)node, reference,
+            new ReferenceDescriptor(resolveInfo, targetId?.Original, null));
 }

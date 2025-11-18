@@ -19,7 +19,7 @@ namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
 
-public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitterBase<INode> where T : IReadableNode
+public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitterBase<T> where T : IReadableNode
 {
     private readonly ReferenceDescriptor? _newTarget;
     private readonly ReferenceDescriptor? _oldTarget;

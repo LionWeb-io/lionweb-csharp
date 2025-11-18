@@ -360,7 +360,7 @@ public static class M2Extensions
         basis.AllGeneralizations(includeSelf).Contains(candidate, new LanguageEntityIdentityComparer());
 
     /// <summary>
-    /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;
+    /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;.
     /// </summary>
     /// <param name="link"><paramref name="value"/>'s origin Link.</param>
     /// <param name="value">Untyped <paramref name="link"/> value.</param>
@@ -375,9 +375,18 @@ public static class M2Extensions
             var (_, v) => throw new InvalidValueException(link, v)
         };
 
+    /// <summary>
+    /// Re-types <paramref name="value"/> as IEnumerable&lt;ReferenceDescriptor&gt;.
+    /// Wraps <see cref="IReadableNode"/>s of type <typeparamref name="T"/>, and passes through <see cref="ReferenceDescriptor"/>s. 
+    /// </summary>
+    /// <param name="reference"><paramref name="value"/>'s origin Reference.</param>
+    /// <param name="value">Untyped <paramref name="reference"/> value.</param>
+    /// <typeparam name="T">Type of nodes in <paramref name="value"/>.</typeparam>
+    /// <returns><paramref name="value"/> re-typed as IEnumerable&lt;ReferenceDescriptor&gt;.</returns>
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be re-typed as IEnumerable&lt;ReferenceDescriptor&gt; with <see cref="ReferenceDescriptor.Target"/> of type <typeparamref name="T"/>.</exception>
     public static IEnumerable<ReferenceDescriptor> AsReferenceDescriptors<T>(this Reference reference, object? value)
         where T : IReadableNode =>
-        (reference.Multiple, value) switch
+        (reference?.Multiple, value) switch
         {
             (_, IEnumerable e) => CastReferenceDescriptorIterator<T>(reference, e),
             (false, T n) => [ReferenceDescriptorExtensions.FromNode(n)],

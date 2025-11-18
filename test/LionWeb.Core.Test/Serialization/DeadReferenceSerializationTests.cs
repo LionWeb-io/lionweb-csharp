@@ -60,8 +60,11 @@ public class DeadReferenceSerializationTests
         var deserialized = nodes.OfType<LinkTestConcept>().Single();
 
         Assert.IsNull(deserialized.Reference_0_1);
-        Assert.IsEmpty(deserialized.Reference_0_n);
-        
+        foreach (var target in deserialized.Reference_0_n)
+        {
+            Assert.IsNull(target);
+        }
+
         deserialized.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
 
         var newRef0 = new LinkTestConcept("ref0");
