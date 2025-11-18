@@ -86,6 +86,7 @@ public partial class FeatureGenerator
             LinkAdder(containment, [
                     SafeNodesVariableContainment(),
                     AssureNonEmptyCall(containment),
+                    ReturnIfAddedNodesAreEqualToExistingNodes(containment),
                     AddMultipleContainmentEmitterVariable(Null()),
                     EmitterCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
@@ -128,6 +129,7 @@ public partial class FeatureGenerator
                 SafeNodesVariableContainment(),
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
+                ReturnIfAddedNodesAreEqualToExistingNodes(containment),
                 AddMultipleContainmentEmitterVariable(Null()),
                 EmitterCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
@@ -153,6 +155,12 @@ public partial class FeatureGenerator
                 ReturnStatement(This())
             ], writeable: true)
         );
+
+    private StatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes(Containment containment) =>
+        IfStatement(InvocationExpression(
+            MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),
+            AsArguments([IdentifierName("safeNodes")])
+        ), ReturnStatement(This()));
 
     private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index) =>
         Variable(
