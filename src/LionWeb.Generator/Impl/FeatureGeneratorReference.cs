@@ -24,25 +24,26 @@ using Core.Notification;
 using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Names;
 using System.Collections.Immutable;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public partial class FeatureGenerator
+public class FeatureGeneratorReference(Classifier classifier, Reference reference, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, reference, names, lionWebVersion, config)
 {
-    private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
+    public IEnumerable<MemberDeclarationSyntax> RequiredSingleReference() =>
         new List<MemberDeclarationSyntax>
             {
                 SingleReferenceField(),
-                SingleRequiredFeatureProperty(InvocationExpression(ReferenceTarget(reference)))
+                SingleRequiredFeatureProperty(InvocationExpression(ReferenceTarget()))
                     .Xdoc(XdocThrowsIfSetToNull()),
-                SingleReferenceTargetMethod(reference),
-                TryGet(InvocationExpression(ReferenceTarget(reference))),
+                SingleReferenceTargetMethod(),
+                TryGet(InvocationExpression(ReferenceTarget())),
                 SingleReferenceSetter([
                         ExpressionStatement(CallGeneric("AssureNotNullInstance",
                             AsType(reference.GetFeatureType()),
                             IdentifierName("value"),
-                            MetaProperty(feature)
+                            MetaProperty(reference)
                         )),
                         ReferenceEmitterVariable(),
                         EmitterCollectOldDataCall(),
@@ -62,7 +63,7 @@ public partial class FeatureGenerator
             IdentifierName("notificationId")));
 
     private FieldDeclarationSyntax SingleReferenceField() =>
-        Field(FeatureField(feature).ToString(),
+        Field(FeatureField(reference).ToString(),
                 NullableType(AsType(typeof(ReferenceDescriptor))),
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
@@ -70,25 +71,25 @@ public partial class FeatureGenerator
     private LocalDeclarationStatementSyntax ReferenceEmitterVariable() =>
         Variable(
             "emitter",
-            AsType(typeof(ReferenceSingleNotificationEmitter<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(ReferenceSingleNotificationEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("value"),
-                FeatureField(feature), IdentifierName("notificationId")
+                MetaProperty(reference), This(), IdentifierName("value"),
+                FeatureField(reference), IdentifierName("notificationId")
             ])
         );
 
-    private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
+    public IEnumerable<MemberDeclarationSyntax> OptionalSingleReference() =>
         new List<MemberDeclarationSyntax>
             {
                 SingleReferenceField(),
-                SingleOptionalFeatureProperty(InvocationExpression(ReferenceTarget(reference))),
-                SingleReferenceTargetMethod(reference),
-                TryGet(InvocationExpression(ReferenceTarget(reference))),
+                SingleOptionalFeatureProperty(InvocationExpression(ReferenceTarget())),
+                SingleReferenceTargetMethod(),
+                TryGet(InvocationExpression(ReferenceTarget())),
                 SingleReferenceSetter([
                     ExpressionStatement(CallGeneric("AssureNullableInstance",
                         AsType(reference.GetFeatureType()),
                         IdentifierName("value"),
-                        MetaProperty(feature)
+                        MetaProperty(reference)
                     )),
                     ReferenceEmitterVariable(),
                     EmitterCollectOldDataCall(),
@@ -126,124 +127,123 @@ public partial class FeatureGenerator
                 ])
             );
 
-    private IEnumerable<MemberDeclarationSyntax> RequiredMultiReference(Reference reference) =>
+    public IEnumerable<MemberDeclarationSyntax> RequiredMultiReference() =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleReferenceField(reference),
-            MultipleReferenceProperty(reference,
-                    CallGeneric("AsNonEmptyReadOnly", AsType(reference.Type),
-                        Call(ReferenceTargets(reference).ToString()),
+            MultipleReferenceField(),
+            MultipleReferenceProperty(CallGeneric("AsNonEmptyReadOnly", AsType(reference.Type),
+                        Call(ReferenceTargets().ToString()),
                         MetaProperty(reference)
                     ))
-                .Xdoc(XdocRequiredMultipleLink(reference)),
-            MultipleReferenceTargetsMethod(reference),
-            TryGetMultiple(InvocationExpression(ReferenceTargets(reference)))
+                .Xdoc(XdocRequiredMultipleLink()),
+            MultipleReferenceTargetsMethod(),
+            TryGetMultiple(InvocationExpression(ReferenceTargets()))
         }.Concat(
-            LinkAdder(reference, [
+            LinkAdder([
                     SafeNodesVariableReference(),
                     AssureNotNullCall(reference),
-                    AssureNonEmptyCall(reference),
+                    AssureNonEmptyCall(),
                     AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference),
                         IdentifierName("Count"))),
                     EmitterCollectOldDataCall(),
-                    SimpleAddRangeCall(reference),
+                    SimpleAddRangeCall(),
                     EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
-                .Select(a => XdocRequiredAdder(a, reference))
+                .Select(XdocRequiredAdder)
         ).Concat(
-            LinkInserter(reference, [
-                    AssureInRangeCall(reference),
+            LinkInserter([
+                    AssureInRangeCall(),
                     SafeNodesVariableReference(),
                     AssureNotNullCall(reference),
-                    AssureNonEmptyCall(reference),
+                    AssureNonEmptyCall(),
                     AddMultipleReferenceEmitterVariable(IdentifierName("index")),
                     EmitterCollectOldDataCall(),
-                    SimpleInsertRangeCall(reference),
+                    SimpleInsertRangeCall(),
                     EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
-                .Select(i => XdocRequiredInserter(i, reference))
+                .Select(XdocRequiredInserter)
         ).Concat(
-            LinkRemover(reference, [
-                    SafeNodesVariableContainment(),
+            LinkRemover([
+                    SafeNodesVariable(),
                     AssureNotNullCall(reference),
-                    AssureNonEmptyCall(reference),
+                    AssureNonEmptyCall(),
                     ExpressionStatement(Call("AssureNotClearing",
                         IdentifierName("safeNodes"),
-                        InvocationExpression(ReferenceTargets(reference)),
+                        InvocationExpression(ReferenceTargets()),
                         MetaProperty(reference)
                     )),
-                    SimpleRemoveAllCall(reference),
+                    SimpleRemoveAllCall(),
                     ReturnStatement(This())
                 ])
-                .Select(r => XdocRequiredRemover(r, reference))
+                .Select(XdocRequiredRemover)
         );
 
     private LocalDeclarationStatementSyntax AddMultipleReferenceEmitterVariable(ExpressionSyntax index) =>
         Variable(
             "emitter",
-            AsType(typeof(ReferenceAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(ReferenceAddMultipleNotificationEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("safeNodes"), index,
+                MetaProperty(reference), This(), IdentifierName("safeNodes"), index,
                 IdentifierName("notificationId")
             ])
         );
 
-    private IEnumerable<MemberDeclarationSyntax> OptionalMultiReference(Reference reference) =>
+    public IEnumerable<MemberDeclarationSyntax> OptionalMultiReference() =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleReferenceField(reference),
-            MultipleReferenceProperty(reference, Call(ReferenceTargets(reference).ToString())),
-            MultipleReferenceTargetsMethod(reference),
-            TryGetMultiple(InvocationExpression(ReferenceTargets(reference)))
+            MultipleReferenceField(),
+            MultipleReferenceProperty(Call(ReferenceTargets().ToString())),
+            MultipleReferenceTargetsMethod(),
+            TryGetMultiple(InvocationExpression(ReferenceTargets()))
         }.Concat(
-            LinkAdder(reference, [
+            LinkAdder([
                 SafeNodesVariableReference(),
                 AssureNotNullCall(reference),
-                AssureNotNullMembersCall(reference),
+                AssureNotNullMembersCall(),
                 AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference),
                     IdentifierName("Count"))),
                 EmitterCollectOldDataCall(),
-                SimpleAddRangeCall(reference),
+                SimpleAddRangeCall(),
                 EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
-            LinkInserter(reference, [
-                AssureInRangeCall(reference),
+            LinkInserter([
+                AssureInRangeCall(),
                 SafeNodesVariableReference(),
                 AssureNotNullCall(reference),
-                AssureNotNullMembersCall(reference),
+                AssureNotNullMembersCall(),
                 AddMultipleReferenceEmitterVariable(IdentifierName("index")),
                 EmitterCollectOldDataCall(),
-                SimpleInsertRangeCall(reference),
+                SimpleInsertRangeCall(),
                 EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
-            LinkRemover(reference, [
-                SafeNodesVariableContainment(),
+            LinkRemover([
+                SafeNodesVariable(),
                 AssureNotNullCall(reference),
-                AssureNotNullMembersCall(reference),
-                SimpleRemoveAllCall(reference),
+                AssureNotNullMembersCall(),
+                SimpleRemoveAllCall(),
                 ReturnStatement(This())
             ])
         );
 
-    private ExpressionStatementSyntax AssureNotNullMembersCall(Reference reference) =>
+    private ExpressionStatementSyntax AssureNotNullMembersCall() =>
         ExpressionStatement(Call("AssureNotNullMembers",
             IdentifierName("safeNodes"),
             MetaProperty(reference)
         ));
 
-    private ExpressionStatementSyntax SimpleAddRangeCall(Reference reference) =>
+    private ExpressionStatementSyntax SimpleAddRangeCall() =>
         ExpressionStatement(InvocationExpression(
             MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
             AsArguments([IdentifierName("safeNodes")])
         ));
 
-    private ExpressionStatementSyntax SimpleRemoveAllCall(Reference reference) =>
+    private ExpressionStatementSyntax SimpleRemoveAllCall() =>
         ExpressionStatement(Call(
             "RemoveAll",
             IdentifierName("safeNodes"),
@@ -251,14 +251,14 @@ public partial class FeatureGenerator
             CallGeneric("ReferenceRemover", AsType(reference.Type), MetaProperty(reference))
         ));
 
-    private ExpressionStatementSyntax SimpleInsertRangeCall(Reference reference) =>
+    private ExpressionStatementSyntax SimpleInsertRangeCall() =>
         ExpressionStatement(InvocationExpression(
             MemberAccess(FeatureField(reference), IdentifierName("InsertRange")),
             AsArguments(
                 [IdentifierName("index"), IdentifierName("safeNodes")])
         ));
 
-    private FieldDeclarationSyntax MultipleReferenceField(Reference reference) =>
+    private FieldDeclarationSyntax MultipleReferenceField() =>
         Field(FeatureField(reference).ToString(),
                 AsType(typeof(List<>),
                     AsType(typeof(ReferenceDescriptor))),
@@ -266,7 +266,7 @@ public partial class FeatureGenerator
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
     private PropertyDeclarationSyntax
-        MultipleReferenceProperty(Reference reference, InvocationExpressionSyntax getter) =>
+        MultipleReferenceProperty(InvocationExpressionSyntax getter) =>
         PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(reference.Type)),
                 Identifier(FeatureProperty(reference).ToString()))
             .WithAccessorList(AccessorList(List([
@@ -281,33 +281,33 @@ public partial class FeatureGenerator
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ])))
             .WithAttributeLists(AsAttributes([
-                MetaPointerAttribute(feature),
+                MetaPointerAttribute(reference),
                 FeatureAttribute(),
-                ObsoleteAttribute(feature)
+                ObsoleteAttribute(reference)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(reference));
 
-    private MethodDeclarationSyntax SingleReferenceTargetMethod(Reference reference) =>
-        Method(ReferenceTarget(reference).ToString(),
+    private MethodDeclarationSyntax SingleReferenceTargetMethod() =>
+        Method(ReferenceTarget().ToString(),
                 NullableType(AsType(reference.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
             .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceDescriptorNullableTarget",
                 AsType(reference.Type), FeatureField(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
-    private ExpressionSyntax ReferenceTarget(Reference reference) =>
+    private ExpressionSyntax ReferenceTarget() =>
         IdentifierName($"{reference.Name.ToFirstUpper()}Target");
 
-    private MethodDeclarationSyntax MultipleReferenceTargetsMethod(Reference reference) =>
-        Method(ReferenceTargets(reference).ToString(),
+    private MethodDeclarationSyntax MultipleReferenceTargetsMethod() =>
+        Method(ReferenceTargets().ToString(),
                 AsType(typeof(IImmutableList<>), AsType(reference.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
             .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceDescriptorNullableTargets",
                 AsType(reference.GetFeatureType()), FeatureField(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
-    private ExpressionSyntax ReferenceTargets(Reference reference) =>
+    private ExpressionSyntax ReferenceTargets() =>
         IdentifierName($"{reference.Name.ToFirstUpper()}Targets");
 
     private LocalDeclarationStatementSyntax SafeNodesVariableReference() =>

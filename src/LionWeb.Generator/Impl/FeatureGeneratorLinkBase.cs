@@ -22,31 +22,32 @@ using Core.M3;
 using Core.Notification;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public partial class FeatureGenerator
+public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, link, names, lionWebVersion, config)
 {
-    private IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(Link link, bool writeable) =>
+    public IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(bool writeable) =>
     [
-        AbstractMultipleLinkProperty(link),
-        AbstractLinkAdder(link, writeable: writeable)
+        AbstractMultipleLinkProperty(),
+        AbstractLinkAdder(writeable: writeable)
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-        AbstractLinkInserter(link, writeable: writeable)
+        AbstractLinkInserter(writeable: writeable)
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-        AbstractLinkRemover(link, writeable: writeable)
+        AbstractLinkRemover(writeable: writeable)
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
-    private IEnumerable<XmlNodeSyntax> XdocRequiredMultipleLink(Link link) =>
+    protected IEnumerable<XmlNodeSyntax> XdocRequiredMultipleLink() =>
         XdocThrows($"If {FeatureProperty(link)} is empty", AsType(typeof(UnsetFeatureException)));
 
-    private MethodDeclarationSyntax XdocRequiredRemover(MethodDeclarationSyntax r, Link link) =>
+    protected MethodDeclarationSyntax XdocRequiredRemover(MethodDeclarationSyntax r) =>
         r.Xdoc(XdocThrows($"If {FeatureProperty(link)} would be empty", AsType(typeof(InvalidValueException))));
 
-    private MethodDeclarationSyntax XdocRequiredInserter(MethodDeclarationSyntax i, Link link) =>
+    protected MethodDeclarationSyntax XdocRequiredInserter(MethodDeclarationSyntax i) =>
         i.Xdoc(
-            XdocThrowsFeatureNodesEmpty(link)
+            XdocThrowsFeatureNodesEmpty()
                 .Concat(
                     XdocThrows($"If index negative or greater than {FeatureProperty(link)}.Count",
                         AsType(typeof(ArgumentOutOfRangeException))
@@ -54,40 +55,40 @@ public partial class FeatureGenerator
                 )
         );
 
-    private MethodDeclarationSyntax XdocRequiredAdder(MethodDeclarationSyntax a, Link link) =>
-        a.Xdoc(XdocThrowsFeatureNodesEmpty(link));
+    protected MethodDeclarationSyntax XdocRequiredAdder(MethodDeclarationSyntax a) =>
+        a.Xdoc(XdocThrowsFeatureNodesEmpty());
 
-    private IEnumerable<XmlNodeSyntax> XdocThrowsFeatureNodesEmpty(Link link) =>
+    private IEnumerable<XmlNodeSyntax> XdocThrowsFeatureNodesEmpty() =>
         XdocThrows($"If both {FeatureProperty(link)} and nodes are empty", AsType(typeof(InvalidValueException)));
 
-    private ExpressionStatementSyntax AssureNotClearingCall(Link link) =>
+    protected ExpressionStatementSyntax AssureNotClearingCall() =>
         ExpressionStatement(Call("AssureNotClearing",
             IdentifierName("safeNodes"),
             FeatureField(link),
             MetaProperty(link)
         ));
 
-    private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
+    protected ExpressionStatementSyntax AssureNonEmptyCall() =>
         ExpressionStatement(Call("AssureNonEmpty",
             IdentifierName("safeNodes"),
             FeatureField(link),
             MetaProperty(link)
         ));
 
-    private ExpressionStatementSyntax AssureInRangeCall(Link link) =>
+    protected ExpressionStatementSyntax AssureInRangeCall() =>
         ExpressionStatement(Call("AssureInRange",
             IdentifierName("index"),
             FeatureField(link)
         ));
 
-    private InvocationExpressionSyntax AsReadOnlyCall(Link link) =>
+    protected InvocationExpressionSyntax AsReadOnlyCall() =>
         InvocationExpression(MemberAccess(FeatureField(link),
             IdentifierName("AsReadOnly")));
 
-    private InvocationExpressionSyntax AsNonEmptyReadOnlyCall(Link link) =>
+    protected InvocationExpressionSyntax AsNonEmptyReadOnlyCall() =>
         Call("AsNonEmptyReadOnly", FeatureField(link), MetaProperty(link));
 
-    private PropertyDeclarationSyntax AbstractMultipleLinkProperty(Link link) =>
+    private PropertyDeclarationSyntax AbstractMultipleLinkProperty() =>
         PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type)),
                 Identifier(FeatureProperty(link).ToString())
             )
@@ -98,34 +99,33 @@ public partial class FeatureGenerator
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ])))
             .WithAttributeLists(AsAttributes([
-                MetaPointerAttribute(feature),
+                MetaPointerAttribute(link),
                 FeatureAttribute(),
-                ObsoleteAttribute(feature)
+                ObsoleteAttribute(link)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(link));
 
-    private IEnumerable<MethodDeclarationSyntax> LinkRemover(Link link, List<StatementSyntax> body,
-        bool writeable = false)
+    protected IEnumerable<MethodDeclarationSyntax> LinkRemover(List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkRemover(link, writeable: writeable)
+            AbstractLinkRemover(writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkRemover(link, writeable: writeable),
-                    Call(LinkRemove(link).ToString(), IdentifierName("nodes"))
+                InterfaceDelegator(AbstractLinkRemover(writeable: writeable),
+                    Call(LinkRemove().ToString(), IdentifierName("nodes"))
                 )
             );
 
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkRemover(Link link, bool writeable = false) =>
-        Method(LinkRemove(link).ToString(), AsType(classifier),
+    private MethodDeclarationSyntax AbstractLinkRemover(bool writeable = false) =>
+        Method(LinkRemove().ToString(), AsType(classifier),
                 [
                     Param("nodes",
                         AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
@@ -133,22 +133,21 @@ public partial class FeatureGenerator
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(link)]))
             .Xdoc(XdocDefault(link));
 
-    private IEnumerable<MethodDeclarationSyntax> LinkInserter(Link link, List<StatementSyntax> body,
-        bool writeable = false)
+    protected IEnumerable<MethodDeclarationSyntax> LinkInserter(List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkInserter(link, writeable: writeable)
+            AbstractLinkInserter(writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkInserter(link, writeable: writeable),
-                    Call(LinkInsert(link).ToString(), IdentifierName("index"),
+                InterfaceDelegator(AbstractLinkInserter(writeable: writeable),
+                    Call(LinkInsert().ToString(), IdentifierName("index"),
                         IdentifierName("nodes"))
                 )
             );
@@ -156,35 +155,34 @@ public partial class FeatureGenerator
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkInserter(Link link, bool writeable = false) =>
-        Method(LinkInsert(link).ToString(), AsType(classifier), [
+    private MethodDeclarationSyntax AbstractLinkInserter(bool writeable = false) =>
+        Method(LinkInsert().ToString(), AsType(classifier), [
                 Param("index", AsType(typeof(int))),
                 Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
                 ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(link)]))
             .Xdoc(XdocDefault(link));
 
-    private IEnumerable<MethodDeclarationSyntax> LinkAdder(Link link, List<StatementSyntax> body,
-        bool writeable = false)
+    protected IEnumerable<MethodDeclarationSyntax> LinkAdder(List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkAdder(link, writeable: writeable)
+            AbstractLinkAdder(writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkAdder(link, writeable: writeable),
+                InterfaceDelegator(AbstractLinkAdder(writeable: writeable),
                     Call(LinkAdd(link).ToString(), IdentifierName("nodes")))
             );
 
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkAdder(Link link, bool writeable = false) =>
+    private MethodDeclarationSyntax AbstractLinkAdder(bool writeable = false) =>
         Method(LinkAdd(link).ToString(), AsType(classifier),
                 [
                     Param("nodes",
@@ -193,12 +191,15 @@ public partial class FeatureGenerator
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(link)]))
             .Xdoc(XdocDefault(link));
 
-    private ExpressionSyntax LinkInsert(Link link) =>
+    private ExpressionSyntax LinkInsert() =>
         IdentifierName($"Insert{link.Name.ToFirstUpper()}");
 
-    private ExpressionSyntax LinkRemove(Link link) =>
+    private ExpressionSyntax LinkRemove() =>
         IdentifierName($"Remove{link.Name.ToFirstUpper()}");
+
+    protected LocalDeclarationStatementSyntax SafeNodesVariable() => 
+        SafeNodesVariable(OptionalNodesToList());
 }

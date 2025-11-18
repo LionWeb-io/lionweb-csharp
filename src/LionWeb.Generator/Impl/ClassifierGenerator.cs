@@ -37,7 +37,7 @@ using static AstExtensions;
 /// </summary>
 /// <seealso cref="FeatureMethodsGenerator"/>
 /// <seealso cref="ContainmentMethodsGenerator"/>
-/// <seealso cref="FeatureGenerator"/>
+/// <seealso cref="FeatureGeneratorBase"/>
 public class ClassifierGenerator(
     Classifier classifier,
     INames names,
@@ -145,7 +145,7 @@ public class ClassifierGenerator(
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
                 FeaturesToImplement(classifier)
-                    .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion, _config).Members())
+                    .SelectMany(f => FeatureGeneratorBase.Members(classifier, f, _names, _lionWebVersion, _config))
                     .Append(GenConstructor(additionalConstructorStatements ?? []))
                     .Concat(additionalMembers)
                     .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion, _config).FeatureMethods())
@@ -206,7 +206,7 @@ public class ClassifierGenerator(
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
-                new FeatureGenerator(classifier, f, _names, _lionWebVersion, _config).AbstractMembers())))
+                FeatureGeneratorBase.AbstractMembers(classifier, f, _names, _lionWebVersion, _config))))
             .Xdoc(XdocDefault());
     }
 

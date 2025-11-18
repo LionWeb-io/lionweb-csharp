@@ -17,17 +17,19 @@
 
 namespace LionWeb.Generator.Impl;
 
+using Core;
 using Core.M2;
 using Core.M3;
 using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public partial class FeatureGenerator
+public class FeatureGeneratorContainment(Classifier classifier, Containment containment, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, containment, names, lionWebVersion, config)
 {
-    private IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment(Containment containment) =>
+    public IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment() =>
         new List<MemberDeclarationSyntax>
         {
             SingleFeatureField(true),
@@ -38,7 +40,7 @@ public partial class FeatureGenerator
                 AsureNotNullCall(),
                 SingleContainmentEmitterVariable(),
                 EmitterCollectOldDataCall(),
-                SetParentNullCall(containment),
+                SetParentNullCall(),
                 AttachChildCall(),
                 AssignFeatureField(),
                 EmitterNotifyCall(),
@@ -47,7 +49,7 @@ public partial class FeatureGenerator
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
         );
 
-    private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
+    public IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment() =>
         new List<MemberDeclarationSyntax>
             {
                 SingleFeatureField(true),
@@ -58,7 +60,7 @@ public partial class FeatureGenerator
                 OptionalFeatureSetter([
                     SingleContainmentEmitterVariable(),
                     EmitterCollectOldDataCall(),
-                    SetParentNullCall(containment),
+                    SetParentNullCall(),
                     AttachChildCall(),
                     AssignFeatureField(),
                     EmitterNotifyCall(),
@@ -68,68 +70,68 @@ public partial class FeatureGenerator
     private LocalDeclarationStatementSyntax SingleContainmentEmitterVariable() =>
         Variable(
             "emitter",
-            AsType(typeof(ContainmentSingleNotificationEmitter<>), AsType(feature.GetFeatureType(), writeable: true)),
+            AsType(typeof(ContainmentSingleNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable: true)),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("value"),
-                FeatureField(feature), IdentifierName("notificationId")
+                MetaProperty(containment), This(), IdentifierName("value"),
+                FeatureField(containment), IdentifierName("notificationId")
             ])
         );
 
-    private IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment(Containment containment) =>
+    public IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment() =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleContainmentField(containment, writeable: true),
-            MultipleContainmentProperty(containment, AsNonEmptyReadOnlyCall(containment), writeable: true)
-                .Xdoc(XdocRequiredMultipleLink(containment)),
+            MultipleContainmentField(),
+            MultipleContainmentProperty(AsNonEmptyReadOnlyCall())
+                .Xdoc(XdocRequiredMultipleLink()),
             TryGetMultiple()
         }.Concat(
-            LinkAdder(containment, [
-                    SafeNodesVariableContainment(),
-                    AssureNonEmptyCall(containment),
-                    ReturnIfAddedNodesAreEqualToExistingNodes(containment),
+            LinkAdder([
+                    SafeNodesVariable(),
+                    AssureNonEmptyCall(),
+                    ReturnIfAddedNodesAreEqualToExistingNodes(),
                     AddMultipleContainmentEmitterVariable(Null()),
                     EmitterCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
                     EmitterNotifyCall(),
                     ReturnStatement(This())
                 ], writeable: true)
-                .Select(a => XdocRequiredAdder(a, containment))
+                .Select(XdocRequiredAdder)
         ).Concat(
-            LinkInserter(containment, [
-                    AssureInRangeCall(containment),
-                    SafeNodesVariableContainment(),
-                    AssureNonEmptyCall(containment),
-                    AssureNoSelfMoveCall(containment),
+            LinkInserter([
+                    AssureInRangeCall(),
+                    SafeNodesVariable(),
+                    AssureNonEmptyCall(),
+                    AssureNoSelfMoveCall(),
                     AddMultipleContainmentEmitterVariable(IdentifierName("index")),
                     EmitterCollectOldDataCall(),
-                    InsertRangeCall(containment),
+                    InsertRangeCall(),
                     EmitterNotifyCall(),
                     ReturnStatement(This())
                 ], writeable: true)
-                .Select(i => XdocRequiredInserter(i, containment))
+                .Select(i => XdocRequiredInserter(i))
         ).Concat(
-            LinkRemover(containment, [
-                    SafeNodesVariableContainment(),
+            LinkRemover([
+                    SafeNodesVariable(),
                     AssureNotNullCall(containment),
-                    AssureNotClearingCall(containment),
-                    RequiredRemoveSelfParentCall(containment),
+                    AssureNotClearingCall(),
+                    RequiredRemoveSelfParentCall(),
                     ReturnStatement(This())
                 ], writeable: true)
-                .Select(r => XdocRequiredRemover(r, containment))
+                .Select(XdocRequiredRemover)
         );
 
-    private IEnumerable<MemberDeclarationSyntax> OptionalMultiContainment(Containment containment) =>
+    public IEnumerable<MemberDeclarationSyntax> OptionalMultiContainment() =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleContainmentField(containment, writeable: true),
-            MultipleContainmentProperty(containment, AsReadOnlyCall(containment), writeable: true),
+            MultipleContainmentField(),
+            MultipleContainmentProperty(AsReadOnlyCall()),
             TryGetMultiple()
         }.Concat(
-            LinkAdder(containment, [
-                SafeNodesVariableContainment(),
+            LinkAdder([
+                SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
-                ReturnIfAddedNodesAreEqualToExistingNodes(containment),
+                ReturnIfAddedNodesAreEqualToExistingNodes(),
                 AddMultipleContainmentEmitterVariable(Null()),
                 EmitterCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
@@ -137,26 +139,26 @@ public partial class FeatureGenerator
                 ReturnStatement(This())
             ], writeable: true)
         ).Concat(
-            LinkInserter(containment, [
-                AssureInRangeCall(containment),
-                SafeNodesVariableContainment(),
+            LinkInserter([
+                AssureInRangeCall(),
+                SafeNodesVariable(),
                 AssureNotNullCall(containment),
-                AssureNoSelfMoveCall(containment),
+                AssureNoSelfMoveCall(),
                 AssureNotNullMembersCall(containment),
                 AddMultipleContainmentEmitterVariable(IdentifierName("index")),
                 EmitterCollectOldDataCall(),
-                InsertRangeCall(containment),
+                InsertRangeCall(),
                 EmitterNotifyCall(),
                 ReturnStatement(This())
             ], writeable: true)
         ).Concat(
-            LinkRemover(containment, [
-                OptionalRemoveSelfParentCall(containment),
+            LinkRemover([
+                OptionalRemoveSelfParentCall(),
                 ReturnStatement(This())
             ], writeable: true)
         );
 
-    private StatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes(Containment containment) =>
+    private StatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes() =>
         IfStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),
             AsArguments([IdentifierName("safeNodes")])
@@ -166,24 +168,24 @@ public partial class FeatureGenerator
         Variable(
             "emitter",
             AsType(typeof(ContainmentAddMultipleNotificationEmitter<>),
-                AsType(feature.GetFeatureType(), writeable: true)),
+                AsType(containment.GetFeatureType(), writeable: true)),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("safeNodes"),
-                FeatureField(feature), index, IdentifierName("notificationId")
+                MetaProperty(containment), This(), IdentifierName("safeNodes"),
+                FeatureField(containment), index, IdentifierName("notificationId")
             ])
         );
 
-    private ExpressionStatementSyntax AssureNoSelfMoveCall(Containment containment) =>
+    private ExpressionStatementSyntax AssureNoSelfMoveCall() =>
         ExpressionStatement(Call("AssureNoSelfMove",
             IdentifierName("index"),
             IdentifierName("safeNodes"),
             FeatureField(containment)
         ));
 
-    private ExpressionStatementSyntax SetParentNullCall(Containment containment) =>
+    private ExpressionStatementSyntax SetParentNullCall() =>
         ExpressionStatement(Call("SetParentNull", FeatureField(containment)));
 
-    private ExpressionStatementSyntax RequiredRemoveSelfParentCall(Containment containment) =>
+    private ExpressionStatementSyntax RequiredRemoveSelfParentCall() =>
         ExpressionStatement(Call("RemoveSelfParent",
             IdentifierName("safeNodes"),
             FeatureField(containment),
@@ -192,7 +194,7 @@ public partial class FeatureGenerator
                 MetaProperty(containment))
         ));
 
-    private ExpressionStatementSyntax OptionalRemoveSelfParentCall(Containment containment) =>
+    private ExpressionStatementSyntax OptionalRemoveSelfParentCall() =>
         ExpressionStatement(Call("RemoveSelfParent",
             OptionalNodesToList(),
             FeatureField(containment),
@@ -201,7 +203,7 @@ public partial class FeatureGenerator
                 MetaProperty(containment))
         ));
 
-    private ExpressionStatementSyntax InsertRangeCall(Containment containment) =>
+    private ExpressionStatementSyntax InsertRangeCall() =>
         ExpressionStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("InsertRange")),
             AsArguments([
@@ -212,16 +214,15 @@ public partial class FeatureGenerator
             ])
         ));
 
-    private FieldDeclarationSyntax MultipleContainmentField(Containment containment, bool writeable = false) =>
+    private FieldDeclarationSyntax MultipleContainmentField() =>
         Field(FeatureField(containment).ToString(),
-                AsType(typeof(List<>), AsType(containment.Type, writeable: writeable)),
+                AsType(typeof(List<>), AsType(containment.Type, writeable: true)),
                 Collection([]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
-    private PropertyDeclarationSyntax MultipleContainmentProperty(Containment containment,
-        InvocationExpressionSyntax getter, bool writeable = false) =>
+    private PropertyDeclarationSyntax MultipleContainmentProperty(InvocationExpressionSyntax getter) =>
         PropertyDeclaration(
-                AsType(typeof(IReadOnlyList<>), AsType(containment.Type, writeable: writeable)),
+                AsType(typeof(IReadOnlyList<>), AsType(containment.Type, writeable: true)),
                 Identifier(FeatureProperty(containment).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -235,13 +236,10 @@ public partial class FeatureGenerator
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ])))
             .WithAttributeLists(AsAttributes([
-                MetaPointerAttribute(feature),
+                MetaPointerAttribute(containment),
                 FeatureAttribute(),
-                ObsoleteAttribute(feature)
+                ObsoleteAttribute(containment)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(containment));
-    
-    private LocalDeclarationStatementSyntax SafeNodesVariableContainment() => 
-        SafeNodesVariable(OptionalNodesToList());
 }

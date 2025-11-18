@@ -43,52 +43,54 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public partial class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+public abstract class FeatureGeneratorBase(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
     : ClassifierGeneratorBase(names, lionWebVersion, config)
 {
-    /// <inheritdoc cref="FeatureGenerator"/>
-    public IEnumerable<MemberDeclarationSyntax> Members() =>
+    /// <inheritdoc cref="FeatureGeneratorBase"/>
+    public static IEnumerable<MemberDeclarationSyntax> Members(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) =>
         feature switch
         {
-            Property { Optional: false } p => RequiredProperty(p),
-            Property { Optional: true } p => OptionalProperty(p),
-            Containment { Optional: false, Multiple: false } c => RequiredSingleContainment(c),
-            Containment { Optional: true, Multiple: false } c => OptionalSingleContainment(c),
-            Reference { Optional: false, Multiple: false } r => RequiredSingleReference(r),
-            Reference { Optional: true, Multiple: false } r => OptionalSingleReference(r),
-            Containment { Optional: false, Multiple: true } c => RequiredMultiContainment(c),
-            Containment { Optional: true, Multiple: true } c => OptionalMultiContainment(c),
-            Reference { Optional: false, Multiple: true } r => RequiredMultiReference(r),
-            Reference { Optional: true, Multiple: true } r => OptionalMultiReference(r),
+            Property { Optional: false } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).RequiredProperty(),
+            Property { Optional: true } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).OptionalProperty(),
+            Containment { Optional: false, Multiple: false } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).RequiredSingleContainment(),
+            Containment { Optional: true, Multiple: false } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).OptionalSingleContainment(),
+            Containment { Optional: false, Multiple: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).RequiredMultiContainment(),
+            Containment { Optional: true, Multiple: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).OptionalMultiContainment(),
+            Reference { Optional: false, Multiple: false } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).RequiredSingleReference(),
+            Reference { Optional: true, Multiple: false } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).OptionalSingleReference(),
+            Reference { Optional: false, Multiple: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).RequiredMultiReference(),
+            Reference { Optional: true, Multiple: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).OptionalMultiReference(),
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
 
-    /// <inheritdoc cref="FeatureGenerator"/>
-    public IEnumerable<MemberDeclarationSyntax> AbstractMembers() =>
+    /// <inheritdoc cref="FeatureGeneratorBase"/>
+    public static IEnumerable<MemberDeclarationSyntax> AbstractMembers(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) =>
         feature switch
         {
-            Containment { Multiple: true } c => AbstractLinkMembers(c, writeable: true),
-            Reference { Multiple: true } r => AbstractLinkMembers(r, writeable: false),
-            Containment { Optional: false } => AbstractSingleRequiredMembers(true),
-            Reference { Optional: false } or Property { Optional: false } => AbstractSingleRequiredMembers(false),
-            Containment { Optional: true } => AbstractSingleOptionalMembers(writeable: true),
-            Reference { Optional: true } or Property { Optional: true } => AbstractSingleOptionalMembers(false),
+            Property { Optional: false } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).AbstractSingleRequiredMembers(false),
+            Property { Optional: true } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).AbstractSingleOptionalMembers(false),
+            Containment { Multiple: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).AbstractLinkMembers(writeable: true),
+            Containment { Optional: false } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).AbstractSingleRequiredMembers(true),
+            Containment { Optional: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).AbstractSingleOptionalMembers(writeable: true),
+            Reference { Multiple: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).AbstractLinkMembers(writeable: false),
+            Reference { Optional: false } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).AbstractSingleRequiredMembers(false),
+            Reference { Optional: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).AbstractSingleOptionalMembers(false),
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
 
-    private IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
+    public IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
     [
         AbstractSingleRequiredFeatureProperty(writeable: writeable),
         AbstractRequiredFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
-    private IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
+    public IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
     [
         AbstractSingleOptionalFeatureProperty(),
         AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
-    private MethodDeclarationSyntax TryGet(ExpressionSyntax? storage = null, bool writeable = false) =>
+    protected MethodDeclarationSyntax TryGet(ExpressionSyntax? storage = null, bool writeable = false) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
                     OutParam(Param(FeatureTryGetParam(),
@@ -105,7 +107,7 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
             ]));
 
 
-    private MethodDeclarationSyntax TryGetMultiple(ExpressionSyntax? storage = null) =>
+    protected MethodDeclarationSyntax TryGetMultiple(ExpressionSyntax? storage = null) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
                     OutParam(Param(
@@ -138,36 +140,36 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
             ]));
 
 
-    private IEnumerable<XmlNodeSyntax> XdocThrowsIfSetToNull() =>
+    protected IEnumerable<XmlNodeSyntax> XdocThrowsIfSetToNull() =>
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
 
-    private ExpressionStatementSyntax AsureNotNullCall() =>
+    protected ExpressionStatementSyntax AsureNotNullCall() =>
         ExpressionStatement(Call("AssureNotNull",
             IdentifierName("value"),
             MetaProperty(feature)
         ));
 
-    private static LocalDeclarationStatementSyntax SafeNodesVariable(ExpressionSyntax init) =>
+    protected static LocalDeclarationStatementSyntax SafeNodesVariable(ExpressionSyntax init) =>
         Variable("safeNodes", Var(), init);
 
-    private static ConditionalAccessExpressionSyntax OptionalNodesToList() =>
+    protected static ConditionalAccessExpressionSyntax OptionalNodesToList() =>
         ConditionalAccessExpression(IdentifierName("nodes"),
             InvocationExpression(MemberBindingExpression(IdentifierName("ToList")))
         );
 
-    private ExpressionStatementSyntax AttachChildCall() =>
+    protected ExpressionStatementSyntax AttachChildCall() =>
         ExpressionStatement(Call("AttachChild", IdentifierName("value")));
 
-    private ExpressionStatementSyntax AssignFeatureField(ExpressionSyntax? value = null) =>
+    protected ExpressionStatementSyntax AssignFeatureField(ExpressionSyntax? value = null) =>
         Assignment(FeatureField(feature).ToString(), value ?? IdentifierName("value"));
 
-    private FieldDeclarationSyntax SingleFeatureField(bool writable = false) =>
+    protected FieldDeclarationSyntax SingleFeatureField(bool writable = false) =>
         Field(FeatureField(feature).ToString(), NullableType(AsType(feature.GetFeatureType(), writeable: writable)),
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private PropertyDeclarationSyntax SingleRequiredFeatureProperty(ExpressionSyntax? storage = null, bool writeable = false) =>
+    protected PropertyDeclarationSyntax SingleRequiredFeatureProperty(ExpressionSyntax? storage = null, bool writeable = false) =>
         Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType(), writeable: writeable),
                 BinaryExpression(
                     SyntaxKind.CoalesceExpression,
@@ -187,7 +189,7 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
                     AsType(typeof(UnsetFeatureException))))
             );
 
-    private AttributeSyntax FeatureAttribute() =>
+    protected AttributeSyntax FeatureAttribute() =>
         AsAttribute(AsType(typeof(LionCoreFeature)),
         [
             ("Kind",
@@ -223,7 +225,7 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(feature));
 
-    private PropertyDeclarationSyntax SingleOptionalFeatureProperty(ExpressionSyntax? storage = null, bool writeable = false) =>
+    protected PropertyDeclarationSyntax SingleOptionalFeatureProperty(ExpressionSyntax? storage = null, bool writeable = false) =>
         Property(FeatureProperty(feature).ToString(),
                 NullableType(AsType(feature.GetFeatureType(), writeable: writeable)),
                 storage ?? FeatureField(feature),
@@ -254,7 +256,7 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(feature));
 
-    private List<MethodDeclarationSyntax> RequiredFeatureSetter(List<StatementSyntax> body, bool writeable = false)
+    protected List<MethodDeclarationSyntax> RequiredFeatureSetter(List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
@@ -285,7 +287,7 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(feature));
 
-    private IEnumerable<MethodDeclarationSyntax> OptionalFeatureSetter(List<StatementSyntax> body,
+    protected IEnumerable<MethodDeclarationSyntax> OptionalFeatureSetter(List<StatementSyntax> body,
         bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
@@ -302,11 +304,11 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
         return result;
     }
 
-    private IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
+    protected IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
         XdocKeyed(ffeature)
             .Concat(XdocRemarks(ffeature));
 
-    private static IEnumerable<XmlNodeSyntax> XdocRemarks(Feature feature)
+    private IEnumerable<XmlNodeSyntax> XdocRemarks(Feature feature)
     {
         var builder = new StringBuilder();
         builder.Append(feature.Optional ? "Optional " : "Required ");
@@ -325,7 +327,7 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
         return XdocLine(builder.ToString(), "remarks");
     }
 
-    private static IEnumerable<XmlNodeSyntax> XdocThrows(string text, TypeSyntax exception) =>
+    protected IEnumerable<XmlNodeSyntax> XdocThrows(string text, TypeSyntax exception) =>
     [
         XdocSlashes(),
         XmlElement("exception", new SyntaxList<XmlNodeSyntax>(XdocText(text)))
@@ -333,10 +335,10 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
         XdocNewline()
     ];
 
-    private bool InheritedFromInterface() =>
+    protected bool InheritedFromInterface() =>
         !classifier.EqualsIdentity(feature.GetFeatureClassifier());
 
-    private MethodDeclarationSyntax InterfaceDelegator(MethodDeclarationSyntax impl,
+    protected MethodDeclarationSyntax InterfaceDelegator(MethodDeclarationSyntax impl,
         ExpressionSyntax expression)
     {
         var modifiers = impl.Modifiers;
@@ -361,7 +363,7 @@ public partial class FeatureGenerator(Classifier classifier, Feature feature, IN
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(feature));
 
-    private ExpressionSyntax FeatureSet() =>
+    protected ExpressionSyntax FeatureSet() =>
         IdentifierName($"Set{feature.Name.ToFirstUpper()}");
 
     private string FeatureTryGetParam() =>

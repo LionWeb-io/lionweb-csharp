@@ -17,17 +17,18 @@
 
 namespace LionWeb.Generator.Impl;
 
+using Core;
 using Core.M3;
 using Core.Notification.Partition.Emitter;
 using Core.Utilities;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public partial class FeatureGenerator
+public class FeatureGeneratorProperty(Classifier classifier, Property property, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, property, names, lionWebVersion, config)
 {
-    private IEnumerable<MemberDeclarationSyntax> RequiredProperty(Property property)
+    public IEnumerable<MemberDeclarationSyntax> RequiredProperty()
     {
         List<StatementSyntax> setterBody =
         [
@@ -50,7 +51,7 @@ public partial class FeatureGenerator
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
 
-    private IEnumerable<MemberDeclarationSyntax> OptionalProperty(Property property) =>
+    public IEnumerable<MemberDeclarationSyntax> OptionalProperty() =>
         new List<MemberDeclarationSyntax>
             {
                 SingleFeatureField(),
@@ -72,8 +73,8 @@ public partial class FeatureGenerator
             "emitter",
             AsType(typeof(PropertyNotificationEmitter)),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("value"),
-                FeatureField(feature), IdentifierName("notificationId")
+                MetaProperty(property), This(), IdentifierName("value"),
+                FeatureField(property), IdentifierName("notificationId")
             ])
         );
 
