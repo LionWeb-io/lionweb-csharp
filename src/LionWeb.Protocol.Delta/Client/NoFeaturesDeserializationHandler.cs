@@ -26,7 +26,7 @@ internal class NoFeaturesDeserializationHandler : DeserializerExceptionHandler
     public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
         null;
 
-    public override ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo,
+    public override ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo,
         Feature reference, IReadableNode node) =>
         null;
 

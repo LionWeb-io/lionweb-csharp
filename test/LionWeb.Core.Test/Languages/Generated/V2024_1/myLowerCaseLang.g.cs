@@ -208,7 +208,7 @@ public partial class myConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private ReferenceDescriptor? _myReference = null;
+	private ReferenceTarget? _myReference = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MyReference has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -224,7 +224,7 @@ public partial class myConcept : ConceptInstanceBase
 		return myReference != null;
 	}
 
-	private myConcept SetMyReference(ReferenceDescriptor? value, INotificationId? notificationId = null)
+	private myConcept SetMyReference(ReferenceTarget? value, INotificationId? notificationId = null)
 	{
 		AssureNotNullInstance<IReadableNode>(value, MyLowerCaseLangLanguage.Instance.myConcept_myReference);
 		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MyLowerCaseLangLanguage.Instance.myConcept_myReference, this, value, _myReference, notificationId);
@@ -238,7 +238,7 @@ public partial class myConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public myConcept SetMyReference(IReadableNode value, INotificationId? notificationId = null)
 	{
-		return SetMyReference(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
+		return SetMyReference(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	public myConcept(string id) : base(id)
@@ -308,7 +308,7 @@ public partial class myConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceDescriptor descriptor)
+			if (value is ReferenceTarget descriptor)
 			{
 				SetMyReference(descriptor, notificationId);
 				return true;

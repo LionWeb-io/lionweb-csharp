@@ -23,7 +23,7 @@ using TargetNode = IReadableNode;
 /// Describes a reference target.
 ///
 /// <para>
-/// At least one of <see cref="ResolveInfo"/> and <see cref="Reference"/> MUST be non-null.
+/// At least one of <see cref="ResolveInfo"/> and <see cref="Target"/> MUST be non-null.
 /// </para>
 /// </summary>
 /// <seealso cref="LionWeb.Core.Serialization.SerializedReferenceTarget"/>
@@ -31,10 +31,9 @@ public interface IReferenceTarget
 {
     /// Textual hint that might be used to find the target node of this reference.
     ResolveInfo? ResolveInfo { get; }
+
+    NodeId? TargetId { get; }
     
     /// Target node of this reference.
-    TargetNode? Reference { get; }
+    TargetNode? Target { get; }
 }
-
-/// <inheritdoc cref="IReferenceTarget"/>
-public readonly record struct ReferenceTarget(ResolveInfo? ResolveInfo, TargetNode? Reference) : IReferenceTarget;

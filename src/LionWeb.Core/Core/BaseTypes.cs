@@ -400,7 +400,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// Represents unresolvable targets as <c>null</c>. 
     /// </summary>
     /// TODO: Add reference parameter
-    protected IImmutableList<R?> ReferenceDescriptorNullableTargets<R>(List<ReferenceDescriptor> storage)
+    protected IImmutableList<R?> ReferenceDescriptorNullableTargets<R>(List<ReferenceTarget> storage)
         where R : IReadableNode =>
         M2Extensions.AsReferenceDescriptors<R>(null, storage)
             .Select(r => (R?)r.Target)
@@ -411,13 +411,13 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// Represents unresolvable target as <c>null</c>. 
     /// </summary>
     /// TODO: Add reference parameter
-    protected R? ReferenceDescriptorNullableTarget<R>(ReferenceDescriptor? storage) where R : class, IReadableNode =>
+    protected R? ReferenceDescriptorNullableTarget<R>(ReferenceTarget? storage) where R : class, IReadableNode =>
         storage?.Target as R;
 
     /// <summary>
     /// Extracts all target nodes from <paramref name="storage"/> descriptors.
     /// </summary>
-    protected IImmutableList<R> ReferenceDescriptorNonNullTargets<R>(List<ReferenceDescriptor> storage,
+    protected IImmutableList<R> ReferenceDescriptorNonNullTargets<R>(List<ReferenceTarget> storage,
         Reference reference,
         IReadableNode parent) where R : IReadableNode =>
         M2Extensions.AsReferenceDescriptors<R>(null, storage)
@@ -430,7 +430,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// Extracts target node from <paramref name="storage"/> descriptor.
     /// </summary>
     /// <exception cref="UnresolvedReferenceExpression">If any target is unresolved.</exception>
-    protected R ReferenceDescriptorNonNullTarget<R>(ReferenceDescriptor storage, Reference reference,
+    protected R ReferenceDescriptorNonNullTarget<R>(ReferenceTarget storage, Reference reference,
         IReadableNode parent) where R : class, IReadableNode =>
         storage.Target as R ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, storage.ResolveInfo,
             storage.TargetId);
@@ -644,12 +644,12 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
-    /// Assures <paramref name="value"/>'s is not <c>null</c> and its <see cref="ReferenceDescriptor.Target"/> is <c>null</c> or <typeparamref name="T"/>.
+    /// Assures <paramref name="value"/>'s is not <c>null</c> and its <see cref="ReferenceTarget.Target"/> is <c>null</c> or <typeparamref name="T"/>.
     /// </summary>
     /// <param name="value">Value to guard against <c>null</c>.</param>
     /// <param name="feature">Feature <paramref name="value"/> originates from.</param>
-    /// <exception cref="InvalidValueException">If <paramref name="value"/> is null or its <see cref="ReferenceDescriptor.Target"/> is not <typeparamref name="T"/>.</exception>
-    protected void AssureNotNullInstance<T>([NotNull] ReferenceDescriptor? value, Feature? feature)
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> is null or its <see cref="ReferenceTarget.Target"/> is not <typeparamref name="T"/>.</exception>
+    protected void AssureNotNullInstance<T>([NotNull] ReferenceTarget? value, Feature? feature)
     {
         if (value is { Target: null or T })
             return;
@@ -658,12 +658,12 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
-    /// Assures <paramref name="value"/>'s is <c>null</c> or its <see cref="ReferenceDescriptor.Target"/> is <c>null</c> or <typeparamref name="T"/>.
+    /// Assures <paramref name="value"/>'s is <c>null</c> or its <see cref="ReferenceTarget.Target"/> is <c>null</c> or <typeparamref name="T"/>.
     /// </summary>
     /// <param name="value">Value to guard against <c>null</c>.</param>
     /// <param name="feature">Feature <paramref name="value"/> originates from.</param>
     /// <exception cref="InvalidValueException">If <paramref name="value"/> is not <typeparamref name="T"/>.</exception>
-    protected void AssureNullableInstance<T>(ReferenceDescriptor? value, Feature? feature)
+    protected void AssureNullableInstance<T>(ReferenceTarget? value, Feature? feature)
     {
         if (value is null or { Target: null or T })
             return;
@@ -996,7 +996,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
     
     /// <inheritdoc cref="RemoveAll{T}(List{T}, List{T}, Action{IPartitionNotificationProducer, Index, T, INotificationId?}?, INotificationId?)"/>
-    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceDescriptor> storage,
+    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceTarget> storage,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
         INotificationId? notificationId = null)
         where T : IReadableNode
@@ -1020,7 +1020,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (producer, index, node, notificationId) =>
         {
-            IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
+            IReferenceTarget deletedTarget = ReferenceTarget.FromNode(node);
             producer.ProduceNotification(new ReferenceDeletedNotification(this, reference, index, deletedTarget,
                 notificationId ?? producer.CreateNotificationId()));
         };
@@ -1081,53 +1081,4 @@ public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionIns
 
     /// <inheritdoc cref="IPartitionInstance.GetNotificationProducer"/>
     protected internal abstract IPartitionNotificationProducer? GetNotificationProducer();
-}
-
-public record ReferenceDescriptor(ResolveInfo? ResolveInfo, NodeId? TargetId, IReadableNode? Target)
-{
-    public IReadableNode? Target { get; set; } = Target;
-}
-
-public static class ReferenceDescriptorExtensions
-{
-    public static ReferenceDescriptor FromNode(IReadableNode node) =>
-        node is not null
-            ? new ReferenceDescriptor(node?.GetNodeName(), node?.GetId(), node)
-            : throw new InvalidValueException(null, node);
-
-    public static ReferenceDescriptor? FromNodeOptional(IReadableNode? node) =>
-        node is null ? null : new ReferenceDescriptor(node.GetNodeName(), node.GetId(), node);
-
-    public static ReferenceTarget ToReferenceTarget(this ReferenceDescriptor referenceDescriptor) =>
-        new ReferenceTarget(referenceDescriptor.ResolveInfo, referenceDescriptor.Target);
-}
-
-public class ReferenceDescriptorIdComparer : IEqualityComparer<ReferenceDescriptor>
-{
-    /// <inheritdoc />
-    public bool Equals(ReferenceDescriptor x, ReferenceDescriptor y)
-    {
-        if (x.Target is not null && y.Target is not null)
-            return x.Target.GetId() == y.Target.GetId();
-
-        if (x.TargetId is not null && y.TargetId is not null)
-            return x.TargetId == y.TargetId;
-
-        return x.ResolveInfo == y.ResolveInfo;
-    }
-
-    /// <inheritdoc />
-    public int GetHashCode(ReferenceDescriptor obj)
-    {
-        if (obj.Target is not null)
-            return obj.Target.GetId().GetHashCode();
-
-        if (obj.TargetId is not null)
-            return obj.TargetId.GetHashCode();
-
-        if (obj.ResolveInfo is not null)
-            return obj.ResolveInfo.GetHashCode();
-
-        return 0;
-    }
 }

@@ -178,7 +178,7 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]
 public partial class Book : ConceptInstanceBase
 {
-	private ReferenceDescriptor? _author = null;
+	private ReferenceTarget? _author = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Author has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -194,7 +194,7 @@ public partial class Book : ConceptInstanceBase
 		return author != null;
 	}
 
-	private Book SetAuthor(ReferenceDescriptor? value, INotificationId? notificationId = null)
+	private Book SetAuthor(ReferenceTarget? value, INotificationId? notificationId = null)
 	{
 		AssureNotNullInstance<Writer>(value, LibraryLanguage.Instance.Book_author);
 		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
@@ -208,7 +208,7 @@ public partial class Book : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Book SetAuthor(Writer value, INotificationId? notificationId = null)
 	{
-		return SetAuthor(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
+		return SetAuthor(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	private int? _pages = null;
@@ -337,7 +337,7 @@ public partial class Book : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceDescriptor descriptor)
+			if (value is ReferenceTarget descriptor)
 			{
 				SetAuthor(descriptor, notificationId);
 				return true;

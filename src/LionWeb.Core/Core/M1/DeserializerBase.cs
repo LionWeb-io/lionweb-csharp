@@ -318,7 +318,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
                     continue;
                 default:
                     {
-                        List<ReferenceDescriptor> targets = targetEntries
+                        List<ReferenceTarget> targets = targetEntries
                             .Select(target =>
                                 FindReferenceTarget(node, feature, target.compressedId, target.resolveInfo))
                             .Where(d => d is not null)
@@ -337,7 +337,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    private void SetReference(List<ReferenceDescriptor> descriptors, IWritableNode node, Feature reference)
+    private void SetReference(List<ReferenceTarget> descriptors, IWritableNode node, Feature reference)
     {
         if (descriptors.Count == 0)
             return;
@@ -354,12 +354,12 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         }
     }
 
-    private ReferenceDescriptor? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
+    private ReferenceTarget? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
         ResolveInfo? resolveInfo)
     {
         var target = FindReferenceTarget(targetId, resolveInfo);
         if (target is not null)
-            return new ReferenceDescriptor(resolveInfo, target?.GetId() ?? targetId?.Original, target);
+            return new ReferenceTarget(resolveInfo, target?.GetId() ?? targetId?.Original, target);
 
         return _handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
     }

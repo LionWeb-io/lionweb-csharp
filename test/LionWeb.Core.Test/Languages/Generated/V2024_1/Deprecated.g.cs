@@ -258,7 +258,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private ReferenceDescriptor? _deprRef = null;
+	private ReferenceTarget? _deprRef = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If DeprRef has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -276,7 +276,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		return deprRef != null;
 	}
 
-	private DeprConcept SetDeprRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
+	private DeprConcept SetDeprRef(ReferenceTarget? value, INotificationId? notificationId = null)
 	{
 		AssureNotNullInstance<DeprAnnotation>(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef, notificationId);
@@ -291,7 +291,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprRef comment")]
 	public DeprConcept SetDeprRef(DeprAnnotation value, INotificationId? notificationId = null)
 	{
-		return SetDeprRef(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
+		return SetDeprRef(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	public DeprConcept(string id) : base(id)
@@ -361,7 +361,7 @@ public partial class DeprConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceDescriptor descriptor)
+			if (value is ReferenceTarget descriptor)
 			{
 				SetDeprRef(descriptor, notificationId);
 				return true;

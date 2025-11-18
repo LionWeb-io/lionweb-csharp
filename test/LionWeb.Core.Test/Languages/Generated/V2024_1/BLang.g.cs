@@ -136,7 +136,7 @@ public partial class BConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private ReferenceDescriptor? _aRef = null;
+	private ReferenceTarget? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
@@ -150,7 +150,7 @@ public partial class BConcept : ConceptInstanceBase
 		return aRef != null;
 	}
 
-	private BConcept SetARef(ReferenceDescriptor? value, INotificationId? notificationId = null)
+	private BConcept SetARef(ReferenceTarget? value, INotificationId? notificationId = null)
 	{
 		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(value, BLangLanguage.Instance.BConcept_ARef);
 		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
@@ -163,7 +163,7 @@ public partial class BConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? value, INotificationId? notificationId = null)
 	{
-		return SetARef(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
+		return SetARef(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	public BConcept(string id) : base(id)
@@ -216,7 +216,7 @@ public partial class BConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceDescriptor descriptor)
+			if (value is ReferenceTarget descriptor)
 			{
 				SetARef(descriptor, notificationId);
 				return true;

@@ -146,7 +146,7 @@ public class LenientNode : NodeBase, INode
                 case Containment { Multiple: true } when value is INode node:
                     value = new List<INode> { node }.AsReadOnly();
                     break;
-                case Reference { Multiple:false} when value is ReferenceDescriptor descriptor:
+                case Reference { Multiple:false} when value is ReferenceTarget descriptor:
                     value =  descriptor.Target;
                     break;
                 case Reference { Multiple: true } reference:
@@ -158,10 +158,10 @@ public class LenientNode : NodeBase, INode
                         case IReadableNode readableNode:
                             value = new List<IReadableNode> { readableNode }.AsReadOnly();
                             break;
-                        case ReferenceDescriptor { Target: not null } descriptor:
+                        case ReferenceTarget { Target: not null } descriptor:
                             value = new List<IReadableNode> { descriptor.Target }.AsReadOnly();
                             break;
-                        case ReferenceDescriptor { Target: null }:
+                        case ReferenceTarget { Target: null }:
                             value = new List<IReadableNode>().AsReadOnly();
                             break;
                         case String s:
@@ -234,14 +234,14 @@ public class LenientNode : NodeBase, INode
                         AttachChild(node);
                         break;
                     case Reference:
-                        SetFeature(feature, ReferenceDescriptorExtensions.FromNode(readableNode));
+                        SetFeature(feature, ReferenceTarget.FromNode(readableNode));
                         return true;
                 }
 
                 SetFeature(feature, readableNode);
                 return true;
             
-            case ReferenceDescriptor descriptor when feature is Reference:
+            case ReferenceTarget descriptor when feature is Reference:
                 SetFeature(feature, descriptor);
                 return true;
 
@@ -288,7 +288,7 @@ public class LenientNode : NodeBase, INode
                             return true;
                         }
                     case Reference reference:
-                        SetFeature(feature, readableNodes.Select(ReferenceDescriptorExtensions.FromNode));
+                        SetFeature(feature, readableNodes.Select(ReferenceTarget.FromNode));
                         return true;
                     default:
                         SetFeature(feature, readableNodes);
@@ -450,12 +450,12 @@ public class LenientNode : NodeBase, INode
     private bool TryGetFeature(Feature featureToFind, out object? value)
     {
         var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
-        if (result.value is ReferenceDescriptor descriptor)
+        if (result.value is ReferenceTarget descriptor)
         {
             value = descriptor.Target;
             return true;
         }
-        if (result.value is List<ReferenceDescriptor> referenceDescriptors)
+        if (result.value is List<ReferenceTarget> referenceDescriptors)
         {
             value =  referenceDescriptors.Select(d => d.Target).Where(t => t is not null).ToList();
             return true;

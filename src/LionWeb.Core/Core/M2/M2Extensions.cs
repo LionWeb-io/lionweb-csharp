@@ -377,34 +377,34 @@ public static class M2Extensions
 
     /// <summary>
     /// Re-types <paramref name="value"/> as IEnumerable&lt;ReferenceDescriptor&gt;.
-    /// Wraps <see cref="IReadableNode"/>s of type <typeparamref name="T"/>, and passes through <see cref="ReferenceDescriptor"/>s. 
+    /// Wraps <see cref="IReadableNode"/>s of type <typeparamref name="T"/>, and passes through <see cref="ReferenceTarget"/>s. 
     /// </summary>
     /// <param name="reference"><paramref name="value"/>'s origin Reference.</param>
     /// <param name="value">Untyped <paramref name="reference"/> value.</param>
     /// <typeparam name="T">Type of nodes in <paramref name="value"/>.</typeparam>
     /// <returns><paramref name="value"/> re-typed as IEnumerable&lt;ReferenceDescriptor&gt;.</returns>
-    /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be re-typed as IEnumerable&lt;ReferenceDescriptor&gt; with <see cref="ReferenceDescriptor.Target"/> of type <typeparamref name="T"/>.</exception>
-    public static IEnumerable<ReferenceDescriptor> AsReferenceDescriptors<T>(this Reference reference, object? value)
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be re-typed as IEnumerable&lt;ReferenceDescriptor&gt; with <see cref="ReferenceTarget.Target"/> of type <typeparamref name="T"/>.</exception>
+    public static IEnumerable<ReferenceTarget> AsReferenceDescriptors<T>(this Reference reference, object? value)
         where T : IReadableNode =>
         (reference?.Multiple, value) switch
         {
             (_, IEnumerable e) => CastReferenceDescriptorIterator<T>(reference, e),
-            (false, T n) => [ReferenceDescriptorExtensions.FromNode(n)],
-            (false, ReferenceDescriptor { Target: null } r) => [r],
-            (false, ReferenceDescriptor { Target: T } r) => [r],
+            (false, T n) => [ReferenceTarget.FromNode(n)],
+            (false, ReferenceTarget { Target: null } r) => [r],
+            (false, ReferenceTarget { Target: T } r) => [r],
             var (_, v) => throw new InvalidValueException(reference, v)
         };
 
-    private static IEnumerable<ReferenceDescriptor> CastReferenceDescriptorIterator<T>(Reference reference,
+    private static IEnumerable<ReferenceTarget> CastReferenceDescriptorIterator<T>(Reference reference,
         IEnumerable source) where T : IReadableNode
     {
         foreach (var obj in source)
         {
             yield return obj switch
             {
-                T tt => ReferenceDescriptorExtensions.FromNode(tt),
-                ReferenceDescriptor { Target: null } r => r,
-                ReferenceDescriptor { Target: T } r => r,
+                T tt => ReferenceTarget.FromNode(tt),
+                ReferenceTarget { Target: null } r => r,
+                ReferenceTarget { Target: T } r => r,
                 _ => throw new InvalidValueException(reference, obj)
             };
         }

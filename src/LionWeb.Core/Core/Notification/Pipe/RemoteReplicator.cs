@@ -392,7 +392,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = (INode)notification.Parent;
-            var target = notification.NewTarget.Reference;
+            var target = notification.NewTarget.Target;
             var newValue = InsertReference(localParent, notification.Reference, notification.Index,
                 target);
 
@@ -424,7 +424,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var localParent = (INotifiableNode)notification.Parent;
 
-            object newValue = notification.NewTarget.Reference;
+            object newValue = notification.NewTarget.Target;
             if (notification.Reference.Multiple)
             {
                 var existingTargets = localParent.Get(notification.Reference);
@@ -443,7 +443,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
     {
         var localParent = (INotifiableNode)notification.Parent;
-        var target = notification.Target.Reference;
+        var target = notification.Target.Target;
 
         object newValue = target;
         var reference = notification.Reference;

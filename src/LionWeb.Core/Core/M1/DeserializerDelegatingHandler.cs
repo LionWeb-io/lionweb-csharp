@@ -80,7 +80,7 @@ public class DeserializerDelegatingHandler(IDeserializerHandler delegateHandler)
         delegateHandler.UnresolvableChild(childId, containment, node);
 
     /// <inheritdoc />
-    public virtual ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo,
+    public virtual ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo,
         Feature reference, IReadableNode node)
         => delegateHandler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
 

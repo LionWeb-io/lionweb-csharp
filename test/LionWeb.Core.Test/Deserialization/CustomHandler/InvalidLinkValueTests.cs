@@ -39,7 +39,7 @@ public class InvalidLinkValueTests
         public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IReadableNode node)
         {
             IEnumerable healed = heal([..value], link, (IWritableNode)node);
-            if (healed is List<ReferenceDescriptor> rl)
+            if (healed is List<ReferenceTarget> rl)
                 healed = rl.Select(r => r.Target);
             return healed?.Cast<T>().ToList();
         }
@@ -509,7 +509,7 @@ public class InvalidLinkValueTests
 
         var writer = new Writer("new-author");
         var deserializerHealingHandler =
-            new DeserializerHealingHandler((list, feature, arg3) => new List<ReferenceDescriptor>() { ReferenceDescriptorExtensions.FromNode(writer) });
+            new DeserializerHealingHandler((list, feature, arg3) => new List<ReferenceTarget>() { ReferenceTarget.FromNode(writer) });
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(LibraryLanguage.Instance)

@@ -81,10 +81,10 @@ public class DeadReferenceSerializationTests
 
     internal class ReceiverDeserializerHandler(UnresolvedReferencesManager unresolvedReferencesManager) : DeserializerExceptionHandler
     {
-        public override ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
+        public override ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
             ResolveInfo? resolveInfo,
             Feature reference, IReadableNode node) =>
             unresolvedReferencesManager.RegisterUnresolvedReference((IWritableNode)node, reference,
-                new ReferenceDescriptor(resolveInfo, targetId?.Original, null));
+                new ReferenceTarget(resolveInfo, targetId?.Original, null));
     }
 }

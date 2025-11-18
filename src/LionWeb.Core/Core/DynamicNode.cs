@@ -93,7 +93,7 @@ public class DynamicNode : NodeBase
 
         if (_settings.TryGetValue(feature, out var setting))
         {
-            if (setting is ReferenceDescriptor descriptor)
+            if (setting is ReferenceTarget descriptor)
             {
                 result = descriptor.Target;
                 if (result is null && feature is Reference { Optional: false })
@@ -175,10 +175,10 @@ public class DynamicNode : NodeBase
                 return true;
 
             case ({ Multiple: false }, INode n):
-                _settings[reference] = ReferenceDescriptorExtensions.FromNode(n);
+                _settings[reference] = ReferenceTarget.FromNode(n);
                 return true;
 
-            case ({ Multiple: false }, ReferenceDescriptor):
+            case ({ Multiple: false }, ReferenceTarget):
                 _settings[reference] = value;
                 return true;
 

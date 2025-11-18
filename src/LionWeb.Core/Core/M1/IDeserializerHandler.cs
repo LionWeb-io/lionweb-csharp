@@ -192,7 +192,7 @@ public interface IDeserializerHandler
     /// <param name="reference">Reference that should contain <paramref name="targetId"/>.</param>
     /// <param name="node">Node that mentions <paramref name="targetId"/> as reference target.</param>
     /// <returns>Replacement reference target node to use, or <c>null</c> to skip reference target <paramref name="targetId"/>.</returns>
-    ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo, Feature reference,
+    ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo, Feature reference,
         IReadableNode node);
 
     /// <summary>

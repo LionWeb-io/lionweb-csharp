@@ -113,7 +113,7 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
 public partial class AConcept : ConceptInstanceBase
 {
-	private ReferenceDescriptor? _bRef = null;
+	private ReferenceTarget? _bRef = null;
 	/// bRef desc
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
@@ -133,7 +133,7 @@ public partial class AConcept : ConceptInstanceBase
 		return bRef != null;
 	}
 
-	private AConcept SetBRef(ReferenceDescriptor? value, INotificationId? notificationId = null)
+	private AConcept SetBRef(ReferenceTarget? value, INotificationId? notificationId = null)
 	{
 		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept>(value, ALangLanguage.Instance.AConcept_BRef);
 		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept> emitter = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, notificationId);
@@ -149,7 +149,7 @@ public partial class AConcept : ConceptInstanceBase
     	/// <remarks>Optional Single Reference</remarks>
         public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? value, INotificationId? notificationId = null)
 	{
-		return SetBRef(ReferenceDescriptorExtensions.FromNodeOptional(value), notificationId);
+		return SetBRef(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	public AConcept(string id) : base(id)
@@ -185,7 +185,7 @@ public partial class AConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceDescriptor descriptor)
+			if (value is ReferenceTarget descriptor)
 			{
 				SetBRef(descriptor, notificationId);
 				return true;

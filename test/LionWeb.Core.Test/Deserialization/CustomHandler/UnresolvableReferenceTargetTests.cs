@@ -30,10 +30,10 @@ public class UnresolvableReferenceTargetTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<ICompressedId?, string?, Feature, IWritableNode, ReferenceDescriptor?> heal)
+    private class DeserializerHealingHandler(Func<ICompressedId?, string?, Feature, IWritableNode, ReferenceTarget?> heal)
         : DeserializerExceptionHandler
     {
-        public override ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
+        public override ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
             ResolveInfo? resolveInfo, Feature reference, IReadableNode node) =>
             heal(targetId, resolveInfo, reference, (IWritableNode)node);
     }
@@ -125,7 +125,7 @@ public class UnresolvableReferenceTargetTests
         };
 
         var circle = new Circle("new-ref-target");
-        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => ReferenceDescriptorExtensions.FromNode(circle));
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => ReferenceTarget.FromNode(circle));
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
@@ -177,7 +177,7 @@ public class UnresolvableReferenceTargetTests
         };
 
         var deserializerHealingHandler = new DeserializerHealingHandler((targetId, resolveInfo, reference, node) =>
-            resolveInfo == "circle" ? ReferenceDescriptorExtensions.FromNode(new Circle("new-ref-target")) : null);
+            resolveInfo == "circle" ? ReferenceTarget.FromNode(new Circle("new-ref-target")) : null);
 
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
@@ -231,7 +231,7 @@ public class UnresolvableReferenceTargetTests
         };
 
         var coord = new Coord("invalid-target");
-        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => ReferenceDescriptorExtensions.FromNode(coord));
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => ReferenceTarget.FromNode(coord));
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)

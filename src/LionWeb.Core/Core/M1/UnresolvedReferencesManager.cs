@@ -26,7 +26,7 @@ using Notification.Pipe;
 /// </summary>
 public class UnresolvedReferencesManager : INotificationReceiver
 {
-    private readonly List<(IWritableNode parent, Feature reference, ReferenceDescriptor descriptor)>
+    private readonly List<(IWritableNode parent, Feature reference, ReferenceTarget descriptor)>
         _unresolvedReferences = [];
     
     /// Updates unresolved reference to nodes newly added in <paramref name="notification"/>.
@@ -38,7 +38,7 @@ public class UnresolvedReferencesManager : INotificationReceiver
         _unresolvedReferences.RemoveAll(e => RemoveMatchingReferences(newNodeNotification, e));
     }
 
-    private bool RemoveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, ReferenceDescriptor descriptor) e)
+    private bool RemoveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, ReferenceTarget descriptor) e)
     {
         if (e.descriptor.TargetId != newNodeNotification.NewNode.GetId())
             return false;
@@ -47,11 +47,11 @@ public class UnresolvedReferencesManager : INotificationReceiver
         return true;
     }
 
-    /// Registers unresolved <paramref name="descriptor"/> in <paramref name="reference"/> of <paramref name="parent"/>,
+    /// Registers unresolved <paramref name="target"/> in <paramref name="reference"/> of <paramref name="parent"/>,
     /// to be resolved later.
-    public ReferenceDescriptor RegisterUnresolvedReference(IWritableNode parent, Feature reference, ReferenceDescriptor descriptor)
+    public ReferenceTarget RegisterUnresolvedReference(IWritableNode parent, Feature reference, ReferenceTarget target)
     {
-        _unresolvedReferences.Add((parent, reference, descriptor));
-        return descriptor;
+        _unresolvedReferences.Add((parent, reference, target));
+        return target;
     }
 }

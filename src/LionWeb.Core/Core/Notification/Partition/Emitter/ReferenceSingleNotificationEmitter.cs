@@ -21,14 +21,14 @@ using M3;
 
 public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitterBase<T> where T : IReadableNode
 {
-    private readonly ReferenceDescriptor? _newTarget;
-    private readonly ReferenceDescriptor? _oldTarget;
+    private readonly ReferenceTarget? _newTarget;
+    private readonly ReferenceTarget? _oldTarget;
 
     /// Raises either <see cref="ReferenceAddedNotification"/>, <see cref="ReferenceDeletedNotification"/> or
     /// <see cref="ReferenceChangedNotification"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, ReferenceDescriptor? newTarget,
-        ReferenceDescriptor? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
+    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, ReferenceTarget? newTarget,
+        ReferenceTarget? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
@@ -49,20 +49,16 @@ public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitte
         switch (_oldTarget, _newTarget)
         {
             case (null, { } v):
-                IReferenceTarget newTarget = v.ToReferenceTarget();
-                ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
+                ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, 0, v,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
-                IReferenceTarget deletedTarget = o.ToReferenceTarget();
-                ProduceNotification(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
+                ProduceNotification(new ReferenceDeletedNotification(DestinationParent, Reference, 0, o,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
-                IReferenceTarget replacedTarget = o.ToReferenceTarget();
                 ProduceNotification(new ReferenceChangedNotification(DestinationParent, Reference, 0,
-                    n.ToReferenceTarget(), replacedTarget,
-                    GetNotificationId()));
+                    n, o, GetNotificationId()));
                 break;
         }
     }

@@ -143,7 +143,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
+    public virtual ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
         ResolveInfo? resolveInfo,
         Feature reference,
         IReadableNode node)

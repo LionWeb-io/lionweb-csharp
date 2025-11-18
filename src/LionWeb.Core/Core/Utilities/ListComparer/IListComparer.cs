@@ -39,8 +39,8 @@ public interface IListComparer
         new MoveDetector<T>(new ListComparer<T>(left, right, new NodeIdComparer<T>()));
 
     /// <inheritdoc cref="Create{T}"/>
-    static IListComparer<ReferenceDescriptor> CreateForReferenceDescriptor(IList<ReferenceDescriptor> left, List<ReferenceDescriptor> right) =>
-        new MoveDetector<ReferenceDescriptor>(new ListComparer<ReferenceDescriptor>(left, right, new ReferenceDescriptorIdComparer()));
+    static IListComparer<ReferenceTarget> CreateForReferenceDescriptor(IList<ReferenceTarget> left, List<ReferenceTarget> right) =>
+        new MoveDetector<ReferenceTarget>(new ListComparer<ReferenceTarget>(left, right, new ReferenceTargetIdComparer()));
 }
 
 /// <inheritdoc />
