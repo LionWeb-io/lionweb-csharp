@@ -17,8 +17,6 @@
 
 namespace LionWeb.Core.Test.Serialization;
 
-using Core.Notification;
-using Core.Notification.Pipe;
 using Core.Serialization;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
@@ -80,43 +78,10 @@ public class DeadReferenceSerializationTests
 
     internal class ReceiverDeserializerHandler(UnresolvedReferencesManager unresolvedReferencesManager) : DeserializerExceptionHandler
     {
-
-        public override bool SkipDeserializingDependentNode(ICompressedId id) =>
-            false;
-
         public override ReferenceDescriptor? UnresolvableReferenceTarget(ICompressedId? targetId,
             ResolveInfo? resolveInfo,
             Feature reference, IReadableNode node) =>
             unresolvedReferencesManager.RegisterUnresolvedReference((IWritableNode)node, reference,
                 new ReferenceDescriptor(resolveInfo, targetId?.Original, null));
-    }
-}
-
-public class UnresolvedReferencesManager : INotificationReceiver
-{
-    private readonly List<(IWritableNode parent, Feature reference, ReferenceDescriptor descriptor)>
-        _unresolvedReferences = [];
-    
-    public void Receive(INotificationSender correspondingSender, INotification notification)
-    {
-        if (notification is not INewNodeNotification newNodeNotification)
-            return;
-
-        _unresolvedReferences.RemoveAll(e => RemoveMatchingReferences(newNodeNotification, e));
-    }
-
-    private bool RemoveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, ReferenceDescriptor descriptor) e)
-    {
-        if (e.descriptor.TargetId != newNodeNotification.NewNode.GetId())
-            return false;
-
-        e.descriptor.Target = newNodeNotification.NewNode;
-        return true;
-    }
-
-    public ReferenceDescriptor RegisterUnresolvedReference(IWritableNode parent, Feature reference, ReferenceDescriptor descriptor)
-    {
-        _unresolvedReferences.Add((parent, reference, descriptor));
-        return descriptor;
     }
 }
