@@ -23,7 +23,7 @@ using M1;
 using M3;
 
 [TestClass]
-public class DeadReferenceSerializationTests
+public class UnresolvedReferenceSerializationTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
     private readonly Language _language = TestLanguageLanguage.Instance;

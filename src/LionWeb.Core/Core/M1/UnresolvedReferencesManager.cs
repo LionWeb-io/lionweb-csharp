@@ -34,10 +34,10 @@ public class UnresolvedReferencesManager : INotificationReceiver
         if (notification is not INewNodeNotification newNodeNotification)
             return;
 
-        _unresolvedReferences.RemoveAll(e => RemoveMatchingReferences(newNodeNotification, e));
+        _unresolvedReferences.RemoveAll(e => ResolveMatchingReferences(newNodeNotification, e));
     }
 
-    private bool RemoveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, ReferenceTarget target) e)
+    private bool ResolveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, ReferenceTarget target) e)
     {
         if (e.target.TargetId != newNodeNotification.NewNode.GetId())
             return false;
