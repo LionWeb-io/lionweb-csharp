@@ -1066,7 +1066,7 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
         originalPartition.AddShapes([a]);
 
         Assert.AreEqual(1, notificationObserver.Count);
-        AssertEquals([b, c, d, a], clonedPartition.Shapes.ToList());
+        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
     }
 
     
@@ -1088,8 +1088,75 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
 
         originalPartition.AddShapes([a, b]);
 
-        Assert.AreEqual(1, notificationObserver.Count);
-        AssertEquals([c, d, a, b], clonedPartition.Shapes.ToList());
+        Assert.AreEqual(2, notificationObserver.Count);
+        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+    }
+
+    [TestMethod]
+    public void ChildMovedInSameContainment_adds_three_of_the_existing_children()
+    {
+        var a = new Circle("a");
+        var b = new Circle("b");
+        var c = new Circle("c");
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        originalPartition.AddShapes([a, b, c]);
+
+        Assert.AreEqual(3, notificationObserver.Count);
+        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+    }
+    
+    [TestMethod]
+    public void ChildMovedInSameContainment_adds_three_of_the_existing_children_in_a_mixed_order()
+    {
+        var a = new Circle("a");
+        var b = new Circle("b");
+        var c = new Circle("c");
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        originalPartition.AddShapes([c, a, b]);
+
+        Assert.AreEqual(3, notificationObserver.Count);
+        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+    }
+    
+    [TestMethod]
+    public void ChildMovedInSameContainment_adds_new_node_to_the_existing_children()
+    {
+        var a = new Circle("a");
+        var b = new Circle("b");
+        var c = new Circle("c");
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        var e = new Circle("e");
+        originalPartition.AddShapes([a, b, c, d, e]);
+
+        Assert.AreEqual(5, notificationObserver.Count);
+        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
     }
     
     #endregion
