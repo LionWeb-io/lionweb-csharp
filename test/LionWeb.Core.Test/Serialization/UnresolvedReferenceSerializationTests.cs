@@ -49,7 +49,7 @@ public class UnresolvedReferenceSerializationTests
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
             .WithLanguage(_language)
-            .WithHandler(new ReceiverDeserializerHandler(unresolvedReferencesManager))
+            .WithHandler(new UnresolvedReferencesDeserializerHandler(unresolvedReferencesManager))
             .Build();
 
         stream.Position = 0;
@@ -79,12 +79,10 @@ public class UnresolvedReferenceSerializationTests
         Assert.AreSame(newRefN1, deserialized.Reference_0_n.Last());
     }
 
-    internal class ReceiverDeserializerHandler(UnresolvedReferencesManager unresolvedReferencesManager) : DeserializerExceptionHandler
+    private class UnresolvedReferencesDeserializerHandler(UnresolvedReferencesManager unresolvedReferencesManager) : DeserializerExceptionHandler
     {
-        public override ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
-            ResolveInfo? resolveInfo,
-            Feature reference, IReadableNode node) =>
-            unresolvedReferencesManager.RegisterUnresolvedReference((IWritableNode)node, reference,
-                new ReferenceTarget(resolveInfo, targetId?.Original, null));
+        public override IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target,
+            Feature reference, IReadableNode parent) =>
+            unresolvedReferencesManager.RegisterUnresolvedReference((IWritableNode)parent, reference, target);
     }
 }

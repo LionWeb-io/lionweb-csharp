@@ -35,9 +35,7 @@ public class DeltaDeserializerHandler(UnresolvedReferencesManager? unresolvedRef
         false;
 
     /// <inheritdoc />
-    public override ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
-        ResolveInfo? resolveInfo,
-        Feature reference, IReadableNode node) =>
-        unresolvedReferencesManager?.RegisterUnresolvedReference((IWritableNode)node, reference,
-            new ReferenceTarget(resolveInfo, targetId?.Original, null));
+    public override IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target,
+        Feature reference, IReadableNode parent) =>
+        unresolvedReferencesManager?.RegisterUnresolvedReference((IWritableNode)parent, reference, target);
 }

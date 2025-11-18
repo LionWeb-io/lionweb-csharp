@@ -318,7 +318,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
                     continue;
                 default:
                     {
-                        List<ReferenceTarget> targets = targetEntries
+                        List<IReferenceTarget> targets = targetEntries
                             .Select(target =>
                                 FindReferenceTarget(node, feature, target.compressedId, target.resolveInfo))
                             .Where(d => d is not null)
@@ -337,7 +337,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    private void SetReference(List<ReferenceTarget> targets, IWritableNode node, Feature reference)
+    private void SetReference(List<IReferenceTarget> targets, IWritableNode node, Feature reference)
     {
         if (targets.Count == 0)
             return;
@@ -354,14 +354,14 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         }
     }
 
-    private ReferenceTarget? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
+    private IReferenceTarget? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
         ResolveInfo? resolveInfo)
     {
         var target = FindReferenceTarget(targetId, resolveInfo);
         if (target is not null)
             return new ReferenceTarget(resolveInfo, target?.GetId() ?? targetId?.Original, target);
 
-        return _handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
+        return _handler.UnresolvableReferenceTarget(new ReferenceTarget(resolveInfo, targetId?.Original, null), reference, node);
     }
 
     /// Compresses <paramref name="r"/>.

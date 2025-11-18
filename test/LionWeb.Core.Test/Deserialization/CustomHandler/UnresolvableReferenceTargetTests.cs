@@ -30,12 +30,12 @@ public class UnresolvableReferenceTargetTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<ICompressedId?, string?, Feature, IWritableNode, ReferenceTarget?> heal)
+    private class DeserializerHealingHandler(Func<IReferenceTarget, Feature, IWritableNode, ReferenceTarget?> heal)
         : DeserializerExceptionHandler
     {
-        public override ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
-            ResolveInfo? resolveInfo, Feature reference, IReadableNode node) =>
-            heal(targetId, resolveInfo, reference, (IWritableNode)node);
+        public override IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target, Feature reference,
+            IReadableNode parent) =>
+            heal(target, reference, (IWritableNode)parent);
     }
 
     [TestMethod]
@@ -76,7 +76,7 @@ public class UnresolvableReferenceTargetTests
             ]
         };
 
-        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => null);
+        var deserializerHealingHandler = new DeserializerHealingHandler((target, arg3, arg4) => null);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
@@ -125,7 +125,7 @@ public class UnresolvableReferenceTargetTests
         };
 
         var circle = new Circle("new-ref-target");
-        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => ReferenceTarget.FromNode(circle));
+        var deserializerHealingHandler = new DeserializerHealingHandler((target, arg3, arg4) => ReferenceTarget.FromNode(circle));
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
@@ -176,8 +176,8 @@ public class UnresolvableReferenceTargetTests
             ]
         };
 
-        var deserializerHealingHandler = new DeserializerHealingHandler((targetId, resolveInfo, reference, node) =>
-            resolveInfo == "circle" ? ReferenceTarget.FromNode(new Circle("new-ref-target")) : null);
+        var deserializerHealingHandler = new DeserializerHealingHandler((target, reference, node) =>
+            target.ResolveInfo == "circle" ? ReferenceTarget.FromNode(new Circle("new-ref-target")) : null);
 
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
@@ -231,7 +231,7 @@ public class UnresolvableReferenceTargetTests
         };
 
         var coord = new Coord("invalid-target");
-        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => ReferenceTarget.FromNode(coord));
+        var deserializerHealingHandler = new DeserializerHealingHandler((target, arg3, arg4) => ReferenceTarget.FromNode(coord));
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)

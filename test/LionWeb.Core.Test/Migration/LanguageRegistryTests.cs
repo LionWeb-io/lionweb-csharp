@@ -65,8 +65,8 @@ public class LanguageRegistryTests : MigrationTestsBase
 
     private class SkipUnknownReferencesDeserializationHandler : DeserializerExceptionHandler
     {
-        public override ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
-            ResolveInfo? resolveInfo, Feature reference, IReadableNode node) =>
+        public override IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target, Feature reference,
+            IReadableNode parent) =>
             null;
     }
 

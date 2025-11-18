@@ -26,7 +26,7 @@ using Notification.Pipe;
 /// </summary>
 public class UnresolvedReferencesManager : INotificationReceiver
 {
-    private readonly List<(IWritableNode parent, Feature reference, ReferenceTarget target)> _unresolvedReferences = [];
+    private readonly List<(IWritableNode parent, Feature reference, IReferenceTarget target)> _unresolvedReferences = [];
     
     /// Updates unresolved reference to nodes newly added in <paramref name="notification"/>.
     public void Receive(INotificationSender correspondingSender, INotification notification)
@@ -37,7 +37,7 @@ public class UnresolvedReferencesManager : INotificationReceiver
         _unresolvedReferences.RemoveAll(e => ResolveMatchingReferences(newNodeNotification, e));
     }
 
-    private bool ResolveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, ReferenceTarget target) e)
+    private bool ResolveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, IReferenceTarget target) e)
     {
         if (e.target.TargetId != newNodeNotification.NewNode.GetId())
             return false;
@@ -48,7 +48,7 @@ public class UnresolvedReferencesManager : INotificationReceiver
 
     /// Registers unresolved <paramref name="target"/> in <paramref name="reference"/> of <paramref name="parent"/>,
     /// to be resolved later.
-    public ReferenceTarget RegisterUnresolvedReference(IWritableNode parent, Feature reference, ReferenceTarget target)
+    public IReferenceTarget RegisterUnresolvedReference(IWritableNode parent, Feature reference, IReferenceTarget target)
     {
         _unresolvedReferences.Add((parent, reference, target));
         return target;

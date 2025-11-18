@@ -109,12 +109,11 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new DeserializerException($"On node with id={node.GetId()}: couldn't find child with id={childId}");
 
     /// <inheritdoc />
-    public virtual ReferenceTarget? UnresolvableReferenceTarget(ICompressedId? targetId,
-        ResolveInfo? resolveInfo,
+    public virtual IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target,
         Feature reference,
-        IReadableNode node) =>
+        IReadableNode parent) =>
         throw new DeserializerException(
-            $"On node with id={node.GetId()}: couldn't find reference target with id={targetId}");
+            $"On node with id={parent.GetId()}: couldn't find reference target with id={target}");
 
     /// <inheritdoc />
     public virtual IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
