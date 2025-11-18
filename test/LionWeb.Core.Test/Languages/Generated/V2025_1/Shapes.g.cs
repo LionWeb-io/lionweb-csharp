@@ -1545,12 +1545,18 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		if (_shapes.SequenceEqual(safeNodes))
+		
+        if (_shapes.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, null, notificationId);
-		emitter.CollectOldData();
-		_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
-		emitter.Notify();
+        
+        foreach (var safeNode in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, null, notificationId);
+            emitter.CollectOldData();
+            _shapes.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.Geometry_shapes));
+            emitter.Notify();    
+        }
+		
 		return this;
 	}
 
