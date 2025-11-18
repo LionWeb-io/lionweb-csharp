@@ -233,7 +233,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<IReadableNode> MultipleOptionalRef { get => MultipleOptionalRefTargets(); init => AddMultipleOptionalRef(value); }
 
-	private IImmutableList<IReadableNode> MultipleOptionalRefTargets() => ReferenceDescriptorNullableTargets<IReadableNode>(_multipleOptionalRef);
+	private IImmutableList<IReadableNode> MultipleOptionalRefTargets() => ReferenceTargetNullableTargets<IReadableNode>(_multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMultipleOptionalRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalRef)
 	{
@@ -285,7 +285,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<IReadableNode> MultipleRef { get => AsNonEmptyReadOnly<IReadableNode>(MultipleRefTargets(), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef); init => AddMultipleRef(value); }
 
-	private IImmutableList<IReadableNode> MultipleRefTargets() => ReferenceDescriptorNullableTargets<IReadableNode>(_multipleRef);
+	private IImmutableList<IReadableNode> MultipleRefTargets() => ReferenceTargetNullableTargets<IReadableNode>(_multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultipleRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleRef)
 	{
@@ -395,7 +395,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public IReadableNode? SingleOptionalRef { get => SingleOptionalRefTarget(); set => SetSingleOptionalRef(value); }
 
-	private IReadableNode? SingleOptionalRefTarget() => ReferenceDescriptorNullableTarget<IReadableNode>(_singleOptionalRef);
+	private IReadableNode? SingleOptionalRefTarget() => ReferenceTargetNullableTarget<IReadableNode>(_singleOptionalRef);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetSingleOptionalRef([NotNullWhenAttribute(true)] out IReadableNode? singleOptionalRef)
 	{
@@ -427,7 +427,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public IReadableNode SingleRef { get => SingleRefTarget() ?? throw new UnsetFeatureException(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef); set => SetSingleRef(value); }
 
-	private IReadableNode? SingleRefTarget() => ReferenceDescriptorNullableTarget<IReadableNode>(_singleRef);
+	private IReadableNode? SingleRefTarget() => ReferenceTargetNullableTarget<IReadableNode>(_singleRef);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSingleRef([NotNullWhenAttribute(true)] out IReadableNode? singleRef)
 	{
@@ -544,7 +544,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.EqualsIdentity(feature))
 		{
-			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.AsReferenceDescriptors<IReadableNode>(value).ToList();
+			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.AsReferenceTargets<IReadableNode>(value).ToList();
 			AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 			AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNodes, _multipleOptionalRef, notificationId);
@@ -557,7 +557,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.EqualsIdentity(feature))
 		{
-			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.AsReferenceDescriptors<IReadableNode>(value).ToList();
+			var safeNodes = GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.AsReferenceTargets<IReadableNode>(value).ToList();
 			AssureNonEmpty(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNodes, _multipleRef, notificationId);
 			emitter.CollectOldData();
@@ -597,9 +597,9 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetSingleOptionalRef(descriptor, notificationId);
+				SetSingleOptionalRef(target, notificationId);
 				return true;
 			}
 
@@ -614,9 +614,9 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetSingleRef(descriptor, notificationId);
+				SetSingleRef(target, notificationId);
 				return true;
 			}
 

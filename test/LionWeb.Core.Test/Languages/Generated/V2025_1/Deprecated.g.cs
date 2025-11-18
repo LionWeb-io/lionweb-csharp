@@ -267,7 +267,7 @@ public partial class DeprConcept : ConceptInstanceBase
 	[Obsolete("deprRef comment")]
 	public DeprAnnotation DeprRef { get => DeprRefTarget() ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
 
-	private DeprAnnotation? DeprRefTarget() => ReferenceDescriptorNullableTarget<DeprAnnotation>(_deprRef);
+	private DeprAnnotation? DeprRefTarget() => ReferenceTargetNullableTarget<DeprAnnotation>(_deprRef);
 	/// <remarks>Required Single Reference</remarks>
         [Obsolete("deprRef comment")]
 	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)
@@ -361,9 +361,9 @@ public partial class DeprConcept : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetDeprRef(descriptor, notificationId);
+				SetDeprRef(target, notificationId);
 				return true;
 			}
 

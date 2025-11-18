@@ -396,41 +396,41 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 
     /// <summary>
-    /// Extracts all target nodes from <paramref name="storage"/> descriptors.
+    /// Extracts all target nodes from <paramref name="storage"/> targets.
     /// Represents unresolvable targets as <c>null</c>. 
     /// </summary>
     /// TODO: Add reference parameter
-    protected IImmutableList<R?> ReferenceDescriptorNullableTargets<R>(List<ReferenceTarget> storage)
+    protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget> storage)
         where R : IReadableNode =>
-        M2Extensions.AsReferenceDescriptors<R>(null, storage)
+        M2Extensions.AsReferenceTargets<R>(null, storage)
             .Select(r => (R?)r.Target)
             .ToImmutableList();
 
     /// <summary>
-    /// Extracts target node from <paramref name="storage"/> descriptor.
+    /// Extracts target node from <paramref name="storage"/> target.
     /// Represents unresolvable target as <c>null</c>. 
     /// </summary>
     /// TODO: Add reference parameter
-    protected R? ReferenceDescriptorNullableTarget<R>(ReferenceTarget? storage) where R : class, IReadableNode =>
+    protected R? ReferenceTargetNullableTarget<R>(ReferenceTarget? storage) where R : class, IReadableNode =>
         storage?.Target as R;
 
     /// <summary>
-    /// Extracts all target nodes from <paramref name="storage"/> descriptors.
+    /// Extracts all target nodes from <paramref name="storage"/> targets.
     /// </summary>
-    protected IImmutableList<R> ReferenceDescriptorNonNullTargets<R>(List<ReferenceTarget> storage,
+    protected IImmutableList<R> ReferenceTargetNonNullTargets<R>(List<ReferenceTarget> storage,
         Reference reference,
         IReadableNode parent) where R : IReadableNode =>
-        M2Extensions.AsReferenceDescriptors<R>(null, storage)
+        M2Extensions.AsReferenceTargets<R>(null, storage)
             .Select(r =>
                 (R?)r.Target ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, r.ResolveInfo,
                     r.TargetId))
             .ToImmutableList();
 
     /// <summary>
-    /// Extracts target node from <paramref name="storage"/> descriptor.
+    /// Extracts target node from <paramref name="storage"/> target.
     /// </summary>
     /// <exception cref="UnresolvedReferenceExpression">If any target is unresolved.</exception>
-    protected R ReferenceDescriptorNonNullTarget<R>(ReferenceTarget storage, Reference reference,
+    protected R ReferenceTargetNonNullTarget<R>(ReferenceTarget storage, Reference reference,
         IReadableNode parent) where R : class, IReadableNode =>
         storage.Target as R ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, storage.ResolveInfo,
             storage.TargetId);

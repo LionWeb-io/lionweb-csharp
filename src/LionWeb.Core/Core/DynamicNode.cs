@@ -93,9 +93,9 @@ public class DynamicNode : NodeBase
 
         if (_settings.TryGetValue(feature, out var setting))
         {
-            if (setting is ReferenceTarget descriptor)
+            if (setting is ReferenceTarget target)
             {
-                result = descriptor.Target;
+                result = target.Target;
                 if (result is null && feature is Reference { Optional: false })
                     throw new UnsetFeatureException(feature);
             } else

@@ -331,24 +331,24 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         }
     }
 
-    /// Sets <paramref name="reference"/> inside <paramref name="node"/> to <paramref name="descriptors"/>, if possible.
-    /// Uses only the first entry of <paramref name="descriptors"/> if <paramref name="reference"/> is single.
+    /// Sets <paramref name="reference"/> inside <paramref name="node"/> to <paramref name="targets"/>, if possible.
+    /// Uses only the first entry of <paramref name="targets"/> if <paramref name="reference"/> is single.
     ///
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    private void SetReference(List<ReferenceTarget> descriptors, IWritableNode node, Feature reference)
+    private void SetReference(List<ReferenceTarget> targets, IWritableNode node, Feature reference)
     {
-        if (descriptors.Count == 0)
+        if (targets.Count == 0)
             return;
 
         var single = reference is Reference { Multiple: false };
         try
         {
-            node.Set(reference, single && descriptors.Count == 1 ? descriptors[0] : descriptors);
+            node.Set(reference, single && targets.Count == 1 ? targets[0] : targets);
         } catch (InvalidValueException)
         {
-            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(descriptors.Select(r => r.Target).Where(t => t is not null)).ToList(), reference, node);
+            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(targets.Select(r => r.Target).Where(t => t is not null)).ToList(), reference, node);
             if (replacement != null)
                 node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
         }

@@ -198,14 +198,14 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         IfStatement(
             IsPatternExpression(IdentifierName("value"), DeclarationPattern(
                     AsType(typeof(ReferenceTarget)),
-                    SingleVariableDesignation(Identifier("descriptor"))
+                    SingleVariableDesignation(Identifier("target"))
                 )
             ),
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
                         IdentifierName(FeatureSet(reference)),
-                        AsArguments([IdentifierName("descriptor"), IdentifierName("notificationId")]))),
+                        AsArguments([IdentifierName("target"), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         );
@@ -275,7 +275,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         Variable("safeNodes", Var(),
             InvocationExpression(MemberAccess(InvocationExpression(
                 MemberAccess(MetaProperty(reference),
-                    Generic("AsReferenceDescriptors", AsType(reference.Type, true))
+                    Generic("AsReferenceTargets", AsType(reference.Type, true))
                 ),
                 AsArguments([IdentifierName("value")])
             ), IdentifierName("ToList")))

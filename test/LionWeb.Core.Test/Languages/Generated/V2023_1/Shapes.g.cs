@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using ReferenceTarget = Core.ReferenceTarget;
 using Time = string;
 
 [LionCoreLanguage(Key = "key-Shapes", Version = "1")]
@@ -464,7 +463,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<IShape> Materials { get => MaterialsTargets(); init => AddMaterials(value); }
 
-	private IImmutableList<IShape> MaterialsTargets() => ReferenceDescriptorNullableTargets<IShape>(_materials);
+	private IImmutableList<IShape> MaterialsTargets() => ReferenceTargetNullableTargets<IShape>(_materials);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
 	{
@@ -587,7 +586,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
 		{
-			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsReferenceDescriptors<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials, notificationId);
@@ -1949,7 +1948,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly<IShape>(MaterialsTargets(), ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
 
-	private IImmutableList<IShape> MaterialsTargets() => ReferenceDescriptorNullableTargets<IShape>(_materials);
+	private IImmutableList<IShape> MaterialsTargets() => ReferenceTargetNullableTargets<IShape>(_materials);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
 	{
@@ -2072,7 +2071,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
 		{
-			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsReferenceDescriptors<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials, notificationId);
 			emitter.CollectOldData();
@@ -2187,7 +2186,7 @@ public partial class OffsetDuplicate : Shape
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public Shape? AltSource { get => AltSourceTarget(); set => SetAltSource(value); }
 
-	private Shape? AltSourceTarget() => ReferenceDescriptorNullableTarget<Shape>(_altSource);
+	private Shape? AltSourceTarget() => ReferenceTargetNullableTarget<Shape>(_altSource);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetAltSource([NotNullWhenAttribute(true)] out Shape? altSource)
 	{
@@ -2298,7 +2297,7 @@ public partial class OffsetDuplicate : Shape
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public Shape Source { get => SourceTarget() ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
 
-	private Shape? SourceTarget() => ReferenceDescriptorNullableTarget<Shape>(_source);
+	private Shape? SourceTarget() => ReferenceTargetNullableTarget<Shape>(_source);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSource([NotNullWhenAttribute(true)] out Shape? source)
 	{
@@ -2380,9 +2379,9 @@ public partial class OffsetDuplicate : Shape
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetAltSource(descriptor, notificationId);
+				SetAltSource(target, notificationId);
 				return true;
 			}
 
@@ -2430,9 +2429,9 @@ public partial class OffsetDuplicate : Shape
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetSource(descriptor, notificationId);
+				SetSource(target, notificationId);
 				return true;
 			}
 
@@ -2511,7 +2510,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<IShape> Shapes { get => ShapesTargets(); init => AddShapes(value); }
 
-	private IImmutableList<IShape> ShapesTargets() => ReferenceDescriptorNullableTargets<IShape>(_shapes);
+	private IImmutableList<IShape> ShapesTargets() => ReferenceTargetNullableTargets<IShape>(_shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
 	{
@@ -2588,7 +2587,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
-			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsReferenceDescriptors<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes, notificationId);

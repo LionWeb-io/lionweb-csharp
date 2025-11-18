@@ -458,7 +458,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public @record Ref { get => RefTarget() ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
 
-	private @record? RefTarget() => ReferenceDescriptorNullableTarget<@record>(_ref);
+	private @record? RefTarget() => ReferenceTargetNullableTarget<@record>(_ref);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetRef([NotNullWhenAttribute(true)] out @record? @ref)
 	{
@@ -533,9 +533,9 @@ public partial class @struct : ConceptInstanceBase, @interface
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetRef(descriptor, notificationId);
+				SetRef(target, notificationId);
 				return true;
 			}
 

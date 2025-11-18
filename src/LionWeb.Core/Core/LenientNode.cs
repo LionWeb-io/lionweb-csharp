@@ -146,8 +146,8 @@ public class LenientNode : NodeBase, INode
                 case Containment { Multiple: true } when value is INode node:
                     value = new List<INode> { node }.AsReadOnly();
                     break;
-                case Reference { Multiple:false} when value is ReferenceTarget descriptor:
-                    value =  descriptor.Target;
+                case Reference { Multiple:false} when value is ReferenceTarget target:
+                    value =  target.Target;
                     break;
                 case Reference { Multiple: true } reference:
                     switch (value)
@@ -158,8 +158,8 @@ public class LenientNode : NodeBase, INode
                         case IReadableNode readableNode:
                             value = new List<IReadableNode> { readableNode }.AsReadOnly();
                             break;
-                        case ReferenceTarget { Target: not null } descriptor:
-                            value = new List<IReadableNode> { descriptor.Target }.AsReadOnly();
+                        case ReferenceTarget { Target: not null } target:
+                            value = new List<IReadableNode> { target.Target }.AsReadOnly();
                             break;
                         case ReferenceTarget { Target: null }:
                             value = new List<IReadableNode>().AsReadOnly();
@@ -169,7 +169,7 @@ public class LenientNode : NodeBase, INode
                             break;
                         case IEnumerable e:
                             value = reference
-                                .AsReferenceDescriptors<IReadableNode>(e)
+                                .AsReferenceTargets<IReadableNode>(e)
                                 .Select(r => r.Target)
                                 .Where(t => t is not null)
                                 .ToImmutableList();
@@ -241,8 +241,8 @@ public class LenientNode : NodeBase, INode
                 SetFeature(feature, readableNode);
                 return true;
             
-            case ReferenceTarget descriptor when feature is Reference:
-                SetFeature(feature, descriptor);
+            case ReferenceTarget target when feature is Reference:
+                SetFeature(feature, target);
                 return true;
 
             case string:
@@ -250,8 +250,8 @@ public class LenientNode : NodeBase, INode
                 return true;
 
             case IEnumerable e when feature is Reference reference:
-                var descriptors = reference.AsReferenceDescriptors<IReadableNode>(e).ToList();
-                if (descriptors.Count == 0)
+                var targets = reference.AsReferenceTargets<IReadableNode>(e).ToList();
+                if (targets.Count == 0)
                 {
                     if (RemoveFeature(feature))
                         return true;
@@ -259,7 +259,7 @@ public class LenientNode : NodeBase, INode
                         return true;
                     return false;
                 }
-                SetFeature(feature, descriptors);
+                SetFeature(feature, targets);
                 return true;
                 
             case IEnumerable:
@@ -450,14 +450,14 @@ public class LenientNode : NodeBase, INode
     private bool TryGetFeature(Feature featureToFind, out object? value)
     {
         var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
-        if (result.value is ReferenceTarget descriptor)
+        if (result.value is ReferenceTarget target)
         {
-            value = descriptor.Target;
+            value = target.Target;
             return true;
         }
-        if (result.value is List<ReferenceTarget> referenceDescriptors)
+        if (result.value is List<ReferenceTarget> referenceTargets)
         {
-            value =  referenceDescriptors.Select(d => d.Target).Where(t => t is not null).ToList();
+            value =  referenceTargets.Select(d => d.Target).Where(t => t is not null).ToList();
             return true;
         }
         if (result != default)

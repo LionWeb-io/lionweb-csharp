@@ -38,7 +38,7 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
         if (!IsActive())
             return;
 
-        var listComparer = IListComparer.CreateForReferenceDescriptor(storage, safeNodes);
+        var listComparer = IListComparer.CreateForReferenceTarget(storage, safeNodes);
         _changes = listComparer.Compare();
     }
 

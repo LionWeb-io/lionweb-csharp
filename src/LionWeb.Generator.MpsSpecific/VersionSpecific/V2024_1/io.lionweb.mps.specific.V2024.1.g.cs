@@ -466,7 +466,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<IReadableNode> SeeAlso { get => SeeAlsoTargets(); init => AddSeeAlso(value); }
 
-    private IImmutableList<IReadableNode> SeeAlsoTargets() => ReferenceDescriptorNullableTargets<IReadableNode>(_seeAlso);
+    private IImmutableList<IReadableNode> SeeAlsoTargets() => ReferenceTargetNullableTargets<IReadableNode>(_seeAlso);
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso)
@@ -556,7 +556,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsReferenceDescriptors<IReadableNode>(value).ToList();
+			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsReferenceTargets<IReadableNode>(value).ToList();
 			AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 			AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, notificationId);

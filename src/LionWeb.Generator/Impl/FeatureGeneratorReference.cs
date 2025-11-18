@@ -118,7 +118,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
     private static InvocationExpressionSyntax FromNodeOptional(ExpressionSyntax value) =>
         InvocationExpression(
                 MemberAccess(
-                    IdentifierName("ReferenceDescriptorExtensions"),
+                    IdentifierName("ReferenceTarget"),
                     IdentifierName("FromNodeOptional")
                 )
             )
@@ -292,7 +292,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
         Method(ReferenceTarget().ToString(),
                 NullableType(AsType(reference.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
-            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceDescriptorNullableTarget",
+            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceTargetNullableTarget",
                 AsType(reference.Type), FeatureField(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
@@ -303,7 +303,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
         Method(ReferenceTargets().ToString(),
                 AsType(typeof(IImmutableList<>), AsType(reference.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
-            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceDescriptorNullableTargets",
+            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceTargetNullableTargets",
                 AsType(reference.GetFeatureType()), FeatureField(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
@@ -325,7 +325,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                                 AsArguments([
                                     MemberAccessExpression(
                                         SyntaxKind.SimpleMemberAccessExpression,
-                                        IdentifierName("ReferenceDescriptorExtensions"),
+                                        IdentifierName("ReferenceTarget"),
                                         IdentifierName("FromNode")
                                     )
                                 ])

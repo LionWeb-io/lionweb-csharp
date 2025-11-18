@@ -134,7 +134,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<INamed> MultivaluedRef { get => AsNonEmptyReadOnly<INamed>(MultivaluedRefTargets(), TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
 
-	private IImmutableList<INamed> MultivaluedRefTargets() => ReferenceDescriptorNullableTargets<INamed>(_multivaluedRef);
+	private IImmutableList<INamed> MultivaluedRefTargets() => ReferenceTargetNullableTargets<INamed>(_multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef)
 	{
@@ -192,7 +192,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public INamed SingularRef { get => SingularRefTarget() ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
 
-	private INamed? SingularRefTarget() => ReferenceDescriptorNullableTarget<INamed>(_singularRef);
+	private INamed? SingularRefTarget() => ReferenceTargetNullableTarget<INamed>(_singularRef);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSingularRef([NotNullWhenAttribute(true)] out INamed? singularRef)
 	{
@@ -267,7 +267,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
 		{
-			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsReferenceDescriptors<INamed>(value).ToList();
+			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsReferenceTargets<INamed>(value).ToList();
 			AssureNonEmpty(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 			ReferenceSetNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef, notificationId);
 			emitter.CollectOldData();
@@ -285,9 +285,9 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetSingularRef(descriptor, notificationId);
+				SetSingularRef(target, notificationId);
 				return true;
 			}
 

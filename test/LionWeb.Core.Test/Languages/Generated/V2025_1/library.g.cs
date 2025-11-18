@@ -186,7 +186,7 @@ public partial class Book : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public Writer Author { get => AuthorTarget() ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
-	private Writer? AuthorTarget() => ReferenceDescriptorNullableTarget<Writer>(_author);
+	private Writer? AuthorTarget() => ReferenceTargetNullableTarget<Writer>(_author);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetAuthor([NotNullWhenAttribute(true)] out Writer? author)
 	{
@@ -337,9 +337,9 @@ public partial class Book : ConceptInstanceBase
 				return true;
 			}
 
-			if (value is ReferenceTarget descriptor)
+			if (value is ReferenceTarget target)
 			{
-				SetAuthor(descriptor, notificationId);
+				SetAuthor(target, notificationId);
 				return true;
 			}
 
