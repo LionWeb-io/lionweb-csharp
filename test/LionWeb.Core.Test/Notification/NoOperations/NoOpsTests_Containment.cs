@@ -78,4 +78,21 @@ public class NoOpsTests_Containment
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
+    
+    [TestMethod]
+    public void ChildMovedInSameContainment_adds_last_of_the_existing_children()
+    {
+        var a = new Circle("a");
+        var b = new Circle("b");
+        var c = new Circle("c");
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        originalPartition.AddShapes([d]);
+
+        Assert.AreEqual(0, notificationObserver.Count);
+    }
 }
