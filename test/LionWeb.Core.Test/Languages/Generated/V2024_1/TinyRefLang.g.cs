@@ -134,7 +134,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<INamed> MultivaluedRef { get => AsNonEmptyReadOnly<INamed>(MultivaluedRefTargets(), TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
 
-	private IImmutableList<INamed> MultivaluedRefTargets() => ReferenceTargetNullableTargets<INamed>(_multivaluedRef);
+	private IImmutableList<INamed> MultivaluedRefTargets() => ReferenceTargetNonNullTargets<INamed>(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef)
 	{
@@ -192,7 +192,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public INamed SingularRef { get => SingularRefTarget() ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
 
-	private INamed? SingularRefTarget() => ReferenceTargetNullableTarget<INamed>(_singularRef);
+	private INamed? SingularRefTarget() => ReferenceTargetNonNullTarget<INamed>(_singularRef, TinyRefLangLanguage.Instance.MyConcept_singularRef);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSingularRef([NotNullWhenAttribute(true)] out INamed? singularRef)
 	{

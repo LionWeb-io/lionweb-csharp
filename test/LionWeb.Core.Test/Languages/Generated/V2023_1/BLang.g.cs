@@ -142,7 +142,7 @@ public partial class BConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? ARef { get => ARefTarget(); set => SetARef(value); }
 
-	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? ARefTarget() => ReferenceTargetNullableTarget<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept>(_aRef);
+	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? ARefTarget() => ReferenceTargetNonNullTarget<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept>(_aRef, BLangLanguage.Instance.BConcept_ARef);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetARef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? aRef)
 	{

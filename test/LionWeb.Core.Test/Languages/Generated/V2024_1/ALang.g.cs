@@ -122,7 +122,7 @@ public partial class AConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? BRef { get => BRefTarget(); set => SetBRef(value); }
 
-	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? BRefTarget() => ReferenceTargetNullableTarget<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept>(_bRef);
+	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? BRefTarget() => ReferenceTargetNonNullTarget<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept>(_bRef, ALangLanguage.Instance.AConcept_BRef);
 	/// bRef desc
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>

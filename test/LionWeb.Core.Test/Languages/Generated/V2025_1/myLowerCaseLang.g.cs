@@ -216,7 +216,7 @@ public partial class myConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public IReadableNode MyReference { get => MyReferenceTarget() ?? throw new UnsetFeatureException(MyLowerCaseLangLanguage.Instance.myConcept_myReference); set => SetMyReference(value); }
 
-	private IReadableNode? MyReferenceTarget() => ReferenceTargetNullableTarget<IReadableNode>(_myReference);
+	private IReadableNode? MyReferenceTarget() => ReferenceTargetNonNullTarget<IReadableNode>(_myReference, MyLowerCaseLangLanguage.Instance.myConcept_myReference);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetMyReference([NotNullWhenAttribute(true)] out IReadableNode? myReference)
 	{

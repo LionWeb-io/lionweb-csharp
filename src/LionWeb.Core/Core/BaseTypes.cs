@@ -445,7 +445,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// <summary>
     /// Extracts target node from <paramref name="storage"/> target.
     /// </summary>
-    /// <exception cref="UnresolvedReferenceExpression">If <paramref name="storage"/> is unresolved.</exception>
+    /// <exception cref="UnresolvedReferenceException">If <paramref name="storage"/> is unresolved.</exception>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> does not resolve to <typeparamref name="R"/>.</exception>
     protected R? ReferenceTargetNonNullTarget<R>(ReferenceTarget? storage, Reference reference) where R : IReadableNode
     {
@@ -453,7 +453,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
             return default;
         
         if (storage.Target is null)
-            throw new UnresolvedReferenceExpression(GetId(), reference, storage.ResolveInfo, storage.TargetId);
+            throw new UnresolvedReferenceException(GetId(), reference, storage.ResolveInfo, storage.TargetId);
         
         if (storage.Target is not R result)
             throw new InvalidValueException(reference, storage.Target);

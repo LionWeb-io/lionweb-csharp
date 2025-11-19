@@ -31,32 +31,60 @@ using static AstExtensions;
 
 public class FeatureGeneratorReference(Classifier classifier, Reference reference, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, reference, names, lionWebVersion, config)
 {
-    public IEnumerable<MemberDeclarationSyntax> RequiredSingleReference() =>
-        new List<MemberDeclarationSyntax>
+    public IEnumerable<MemberDeclarationSyntax> RequiredSingleReference()
+    {
+        TypeSyntax returnType;
+        ExpressionSyntax getter;
+        ExpressionSyntax setter;
+        switch (config.UnresolvedReferenceHandling)
+        {
+            case UnresolvedReferenceHandling.Throw:
+                returnType = AsType(reference.GetFeatureType());
+                getter = NotNullOrThrow(InvocationExpression(ReferenceTarget()),
+                    NewCall([MetaProperty(reference)], AsType(typeof(UnsetFeatureException)))
+                );
+                setter = InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]));
+                break;
+            
+            case UnresolvedReferenceHandling.ReturnAsNull:
+                returnType = NullableType(AsType(reference.GetFeatureType()));
+                getter = InvocationExpression(ReferenceTarget());
+                setter = InvocationExpression(FeatureSet(), AsArguments([
+                    NotNullOrThrow(IdentifierName("value"),
+                        NewCall([MetaProperty(reference), IdentifierName("value")],
+                            AsType(typeof(InvalidValueException))))
+                ]));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling), config.UnresolvedReferenceHandling.ToString());
+        }
+
+        return new List<MemberDeclarationSyntax>
             {
                 SingleReferenceField(),
-                SingleRequiredFeatureProperty(InvocationExpression(ReferenceTarget()))
+                SingleRequiredFeatureProperty(returnType, getter, setter)
                     .Xdoc(XdocThrowsIfSetToNull()),
                 SingleReferenceTargetMethod(),
                 TryGet(InvocationExpression(ReferenceTarget())),
                 SingleReferenceSetter([
-                        ExpressionStatement(CallGeneric("AssureNotNullInstance",
-                            AsType(reference.GetFeatureType()),
-                            IdentifierName("value"),
-                            MetaProperty(reference)
-                        )),
-                        ReferenceEmitterVariable(),
-                        EmitterCollectOldDataCall(),
-                        AssignFeatureField(),
-                        EmitterNotifyCall(),
-                        ReturnStatement(This())
-                    ])
+                    ExpressionStatement(CallGeneric("AssureNotNullInstance",
+                        AsType(reference.GetFeatureType()),
+                        IdentifierName("value"),
+                        MetaProperty(reference)
+                    )),
+                    ReferenceEmitterVariable(),
+                    EmitterCollectOldDataCall(),
+                    AssignFeatureField(),
+                    EmitterNotifyCall(),
+                    ReturnStatement(This())
+                ])
             }
             .Concat(RequiredFeatureSetter([
                     SingleReferenceSetterForwarder()
                 ])
                 .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
             );
+    }
 
     private ReturnStatementSyntax SingleReferenceSetterForwarder() =>
         ReturnStatement(Call(FeatureSet().ToString(), FromNodeOptional(IdentifierName("value")),
@@ -127,17 +155,34 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 ])
             );
 
-    public IEnumerable<MemberDeclarationSyntax> RequiredMultiReference() =>
-        new List<MemberDeclarationSyntax>
+    public IEnumerable<MemberDeclarationSyntax> RequiredMultiReference()
+    {
+        string filterMethodName;
+        TypeSyntax? outType;
+        switch (config.UnresolvedReferenceHandling)
+        {
+            case UnresolvedReferenceHandling.ReturnAsNull:
+                outType = NullableType(AsType(reference.GetFeatureType()));
+                filterMethodName = "AsNonEmptyNullableReadOnly";
+                break;
+            case UnresolvedReferenceHandling.Throw:
+                outType = AsType(reference.GetFeatureType());
+                filterMethodName = "AsNonEmptyReadOnly";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling), config.UnresolvedReferenceHandling.ToString());
+        }
+
+        return new List<MemberDeclarationSyntax>
         {
             MultipleReferenceField(),
-            MultipleReferenceProperty(CallGeneric("AsNonEmptyReadOnly", AsType(reference.Type),
-                        Call(ReferenceTargets().ToString()),
-                        MetaProperty(reference)
-                    ))
+            MultipleReferenceProperty(CallGeneric(filterMethodName, AsType(reference.Type),
+                    Call(ReferenceTargets().ToString()),
+                    MetaProperty(reference)
+                ))
                 .Xdoc(XdocRequiredMultipleLink()),
             MultipleReferenceTargetsMethod(),
-            TryGetMultiple(InvocationExpression(ReferenceTargets()))
+            TryGetMultiple(InvocationExpression(ReferenceTargets()), outType)
         }.Concat(
             LinkAdder([
                     SafeNodesVariableReference(),
@@ -179,6 +224,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 ])
                 .Select(XdocRequiredRemover)
         );
+    }
 
     private LocalDeclarationStatementSyntax AddMultipleReferenceEmitterVariable(ExpressionSyntax index) =>
         Variable(
@@ -190,13 +236,21 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
             ])
         );
 
-    public IEnumerable<MemberDeclarationSyntax> OptionalMultiReference() =>
-        new List<MemberDeclarationSyntax>
+    public IEnumerable<MemberDeclarationSyntax> OptionalMultiReference()
+    {
+        var outType = config.UnresolvedReferenceHandling switch
+        {
+            UnresolvedReferenceHandling.ReturnAsNull => NullableType(AsType(reference.GetFeatureType())),
+            UnresolvedReferenceHandling.Throw => AsType(reference.GetFeatureType()),
+            _ => throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling), config.UnresolvedReferenceHandling.ToString())
+        };
+        
+        return new List<MemberDeclarationSyntax>
         {
             MultipleReferenceField(),
             MultipleReferenceProperty(Call(ReferenceTargets().ToString())),
             MultipleReferenceTargetsMethod(),
-            TryGetMultiple(InvocationExpression(ReferenceTargets()))
+            TryGetMultiple(InvocationExpression(ReferenceTargets()), outType)
         }.Concat(
             LinkAdder([
                 SafeNodesVariableReference(),
@@ -230,6 +284,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 ReturnStatement(This())
             ])
         );
+    }
 
     private ExpressionStatementSyntax AssureNotNullMembersCall() =>
         ExpressionStatement(Call("AssureNotNullMembers",
@@ -265,18 +320,44 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 Collection([]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
-    private PropertyDeclarationSyntax
-        MultipleReferenceProperty(InvocationExpressionSyntax getter) =>
-        PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(reference.Type)),
+    private PropertyDeclarationSyntax MultipleReferenceProperty(InvocationExpressionSyntax getter)
+    {
+        TypeSyntax returnType;
+        InvocationExpressionSyntax initer;
+
+        switch (config.UnresolvedReferenceHandling)
+        {
+            case UnresolvedReferenceHandling.ReturnAsNull:
+                returnType = NullableType(AsType(reference.Type));
+                initer = InvocationExpression(
+                    LinkAdd(reference),
+                    AsArguments([PostfixUnaryExpression(
+                        SyntaxKind.SuppressNullableWarningExpression,
+                        IdentifierName("value")
+                    )])
+                );
+                break;
+
+            case UnresolvedReferenceHandling.Throw:
+                returnType = AsType(reference.Type);
+                initer = InvocationExpression(
+                    LinkAdd(reference),
+                    AsArguments([IdentifierName("value")])
+                );
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling), config.UnresolvedReferenceHandling.ToString());
+        }
+
+        return PropertyDeclaration(AsType(typeof(IReadOnlyList<>), returnType),
                 Identifier(FeatureProperty(reference).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                     .WithExpressionBody(ArrowExpressionClause(getter))
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
                 AccessorDeclaration(SyntaxKind.InitAccessorDeclaration)
-                    .WithExpressionBody(ArrowExpressionClause(InvocationExpression(
-                        LinkAdd(reference),
-                        AsArguments([IdentifierName("value")])))
+                    .WithExpressionBody(ArrowExpressionClause(initer)
                     )
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ])))
@@ -287,25 +368,53 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(reference));
+    }
 
-    private MethodDeclarationSyntax SingleReferenceTargetMethod() =>
-        Method(ReferenceTarget().ToString(),
+    private MethodDeclarationSyntax SingleReferenceTargetMethod()
+    {
+        var methodName = config.UnresolvedReferenceHandling switch
+        {
+            UnresolvedReferenceHandling.ReturnAsNull => "ReferenceTargetNullableTarget",
+            UnresolvedReferenceHandling.Throw => "ReferenceTargetNonNullTarget",
+            _ => throw new ArgumentOutOfRangeException(config.UnresolvedReferenceHandling.ToString())
+        };
+        return Method(ReferenceTarget().ToString(),
                 NullableType(AsType(reference.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
-            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceTargetNullableTarget",
-                AsType(reference.Type), FeatureField(reference))))
+            .WithExpressionBody(ArrowExpressionClause(CallGeneric(methodName,
+                AsType(reference.Type), FeatureField(reference), MetaProperty(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+    }
 
     private ExpressionSyntax ReferenceTarget() =>
         IdentifierName($"{reference.Name.ToFirstUpper()}Target");
 
-    private MethodDeclarationSyntax MultipleReferenceTargetsMethod() =>
-        Method(ReferenceTargets().ToString(),
-                AsType(typeof(IImmutableList<>), AsType(reference.Type)))
+    private MethodDeclarationSyntax MultipleReferenceTargetsMethod()
+    {
+        TypeSyntax returnType;
+        string methodName;
+        
+        switch (config.UnresolvedReferenceHandling)
+        {
+            case UnresolvedReferenceHandling.ReturnAsNull:
+                returnType = NullableType(AsType(reference.Type));
+                methodName = "ReferenceTargetNullableTargets";
+                break;
+            case UnresolvedReferenceHandling.Throw:
+                returnType = AsType(reference.Type);
+                methodName = "ReferenceTargetNonNullTargets";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling), config.UnresolvedReferenceHandling.ToString());
+        }
+
+        return Method(ReferenceTargets().ToString(),
+                AsType(typeof(IImmutableList<>), returnType))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword))
-            .WithExpressionBody(ArrowExpressionClause(CallGeneric("ReferenceTargetNullableTargets",
-                AsType(reference.GetFeatureType()), FeatureField(reference))))
+            .WithExpressionBody(ArrowExpressionClause(CallGeneric(methodName,
+                AsType(reference.GetFeatureType()), FeatureField(reference), MetaProperty(reference))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+    }
 
     private ExpressionSyntax ReferenceTargets() =>
         IdentifierName($"{reference.Name.ToFirstUpper()}Targets");

@@ -214,7 +214,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public IReadableNode Ref { get => RefTarget() ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
 
-	private IReadableNode? RefTarget() => ReferenceTargetNullableTarget<IReadableNode>(_ref);
+	private IReadableNode? RefTarget() => ReferenceTargetNonNullTarget<IReadableNode>(_ref, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetRef([NotNullWhenAttribute(true)] out IReadableNode? @ref)
 	{

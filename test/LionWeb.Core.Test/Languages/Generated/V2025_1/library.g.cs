@@ -186,7 +186,7 @@ public partial class Book : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public Writer Author { get => AuthorTarget() ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
-	private Writer? AuthorTarget() => ReferenceTargetNullableTarget<Writer>(_author);
+	private Writer? AuthorTarget() => ReferenceTargetNonNullTarget<Writer>(_author, LibraryLanguage.Instance.Book_author);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetAuthor([NotNullWhenAttribute(true)] out Writer? author)
 	{
@@ -491,7 +491,7 @@ public partial class Library : ConceptInstanceBase
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetBooks([NotNullWhenAttribute(true)] out IReadOnlyList<Book> books)
 	{
-		books = _books;
+		books = _books.AsReadOnly();
 		return books.Count != 0;
 	}
 

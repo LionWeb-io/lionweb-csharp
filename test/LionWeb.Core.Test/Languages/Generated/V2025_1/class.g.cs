@@ -458,7 +458,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public @record Ref { get => RefTarget() ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
 
-	private @record? RefTarget() => ReferenceTargetNullableTarget<@record>(_ref);
+	private @record? RefTarget() => ReferenceTargetNonNullTarget<@record>(_ref, ClassLanguage.Instance.struct_ref);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetRef([NotNullWhenAttribute(true)] out @record? @ref)
 	{

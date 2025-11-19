@@ -188,7 +188,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprChild comment")]
 	public bool TryGetDeprChild([NotNullWhenAttribute(true)] out IReadOnlyList<DeprIface> deprChild)
 	{
-		deprChild = _deprChild;
+		deprChild = _deprChild.AsReadOnly();
 		return deprChild.Count != 0;
 	}
 
@@ -271,7 +271,7 @@ public partial class DeprConcept : ConceptInstanceBase
 	[Obsolete("deprRef comment")]
 	public DeprAnnotation DeprRef { get => DeprRefTarget() ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
 
-	private DeprAnnotation? DeprRefTarget() => ReferenceTargetNullableTarget<DeprAnnotation>(_deprRef);
+	private DeprAnnotation? DeprRefTarget() => ReferenceTargetNonNullTarget<DeprAnnotation>(_deprRef, DeprecatedLanguage.Instance.DeprConcept_deprRef);
 	/// <remarks>Required Single Reference</remarks>
         [Obsolete("deprRef comment")]
 	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)

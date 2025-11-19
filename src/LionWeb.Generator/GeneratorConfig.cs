@@ -25,12 +25,18 @@ public record GeneratorConfig
     /// Defaults to <c>true</c>.
     public bool WritableInterfaces { get; init; } = true;
 
+    /// <inheritdoc cref="Generator.UnresolvedReferenceHandling"/>
+    /// Defaults to <see cref="Generator.UnresolvedReferenceHandling.Throw"/>.
     public UnresolvedReferenceHandling UnresolvedReferenceHandling { get; init; } =
-        UnresolvedReferenceHandling.ThrowIfPresent;
+        UnresolvedReferenceHandling.Throw;
 }
 
+/// How generated code should handle unresolved references.
 public enum UnresolvedReferenceHandling
 {
+    /// Return unresolved references as <c>null</c>.
     ReturnAsNull,
-    ThrowIfPresent
+    
+    /// Throw <see cref="LionWeb.Core.UnresolvedReferenceException"/> on access to unresolved references.
+    Throw
 }

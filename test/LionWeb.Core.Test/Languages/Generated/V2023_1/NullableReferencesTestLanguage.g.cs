@@ -661,7 +661,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Optional Multiple Containment</remarks>
         public bool TryGetContainment_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> containment_0_n)
 	{
-		containment_0_n = _containment_0_n;
+		containment_0_n = _containment_0_n.AsReadOnly();
 		return containment_0_n.Count != 0;
 	}
 
@@ -741,7 +741,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetContainment_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> containment_1_n)
 	{
-		containment_1_n = _containment_1_n;
+		containment_1_n = _containment_1_n.AsReadOnly();
 		return containment_1_n.Count != 0;
 	}
 
@@ -793,7 +793,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LinkTestConcept? Reference_0_1 { get => Reference_0_1Target(); set => SetReference_0_1(value); }
 
-	private LinkTestConcept? Reference_0_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1);
+	private LinkTestConcept? Reference_0_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetReference_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_0_1)
 	{
@@ -821,11 +821,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_0_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Reference_0_n { get => Reference_0_nTargets(); init => AddReference_0_n(value); }
+	public IReadOnlyList<LinkTestConcept?> Reference_0_n { get => Reference_0_nTargets(); init => AddReference_0_n(value!); }
 
-	private IImmutableList<LinkTestConcept> Reference_0_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_0_n);
+	private IImmutableList<LinkTestConcept?> Reference_0_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_0_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_0_n)
+        public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept?> reference_0_n)
 	{
 		reference_0_n = Reference_0_nTargets();
 		return reference_0_n.Count != 0;
@@ -874,9 +874,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public LinkTestConcept Reference_1 { get => Reference_1Target() ?? throw new UnsetFeatureException(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1); set => SetReference_1(value); }
+	public LinkTestConcept? Reference_1 { get => Reference_1Target(); set => SetReference_1(value ?? throw new InvalidValueException(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1, value)); }
 
-	private LinkTestConcept? Reference_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1);
+	private LinkTestConcept? Reference_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
@@ -906,11 +906,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
     	/// <exception cref = "UnsetFeatureException">If Reference_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_1_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Reference_1_n { get => AsNonEmptyReadOnly<LinkTestConcept>(Reference_1_nTargets(), NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value); }
+	public IReadOnlyList<LinkTestConcept?> Reference_1_n { get => AsNonEmptyNullableReadOnly<LinkTestConcept>(Reference_1_nTargets(), NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value!); }
 
-	private IImmutableList<LinkTestConcept> Reference_1_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n);
+	private IImmutableList<LinkTestConcept?> Reference_1_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 	/// <remarks>Required Multiple Reference</remarks>
-        public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_1_n)
+        public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept?> reference_1_n)
 	{
 		reference_1_n = Reference_1_nTargets();
 		return reference_1_n.Count != 0;

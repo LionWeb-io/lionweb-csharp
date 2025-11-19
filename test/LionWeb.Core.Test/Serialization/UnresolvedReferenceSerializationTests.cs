@@ -21,6 +21,7 @@ using Core.Serialization;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M3;
+using NullableReferencesTestLang = Languages.Generated.V2024_1.NullableReferencesTestLang; 
 
 [TestClass]
 public class UnresolvedReferenceSerializationTests
@@ -29,7 +30,7 @@ public class UnresolvedReferenceSerializationTests
     private readonly Language _language = TestLanguageLanguage.Instance;
 
     [TestMethod]
-    public void DeserializeMissingReference()
+    public void DeserializeMissingReference_Throw()
     {
         var input = new LinkTestConcept("root")
         {
@@ -59,6 +60,53 @@ public class UnresolvedReferenceSerializationTests
 
         var deserialized = nodes.OfType<LinkTestConcept>().Single();
 
+        Assert.Throws<UnresolvedReferenceException>(() => deserialized.Reference_0_1);
+        Assert.Throws<UnresolvedReferenceException>(() => deserialized.Reference_0_n);
+
+        deserialized.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
+
+        var newRef0 = new LinkTestConcept("ref0");
+        deserialized.Containment_0_1 = newRef0;
+
+        var newRefN1 = new LinkTestConcept("refN1");
+        deserialized.Containment_1 = newRefN1;
+        
+        Assert.AreSame(newRef0, deserialized.Reference_0_1);
+        Assert.AreSame(newRef0, deserialized.Reference_0_n.First());
+        Assert.AreSame(newRefN1, deserialized.Reference_0_n.Last());
+    }
+
+    [TestMethod]
+    public void DeserializeMissingReference_Null()
+    {
+        var input = new NullableReferencesTestLang.LinkTestConcept("root")
+        {
+            Reference_0_1 = new NullableReferencesTestLang.LinkTestConcept("ref0"),
+            Reference_0_n = [new NullableReferencesTestLang.LinkTestConcept("ref0"), new NullableReferencesTestLang.LinkTestConcept("refN1")]
+        };
+
+        var serializer = new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .Build();
+
+        var stream = new MemoryStream();
+        JsonUtils.WriteNodesToStream(stream, serializer, [input]);
+
+        var unresolvedReferencesManager = new UnresolvedReferencesManager();
+        
+        var deserializer = new DeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithLanguage(NullableReferencesTestLang.NullableReferencesTestLanguageLanguage.Instance)
+            .WithHandler(new UnresolvedReferencesDeserializerHandler(unresolvedReferencesManager))
+            .Build();
+
+        stream.Position = 0;
+        var nodes = JsonUtils.ReadNodesFromStream(stream, deserializer);
+
+        Assert.HasCount(1, nodes);
+
+        var deserialized = nodes.OfType<NullableReferencesTestLang.LinkTestConcept>().Single();
+
         Assert.IsNull(deserialized.Reference_0_1);
         foreach (var target in deserialized.Reference_0_n)
         {
@@ -67,13 +115,13 @@ public class UnresolvedReferenceSerializationTests
 
         deserialized.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
 
-        var newRef0 = new LinkTestConcept("ref0");
+        var newRef0 = new NullableReferencesTestLang.LinkTestConcept("ref0");
         deserialized.Containment_0_1 = newRef0;
         
         Assert.AreSame(newRef0, deserialized.Reference_0_1);
         Assert.AreSame(newRef0, deserialized.Reference_0_n.First());
         
-        var newRefN1 = new LinkTestConcept("refN1");
+        var newRefN1 = new NullableReferencesTestLang.LinkTestConcept("refN1");
         deserialized.Containment_0_1 = newRefN1;
 
         Assert.AreSame(newRefN1, deserialized.Reference_0_n.Last());

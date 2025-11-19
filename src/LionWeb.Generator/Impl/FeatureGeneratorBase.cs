@@ -107,12 +107,12 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
             ]));
 
 
-    protected MethodDeclarationSyntax TryGetMultiple(ExpressionSyntax? storage = null) =>
+    protected MethodDeclarationSyntax TryGetMultiple(ExpressionSyntax? storage = null, TypeSyntax? outType = null) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
                     OutParam(Param(
                             FeatureTryGetParam(),
-                            AsType(typeof(IReadOnlyList<>), AsType(feature.GetFeatureType()))
+                            AsType(typeof(IReadOnlyList<>), outType ?? AsType(feature.GetFeatureType()))
                         ))
                         .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
                 ]
@@ -169,14 +169,14 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    protected PropertyDeclarationSyntax SingleRequiredFeatureProperty(ExpressionSyntax? storage = null, bool writeable = false) =>
-        Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType(), writeable: writeable),
-                BinaryExpression(
-                    SyntaxKind.CoalesceExpression,
-                    storage ?? FeatureField(feature),
-                    ThrowExpression(NewCall([MetaProperty(feature)], AsType(typeof(UnsetFeatureException))))
+    protected PropertyDeclarationSyntax SingleRequiredFeatureProperty(TypeSyntax returnType,
+        ExpressionSyntax? getter = null, ExpressionSyntax? setter = null) =>
+        Property(FeatureProperty(feature).ToString(), returnType,
+                getter ?? NotNullOrThrow(
+                    FeatureField(feature),
+                    NewCall([MetaProperty(feature)], AsType(typeof(UnsetFeatureException)))
                 ),
-                InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]))
+                setter ?? InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]))
             )
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),

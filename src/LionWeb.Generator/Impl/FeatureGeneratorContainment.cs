@@ -33,7 +33,7 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
         new List<MemberDeclarationSyntax>
         {
             SingleFeatureField(true),
-            SingleRequiredFeatureProperty(writeable: true)
+            SingleRequiredFeatureProperty(AsType(containment.GetFeatureType(), writeable: true))
                 .Xdoc(XdocThrowsIfSetToNull()),
             TryGet(writeable: true)
         }.Concat(RequiredFeatureSetter([
@@ -83,7 +83,7 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
             MultipleContainmentField(),
             MultipleContainmentProperty(AsNonEmptyReadOnlyCall())
                 .Xdoc(XdocRequiredMultipleLink()),
-            TryGetMultiple()
+            TryGetMultiple(InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly"))))
         }.Concat(
             LinkAdder([
                     SafeNodesVariable(),
@@ -126,7 +126,7 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
         {
             MultipleContainmentField(),
             MultipleContainmentProperty(AsReadOnlyCall()),
-            TryGetMultiple()
+            TryGetMultiple(InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly"))))
         }.Concat(
             LinkAdder([
                 SafeNodesVariable(),

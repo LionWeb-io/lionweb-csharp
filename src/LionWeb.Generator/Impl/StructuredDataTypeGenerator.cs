@@ -203,11 +203,10 @@ public class StructuredDataTypeGenerator(
             .WithAttributeLists(AsAttributes([MetaPointerAttribute(field)]))
             .WithAccessorList(AccessorList(List([
                             AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                                .WithExpressionBody(ArrowExpressionClause(BinaryExpression(
-                                    SyntaxKind.CoalesceExpression,
+                                .WithExpressionBody(ArrowExpressionClause(NotNullOrThrow(
                                     FieldField(field),
-                                    ThrowExpression(NewCall([MetaProperty(field)],
-                                        AsType(typeof(UnsetFieldException))))
+                                    NewCall([MetaProperty(field)],
+                                        AsType(typeof(UnsetFieldException)))
                                 )))
                                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
                             AccessorDeclaration(SyntaxKind.InitAccessorDeclaration)

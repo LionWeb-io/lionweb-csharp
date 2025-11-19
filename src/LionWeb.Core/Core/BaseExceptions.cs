@@ -186,7 +186,7 @@ public class UnsupportedStructuredDataTypeException : LionWebExceptionBase
     }
 }
 
-public class UnresolvedReferenceExpression(NodeId parent, Reference reference, ResolveInfo? resolveInfo, NodeId? targetId)
+public class UnresolvedReferenceException(NodeId parent, Reference reference, ResolveInfo? resolveInfo, NodeId? targetId)
     : LionWebExceptionBase($"node {parent}: reference {reference}: unresolved target '{resolveInfo}'/'{targetId}'");
 
 /// <summary>
