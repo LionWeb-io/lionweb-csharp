@@ -7,7 +7,8 @@
     "DotGSuffix": false,
     "LionWebVersion": "2023.1",
     "GeneratorConfig": {
-      "WritableInterfaces": true
+      "WritableInterfaces": true,
+      "UnresolvedReferenceHandling": "ReturnAsNull"
     }
   }
 ]

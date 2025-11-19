@@ -19,8 +19,8 @@ namespace LionWeb.Generator.Cli;
 
 using Core;
 using System.CommandLine;
-using System.CommandLine.Help;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 internal class CmdlineParser
 {
@@ -40,6 +40,7 @@ internal class CmdlineParser
     private readonly Option<string?> _lionWebVersion;
     private readonly Option<bool?> _dotGSuffix;
     private readonly Option<bool?> _writableIface;
+    private readonly Option<UnresolvedReferenceHandling?> _unresolvedReferenceHandling;
     private ParseResult? _parseResult;
 
     public List<Configuration> Configurations { get; } = [];
@@ -141,6 +142,15 @@ internal class CmdlineParser
             };
         _rootCommand.Options.Add(_writableIface);
 
+        _unresolvedReferenceHandling =
+            new("--unresolvedReferenceHandling")
+            {
+                Description = "How generated code should handle unresolved references",
+                Arity = ArgumentArity.ZeroOrOne,
+                DefaultValueFactory = _ => null
+            };
+        _rootCommand.Options.Add(_unresolvedReferenceHandling);
+
         _languageFile = new("languageFile")
         {
             Description = "LionWeb JSON file(s) containing languages to generate", Arity = ArgumentArity.ZeroOrMore
@@ -198,7 +208,9 @@ internal class CmdlineParser
             try
             {
                 var utf8JsonStream = configurationFile.OpenRead();
-                deserialized = JsonSerializer.Deserialize<Configuration[]>(utf8JsonStream);
+                var jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerOptions.Default);
+                jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter<UnresolvedReferenceHandling>());
+                deserialized = JsonSerializer.Deserialize<Configuration[]>(utf8JsonStream, jsonSerializerOptions);
             } catch (JsonException e)
             {
                 LogError(e);
@@ -260,8 +272,12 @@ internal class CmdlineParser
             if (configuration.DotGSuffix is null || DotGSuffix is not null)
                 configuration.DotGSuffix = DotGSuffixOrDefault;
 
-            if (GeneratorConfig is not null)
-                configuration.GeneratorConfig = GeneratorConfig;
+            var baseline = configuration.GeneratorConfig ?? GeneratorConfig;
+            configuration.GeneratorConfig = baseline with
+            {
+                WritableInterfaces = WritableInterfaces ?? baseline.WritableInterfaces,
+                UnresolvedReferenceHandling = UnresolvedReferenceHandling ?? baseline.UnresolvedReferenceHandling
+            };
         }
     }
 
@@ -312,6 +328,7 @@ internal class CmdlineParser
     private PathPattern? PathPattern => ParseResult.GetValue(_pathPattern);
     private PathPattern? PathPatternOrDefault => PathPattern ?? _defaultPathPattern;
     private bool? WritableInterfaces => ParseResult.GetValue(_writableIface);
+    private UnresolvedReferenceHandling? UnresolvedReferenceHandling => ParseResult.GetValue(_unresolvedReferenceHandling);
     private bool? DotGSuffix => ParseResult.GetValue(_dotGSuffix);
     private bool? DotGSuffixOrDefault => DotGSuffix ?? _defaultDotGSuffix;
 
@@ -322,6 +339,8 @@ internal class CmdlineParser
             GeneratorConfig cfg = new();
             if (WritableInterfaces is { } b)
                 cfg = cfg with { WritableInterfaces = b };
+            if (UnresolvedReferenceHandling is { } h)
+                cfg = cfg with { UnresolvedReferenceHandling = h };
             return cfg;
         }
     }

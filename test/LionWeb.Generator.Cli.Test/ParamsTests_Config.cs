@@ -97,7 +97,11 @@ public class ParamsTests_Config : ParamsTestsBase
                 PathPattern = PathPattern.NamespaceInFilename,
                 DotGSuffix = false,
                 LionWebVersion = "2023.1",
-                GeneratorConfig = new GeneratorConfig { WritableInterfaces = true }
+                GeneratorConfig = new GeneratorConfig
+                {
+                    WritableInterfaces = true,
+                    UnresolvedReferenceHandling = UnresolvedReferenceHandling.ReturnAsNull
+                }
             }, generator.Configurations[0]);
 
         Assert.AreEqual(generator.Configurations[0], generator.ValidConfigurations[0]);
@@ -123,6 +127,7 @@ public class ParamsTests_Config : ParamsTestsBase
             "--dotGSuffix", "true",
             "--lionWebVersion", "2024.1",
             "--writableInterfaces", "false",
+            "--unresolvedReferenceHandling", nameof(UnresolvedReferenceHandling.Throw),
             TestLanguage2024
         ]);
 
@@ -144,7 +149,10 @@ public class ParamsTests_Config : ParamsTestsBase
                 PathPattern = PathPattern.VerbatimName,
                 DotGSuffix = true,
                 LionWebVersion = "2024.1",
-                GeneratorConfig = new GeneratorConfig { WritableInterfaces = false }
+                GeneratorConfig = new GeneratorConfig {
+                    WritableInterfaces = false,
+                    UnresolvedReferenceHandling = UnresolvedReferenceHandling.Throw
+                }
             }, generator.Configurations[0]);
 
         Assert.AreEqual(
@@ -156,7 +164,10 @@ public class ParamsTests_Config : ParamsTestsBase
                 PathPattern = PathPattern.VerbatimName,
                 DotGSuffix = true,
                 LionWebVersion = "2024.1",
-                GeneratorConfig = new GeneratorConfig { WritableInterfaces = false }
+                GeneratorConfig = new GeneratorConfig {
+                    WritableInterfaces = false,
+                    UnresolvedReferenceHandling = UnresolvedReferenceHandling.Throw
+                }
             }, generator.Configurations[1]);
 
         Assert.AreEqual(generator.Configurations[1], generator.ValidConfigurations[0]);
