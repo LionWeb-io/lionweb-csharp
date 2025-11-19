@@ -243,12 +243,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private IImmutableList<IReadableNode> MultipleOptionalRefTargets() => ReferenceTargetNonNullTargets<IReadableNode>(_multipleOptionalRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetMultipleOptionalRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalRef)
-	{
-		multipleOptionalRef = MultipleOptionalRefTargets();
-		return multipleOptionalRef.Count != 0;
-	}
-
+        public bool TryGetMultipleOptionalRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalRef) => TryGetReference<IReadableNode>(_multipleOptionalRef, out multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept AddMultipleOptionalRef(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
@@ -295,12 +290,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private IImmutableList<IReadableNode> MultipleRefTargets() => ReferenceTargetNonNullTargets<IReadableNode>(_multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
-        public bool TryGetMultipleRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleRef)
-	{
-		multipleRef = MultipleRefTargets();
-		return multipleRef.Count != 0;
-	}
-
+        public bool TryGetMultipleRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleRef) => TryGetReference<IReadableNode>(_multipleRef, out multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultipleRef and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleRef(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
@@ -401,13 +391,12 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-singleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public IReadableNode? SingleOptionalRef { get => SingleOptionalRefTarget(); set => SetSingleOptionalRef(value); }
+	public IReadableNode? SingleOptionalRef { get => ReferenceTargetNonNullTarget<IReadableNode>(_singleOptionalRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef); set => SetSingleOptionalRef(value); }
 
-	private IReadableNode? SingleOptionalRefTarget() => ReferenceTargetNonNullTarget<IReadableNode>(_singleOptionalRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetSingleOptionalRef([NotNullWhenAttribute(true)] out IReadableNode? singleOptionalRef)
 	{
-		singleOptionalRef = SingleOptionalRefTarget();
+		singleOptionalRef = ReferenceTargetNullableTarget<IReadableNode>(_singleOptionalRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef);
 		return singleOptionalRef != null;
 	}
 
@@ -433,13 +422,12 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-singleRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadableNode SingleRef { get => SingleRefTarget() ?? throw new UnsetFeatureException(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef); set => SetSingleRef(value); }
+	public IReadableNode SingleRef { get => ReferenceTargetNonNullTarget<IReadableNode>(_singleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef) ?? throw new UnsetFeatureException(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef); set => SetSingleRef(value); }
 
-	private IReadableNode? SingleRefTarget() => ReferenceTargetNonNullTarget<IReadableNode>(_singleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSingleRef([NotNullWhenAttribute(true)] out IReadableNode? singleRef)
 	{
-		singleRef = SingleRefTarget();
+		singleRef = ReferenceTargetNullableTarget<IReadableNode>(_singleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef);
 		return singleRef != null;
 	}
 

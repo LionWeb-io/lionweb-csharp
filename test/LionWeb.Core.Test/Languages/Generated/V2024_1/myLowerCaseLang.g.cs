@@ -214,13 +214,12 @@ public partial class myConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(MyLowerCaseLangLanguage), Key = "key-reference")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadableNode MyReference { get => MyReferenceTarget() ?? throw new UnsetFeatureException(MyLowerCaseLangLanguage.Instance.myConcept_myReference); set => SetMyReference(value); }
+	public IReadableNode MyReference { get => ReferenceTargetNonNullTarget<IReadableNode>(_myReference, MyLowerCaseLangLanguage.Instance.myConcept_myReference) ?? throw new UnsetFeatureException(MyLowerCaseLangLanguage.Instance.myConcept_myReference); set => SetMyReference(value); }
 
-	private IReadableNode? MyReferenceTarget() => ReferenceTargetNonNullTarget<IReadableNode>(_myReference, MyLowerCaseLangLanguage.Instance.myConcept_myReference);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetMyReference([NotNullWhenAttribute(true)] out IReadableNode? myReference)
 	{
-		myReference = MyReferenceTarget();
+		myReference = ReferenceTargetNullableTarget<IReadableNode>(_myReference, MyLowerCaseLangLanguage.Instance.myConcept_myReference);
 		return myReference != null;
 	}
 

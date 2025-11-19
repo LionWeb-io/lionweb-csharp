@@ -473,12 +473,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 	private IImmutableList<IShape> MaterialsTargets() => ReferenceTargetNonNullTargets<IShape>(_materials, ShapesLanguage.Instance.BillOfMaterials_materials);
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
-	{
-		materials = MaterialsTargets();
-		return materials.Count != 0;
-	}
-
+        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
 	/// <remarks>Optional Multiple Reference</remarks>
         public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{
@@ -1970,12 +1965,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	private IImmutableList<IShape> MaterialsTargets() => ReferenceTargetNonNullTargets<IShape>(_materials, ShapesLanguage.Instance.MaterialGroup_materials);
 	/// <remarks>Required Multiple Reference</remarks>
-        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
-	{
-		materials = MaterialsTargets();
-		return materials.Count != 0;
-	}
-
+        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
         public MaterialGroup AddMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
@@ -2204,13 +2194,12 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-source")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public Shape? AltSource { get => AltSourceTarget(); set => SetAltSource(value); }
+	public Shape? AltSource { get => ReferenceTargetNonNullTarget<Shape>(_altSource, ShapesLanguage.Instance.OffsetDuplicate_altSource); set => SetAltSource(value); }
 
-	private Shape? AltSourceTarget() => ReferenceTargetNonNullTarget<Shape>(_altSource, ShapesLanguage.Instance.OffsetDuplicate_altSource);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetAltSource([NotNullWhenAttribute(true)] out Shape? altSource)
 	{
-		altSource = AltSourceTarget();
+		altSource = ReferenceTargetNullableTarget<Shape>(_altSource, ShapesLanguage.Instance.OffsetDuplicate_altSource);
 		return altSource != null;
 	}
 
@@ -2315,13 +2304,12 @@ public partial class OffsetDuplicate : Shape
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-source")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public Shape Source { get => SourceTarget() ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
+	public Shape Source { get => ReferenceTargetNonNullTarget<Shape>(_source, ShapesLanguage.Instance.OffsetDuplicate_source) ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
 
-	private Shape? SourceTarget() => ReferenceTargetNonNullTarget<Shape>(_source, ShapesLanguage.Instance.OffsetDuplicate_source);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSource([NotNullWhenAttribute(true)] out Shape? source)
 	{
-		source = SourceTarget();
+		source = ReferenceTargetNullableTarget<Shape>(_source, ShapesLanguage.Instance.OffsetDuplicate_source);
 		return source != null;
 	}
 
@@ -2532,12 +2520,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	private IImmutableList<IShape> ShapesTargets() => ReferenceTargetNonNullTargets<IShape>(_shapes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
-	{
-		shapes = ShapesTargets();
-		return shapes.Count != 0;
-	}
-
+        public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes) => TryGetReference<IShape>(_shapes, out shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
         public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
 	{

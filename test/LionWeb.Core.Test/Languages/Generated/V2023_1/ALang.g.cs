@@ -120,16 +120,15 @@ public partial class AConcept : ConceptInstanceBase
     	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? BRef { get => BRefTarget(); set => SetBRef(value); }
+	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? BRef { get => ReferenceTargetNonNullTarget<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept>(_bRef, ALangLanguage.Instance.AConcept_BRef); set => SetBRef(value); }
 
-	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? BRefTarget() => ReferenceTargetNonNullTarget<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept>(_bRef, ALangLanguage.Instance.AConcept_BRef);
 	/// bRef desc
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetBRef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? bRef)
 	{
-		bRef = BRefTarget();
+		bRef = ReferenceTargetNullableTarget<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept>(_bRef, ALangLanguage.Instance.AConcept_BRef);
 		return bRef != null;
 	}
 

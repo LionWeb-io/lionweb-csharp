@@ -136,12 +136,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	private IImmutableList<INamed> MultivaluedRefTargets() => ReferenceTargetNonNullTargets<INamed>(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
-        public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef)
-	{
-		multivaluedRef = MultivaluedRefTargets();
-		return multivaluedRef.Count != 0;
-	}
-
+        public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef) => TryGetReference<INamed>(_multivaluedRef, out multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
         public MyConcept AddMultivaluedRef(IEnumerable<INamed> nodes, INotificationId? notificationId = null)
@@ -190,13 +185,12 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-singularRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public INamed SingularRef { get => SingularRefTarget() ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
+	public INamed SingularRef { get => ReferenceTargetNonNullTarget<INamed>(_singularRef, TinyRefLangLanguage.Instance.MyConcept_singularRef) ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
 
-	private INamed? SingularRefTarget() => ReferenceTargetNonNullTarget<INamed>(_singularRef, TinyRefLangLanguage.Instance.MyConcept_singularRef);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSingularRef([NotNullWhenAttribute(true)] out INamed? singularRef)
 	{
-		singularRef = SingularRefTarget();
+		singularRef = ReferenceTargetNullableTarget<INamed>(_singularRef, TinyRefLangLanguage.Instance.MyConcept_singularRef);
 		return singularRef != null;
 	}
 

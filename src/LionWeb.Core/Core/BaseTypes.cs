@@ -456,6 +456,26 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
         return result;
     }
     
+    protected R? GetRequiredReference<R>(ReferenceTarget? storage, Reference reference) where R : IReadableNode
+    {
+        if (storage is null)
+            throw new UnsetFeatureException(reference);
+        
+        return ReferenceTargetNullableTarget<R>(storage, reference);
+    }
+    
+    /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
+    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget> storage, Reference reference) where R : IReadableNode =>
+        storage.Count != 0
+            ? ReferenceTargetNullableTargets<R>(storage, reference)
+            : throw new UnsetFeatureException(reference);
+
+    /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
+    protected IReadOnlyList<R> GetRequiredNonNullReferences<R>(List<ReferenceTarget> storage, Reference reference) where R : IReadableNode =>
+        storage.Count != 0
+            ? ReferenceTargetNonNullTargets<R>(storage, reference)
+            : throw new UnsetFeatureException(reference);
+
     /// <summary>
     /// Tries to retrieve all <see cref="ReferenceTarget.Target"/>s from <paramref name="storage"/>.
     /// </summary>
@@ -905,12 +925,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
     protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(IReadOnlyList<T> storage, Link link) where T : IReadableNode =>
-        storage.Count != 0
-            ? storage
-            : throw new UnsetFeatureException(link);
-
-    /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<T?> AsNonEmptyNullableReadOnly<T>(IReadOnlyList<T?> storage, Link link) where T : IReadableNode =>
         storage.Count != 0
             ? storage
             : throw new UnsetFeatureException(link);

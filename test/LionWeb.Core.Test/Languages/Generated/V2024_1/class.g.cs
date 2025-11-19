@@ -456,13 +456,12 @@ public partial class @struct : ConceptInstanceBase, @interface
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-reference")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public @record Ref { get => RefTarget() ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
+	public @record Ref { get => ReferenceTargetNonNullTarget<@record>(_ref, ClassLanguage.Instance.struct_ref) ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
 
-	private @record? RefTarget() => ReferenceTargetNonNullTarget<@record>(_ref, ClassLanguage.Instance.struct_ref);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetRef([NotNullWhenAttribute(true)] out @record? @ref)
 	{
-		@ref = RefTarget();
+		@ref = ReferenceTargetNullableTarget<@record>(_ref, ClassLanguage.Instance.struct_ref);
 		return @ref != null;
 	}
 

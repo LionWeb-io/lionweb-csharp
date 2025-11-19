@@ -184,13 +184,12 @@ public partial class Book : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "author")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public Writer Author { get => AuthorTarget() ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
+	public Writer Author { get => ReferenceTargetNonNullTarget<Writer>(_author, LibraryLanguage.Instance.Book_author) ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
-	private Writer? AuthorTarget() => ReferenceTargetNonNullTarget<Writer>(_author, LibraryLanguage.Instance.Book_author);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetAuthor([NotNullWhenAttribute(true)] out Writer? author)
 	{
-		author = AuthorTarget();
+		author = ReferenceTargetNullableTarget<Writer>(_author, LibraryLanguage.Instance.Book_author);
 		return author != null;
 	}
 

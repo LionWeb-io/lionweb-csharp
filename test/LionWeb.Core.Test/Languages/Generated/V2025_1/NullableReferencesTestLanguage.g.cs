@@ -791,13 +791,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_0_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public LinkTestConcept? Reference_0_1 { get => Reference_0_1Target(); set => SetReference_0_1(value); }
+	public LinkTestConcept? Reference_0_1 { get => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1); set => SetReference_0_1(value); }
 
-	private LinkTestConcept? Reference_0_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetReference_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_0_1)
 	{
-		reference_0_1 = Reference_0_1Target();
+		reference_0_1 = ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 		return reference_0_1 != null;
 	}
 
@@ -874,14 +873,13 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public LinkTestConcept? Reference_1 { get => Reference_1Target(); set => SetReference_1(value ?? throw new InvalidValueException(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1, value)); }
+	public LinkTestConcept? Reference_1 { get => GetRequiredReference<LinkTestConcept>(_reference_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1); set => SetReference_1(value ?? throw new InvalidValueException(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1, value)); }
 
-	private LinkTestConcept? Reference_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
-		reference_1 = Reference_1Target();
-		return reference_1 != null;
+		reference_1 = ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1);
+		return _reference_1 != null || reference_1 != null;
 	}
 
 	private LinkTestConcept SetReference_1(ReferenceTarget? value, INotificationId? notificationId = null)
@@ -906,7 +904,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
     	/// <exception cref = "UnsetFeatureException">If Reference_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_1_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept?> Reference_1_n { get => AsNonEmptyNullableReadOnly<LinkTestConcept>(Reference_1_nTargets(), NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value!); }
+	public IReadOnlyList<LinkTestConcept?> Reference_1_n { get => GetRequiredNullableReferences<LinkTestConcept>(_reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value!); }
 
 	private IImmutableList<LinkTestConcept?> Reference_1_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 	/// <remarks>Required Multiple Reference</remarks>
