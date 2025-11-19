@@ -19,16 +19,16 @@ namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
 
-public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBase<INode>
+public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitterBase<T> where T : IReadableNode
 {
-    private readonly IReadableNode? _newTarget;
-    private readonly IReadableNode? _oldTarget;
+    private readonly ReferenceTarget? _newTarget;
+    private readonly ReferenceTarget? _oldTarget;
 
     /// Raises either <see cref="ReferenceAddedNotification"/>, <see cref="ReferenceDeletedNotification"/> or
     /// <see cref="ReferenceChangedNotification"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, IReadableNode? newTarget,
-        IReadableNode? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
+    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, ReferenceTarget? newTarget,
+        ReferenceTarget? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
@@ -43,26 +43,22 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
         if (!IsActive())
             return;
 
-        if (ReferenceEquals(_oldTarget, _newTarget))
+        if (_oldTarget == _newTarget || ReferenceEquals(_oldTarget?.Target, _newTarget?.Target))
             return;
         
         switch (_oldTarget, _newTarget)
         {
             case (null, { } v):
-                IReferenceTarget newTarget = new ReferenceTarget(null, v);
-                ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
+                ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, 0, v,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
-                IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
-                ProduceNotification(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
+                ProduceNotification(new ReferenceDeletedNotification(DestinationParent, Reference, 0, o,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
-                IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
                 ProduceNotification(new ReferenceChangedNotification(DestinationParent, Reference, 0,
-                    new ReferenceTarget(null, n), replacedTarget,
-                    GetNotificationId()));
+                    n, o, GetNotificationId()));
                 break;
         }
     }

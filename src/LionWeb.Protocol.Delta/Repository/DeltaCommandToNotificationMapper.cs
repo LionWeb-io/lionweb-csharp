@@ -400,7 +400,7 @@ public class DeltaCommandToNotificationMapper
             parent,
             reference,
             deleteReferenceCommand.Index,
-            new ReferenceTarget(null, parent.Get(reference) as IReadableNode),
+            ReferenceTarget.FromNode(parent.Get(reference) as IReadableNode),
             ToNotificationId(deleteReferenceCommand)
         );
     }
@@ -414,7 +414,7 @@ public class DeltaCommandToNotificationMapper
             reference,
             changeReferenceCommand.Index,
             ToTarget(changeReferenceCommand.NewTarget, changeReferenceCommand.NewResolveInfo),
-            new ReferenceTarget(null, parent.Get(reference) as IReadableNode),
+            ReferenceTarget.FromNode(parent.Get(reference) as IReadableNode),
             ToNotificationId(changeReferenceCommand)
         );
     }
@@ -429,7 +429,7 @@ public class DeltaCommandToNotificationMapper
             _sharedNodeMap.TryGetValue(targetNode, out var node))
             target = node;
 
-        return new ReferenceTarget(resolveInfo, target);
+        return new ReferenceTarget(resolveInfo, targetNode, target);
     }
 
     #endregion

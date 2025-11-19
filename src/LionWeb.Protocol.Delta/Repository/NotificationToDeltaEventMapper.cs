@@ -289,7 +289,7 @@ public class NotificationToDeltaEventMapper
             referenceAddedNotification.Parent.GetId(),
             referenceAddedNotification.Reference.ToMetaPointer(),
             referenceAddedNotification.Index,
-            referenceAddedNotification.NewTarget.Reference?.GetId(),
+            referenceAddedNotification.NewTarget.TargetId,
             referenceAddedNotification.NewTarget.ResolveInfo,
             ToCommandSources(referenceAddedNotification),
             []
@@ -300,7 +300,7 @@ public class NotificationToDeltaEventMapper
             referenceDeletedNotification.Parent.GetId(),
             referenceDeletedNotification.Reference.ToMetaPointer(),
             referenceDeletedNotification.Index,
-            referenceDeletedNotification.DeletedTarget.Reference?.GetId(),
+            referenceDeletedNotification.DeletedTarget.TargetId,
             referenceDeletedNotification.DeletedTarget.ResolveInfo,
             ToCommandSources(referenceDeletedNotification),
             []
@@ -311,9 +311,9 @@ public class NotificationToDeltaEventMapper
             referenceChangedNotification.Parent.GetId(),
             referenceChangedNotification.Reference.ToMetaPointer(),
             referenceChangedNotification.Index,
-            referenceChangedNotification.NewTarget.Reference?.GetId(),
+            referenceChangedNotification.NewTarget.TargetId,
             referenceChangedNotification.NewTarget.ResolveInfo,
-            referenceChangedNotification.OldTarget.Reference?.GetId(),
+            referenceChangedNotification.OldTarget.TargetId,
             referenceChangedNotification.OldTarget.ResolveInfo,
             ToCommandSources(referenceChangedNotification),
             []

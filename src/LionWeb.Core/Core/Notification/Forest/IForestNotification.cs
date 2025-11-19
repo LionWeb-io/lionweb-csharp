@@ -54,8 +54,11 @@ public record PartitionDeletedNotification(
 public record PartitionAddedNotification(
     IPartitionInstance NewPartition,
     INotificationId NotificationId)
-    : AForestNotification(NotificationId)
+    : AForestNotification(NotificationId), INewNodeNotification
 {
     /// <inheritdoc />
     public override IPartitionInstance Partition => NewPartition;
+
+    /// <inheritdoc />
+    public IReadableNode NewNode => NewPartition;
 }

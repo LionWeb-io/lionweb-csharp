@@ -459,9 +459,9 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ReferenceTarget LookUpNode(IReferenceTarget target)
     {
-        var nodeId = target.Reference.GetId();
+        var nodeId = target.TargetId;
         if (sharedNodeMap.TryGetValue(nodeId, out var result))
-            return new ReferenceTarget(null, result);
+            return new ReferenceTarget(target.ResolveInfo, target.TargetId, result);
 
         // TODO change to correct exception (UnknownNodeIdException ?)
         throw new NotImplementedException($"Unknown target node with id: {nodeId}");

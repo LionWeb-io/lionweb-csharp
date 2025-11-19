@@ -25,6 +25,7 @@ using Notification.Partition;
 using Notification.Partition.Emitter;
 using Notification.Pipe;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -393,6 +394,46 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
 
     /// <inheritdoc />
     public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
+
+    /// <summary>
+    /// Extracts all target nodes from <paramref name="storage"/> targets.
+    /// Represents unresolvable targets as <c>null</c>. 
+    /// </summary>
+    /// TODO: Add reference parameter
+    protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget> storage)
+        where R : IReadableNode =>
+        M2Extensions.AsReferenceTargets<R>(null, storage)
+            .Select(r => (R?)r.Target)
+            .ToImmutableList();
+
+    /// <summary>
+    /// Extracts target node from <paramref name="storage"/> target.
+    /// Represents unresolvable target as <c>null</c>. 
+    /// </summary>
+    /// TODO: Add reference parameter
+    protected R? ReferenceTargetNullableTarget<R>(ReferenceTarget? storage) where R : class, IReadableNode =>
+        storage?.Target as R;
+
+    /// <summary>
+    /// Extracts all target nodes from <paramref name="storage"/> targets.
+    /// </summary>
+    protected IImmutableList<R> ReferenceTargetNonNullTargets<R>(List<ReferenceTarget> storage,
+        Reference reference,
+        IReadableNode parent) where R : IReadableNode =>
+        M2Extensions.AsReferenceTargets<R>(null, storage)
+            .Select(r =>
+                (R?)r.Target ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, r.ResolveInfo,
+                    r.TargetId))
+            .ToImmutableList();
+
+    /// <summary>
+    /// Extracts target node from <paramref name="storage"/> target.
+    /// </summary>
+    /// <exception cref="UnresolvedReferenceExpression">If any target is unresolved.</exception>
+    protected R ReferenceTargetNonNullTarget<R>(ReferenceTarget storage, Reference reference,
+        IReadableNode parent) where R : class, IReadableNode =>
+        storage.Target as R ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, storage.ResolveInfo,
+            storage.TargetId);
 }
 
 /// Base implementation of <see cref="INode"/>.
@@ -603,6 +644,34 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
+    /// Assures <paramref name="value"/>'s is not <c>null</c> and its <see cref="ReferenceTarget.Target"/> is <c>null</c> or <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="value">Value to guard against <c>null</c>.</param>
+    /// <param name="feature">Feature <paramref name="value"/> originates from.</param>
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> is null or its <see cref="ReferenceTarget.Target"/> is not <typeparamref name="T"/>.</exception>
+    protected void AssureNotNullInstance<T>([NotNull] ReferenceTarget? value, Feature? feature)
+    {
+        if (value is { Target: null or T })
+            return;
+
+        throw new InvalidValueException(feature, value);
+    }
+
+    /// <summary>
+    /// Assures <paramref name="value"/>'s is <c>null</c> or its <see cref="ReferenceTarget.Target"/> is <c>null</c> or <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="value">Value to guard against <c>null</c>.</param>
+    /// <param name="feature">Feature <paramref name="value"/> originates from.</param>
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> is not <typeparamref name="T"/>.</exception>
+    protected void AssureNullableInstance<T>(ReferenceTarget? value, Feature? feature)
+    {
+        if (value is null or { Target: null or T })
+            return;
+
+        throw new InvalidValueException(feature, value);
+    }
+
+    /// <summary>
     /// Assures none of <paramref name="safeNodes">list's</paramref> members are <c>null</c>.
     /// </summary>
     /// <param name="safeNodes">Value to guard against <c>null</c>.</param>
@@ -630,7 +699,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c>, contains any <c>null</c> members,
     /// or both <paramref name="list"/> and <paramref name="storage"/> are empty.</exception>
-    protected void AssureNonEmpty<T>([NotNull] List<T>? list, List<T> storage, Link link)
+    protected void AssureNonEmpty<T>([NotNull] List<T>? list, IList storage, Link link)
     {
         if (list == null || (list.Count == 0 && storage.Count == 0))
             throw new InvalidValueException(link, list);
@@ -696,7 +765,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Link of <paramref name="storage"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> were empty after removing all of <paramref name="safeNodes"/>.</exception>
-    protected void AssureNotClearing<T>(List<T> safeNodes, List<T> storage, Link link) where T : IReadableNode
+    protected void AssureNotClearing<T>(List<T> safeNodes, IEnumerable<T> storage, Link link) where T : IReadableNode
     {
         var copy = new List<T>(storage);
         RemoveAll(safeNodes, copy, null);
@@ -783,9 +852,15 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns>Non-empty, read-only view of <paramref name="storage"/>.</returns>
     /// <exception cref="UnsetFeatureException">If <paramref name="storage"/> is empty.</exception>
-    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T> storage, Link link) =>
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T> storage, Link link) where T : IReadableNode =>
         storage.Count != 0
             ? storage.AsReadOnly()
+            : throw new UnsetFeatureException(link);
+
+    /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(IReadOnlyList<T> storage, Link link) where T : IReadableNode =>
+        storage.Count != 0
+            ? storage
             : throw new UnsetFeatureException(link);
 
     /// <summary>
@@ -919,13 +994,33 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
         }
     }
+    
+    /// <inheritdoc cref="RemoveAll{T}(List{T}, List{T}, Action{IPartitionNotificationProducer, Index, T, INotificationId?}?, INotificationId?)"/>
+    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceTarget> storage,
+        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
+        INotificationId? notificationId = null)
+        where T : IReadableNode
+    {
+        var partitionProducer = GetPartitionNotificationProducer();
+
+        foreach (var node in safeNodes)
+        {
+            var index = storage.FindIndex(r => Equals(node, r.Target));
+            if (index < 0)
+                continue;
+
+            storage.RemoveAt(index);
+            if (partitionProducer != null && remover != null)
+                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
+        }
+    }
 
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
     protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
         ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (producer, index, node, notificationId) =>
         {
-            IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
+            IReferenceTarget deletedTarget = ReferenceTarget.FromNode(node);
             producer.ProduceNotification(new ReferenceDeletedNotification(this, reference, index, deletedTarget,
                 notificationId ?? producer.CreateNotificationId()));
         };

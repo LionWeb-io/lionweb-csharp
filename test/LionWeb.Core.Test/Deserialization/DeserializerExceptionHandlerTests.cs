@@ -121,8 +121,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableReferenceTarget(
-                ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
-                "resolve-info",
+                new ReferenceTarget(null, "a", null),
                 new DynamicReference("dyn-reference", _lionWebVersion,
                     new DynamicConcept("dyn-concept", _lionWebVersion, new DynamicLanguage("dyn-lang", _lionWebVersion))),
                 new Line("line")));

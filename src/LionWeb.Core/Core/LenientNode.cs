@@ -23,6 +23,7 @@ using Notification;
 using Notification.Partition;
 using Notification.Pipe;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -145,7 +146,10 @@ public class LenientNode : NodeBase, INode
                 case Containment { Multiple: true } when value is INode node:
                     value = new List<INode> { node }.AsReadOnly();
                     break;
-                case Reference { Multiple: true }:
+                case Reference { Multiple:false} when value is ReferenceTarget target:
+                    value =  target.Target;
+                    break;
+                case Reference { Multiple: true } reference:
                     switch (value)
                     {
                         case INode iNode:
@@ -153,6 +157,22 @@ public class LenientNode : NodeBase, INode
                             break;
                         case IReadableNode readableNode:
                             value = new List<IReadableNode> { readableNode }.AsReadOnly();
+                            break;
+                        case ReferenceTarget { Target: not null } target:
+                            value = new List<IReadableNode> { target.Target }.AsReadOnly();
+                            break;
+                        case ReferenceTarget { Target: null }:
+                            value = new List<IReadableNode>().AsReadOnly();
+                            break;
+                        case String s:
+                            value = s;
+                            break;
+                        case IEnumerable e:
+                            value = reference
+                                .AsReferenceTargets<IReadableNode>(e)
+                                .Select(r => r.Target)
+                                .Where(t => t is not null)
+                                .ToImmutableList();
                             break;
                     }
 
@@ -207,19 +227,41 @@ public class LenientNode : NodeBase, INode
                 return false;
 
             case IReadableNode readableNode:
-                if (feature is Containment c && readableNode is INode node)
+                switch (feature)
                 {
-                    RemoveExistingChildren(c, oldValue);
-                    AttachChild(node);
+                    case Containment c when readableNode is INode node:
+                        RemoveExistingChildren(c, oldValue);
+                        AttachChild(node);
+                        break;
+                    case Reference:
+                        SetFeature(feature, ReferenceTarget.FromNode(readableNode));
+                        return true;
                 }
 
                 SetFeature(feature, readableNode);
+                return true;
+            
+            case ReferenceTarget target when feature is Reference:
+                SetFeature(feature, target);
                 return true;
 
             case string:
                 SetFeature(feature, value);
                 return true;
 
+            case IEnumerable e when feature is Reference reference:
+                var targets = reference.AsReferenceTargets<IReadableNode>(e).ToList();
+                if (targets.Count == 0)
+                {
+                    if (RemoveFeature(feature))
+                        return true;
+                    if (_classifier != null && _classifier.AllFeatures().Contains(feature))
+                        return true;
+                    return false;
+                }
+                SetFeature(feature, targets);
+                return true;
+                
             case IEnumerable:
                 var readableNodes = M2Extensions.AsNodes<IReadableNode>(value).ToList();
                 if (readableNodes.Count == 0)
@@ -231,22 +273,27 @@ public class LenientNode : NodeBase, INode
                     return false;
                 }
 
-                if (feature is Containment cont)
+                switch (feature)
                 {
-                    RemoveExistingChildren(cont, oldValue);
-                    var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
-                    foreach (var newChild in newChildren)
-                    {
-                        AttachChild(newChild);
-                    }
+                    case Containment cont:
+                        {
+                            RemoveExistingChildren(cont, oldValue);
+                            var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
+                            foreach (var newChild in newChildren)
+                            {
+                                AttachChild(newChild);
+                            }
 
-                    SetFeature(feature, newChildren.ToList());
-                } else
-                {
-                    SetFeature(feature, readableNodes);
+                            SetFeature(feature, newChildren.ToList());
+                            return true;
+                        }
+                    case Reference reference:
+                        SetFeature(feature, readableNodes.Select(ReferenceTarget.FromNode));
+                        return true;
+                    default:
+                        SetFeature(feature, readableNodes);
+                        return true;
                 }
-
-                return true;
 
             case { } v:
                 if (!v.GetType().IsValueType)
@@ -403,6 +450,16 @@ public class LenientNode : NodeBase, INode
     private bool TryGetFeature(Feature featureToFind, out object? value)
     {
         var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
+        if (result.value is ReferenceTarget target)
+        {
+            value = target.Target;
+            return true;
+        }
+        if (result.value is List<ReferenceTarget> referenceTargets)
+        {
+            value =  referenceTargets.Select(d => d.Target).Where(t => t is not null).ToList();
+            return true;
+        }
         if (result != default)
         {
             value = result.value;

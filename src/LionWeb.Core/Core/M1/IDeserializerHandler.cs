@@ -185,15 +185,13 @@ public interface IDeserializerHandler
     IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node);
 
     /// <summary>
-    /// Cannot find node with id <paramref name="targetId"/> mentioned as reference target in <paramref name="node"/> in reference <paramref name="reference"/>.
+    /// Cannot find node targeted by <paramref name="target"/> mentioned as reference target in <paramref name="parent"/> in reference <paramref name="reference"/>.
     /// </summary>
-    /// <param name="targetId">Unresolvable target node id.</param>
-    /// <param name="resolveInfo">ResolveInfo of <paramref name="targetId"/>.</param>
-    /// <param name="reference">Reference that should contain <paramref name="targetId"/>.</param>
-    /// <param name="node">Node that mentions <paramref name="targetId"/> as reference target.</param>
-    /// <returns>Replacement reference target node to use, or <c>null</c> to skip reference target <paramref name="targetId"/>.</returns>
-    IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo, Feature reference,
-        IReadableNode node);
+    /// <param name="target">Unresolved reference target.</param>
+    /// <param name="reference">Reference that should contain <paramref name="target"/>.</param>
+    /// <param name="parent">Node that mentions <paramref name="target"/> as reference target.</param>
+    /// <returns>Replacement reference target node to use, or <c>null</c> to skip reference target <paramref name="target"/>.</returns>
+    IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target, Feature reference, IReadableNode parent);
 
     /// <summary>
     /// Cannot find node with id <paramref name="annotationId"/> mentioned as annotation on <paramref name="node"/>.

@@ -259,7 +259,7 @@ public class NotificationToDeltaCommandMapper
             referenceAddedNotification.Parent.GetId(),
             referenceAddedNotification.Reference.ToMetaPointer(),
             referenceAddedNotification.Index,
-            referenceAddedNotification.NewTarget.Reference?.GetId(),
+            referenceAddedNotification.NewTarget.TargetId,
             referenceAddedNotification.NewTarget.ResolveInfo,
             ToCommandId(referenceAddedNotification),
             []
@@ -270,7 +270,7 @@ public class NotificationToDeltaCommandMapper
             referenceDeletedNotification.Parent.GetId(),
             referenceDeletedNotification.Reference.ToMetaPointer(),
             referenceDeletedNotification.Index,
-            referenceDeletedNotification.DeletedTarget.Reference?.GetId(),
+            referenceDeletedNotification.DeletedTarget.TargetId,
             referenceDeletedNotification.DeletedTarget.ResolveInfo,
             ToCommandId(referenceDeletedNotification),
             []
@@ -281,9 +281,9 @@ public class NotificationToDeltaCommandMapper
             referenceChangedNotification.Parent.GetId(),
             referenceChangedNotification.Reference.ToMetaPointer(),
             referenceChangedNotification.Index,
-            referenceChangedNotification.OldTarget.Reference?.GetId(),
+            referenceChangedNotification.OldTarget.TargetId,
             referenceChangedNotification.OldTarget.ResolveInfo,
-            referenceChangedNotification.NewTarget.Reference?.GetId(),
+            referenceChangedNotification.NewTarget.TargetId,
             referenceChangedNotification.NewTarget.ResolveInfo,
             ToCommandId(referenceChangedNotification),
             []
@@ -292,7 +292,7 @@ public class NotificationToDeltaCommandMapper
     #endregion
 
     private SerializedReferenceTarget ToDelta(IReferenceTarget target) =>
-        new SerializedReferenceTarget { Reference = target.Reference?.GetId(), ResolveInfo = target.ResolveInfo };
+        new SerializedReferenceTarget { Reference = target.TargetId, ResolveInfo = target.ResolveInfo };
 
     private DeltaSerializationChunk ToDeltaChunk(IReadableNode node)
     {

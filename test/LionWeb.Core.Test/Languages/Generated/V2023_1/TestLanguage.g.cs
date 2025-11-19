@@ -16,6 +16,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "TestLanguage", Version = "0")]
@@ -220,7 +221,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetBooleanValue_0_1([NotNullWhenAttribute(true)] out bool? booleanValue_0_1)
 	{
 		booleanValue_0_1 = _booleanValue_0_1;
-		return _booleanValue_0_1 != null;
+		return booleanValue_0_1 != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -244,7 +245,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetBooleanValue_1([NotNullWhenAttribute(true)] out bool? booleanValue_1)
 	{
 		booleanValue_1 = _booleanValue_1;
-		return _booleanValue_1 != null;
+		return booleanValue_1 != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -267,7 +268,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetEnumValue_0_1([NotNullWhenAttribute(true)] out TestEnumeration? enumValue_0_1)
 	{
 		enumValue_0_1 = _enumValue_0_1;
-		return _enumValue_0_1 != null;
+		return enumValue_0_1 != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -293,7 +294,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetEnumValue_1([NotNullWhenAttribute(true)] out TestEnumeration? enumValue_1)
 	{
 		enumValue_1 = _enumValue_1;
-		return _enumValue_1 != null;
+		return enumValue_1 != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -318,7 +319,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetIntegerValue_0_1([NotNullWhenAttribute(true)] out int? integerValue_0_1)
 	{
 		integerValue_0_1 = _integerValue_0_1;
-		return _integerValue_0_1 != null;
+		return integerValue_0_1 != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -342,7 +343,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetIntegerValue_1([NotNullWhenAttribute(true)] out int? integerValue_1)
 	{
 		integerValue_1 = _integerValue_1;
-		return _integerValue_1 != null;
+		return integerValue_1 != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -365,7 +366,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetStringValue_0_1([NotNullWhenAttribute(true)] out string? stringValue_0_1)
 	{
 		stringValue_0_1 = _stringValue_0_1;
-		return _stringValue_0_1 != null;
+		return stringValue_0_1 != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -391,7 +392,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public bool TryGetStringValue_1([NotNullWhenAttribute(true)] out string? stringValue_1)
 	{
 		stringValue_1 = _stringValue_1;
-		return _stringValue_1 != null;
+		return stringValue_1 != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -609,7 +610,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
@@ -636,7 +637,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetContainment_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? containment_0_1)
 	{
 		containment_0_1 = _containment_0_1;
-		return _containment_0_1 != null;
+		return containment_0_1 != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -661,7 +662,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetContainment_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> containment_0_n)
 	{
 		containment_0_n = _containment_0_n;
-		return _containment_0_n.Count != 0;
+		return containment_0_n.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -713,7 +714,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetContainment_1([NotNullWhenAttribute(true)] out LinkTestConcept? containment_1)
 	{
 		containment_1 = _containment_1;
-		return _containment_1 != null;
+		return containment_1 != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -741,7 +742,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetContainment_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> containment_1_n)
 	{
 		containment_1_n = _containment_1_n;
-		return _containment_1_n.Count != 0;
+		return containment_1_n.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -786,46 +787,54 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-	private LinkTestConcept? _reference_0_1 = null;
+	private ReferenceTarget? _reference_0_1 = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_0_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public LinkTestConcept? Reference_0_1 { get => _reference_0_1; set => SetReference_0_1(value); }
+	public LinkTestConcept? Reference_0_1 { get => Reference_0_1Target(); set => SetReference_0_1(value); }
 
+	private LinkTestConcept? Reference_0_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetReference_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_0_1)
 	{
-		reference_0_1 = _reference_0_1;
-		return _reference_0_1 != null;
+		reference_0_1 = Reference_0_1Target();
+		return reference_0_1 != null;
 	}
 
-	/// <remarks>Optional Single Reference</remarks>
-        public LinkTestConcept SetReference_0_1(LinkTestConcept? value, INotificationId? notificationId = null)
+	private LinkTestConcept SetReference_0_1(ReferenceTarget? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
+		AssureNullableInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
+		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
 		emitter.CollectOldData();
 		_reference_0_1 = value;
 		emitter.Notify();
 		return this;
 	}
 
-	private readonly List<LinkTestConcept> _reference_0_n = [];
+	/// <remarks>Optional Single Reference</remarks>
+        public LinkTestConcept SetReference_0_1(LinkTestConcept? value, INotificationId? notificationId = null)
+	{
+		return SetReference_0_1(ReferenceTarget.FromNodeOptional(value), notificationId);
+	}
+
+	private readonly List<ReferenceTarget> _reference_0_n = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_0_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Reference_0_n { get => _reference_0_n.AsReadOnly(); init => AddReference_0_n(value); }
+	public IReadOnlyList<LinkTestConcept> Reference_0_n { get => Reference_0_nTargets(); init => AddReference_0_n(value); }
 
+	private IImmutableList<LinkTestConcept> Reference_0_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_0_n);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_0_n)
 	{
-		reference_0_n = _reference_0_n;
-		return _reference_0_n.Count != 0;
+		reference_0_n = Reference_0_nTargets();
+		return reference_0_n.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept AddReference_0_n(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n.Count, notificationId);
@@ -839,7 +848,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public LinkTestConcept InsertReference_0_n(int index, IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _reference_0_n);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, index, notificationId);
@@ -859,52 +868,59 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-	private LinkTestConcept? _reference_1 = null;
+	private ReferenceTarget? _reference_1 = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Reference_1 has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public LinkTestConcept Reference_1 { get => _reference_1 ?? throw new UnsetFeatureException(TestLanguageLanguage.Instance.LinkTestConcept_reference_1); set => SetReference_1(value); }
+	public LinkTestConcept Reference_1 { get => Reference_1Target() ?? throw new UnsetFeatureException(TestLanguageLanguage.Instance.LinkTestConcept_reference_1); set => SetReference_1(value); }
 
+	private LinkTestConcept? Reference_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
-		reference_1 = _reference_1;
-		return _reference_1 != null;
+		reference_1 = Reference_1Target();
+		return reference_1 != null;
 	}
 
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public LinkTestConcept SetReference_1(LinkTestConcept value, INotificationId? notificationId = null)
+	private LinkTestConcept SetReference_1(ReferenceTarget? value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
-		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1, notificationId);
+		AssureNotNullInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
+		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1, notificationId);
 		emitter.CollectOldData();
 		_reference_1 = value;
 		emitter.Notify();
 		return this;
 	}
 
-	private readonly List<LinkTestConcept> _reference_1_n = [];
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public LinkTestConcept SetReference_1(LinkTestConcept value, INotificationId? notificationId = null)
+	{
+		return SetReference_1(ReferenceTarget.FromNodeOptional(value), notificationId);
+	}
+
+	private readonly List<ReferenceTarget> _reference_1_n = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Reference_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_1_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Reference_1_n { get => AsNonEmptyReadOnly(_reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value); }
+	public IReadOnlyList<LinkTestConcept> Reference_1_n { get => AsNonEmptyReadOnly<LinkTestConcept>(Reference_1_nTargets(), TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value); }
 
+	private IImmutableList<LinkTestConcept> Reference_1_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_1_n)
 	{
-		reference_1_n = _reference_1_n;
-		return _reference_1_n.Count != 0;
+		reference_1_n = Reference_1_nTargets();
+		return reference_1_n.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Reference_1_n and nodes are empty</exception>
         public LinkTestConcept AddReference_1_n(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n.Count, notificationId);
@@ -920,7 +936,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public LinkTestConcept InsertReference_1_n(int index, IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _reference_1_n);
-		var safeNodes = nodes?.ToList();
+		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, index, notificationId);
@@ -937,7 +953,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNotClearing(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
+		AssureNotClearing(safeNodes, Reference_1_nTargets(), TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		RemoveAll(safeNodes, _reference_1_n, ReferenceRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n));
 		return this;
 	}
@@ -1084,12 +1100,18 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 				return true;
 			}
 
+			if (value is ReferenceTarget target)
+			{
+				SetReference_0_1(target, notificationId);
+				return true;
+			}
+
 			throw new InvalidValueException(feature, value);
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(feature))
 		{
-			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.TestLanguage.LinkTestConcept>(value).ToList();
+			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 			AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n, notificationId);
@@ -1108,12 +1130,18 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 				return true;
 			}
 
+			if (value is ReferenceTarget target)
+			{
+				SetReference_1(target, notificationId);
+				return true;
+			}
+
 			throw new InvalidValueException(feature, value);
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(feature))
 		{
-			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.TestLanguage.LinkTestConcept>(value).ToList();
+			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNonEmpty(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n, notificationId);
 			emitter.CollectOldData();

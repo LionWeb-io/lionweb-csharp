@@ -24,7 +24,7 @@ using M1;
 
 public abstract class NotificationTestsBase
 {
-    protected T ClonePartition<T>(T node) where T : IPartitionInstance, INode =>
+    protected T ClonePartition<T>(T node) where T : INode =>
         (T)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
     protected static void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

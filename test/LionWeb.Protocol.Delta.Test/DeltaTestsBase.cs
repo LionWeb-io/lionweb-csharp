@@ -23,37 +23,67 @@ using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Core.Test.Notification;
 using Delta.Client;
 using Message.Command;
 
 public abstract class DeltaTestsBase: NotificationTestsBase
 {
-    /// <summary>
-    /// This replicator exercises the following path:
-    /// notification ->  notificationToDeltaCommandMapper -> commandToEventMapper -> deltaProtocolEventReceiver
-    /// -> deltaEventToNotificationMapper -> forestReplicator
-    /// ForestReplicator replicates notifications on clone partitions
-    /// </summary>
-    protected Geometry CreateDeltaReplicator(Geometry node)
+    /// <inheritdoc cref="CreateDeltaReplicator(IForest, INotificationSender)"/>
+    protected T CreateDeltaReplicator<T>(T node) where T : IPartitionInstance, INode
     {
         var clone = ClonePartition(node);
+        var cloneForest = new Forest();
+        cloneForest.AddPartitions([clone]);
 
+        CreateDeltaReplicator(cloneForest, node.GetNotificationSender()!);
+
+        return clone;
+    }
+
+    /// <inheritdoc cref="CreateDeltaReplicator(IForest, INotificationSender)"/>
+    protected IForest CreateDeltaReplicator(IForest originalForest)
+    {
+        var cloneForest = new Forest();
+        cloneForest.AddPartitions(originalForest.Partitions.Select(p => (IPartitionInstance)ClonePartition((INode)p)));
+
+        CreateDeltaReplicator(cloneForest, originalForest.GetNotificationSender()!);
+
+        return cloneForest;
+    }
+    
+    /// <summary>
+    /// This replicator exercises the following path:
+    /// 
+    /// notification
+    /// -> notificationToDeltaCommandMapper
+    /// -> commandToEventMapper
+    /// -> deltaProtocolEventReceiver
+    /// -> deltaEventToNotificationMapper
+    /// -> forestReplicator
+    /// 
+    /// ForestReplicator replicates notifications on clone partitions
+    /// </summary>
+    private void CreateDeltaReplicator(IForest cloneForest, INotificationSender originalSender)
+    {
         var lionWebVersion = LionWebVersions.v2024_1;
-        List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
+        List<Language> languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         PartitionSharedNodeMap sharedNodeMap = new();
 
+        var unresolvedReferencesManager = new UnresolvedReferencesManager();
+
         var deserializerBuilder = new DeserializerBuilder()
             .WithLionWebVersion(lionWebVersion)
             .WithLanguages(languages)
-            .WithHandler(new DeltaDeserializerHandler());
+            .WithHandler(new DeltaDeserializerHandler(unresolvedReferencesManager));
 
-        var cloneForest = new Forest();
-        cloneForest.AddPartitions([clone]);
+        cloneForest.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
         
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
@@ -65,24 +95,31 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         eventReceiver.ConnectTo(replicator);
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
+        var notificationToDeltaCommandMapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
         
-        node.GetNotificationSender()?.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
+        originalSender.Subscribe<INotification>((sender, partitionNotification) =>
         {
-            var deltaCommand = 
-                new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion)
-                    .Map(partitionNotification);
+            var deltaCommand = notificationToDeltaCommandMapper.Map(partitionNotification);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
         });
-        
-        return clone;
     }
     
     /// <summary>
     /// This replicator exercises the following path:
-    /// notification -> notificationToDeltaCommandMapper -> deltaSerializer -> json -> deltaDeserializer
-    /// -> commandToEventMapper -> deltaProtocolEventReceiver -> deltaEventToNotificationMapper -> forestReplicator
-    /// ForestReplicator replicates notifications on clone partitions
-    /// Different from <see cref="CreateDeltaReplicator"/> this replicator serialize and deserialize delta commands
+    /// 
+    /// notification
+    /// -> notificationToDeltaCommandMapper
+    /// -> deltaSerializer
+    /// -> json
+    /// -> deltaDeserializer
+    /// -> commandToEventMapper
+    /// -> deltaProtocolEventReceiver
+    /// -> deltaEventToNotificationMapper
+    /// -> forestReplicator
+    /// 
+    /// ForestReplicator replicates notifications on clone partitions.
+    /// 
+    /// Different from <see cref="CreateDeltaReplicator"/> this replicator serialize and deserialize delta commands.
     /// </summary>
     protected Geometry CreateDeltaReplicatorWithJson(Geometry node)
     {
@@ -115,9 +152,11 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var deltaSerializer = new DeltaSerializer();
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
+        var notificationToDeltaCommandMapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
+        
         node.GetNotificationSender()?.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
-            var command = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
+            var command = notificationToDeltaCommandMapper.Map(partitionNotification);
             var json = deltaSerializer.Serialize(command);
             var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
             eventReceiver.Receive(commandToEventMapper.Map(deserialized));
