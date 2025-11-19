@@ -14,7 +14,6 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "0")]
@@ -171,7 +170,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
         public bool TryGetConceptAlias([NotNullWhenAttribute(true)] out string? conceptAlias)
 	{
 		conceptAlias = _conceptAlias;
-		return _conceptAlias != null;
+		return conceptAlias != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -194,7 +193,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
         public bool TryGetConceptShortDescription([NotNullWhenAttribute(true)] out string? conceptShortDescription)
 	{
 		conceptShortDescription = _conceptShortDescription;
-		return _conceptShortDescription != null;
+		return conceptShortDescription != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -217,7 +216,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
         public bool TryGetHelpUrl([NotNullWhenAttribute(true)] out string? helpUrl)
 	{
 		helpUrl = _helpUrl;
-		return _helpUrl != null;
+		return helpUrl != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -330,7 +329,7 @@ public partial class Deprecated : AnnotationInstanceBase
         public bool TryGetBuild([NotNullWhenAttribute(true)] out string? build)
 	{
 		build = _build;
-		return _build != null;
+		return build != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -353,7 +352,7 @@ public partial class Deprecated : AnnotationInstanceBase
         public bool TryGetComment([NotNullWhenAttribute(true)] out string? comment)
 	{
 		comment = _comment;
-		return _comment != null;
+		return comment != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -447,7 +446,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
         public bool TryGetDocumentation([NotNullWhenAttribute(true)] out string? documentation)
 	{
 		documentation = _documentation;
-		return _documentation != null;
+		return documentation != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -464,17 +463,10 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IReadableNode> SeeAlso { get => SeeAlsoTargets(); init => AddSeeAlso(value); }
-
-    private IImmutableList<IReadableNode> SeeAlsoTargets() => ReferenceTargetNullableTargets<IReadableNode>(_seeAlso, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+	public IReadOnlyList<IReadableNode> SeeAlso { get => ReferenceTargetNonNullTargets<IReadableNode>(_seeAlso, SpecificLanguage.Instance.KeyedDescription_seeAlso); init => AddSeeAlso(value); }
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso)
-	{
-		seeAlso = SeeAlsoTargets();
-		return _seeAlso.Count != 0;
-	}
-
+        public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso) => TryGetReference<IReadableNode>(_seeAlso, out seeAlso);
 	/// <remarks>Optional Multiple Reference</remarks>
         public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
@@ -580,6 +572,48 @@ public partial class KeyedDescription : AnnotationInstanceBase
 			result.Add(SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		return result;
 	}
+
+	/// <inheritdoc/>
+        protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.AddInternal(link, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(link))
+		{
+			AddSeeAlso(SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
+	{
+		if (base.InsertInternal(link, index, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(link))
+		{
+			InsertSeeAlso(index, SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
+	{
+		if (base.RemoveInternal(link, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(link))
+		{
+			RemoveSeeAlso(SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value));
+			return true;
+		}
+
+		return false;
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ShortDescription")]
@@ -595,7 +629,7 @@ public partial class ShortDescription : AnnotationInstanceBase
         public bool TryGetDescription([NotNullWhenAttribute(true)] out string? description)
 	{
 		description = _description;
-		return _description != null;
+		return description != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -673,7 +707,7 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
