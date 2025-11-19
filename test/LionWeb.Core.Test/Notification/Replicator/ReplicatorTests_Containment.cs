@@ -43,6 +43,72 @@ public class ReplicatorTests_Containment : ReplicatorTestsBase
 
         AssertEquals([originalPartition], [clonedPartition]);
         Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+    }  
+    
+    [TestMethod]
+    public void ChildAdded_Multiple_adds_one_node_using_generic_api()
+    {
+        var originalPartition = new Geometry("a");
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var added = new Circle("added");
+        originalPartition.Add(ShapesLanguage.Instance.Geometry_shapes, [added]);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+    }
+
+    [TestMethod]
+    public void ChildAdded_Multiple_adds_multiple_nodes_using_generic_api()
+    {
+        var originalPartition = new Geometry("a");
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var added1 = new Circle("added1");
+        var added2 = new Circle("added2");
+        originalPartition.Add(ShapesLanguage.Instance.Geometry_shapes, [added1, added2]);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added2, clonedPartition.Shapes[0]);
+    }
+
+    [TestMethod]
+    public void ChildAdded_Multiple_sets_one_node_using_set()
+    {
+        var originalPartition = new Geometry("a");
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var added = new Circle("added");
+        var values = new IShape[] { added };
+        
+        originalPartition.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+    }
+
+    [TestMethod]
+    public void ChildAdded_Multiple_sets_multiple_nodes_using_set()
+    {
+        var originalPartition = new Geometry("a");
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var added1 = new Circle("added1");
+        var added2 = new Circle("added2");
+        var values = new IShape[] { added1, added2 };
+        
+        originalPartition.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added2, clonedPartition.Shapes[0]);
     }
 
     [TestMethod]
@@ -1340,6 +1406,37 @@ public class ReplicatorTests_Containment : ReplicatorTestsBase
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }
         
+        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+    }
+
+    [TestMethod]
+    public void ChildMovedInSameContainment_sets_two_of_the_existing_children_using_set()
+    {
+        var a = new Circle("a");
+        var b = new Circle("b");
+        var c = new Circle("c");
+        var d = new Circle("d");
+        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        var values = new IShape[] { a, b };
+        originalPartition.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+
+        Assert.AreEqual(2, notificationObserver.Count);
+
+        foreach (var notification in notificationObserver.Notifications)
+        {
+            Assert.IsInstanceOfType<ChildDeletedNotification>(notification);
+            var childDeletedNotification = notification as ChildDeletedNotification;
+            Assert.AreEqual(2, childDeletedNotification?.Index);
+        }
+
         AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
     }
 
