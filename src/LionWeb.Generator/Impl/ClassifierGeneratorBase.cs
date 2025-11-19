@@ -75,19 +75,20 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
     protected ExpressionStatementSyntax EmitterNotifyCall() =>
         ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("emitter"), IdentifierName("Notify"))));
 
-    protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment) =>
+    protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment, bool isAddedNodeSingle = false) =>
         ExpressionStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
             AsArguments([
-                Call("SetSelfParent", IdentifierName("safeNodes"), MetaProperty(containment))
+                Call("SetSelfParent", isAddedNodeSingle ? IdentifierName("[safeNode]") : IdentifierName("safeNodes"), 
+                    MetaProperty(containment))
             ])
         ));
 
-    protected ExpressionStatementSyntax RequiredAddRangeCall(Containment containment) =>
+    protected ExpressionStatementSyntax RequiredAddRangeCall(Containment containment, bool isAddedNodeSingle = false) =>
         ExpressionStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
             AsArguments([
-                Call("SetSelfParent", IdentifierName("safeNodes"),
+                Call("SetSelfParent", isAddedNodeSingle ? IdentifierName("[safeNode]") : IdentifierName("safeNodes"),
                     MetaProperty(containment)
                 )
             ])
