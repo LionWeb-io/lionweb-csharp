@@ -395,14 +395,12 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// <inheritdoc />
     public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 
+    #region References
+
     /// <summary>
     /// Extracts all target nodes from <paramref name="storage"/> targets.
     /// Represents unresolvable targets as <c>null</c>. 
     /// </summary>
-    [Obsolete]
-    protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget> storage)
-        where R : IReadableNode => ReferenceTargetNullableTargets<R>(storage, null);
-        
     protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget> storage, Reference reference)
         where R : IReadableNode =>
         storage
@@ -413,9 +411,6 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// Extracts target node from <paramref name="storage"/> target.
     /// Represents unresolvable target as <c>null</c>. 
     /// </summary>
-    [Obsolete]
-    protected R? ReferenceTargetNullableTarget<R>(ReferenceTarget? storage) where R : IReadableNode =>
-        ReferenceTargetNullableTarget<R>(storage, null);
     protected R? ReferenceTargetNullableTarget<R>(ReferenceTarget? storage, Reference reference) where R : IReadableNode
     {
         if (storage?.Target is null)
@@ -460,6 +455,31 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
 
         return result;
     }
+    
+    /// <summary>
+    /// Tries to retrieve all <see cref="ReferenceTarget.Target"/>s from <paramref name="storage"/>.
+    /// </summary>
+    /// <returns><c>true</c> if all <paramref name="storage"/>.<see cref="ReferenceTarget.Target"/>s are non-null and of type <typeparamref name="R"/>; <c>false</c> otherwise.</returns>
+    protected bool TryGetReference<R>(List<ReferenceTarget> storage, out IReadOnlyList<R> targets)
+    {
+        var result = storage.Count != 0;
+        var nodes = new List<R>(storage.Count);
+        foreach (var r in storage)
+        {
+            if (r.Target is not R target)
+            {
+                result = false;
+                break;
+            }
+                
+            nodes.Add(target);
+        }
+            
+        targets = result ? nodes.AsReadOnly() : [];
+        return result;
+    }
+
+    #endregion
 }
 
 /// Base implementation of <see cref="INode"/>.
@@ -888,6 +908,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         storage.Count != 0
             ? storage
             : throw new UnsetFeatureException(link);
+
+    /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
     protected IReadOnlyList<T?> AsNonEmptyNullableReadOnly<T>(IReadOnlyList<T?> storage, Link link) where T : IReadableNode =>
         storage.Count != 0
             ? storage

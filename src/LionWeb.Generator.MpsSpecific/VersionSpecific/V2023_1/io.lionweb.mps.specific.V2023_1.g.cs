@@ -466,7 +466,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<IReadableNode> SeeAlso { get => SeeAlsoTargets(); init => AddSeeAlso(value); }
 
-    private IImmutableList<IReadableNode> SeeAlsoTargets() => ReferenceTargetNullableTargets<IReadableNode>(_seeAlso);
+    private IImmutableList<IReadableNode> SeeAlsoTargets() => ReferenceTargetNullableTargets<IReadableNode>(_seeAlso, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso)

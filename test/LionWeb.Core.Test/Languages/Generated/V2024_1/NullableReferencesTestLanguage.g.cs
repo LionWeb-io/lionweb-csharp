@@ -874,14 +874,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public LinkTestConcept? Reference_1 { get => Reference_1Target(); set => SetReference_1(value ?? throw new InvalidValueException(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1, value)); }
+	public LinkTestConcept? Reference_1 { get => _reference_1 is not null ? Reference_1Target() : throw new UnsetFeatureException(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1); set => SetReference_1(value ?? throw new InvalidValueException(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1, value)); }
 
 	private LinkTestConcept? Reference_1Target() => ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
 		reference_1 = Reference_1Target();
-		return reference_1 != null;
+		return _reference_1 != null || reference_1 != null;
 	}
 
 	private LinkTestConcept SetReference_1(ReferenceTarget? value, INotificationId? notificationId = null)

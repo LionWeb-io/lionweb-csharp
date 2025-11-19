@@ -805,7 +805,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetReference_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_0_1)
 	{
-		reference_0_1 = Reference_0_1Target();
+		reference_0_1 = ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 		return reference_0_1 != null;
 	}
 
@@ -834,10 +834,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	private IImmutableList<LinkTestConcept> Reference_0_nTargets() => ReferenceTargetNonNullTargets<LinkTestConcept>(_reference_0_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_0_n)
-	{
-		reference_0_n = Reference_0_nTargets();
-		return reference_0_n.Count != 0;
-	}
+    => TryGetReference<LinkTestConcept>(_reference_0_n, out  reference_0_n);
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept AddReference_0_n(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
@@ -888,7 +885,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
-		reference_1 = Reference_1Target();
+		reference_1 = ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
 		return reference_1 != null;
 	}
 
@@ -919,10 +916,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	private IImmutableList<LinkTestConcept> Reference_1_nTargets() => ReferenceTargetNonNullTargets<LinkTestConcept>(_reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_1_n)
-	{
-		reference_1_n = Reference_1_nTargets();
-		return reference_1_n.Count != 0;
-	}
+            => TryGetReference<LinkTestConcept>(_reference_1_n, out  reference_1_n);
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Reference_1_n and nodes are empty</exception>
@@ -961,7 +955,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNotClearing(safeNodes, Reference_1_nTargets(), TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
+		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n), TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		RemoveAll(safeNodes, _reference_1_n, ReferenceRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n));
 		return this;
 	}
