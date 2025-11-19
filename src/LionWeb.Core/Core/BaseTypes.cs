@@ -399,41 +399,67 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// Extracts all target nodes from <paramref name="storage"/> targets.
     /// Represents unresolvable targets as <c>null</c>. 
     /// </summary>
-    /// TODO: Add reference parameter
+    [Obsolete]
     protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget> storage)
+        where R : IReadableNode => ReferenceTargetNullableTargets<R>(storage, null);
+        
+    protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget> storage, Reference reference)
         where R : IReadableNode =>
-        M2Extensions.AsReferenceTargets<R>(null, storage)
-            .Select(r => (R?)r.Target)
+        storage
+            .Select(r => ReferenceTargetNullableTarget<R>(r, reference))
             .ToImmutableList();
 
     /// <summary>
     /// Extracts target node from <paramref name="storage"/> target.
     /// Represents unresolvable target as <c>null</c>. 
     /// </summary>
-    /// TODO: Add reference parameter
-    protected R? ReferenceTargetNullableTarget<R>(ReferenceTarget? storage) where R : class, IReadableNode =>
-        storage?.Target as R;
+    [Obsolete]
+    protected R? ReferenceTargetNullableTarget<R>(ReferenceTarget? storage) where R : IReadableNode =>
+        ReferenceTargetNullableTarget<R>(storage, null);
+    protected R? ReferenceTargetNullableTarget<R>(ReferenceTarget? storage, Reference reference) where R : IReadableNode
+    {
+        if (storage?.Target is null)
+            return default;
+        
+        if (storage.Target is not R result)
+            throw new InvalidValueException(reference, storage.Target);
+
+        return result;
+    }
 
     /// <summary>
     /// Extracts all target nodes from <paramref name="storage"/> targets.
     /// </summary>
-    protected IImmutableList<R> ReferenceTargetNonNullTargets<R>(List<ReferenceTarget> storage,
-        Reference reference,
-        IReadableNode parent) where R : IReadableNode =>
-        M2Extensions.AsReferenceTargets<R>(null, storage)
+    protected IImmutableList<R> ReferenceTargetNonNullTargets<R>(List<ReferenceTarget> storage, Reference reference)
+        where R : IReadableNode =>
+        storage
             .Select(r =>
-                (R?)r.Target ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, r.ResolveInfo,
-                    r.TargetId))
+            {
+                var result = ReferenceTargetNonNullTarget<R>(r, reference);
+                if (result is null)
+                    throw new InvalidValueException(reference, r);
+                return result;
+            })
             .ToImmutableList();
 
     /// <summary>
     /// Extracts target node from <paramref name="storage"/> target.
     /// </summary>
-    /// <exception cref="UnresolvedReferenceExpression">If any target is unresolved.</exception>
-    protected R ReferenceTargetNonNullTarget<R>(ReferenceTarget storage, Reference reference,
-        IReadableNode parent) where R : class, IReadableNode =>
-        storage.Target as R ?? throw new UnresolvedReferenceExpression(parent.GetId(), reference, storage.ResolveInfo,
-            storage.TargetId);
+    /// <exception cref="UnresolvedReferenceExpression">If <paramref name="storage"/> is unresolved.</exception>
+    /// <exception cref="InvalidValueException">If <paramref name="storage"/> does not resolve to <typeparamref name="R"/>.</exception>
+    protected R? ReferenceTargetNonNullTarget<R>(ReferenceTarget? storage, Reference reference) where R : IReadableNode
+    {
+        if (storage is null)
+            return default;
+        
+        if (storage.Target is null)
+            throw new UnresolvedReferenceExpression(GetId(), reference, storage.ResolveInfo, storage.TargetId);
+        
+        if (storage.Target is not R result)
+            throw new InvalidValueException(reference, storage.Target);
+
+        return result;
+    }
 }
 
 /// Base implementation of <see cref="INode"/>.
@@ -765,7 +791,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Link of <paramref name="storage"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> were empty after removing all of <paramref name="safeNodes"/>.</exception>
-    protected void AssureNotClearing<T>(List<T> safeNodes, IEnumerable<T> storage, Link link) where T : IReadableNode
+    protected void AssureNotClearing<T>(List<T?> safeNodes, IEnumerable<T> storage, Link link) where T : IReadableNode?
     {
         var copy = new List<T>(storage);
         RemoveAll(safeNodes, copy, null);
@@ -859,6 +885,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
     protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(IReadOnlyList<T> storage, Link link) where T : IReadableNode =>
+        storage.Count != 0
+            ? storage
+            : throw new UnsetFeatureException(link);
+    protected IReadOnlyList<T?> AsNonEmptyNullableReadOnly<T>(IReadOnlyList<T?> storage, Link link) where T : IReadableNode =>
         storage.Count != 0
             ? storage
             : throw new UnsetFeatureException(link);
@@ -976,7 +1006,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// </param>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage,
+    protected void RemoveAll<T>(List<T?> safeNodes, List<T> storage,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
         INotificationId? notificationId = null)
         where T : IReadableNode
@@ -985,6 +1015,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
         foreach (var node in safeNodes)
         {
+            if (node is null)
+                continue;
             var index = storage.IndexOf(node);
             if (index < 0)
                 continue;

@@ -24,4 +24,13 @@ public record GeneratorConfig
     /// or <see cref="Core.IReadableNode"/> (if set to <c>false</c>).
     /// Defaults to <c>true</c>.
     public bool WritableInterfaces { get; init; } = true;
+
+    public UnresolvedReferenceHandling UnresolvedReferenceHandling { get; init; } =
+        UnresolvedReferenceHandling.ThrowIfPresent;
+}
+
+public enum UnresolvedReferenceHandling
+{
+    ReturnAsNull,
+    ThrowIfPresent
 }
