@@ -159,7 +159,7 @@ public class DeltaCommandToNotificationMapper
         var containment = ToContainment(command.Containment, parent);
 
         return new ChildDeletedNotification(
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[command.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[command.Index],
             parent,
             containment,
             command.Index,
@@ -173,7 +173,7 @@ public class DeltaCommandToNotificationMapper
         var containment = ToContainment(command.Containment, parent);
         return new ChildReplacedNotification(
             Deserialize(command.NewChild),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[command.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[command.Index],
             parent,
             containment,
             command.Index,

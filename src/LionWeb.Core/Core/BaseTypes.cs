@@ -296,21 +296,21 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
 
     /// <inheritdoc/>
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) =>
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations));
+        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null));
 
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
     public void AddAnnotations(IEnumerable<T> annotations);
 
     /// <inheritdoc/>
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations));
+        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null));
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
     public void InsertAnnotations(Index index, IEnumerable<T> annotations);
 
     /// <inheritdoc/>
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) =>
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations));
+        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null));
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
     public bool RemoveAnnotations(IEnumerable<T> annotations);
@@ -546,7 +546,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         {
             if (value is not IEnumerable)
                 throw new InvalidValueException(feature, value);
-            var safeNodes = M2Extensions.AsNodes<INode>(value).ToList();
+            var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
             AssureAnnotations(safeNodes);
             AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
             notification.CollectOldData();

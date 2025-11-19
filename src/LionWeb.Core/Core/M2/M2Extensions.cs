@@ -409,7 +409,7 @@ public static class M2Extensions
             };
         }
     }
-    
+
     /// <summary>
     /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;
     /// </summary>
@@ -417,12 +417,16 @@ public static class M2Extensions
     /// <typeparam name="T">Type of nodes in <paramref name="value"/>.</typeparam>
     /// <returns><paramref name="value"/> re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;</exception>
+    [Obsolete("Use AsNodes(object, Feature) instead.")]
     public static IEnumerable<T> AsNodes<T>(object? value) where T : IReadableNode
+        => AsNodes<T>(value, null);
+    
+    public static IEnumerable<T> AsNodes<T>(object? value, Feature feature) where T : IReadableNode
         => value switch
         {
             IEnumerable e => CastIterator<T>(null, e),
             T n => [n],
-            _ => throw new InvalidValueException(null, value)
+            _ => throw new InvalidValueException(feature, value)
         };
 
     private static IEnumerable<T> CastIterator<T>(Link? link, IEnumerable source)

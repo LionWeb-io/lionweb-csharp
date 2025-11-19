@@ -209,7 +209,7 @@ public class LenientNode : NodeBase, INode
     {
         if (feature == null)
         {
-            var annotations = M2Extensions.AsNodes<INode>(value).ToList();
+            var annotations = M2Extensions.AsNodes<INode>(value, null).ToList();
             RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
             AddAnnotations(annotations);
             return true;
@@ -263,7 +263,7 @@ public class LenientNode : NodeBase, INode
                 return true;
                 
             case IEnumerable:
-                var readableNodes = M2Extensions.AsNodes<IReadableNode>(value).ToList();
+                var readableNodes = M2Extensions.AsNodes<IReadableNode>(value, feature).ToList();
                 if (readableNodes.Count == 0)
                 {
                     if (RemoveFeature(feature))
@@ -278,7 +278,7 @@ public class LenientNode : NodeBase, INode
                     case Containment cont:
                         {
                             RemoveExistingChildren(cont, oldValue);
-                            var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
+                            var newChildren = M2Extensions.AsNodes<INode>(readableNodes, feature).ToList();
                             foreach (var newChild in newChildren)
                             {
                                 AttachChild(newChild);
@@ -309,7 +309,7 @@ public class LenientNode : NodeBase, INode
     {
         if (link == null)
         {
-            var annotations = M2Extensions.AsNodes<INode>(nodes).ToList();
+            var annotations = M2Extensions.AsNodes<INode>(nodes, link).ToList();
             AddAnnotations(annotations);
             return true;
         }
@@ -318,7 +318,7 @@ public class LenientNode : NodeBase, INode
         
         var oldValue = TryGetFeature(link, out var old) ? old : null;
         
-        var readableNodes = M2Extensions.AsNodes<IReadableNode>(nodes).ToList();
+        var readableNodes = M2Extensions.AsNodes<IReadableNode>(nodes, link).ToList();
         if (readableNodes.Count == 0)
         {
             if (RemoveFeature(link))
@@ -331,7 +331,7 @@ public class LenientNode : NodeBase, INode
         if (link is Containment cont)
         {
             RemoveExistingChildren(cont, oldValue);
-            var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
+            var newChildren = M2Extensions.AsNodes<INode>(readableNodes, cont).ToList();
             foreach (var newChild in newChildren)
             {
                 AttachChild(newChild);
@@ -351,7 +351,7 @@ public class LenientNode : NodeBase, INode
     {
         if (link == null)
         {
-            var annotations = M2Extensions.AsNodes<INode>(nodes).ToList();
+            var annotations = M2Extensions.AsNodes<INode>(nodes, link).ToList();
             InsertAnnotations(index, annotations);
             return true;
         }
@@ -366,7 +366,7 @@ public class LenientNode : NodeBase, INode
     {
         if (link is null)
         {
-            var annotations= M2Extensions.AsNodes<INode>(nodes).ToList();
+            var annotations= M2Extensions.AsNodes<INode>(nodes, link).ToList();
             RemoveAnnotations(annotations);
             return true;
         }

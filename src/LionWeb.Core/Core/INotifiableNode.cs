@@ -58,13 +58,13 @@ public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T 
     #region AddAnnotations
 
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => 
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations), null);
+        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null), null);
     
     void INotifiableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) => 
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations), notificationId);
+        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null), notificationId);
     
     void IWritableNode<T>.AddAnnotations(IEnumerable<T> annotations) => 
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations));
+        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null));
 
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
@@ -75,13 +75,13 @@ public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T 
     #region InsertAnnotations
 
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), null);
+        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null), null);
     
     void INotifiableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, INotificationId? notificationId) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), notificationId);
+        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null), notificationId);
     
     void IWritableNode<T>.InsertAnnotations(Index index, IEnumerable<T> annotations) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations));
+        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null));
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param> 
@@ -92,13 +92,13 @@ public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T 
     #region RemoveAnnotations
 
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => 
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), null);
+        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null), null);
 
     bool INotifiableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) => 
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), notificationId);
+        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null), notificationId);
 
     bool IWritableNode<T>.RemoveAnnotations(IEnumerable<T> annotations) => 
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations));
+        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null));
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>

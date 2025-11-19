@@ -52,7 +52,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
             return null;
 
         var oldIndex = oldContainment.Multiple
-            ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(value)
+            ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment), oldContainment).ToList().IndexOf(value)
             : 0;
 
         return new OldContainmentInfo(oldParent, oldContainment, oldIndex, oldPartition);
