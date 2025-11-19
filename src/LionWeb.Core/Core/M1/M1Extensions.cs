@@ -346,7 +346,7 @@ public static class M1Extensions
             .FirstOrDefault();
 
     /// <summary>
-    /// Returns the name of the node if it is set, <c>null</c>/> otherwise.
+    /// Returns the name of the node if it is set, <c>null</c> otherwise.
     /// </summary>
     /// <param name="self">Base node to get name of.</param>
     public static string? GetNodeName(this IReadableNode self)

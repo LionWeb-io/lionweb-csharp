@@ -28,7 +28,7 @@ using RightIndex = Index;
 /// </remarks>
 public class ListComparer<T> : IListComparer<T> where T : notnull
 {
-    private readonly List<T> _left;
+    private readonly IList<T> _left;
     private readonly List<T> _right;
     private readonly IEqualityComparer<T> _comparer;
 
@@ -44,7 +44,7 @@ public class ListComparer<T> : IListComparer<T> where T : notnull
     /// Compares two lists, and returns the minimum number of <see cref="IListChange{T}">changes</see>
     /// to convert <paramref name="left"/> into <paramref name="right"/>. 
     /// </summary>
-    public ListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
+    public ListComparer(IList<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
     {
         _left = left;
         _right = right;

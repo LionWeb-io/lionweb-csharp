@@ -39,7 +39,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         parent.AddShapes([line]);
@@ -60,7 +60,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line });
@@ -84,7 +84,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         parent.InsertShapes(0, [line]);
@@ -106,7 +106,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circle });
@@ -128,7 +128,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         parent.InsertShapes(1, [line]);
@@ -150,7 +150,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle, line });
@@ -172,7 +172,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -195,7 +195,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -218,7 +218,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -241,7 +241,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -264,7 +264,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(2, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -287,7 +287,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(2, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -356,7 +356,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.RemoveShapes([line]);
@@ -377,7 +377,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
@@ -399,7 +399,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.RemoveShapes([line]);
@@ -421,7 +421,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
@@ -443,7 +443,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.RemoveShapes([line]);
@@ -465,7 +465,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
@@ -488,7 +488,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.RemoveShapes([line]);
@@ -511,7 +511,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB });
@@ -596,7 +596,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, circle), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(circle), args.DeletedTarget);
             notifications++;
         });
 
@@ -623,7 +623,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -646,7 +646,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -671,7 +671,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -696,7 +696,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1 + notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -724,7 +724,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 
@@ -766,7 +766,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, circleA), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(circleA), args.DeletedTarget);
             notifications++;
         });
 
@@ -789,7 +789,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 
@@ -813,7 +813,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 
@@ -838,7 +838,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 
@@ -864,7 +864,7 @@ public class ReferenceTests_Multiple_Optional_Listener
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(indexes[notifications], args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 

@@ -397,7 +397,7 @@ public class DeltaEventToNotificationMapper
             _sharedNodeMap.TryGetValue(targetNode, out var node))
             target = node;
 
-        return new ReferenceTarget(resolveInfo, target);
+        return new ReferenceTarget(resolveInfo, targetNode, target);
     }
 
     #endregion

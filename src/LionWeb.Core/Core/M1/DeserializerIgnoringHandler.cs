@@ -143,12 +143,11 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId,
-        ResolveInfo? resolveInfo,
+    public virtual IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target,
         Feature reference,
-        IReadableNode node)
+        IReadableNode parent)
     {
-        LogMessage($"On node with id={node.GetId()}: couldn't find reference target with id={targetId} - skipping.");
+        LogMessage($"On node with id={parent.GetId()}: couldn't find reference target with id={target} - skipping.");
         return null;
     }
 

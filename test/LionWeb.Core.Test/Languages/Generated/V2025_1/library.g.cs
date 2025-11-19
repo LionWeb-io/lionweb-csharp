@@ -178,31 +178,37 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]
 public partial class Book : ConceptInstanceBase
 {
-	private Writer? _author = null;
+	private ReferenceTarget? _author = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Author has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "author")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public Writer Author { get => _author ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
+	public Writer Author { get => AuthorTarget() ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
+	private Writer? AuthorTarget() => ReferenceTargetNullableTarget<Writer>(_author);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetAuthor([NotNullWhenAttribute(true)] out Writer? author)
 	{
-		author = _author;
-		return _author != null;
+		author = AuthorTarget();
+		return author != null;
+	}
+
+	private Book SetAuthor(ReferenceTarget? value, INotificationId? notificationId = null)
+	{
+		AssureNotNullInstance<Writer>(value, LibraryLanguage.Instance.Book_author);
+		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
+		emitter.CollectOldData();
+		_author = value;
+		emitter.Notify();
+		return this;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Book SetAuthor(Writer value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
-		ReferenceSingleNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
-		emitter.CollectOldData();
-		_author = value;
-		emitter.Notify();
-		return this;
+		return SetAuthor(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	private int? _pages = null;
@@ -216,7 +222,7 @@ public partial class Book : ConceptInstanceBase
         public bool TryGetPages([NotNullWhenAttribute(true)] out int? pages)
 	{
 		pages = _pages;
-		return _pages != null;
+		return pages != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -242,7 +248,7 @@ public partial class Book : ConceptInstanceBase
         public bool TryGetTitle([NotNullWhenAttribute(true)] out string? title)
 	{
 		title = _title;
-		return _title != null;
+		return title != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -267,7 +273,7 @@ public partial class Book : ConceptInstanceBase
         public bool TryGetType([NotNullWhenAttribute(true)] out BookType? @type)
 	{
 		@type = _type;
-		return _type != null;
+		return @type != null;
 	}
 
 	/// <remarks>Optional Property</remarks>
@@ -328,6 +334,12 @@ public partial class Book : ConceptInstanceBase
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Writer v)
 			{
 				SetAuthor(v, notificationId);
+				return true;
+			}
+
+			if (value is ReferenceTarget target)
+			{
+				SetAuthor(target, notificationId);
 				return true;
 			}
 
@@ -402,7 +414,7 @@ public partial class GuideBookWriter : Writer
         public bool TryGetCountries([NotNullWhenAttribute(true)] out string? countries)
 	{
 		countries = _countries;
-		return _countries != null;
+		return countries != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -480,7 +492,7 @@ public partial class Library : ConceptInstanceBase
         public bool TryGetBooks([NotNullWhenAttribute(true)] out IReadOnlyList<Book> books)
 	{
 		books = _books;
-		return _books.Count != 0;
+		return books.Count != 0;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -538,7 +550,7 @@ public partial class Library : ConceptInstanceBase
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -706,7 +718,7 @@ public partial class SpecialistBookWriter : Writer
         public bool TryGetSubject([NotNullWhenAttribute(true)] out string? subject)
 	{
 		subject = _subject;
-		return _subject != null;
+		return subject != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -786,7 +798,7 @@ public partial class Writer : ConceptInstanceBase
         public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
-		return _name != null;
+		return name != null;
 	}
 
 	/// <remarks>Required Property</remarks>

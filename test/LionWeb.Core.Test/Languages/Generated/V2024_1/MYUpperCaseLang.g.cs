@@ -163,7 +163,7 @@ public partial class MYConcept : ConceptInstanceBase
         public bool TryGetMYContainment([NotNullWhenAttribute(true)] out INode? mYContainment)
 	{
 		mYContainment = _mYContainment;
-		return _mYContainment != null;
+		return mYContainment != null;
 	}
 
 	/// <remarks>Required Single Containment</remarks>
@@ -193,7 +193,7 @@ public partial class MYConcept : ConceptInstanceBase
         public bool TryGetMYProperty([NotNullWhenAttribute(true)] out string? mYProperty)
 	{
 		mYProperty = _mYProperty;
-		return _mYProperty != null;
+		return mYProperty != null;
 	}
 
 	/// <remarks>Required Property</remarks>
@@ -208,31 +208,37 @@ public partial class MYConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private IReadableNode? _mYReference = null;
+	private ReferenceTarget? _mYReference = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MYReference has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(MYUpperCaseLangLanguage), Key = "key-reference")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadableNode MYReference { get => _mYReference ?? throw new UnsetFeatureException(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference); set => SetMYReference(value); }
+	public IReadableNode MYReference { get => MYReferenceTarget() ?? throw new UnsetFeatureException(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference); set => SetMYReference(value); }
 
+	private IReadableNode? MYReferenceTarget() => ReferenceTargetNullableTarget<IReadableNode>(_mYReference);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetMYReference([NotNullWhenAttribute(true)] out IReadableNode? mYReference)
 	{
-		mYReference = _mYReference;
-		return _mYReference != null;
+		mYReference = MYReferenceTarget();
+		return mYReference != null;
+	}
+
+	private MYConcept SetMYReference(ReferenceTarget? value, INotificationId? notificationId = null)
+	{
+		AssureNotNullInstance<IReadableNode>(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference, notificationId);
+		emitter.CollectOldData();
+		_mYReference = value;
+		emitter.Notify();
+		return this;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public MYConcept SetMYReference(IReadableNode value, INotificationId? notificationId = null)
 	{
-		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
-		ReferenceSingleNotificationEmitter emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference, notificationId);
-		emitter.CollectOldData();
-		_mYReference = value;
-		emitter.Notify();
-		return this;
+		return SetMYReference(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	public MYConcept(string id) : base(id)
@@ -299,6 +305,12 @@ public partial class MYConcept : ConceptInstanceBase
 			if (value is IReadableNode v)
 			{
 				SetMYReference(v, notificationId);
+				return true;
+			}
+
+			if (value is ReferenceTarget target)
+			{
+				SetMYReference(target, notificationId);
 				return true;
 			}
 

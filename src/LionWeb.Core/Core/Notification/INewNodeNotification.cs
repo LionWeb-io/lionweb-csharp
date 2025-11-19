@@ -15,26 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Partition;
+namespace LionWeb.Core.Notification;
 
-using TargetNode = IReadableNode;
-
-/// <summary>
-/// Describes a reference target.
-///
-/// <para>
-/// At least one of <see cref="ResolveInfo"/> and <see cref="Reference"/> MUST be non-null.
-/// </para>
-/// </summary>
-/// <seealso cref="LionWeb.Core.Serialization.SerializedReferenceTarget"/>
-public interface IReferenceTarget
+/// Implementers create a new node.
+public interface INewNodeNotification : INotification
 {
-    /// Textual hint that might be used to find the target node of this reference.
-    ResolveInfo? ResolveInfo { get; }
-    
-    /// Target node of this reference.
-    TargetNode? Reference { get; }
+    /// The newly created node.
+    IReadableNode NewNode { get; }
 }
-
-/// <inheritdoc cref="IReferenceTarget"/>
-public readonly record struct ReferenceTarget(ResolveInfo? ResolveInfo, TargetNode? Reference) : IReferenceTarget;

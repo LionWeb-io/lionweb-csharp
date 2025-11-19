@@ -41,7 +41,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         materialGroup.AddMaterials([line]);
@@ -64,7 +64,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line });
@@ -90,7 +90,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         materialGroup.InsertMaterials(0, [line]);
@@ -114,7 +114,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line, circle });
@@ -138,7 +138,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         materialGroup.InsertMaterials(1, [line]);
@@ -162,7 +162,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circle, line });
@@ -186,7 +186,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -211,7 +211,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -236,7 +236,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -261,7 +261,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -286,7 +286,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(2, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -311,7 +311,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(2, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
             notifications++;
         });
 
@@ -422,7 +422,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         materialGroup.RemoveMaterials([line]);
@@ -446,7 +446,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
@@ -470,7 +470,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         materialGroup.RemoveMaterials([line]);
@@ -494,7 +494,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
@@ -519,7 +519,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         materialGroup.RemoveMaterials([line]);
@@ -544,7 +544,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, line), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circleA, circleB});
@@ -661,7 +661,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -686,7 +686,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -713,7 +713,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -740,7 +740,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1 + notifications, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
             notifications++;
         });
 
@@ -827,7 +827,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, circleA), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(circleA), args.DeletedTarget);
             notifications++;
         });
 
@@ -853,7 +853,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 
@@ -880,7 +880,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 
@@ -908,7 +908,7 @@ public class ReferenceTests_Multiple_Required_Listener
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(indexes[notifications], args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
             notifications++;
         });
 

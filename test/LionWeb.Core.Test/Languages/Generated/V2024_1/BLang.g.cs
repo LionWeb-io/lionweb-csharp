@@ -118,7 +118,7 @@ public partial class BConcept : ConceptInstanceBase
         public bool TryGetAEnumProp([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum? aEnumProp)
 	{
 		aEnumProp = _aEnumProp;
-		return _aEnumProp != null;
+		return aEnumProp != null;
 	}
 
 	/// enum desc
@@ -136,27 +136,34 @@ public partial class BConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? _aRef = null;
+	private ReferenceTarget? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
+	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => ARefTarget(); set => SetARef(value); }
 
+	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARefTarget() => ReferenceTargetNullableTarget<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(_aRef);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetARef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? aRef)
 	{
-		aRef = _aRef;
-		return _aRef != null;
+		aRef = ARefTarget();
+		return aRef != null;
+	}
+
+	private BConcept SetARef(ReferenceTarget? value, INotificationId? notificationId = null)
+	{
+		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(value, BLangLanguage.Instance.BConcept_ARef);
+		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
+		emitter.CollectOldData();
+		_aRef = value;
+		emitter.Notify();
+		return this;
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
-		emitter.CollectOldData();
-		_aRef = value;
-		emitter.Notify();
-		return this;
+		return SetARef(ReferenceTarget.FromNodeOptional(value), notificationId);
 	}
 
 	public BConcept(string id) : base(id)
@@ -206,6 +213,12 @@ public partial class BConcept : ConceptInstanceBase
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept)
 			{
 				SetARef((LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept?)value, notificationId);
+				return true;
+			}
+
+			if (value is ReferenceTarget target)
+			{
+				SetARef(target, notificationId);
 				return true;
 			}
 

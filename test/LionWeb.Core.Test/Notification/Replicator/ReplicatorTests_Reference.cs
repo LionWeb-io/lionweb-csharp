@@ -206,11 +206,11 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
 
         var referenceAddedNotification = new ReferenceAddedNotification(originalPartition,
             ShapesLanguage.Instance.OffsetDuplicate_source, 0,
-            new ReferenceTarget(null, circle), new NumericNotificationId("refAddedNotification", 0));
+            ReferenceTarget.FromNode(circle), new NumericNotificationId("refAddedNotification", 0));
 
         var notification = notificationMapper.Map(referenceAddedNotification);
 
-        Assert.AreNotSame(circle, ((ReferenceAddedNotification)notification).NewTarget.Reference);
+        Assert.AreNotSame(circle, ((ReferenceAddedNotification)notification).NewTarget.Target);
     }
 
     [TestMethod]
@@ -227,12 +227,12 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
 
         var notificationMapper = new NotificationToNotificationMapper(sharedNodeMap);
         var referenceChangedNotification = new ReferenceChangedNotification(originalPartition, ShapesLanguage.Instance.OffsetDuplicate_altSource, 0,
-            new ReferenceTarget(null, line), new ReferenceTarget(null, circle), new NumericNotificationId("refChangedNotification", 0));
+            ReferenceTarget.FromNode(line), ReferenceTarget.FromNode(circle), new NumericNotificationId("refChangedNotification", 0));
 
         var notification = notificationMapper.Map(referenceChangedNotification);
 
-        Assert.AreNotSame(line, ((ReferenceChangedNotification)notification).NewTarget.Reference);
-        Assert.AreNotSame(circle, ((ReferenceChangedNotification)notification).OldTarget.Reference);
+        Assert.AreNotSame(line, ((ReferenceChangedNotification)notification).NewTarget.Target);
+        Assert.AreNotSame(circle, ((ReferenceChangedNotification)notification).OldTarget.Target);
     }
 
     [TestMethod]
@@ -248,12 +248,12 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
 
         var notificationMapper = new NotificationToNotificationMapper(sharedNodeMap);
         var referenceDeletedNotification = new ReferenceDeletedNotification(originalPartition, ShapesLanguage.Instance.OffsetDuplicate_altSource, 0,
-            new ReferenceTarget(null, circle),
+            ReferenceTarget.FromNode(circle),
             new NumericNotificationId("refChangedNotification", 0));
 
         var notification = notificationMapper.Map(referenceDeletedNotification);
 
-        Assert.AreNotSame(circle, ((ReferenceDeletedNotification)notification).DeletedTarget.Reference);
+        Assert.AreNotSame(circle, ((ReferenceDeletedNotification)notification).DeletedTarget.Target);
     }
 
     #endregion
@@ -277,7 +277,7 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
         var oldIndex = 2;
         var newIndex = 0;
         var notification = new EntryMovedInSameReferenceNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
+            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
         
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(ref1);
@@ -307,7 +307,7 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
         var oldIndex = 0;
         var newIndex = 2;
         var notification = new EntryMovedInSameReferenceNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
+            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
         
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(ref1);
@@ -339,7 +339,7 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
         var oldIndex = 1;
         var newIndex = 3;
         var notification = new EntryMovedInSameReferenceNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
+            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
         
         var sharedNodeMap = new SharedNodeMap();
         
@@ -373,7 +373,7 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
         var oldIndex = 3;
         var newIndex = 1;
         var notification = new EntryMovedInSameReferenceNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
+            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
         
         var sharedNodeMap = new SharedNodeMap();
         

@@ -24,21 +24,21 @@ using Utilities.ListComparer;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Reference"/>.</typeparam>
 public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationEmitterBase<T> where T : IReadableNode
 {
-    private readonly List<IListChange<T>> _changes = [];
+    private readonly List<IListChange<ReferenceTarget>> _changes = [];
 
     /// <param name="reference">Represented <see cref="Reference"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="reference"/>.</param>
     /// <param name="safeNodes">Newly added values.</param>
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<T> safeNodes, List<T> storage,
+    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<ReferenceTarget> safeNodes, IList<ReferenceTarget> storage,
         INotificationId? notificationId = null) :
         base(reference, destinationParent, safeNodes, notificationId)
     {
         if (!IsActive())
             return;
 
-        var listComparer = IListComparer.CreateForNodes(storage, safeNodes);
+        var listComparer = IListComparer.CreateForReferenceTarget(storage, safeNodes);
         _changes = listComparer.Compare();
     }
 
@@ -55,21 +55,18 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
         {
             switch (change)
             {
-                case ListAdded<T> added:
-                    IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
-                    ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
+                case ListAdded<ReferenceTarget> added:
+                    ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, added.Element,
                         GetNotificationId()));
                     break;
-                case ListMoved<T> moved:
-                    IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
+                case ListMoved<ReferenceTarget> moved:
                     ProduceNotification(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
-                        moved.LeftIndex, target,
+                        moved.LeftIndex, moved.LeftElement,
                         GetNotificationId()));
                     break;
-                case ListDeleted<T> deleted:
-                    IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
+                case ListDeleted<ReferenceTarget> deleted:
                     ProduceNotification(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
-                        deletedTarget, GetNotificationId()));
+                        deleted.Element, GetNotificationId()));
                     break;
             }
         }

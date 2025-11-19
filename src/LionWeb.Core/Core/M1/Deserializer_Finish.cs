@@ -55,22 +55,8 @@ public partial class Deserializer
             if (containment == null)
                 continue;
 
-            List<IWritableNode> children = compressedChildrenIds
-                .Select(childId => FindChild(node, containment, childId))
-                .Where(c => c != null)
-                .ToList()!;
-
-            SetLink(children, node, containment);
+            InstallContainment(compressedChildrenIds, node, containment);
         }
-    }
-
-    private IWritableNode? FindChild(IWritableNode node, Feature containment, ICompressedId childId)
-    {
-        IWritableNode? result = _deserializedNodesById.TryGetValue(childId, out var existingChild)
-            ? existingChild as IWritableNode
-            : _handler.UnresolvableChild(childId, containment, node);
-
-        return PreventCircularContainment(node, result);
     }
 
     #endregion

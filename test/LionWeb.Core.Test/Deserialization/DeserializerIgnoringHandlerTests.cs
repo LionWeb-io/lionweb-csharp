@@ -96,8 +96,7 @@ public class DeserializerIgnoringHandlerTests
     public void unresolvable_reference_target()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableReferenceTarget(
-            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
-            "resolve-info",
+            new ReferenceTarget(null, "a", null),
             new DynamicReference("dyn-reference", _lionWebVersion,
                 new DynamicConcept("dyn-concept", _lionWebVersion, new DynamicLanguage("dyn-lang", _lionWebVersion))),
             new Line("line")));

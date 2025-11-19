@@ -316,6 +316,6 @@ internal abstract class ReferencesInstallerBase(
 
     private T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>
         _versionSpecifics._handler.UnresolvableReferenceTarget(
-            _versionSpecifics._deserializer.CompressOpt(target.Reference), target.ResolveInfo, reference,
+            new ReferenceTarget(target.ResolveInfo, target.Reference, null), reference,
             (IWritableNode)_node) as T;
 }
