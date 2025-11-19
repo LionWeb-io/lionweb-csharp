@@ -353,10 +353,14 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		if (_altGroups.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, null, notificationId);
-		emitter.CollectOldData();
-		_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, [safeNode], _altGroups, null, notificationId);
+			emitter.CollectOldData();
+			_altGroups.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.BillOfMaterials_altGroups));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -428,10 +432,14 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		if (_groups.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, null, notificationId);
-		emitter.CollectOldData();
-		_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, [safeNode], _groups, null, notificationId);
+			emitter.CollectOldData();
+			_groups.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.BillOfMaterials_groups));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -911,10 +919,14 @@ public partial class CompositeShape : Shape
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		if (_disabledParts.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, null, notificationId);
-		emitter.CollectOldData();
-		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, [safeNode], _disabledParts, null, notificationId);
+			emitter.CollectOldData();
+			_disabledParts.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.CompositeShape_disabledParts));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -996,10 +1008,14 @@ public partial class CompositeShape : Shape
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		if (_parts.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, null, notificationId);
-		emitter.CollectOldData();
-		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, [safeNode], _parts, null, notificationId);
+			emitter.CollectOldData();
+			_parts.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.CompositeShape_parts));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -1547,18 +1563,16 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		
-        if (_shapes.SequenceEqual(safeNodes))
+		if (_shapes.SequenceEqual(safeNodes))
 			return this;
-        
-        foreach (var safeNode in safeNodes)
-        {
-            ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, null, notificationId);
-            emitter.CollectOldData();
-            _shapes.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.Geometry_shapes));
-            emitter.Notify();    
-        }
-		
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, null, notificationId);
+			emitter.CollectOldData();
+			_shapes.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.Geometry_shapes));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -2714,10 +2728,14 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		if (_fixpoints.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, null, notificationId);
-		emitter.CollectOldData();
-		_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, [safeNode], _fixpoints, null, notificationId);
+			emitter.CollectOldData();
+			_fixpoints.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.IShape_fixpoints));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>

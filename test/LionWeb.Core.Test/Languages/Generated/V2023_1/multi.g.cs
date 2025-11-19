@@ -114,10 +114,14 @@ public partial class Container : ConceptInstanceBase
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		if (_libraries.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, null, notificationId);
-		emitter.CollectOldData();
-		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, [safeNode], _libraries, null, notificationId);
+			emitter.CollectOldData();
+			_libraries.AddRange(SetSelfParent([safeNode], MultiLanguage.Instance.Container_libraries));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
