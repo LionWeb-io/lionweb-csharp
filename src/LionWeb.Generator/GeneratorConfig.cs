@@ -34,9 +34,9 @@ public record GeneratorConfig
 /// How generated code should handle unresolved references.
 public enum UnresolvedReferenceHandling
 {
-    /// Return unresolved references as <c>null</c>.
-    ReturnAsNull,
-    
     /// Throw <see cref="LionWeb.Core.UnresolvedReferenceException"/> on access to unresolved references.
-    Throw
+    Throw,
+
+    /// Return unresolved references as <c>null</c>.
+    ReturnAsNull
 }

@@ -52,7 +52,8 @@ Example:
     "DotGSuffix": false,
     "LionWebVersion": "2024.1",
     "GeneratorConfig": {
-      "WritableInterfaces": true
+      "WritableInterfaces": true,
+      "UnresolvedReferenceHandling": "ReturnAsNull"
     }
   }
 ]
@@ -172,3 +173,15 @@ Defaults to the current LionWeb version.
 Specifies whether generated interfaces should implement `IWritableNode`, defaults to `true`.
 * `true`:: generated interfaces implement `IWritableNode`
 * `false`:: generated interfaces implement `IReadableNode`
+
+#### unresolvedReferenceHandling
+```
+--unresolvedReferenceHandling
+    Throw (default) |
+    ReturnAsNull
+```
+
+Specifies how generated code should handle unresolved references.
+
+* `Throw`:: Throw `UnresolvedReferenceException` on access to unresolved references.
+* `ReturnAsNull`:: Return unresolved references as `null`.
