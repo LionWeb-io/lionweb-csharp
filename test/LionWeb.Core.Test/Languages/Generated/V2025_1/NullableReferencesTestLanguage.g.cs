@@ -16,7 +16,6 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "TestLanguage", Version = "0")]
@@ -820,13 +819,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_0_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept?> Reference_0_n { get => Reference_0_nTargets(); init => AddReference_0_n(value!); }
+	public IReadOnlyList<LinkTestConcept?> Reference_0_n { get => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_0_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n); init => AddReference_0_n(value!); }
 
-	private IImmutableList<LinkTestConcept?> Reference_0_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_0_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept?> reference_0_n)
 	{
-		reference_0_n = Reference_0_nTargets();
+		reference_0_n = ReferenceTargetNullableTargets<LinkTestConcept>(_reference_0_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		return reference_0_n.Count != 0;
 	}
 
@@ -906,11 +904,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<LinkTestConcept?> Reference_1_n { get => GetRequiredNullableReferences<LinkTestConcept>(_reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value!); }
 
-	private IImmutableList<LinkTestConcept?> Reference_1_nTargets() => ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept?> reference_1_n)
 	{
-		reference_1_n = Reference_1_nTargets();
+		reference_1_n = ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		return reference_1_n.Count != 0;
 	}
 
@@ -951,7 +948,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNotClearing(safeNodes, Reference_1_nTargets(), NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
+		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n), NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		RemoveAll(safeNodes, _reference_1_n, ReferenceRemover<LinkTestConcept>(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n));
 		return this;
 	}

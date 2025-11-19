@@ -16,7 +16,6 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Time = string;
 
@@ -469,9 +468,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Materials { get => MaterialsTargets(); init => AddMaterials(value); }
+	public IReadOnlyList<IShape> Materials { get => ReferenceTargetNonNullTargets<IShape>(_materials, ShapesLanguage.Instance.BillOfMaterials_materials); init => AddMaterials(value); }
 
-	private IImmutableList<IShape> MaterialsTargets() => ReferenceTargetNonNullTargets<IShape>(_materials, ShapesLanguage.Instance.BillOfMaterials_materials);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
 	/// <remarks>Optional Multiple Reference</remarks>
@@ -1961,9 +1959,8 @@ public partial class MaterialGroup : ConceptInstanceBase
     	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly<IShape>(MaterialsTargets(), ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
+	public IReadOnlyList<IShape> Materials { get => GetRequiredNonNullReferences<IShape>(_materials, ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
 
-	private IImmutableList<IShape> MaterialsTargets() => ReferenceTargetNonNullTargets<IShape>(_materials, ShapesLanguage.Instance.MaterialGroup_materials);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
 	/// <remarks>Required Multiple Reference</remarks>
@@ -2003,7 +2000,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		AssureNotClearing(safeNodes, MaterialsTargets(), ShapesLanguage.Instance.MaterialGroup_materials);
+		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<IShape>(_materials, ShapesLanguage.Instance.MaterialGroup_materials), ShapesLanguage.Instance.MaterialGroup_materials);
 		RemoveAll(safeNodes, _materials, ReferenceRemover<IShape>(ShapesLanguage.Instance.MaterialGroup_materials));
 		return this;
 	}
@@ -2516,9 +2513,8 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Shapes { get => ShapesTargets(); init => AddShapes(value); }
+	public IReadOnlyList<IShape> Shapes { get => ReferenceTargetNonNullTargets<IShape>(_shapes, ShapesLanguage.Instance.ReferenceGeometry_shapes); init => AddShapes(value); }
 
-	private IImmutableList<IShape> ShapesTargets() => ReferenceTargetNonNullTargets<IShape>(_shapes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes) => TryGetReference<IShape>(_shapes, out shapes);
 	/// <remarks>Optional Multiple Reference</remarks>

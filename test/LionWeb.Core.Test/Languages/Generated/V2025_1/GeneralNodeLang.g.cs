@@ -14,7 +14,6 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-GeneralNodeLang", Version = "1")]
@@ -239,9 +238,8 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IReadableNode> MultipleOptionalRef { get => MultipleOptionalRefTargets(); init => AddMultipleOptionalRef(value); }
+	public IReadOnlyList<IReadableNode> MultipleOptionalRef { get => ReferenceTargetNonNullTargets<IReadableNode>(_multipleOptionalRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef); init => AddMultipleOptionalRef(value); }
 
-	private IImmutableList<IReadableNode> MultipleOptionalRefTargets() => ReferenceTargetNonNullTargets<IReadableNode>(_multipleOptionalRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMultipleOptionalRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalRef) => TryGetReference<IReadableNode>(_multipleOptionalRef, out multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
@@ -286,9 +284,8 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "UnsetFeatureException">If MultipleRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<IReadableNode> MultipleRef { get => AsNonEmptyReadOnly<IReadableNode>(MultipleRefTargets(), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef); init => AddMultipleRef(value); }
+	public IReadOnlyList<IReadableNode> MultipleRef { get => GetRequiredNonNullReferences<IReadableNode>(_multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef); init => AddMultipleRef(value); }
 
-	private IImmutableList<IReadableNode> MultipleRefTargets() => ReferenceTargetNonNullTargets<IReadableNode>(_multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultipleRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleRef) => TryGetReference<IReadableNode>(_multipleRef, out multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
@@ -328,7 +325,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		AssureNotClearing(safeNodes, MultipleRefTargets(), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
+		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<IReadableNode>(_multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		RemoveAll(safeNodes, _multipleRef, ReferenceRemover<IReadableNode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef));
 		return this;
 	}
