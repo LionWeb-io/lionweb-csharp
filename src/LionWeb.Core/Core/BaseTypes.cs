@@ -448,7 +448,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
             return default;
         
         if (storage.Target is null)
-            throw new UnresolvedReferenceException(GetId(), reference, storage.ResolveInfo, storage.TargetId);
+            throw new UnresolvedReferenceException(GetId(), reference, storage);
         
         if (storage.Target is not R result)
             throw new InvalidValueException(reference, storage.Target);
