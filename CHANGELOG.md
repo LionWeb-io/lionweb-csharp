@@ -14,7 +14,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added generator configuration option `UnresolvedReferenceHandling`:
   * `Throw` (default) :: Throw `UnresolvedReferenceException` on access to unresolved references.
   * `ReturnAsNull`:: Return unresolved references as `null`.
-* Added `DebuggerDisplay` with "NodeType[NodeId]" to most nodes
+* Added `DebuggerDisplay` with "NodeType[NodeId]" to most nodes.
 ### Fixed
 * Bug fix: Introduce check to validate that the deleted node's ID matches the actual node's ID during child deletion notification.
 * Bug fix: Notification emitter now checks whether a moved node is part of partition of not. If the moved node is a floating node – i.e. not part of a partition – and it replaces another node, then `ChildReplacedNotification` is emitted. If there is no replacement, then `ChildAddedNotification` is emitted.
