@@ -89,10 +89,11 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
                     SafeNodesVariable(),
                     AssureNonEmptyCall(),
                     ReturnIfAddedNodesAreEqualToExistingNodes(),
-                    AddMultipleContainmentEmitterVariable(Null()),
-                    EmitterCollectOldDataCall(),
-                    RequiredAddRangeCall(containment),
-                    EmitterNotifyCall(),
+                    LoopOverSafeNodes([
+                        AddMultipleContainmentEmitterVariable(Null(), true),
+                        EmitterCollectOldDataCall(),
+                        RequiredAddRangeCall(containment, true),
+                        EmitterNotifyCall()]),
                     ReturnStatement(This())
                 ], writeable: true)
                 .Select(XdocRequiredAdder)
@@ -132,10 +133,11 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
                 ReturnIfAddedNodesAreEqualToExistingNodes(),
-                AddMultipleContainmentEmitterVariable(Null()),
-                EmitterCollectOldDataCall(),
-                OptionalAddRangeCall(containment),
-                EmitterNotifyCall(),
+                LoopOverSafeNodes([
+                    AddMultipleContainmentEmitterVariable(Null(), true),
+                    EmitterCollectOldDataCall(),
+                    OptionalAddRangeCall(containment, true),
+                    EmitterNotifyCall()]),
                 ReturnStatement(This())
             ], writeable: true)
         ).Concat(
@@ -158,19 +160,26 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
             ], writeable: true)
         );
 
-    private StatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes() =>
+    private ForEachStatementSyntax LoopOverSafeNodes(IEnumerable<StatementSyntax> loopBody) => 
+        ForEachStatement(
+            type: IdentifierName("var"),
+            identifier: Identifier("safeNode"),
+            expression: IdentifierName("safeNodes"),
+            statement: Block(loopBody));
+    
+    private IfStatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes() =>
         IfStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),
             AsArguments([IdentifierName("safeNodes")])
         ), ReturnStatement(This()));
 
-    private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index) =>
+    private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index, bool isAddedNodeSingle = false) =>
         Variable(
             "emitter",
             AsType(typeof(ContainmentAddMultipleNotificationEmitter<>),
                 AsType(containment.GetFeatureType(), writeable: true)),
             NewCall([
-                MetaProperty(containment), This(), IdentifierName("safeNodes"),
+                MetaProperty(containment), This(), isAddedNodeSingle ? IdentifierName("[safeNode]"): IdentifierName("safeNodes"),
                 FeatureField(containment), index, IdentifierName("notificationId")
             ])
         );

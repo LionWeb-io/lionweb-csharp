@@ -503,10 +503,14 @@ public partial class Library : ConceptInstanceBase
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		if (_books.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null, notificationId);
-		emitter.CollectOldData();
-		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, [safeNode], _books, null, notificationId);
+			emitter.CollectOldData();
+			_books.AddRange(SetSelfParent([safeNode], LibraryLanguage.Instance.Library_books));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 

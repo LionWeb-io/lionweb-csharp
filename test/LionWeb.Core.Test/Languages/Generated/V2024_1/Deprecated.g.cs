@@ -201,10 +201,14 @@ public partial class DeprConcept : ConceptInstanceBase
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		if (_deprChild.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, null, notificationId);
-		emitter.CollectOldData();
-		_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, [safeNode], _deprChild, null, notificationId);
+			emitter.CollectOldData();
+			_deprChild.AddRange(SetSelfParent([safeNode], DeprecatedLanguage.Instance.DeprConcept_deprChild));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 

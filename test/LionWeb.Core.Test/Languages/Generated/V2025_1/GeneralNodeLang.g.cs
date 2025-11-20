@@ -143,10 +143,14 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		AssureNonEmpty(safeNodes, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
 		if (_multipleContainment.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, safeNodes, _multipleContainment, null, notificationId);
-		emitter.CollectOldData();
-		_multipleContainment.AddRange(SetSelfParent(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, [safeNode], _multipleContainment, null, notificationId);
+			emitter.CollectOldData();
+			_multipleContainment.AddRange(SetSelfParent([safeNode], GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -198,10 +202,14 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
 		if (_multipleOptionalContainment.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, safeNodes, _multipleOptionalContainment, null, notificationId);
-		emitter.CollectOldData();
-		_multipleOptionalContainment.AddRange(SetSelfParent(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, [safeNode], _multipleOptionalContainment, null, notificationId);
+			emitter.CollectOldData();
+			_multipleOptionalContainment.AddRange(SetSelfParent([safeNode], GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
