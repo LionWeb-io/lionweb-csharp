@@ -47,7 +47,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var index = M2Extensions.AsNodes<INode>(value).GetIndexOf(node => node == self);
+        var index = M2Extensions.AsNodes<INode>(value, containment).GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
@@ -76,7 +76,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
-        var index = M2Extensions.AsNodes<INode>(value).GetIndexOf(node => node == self);
+        var index = M2Extensions.AsNodes<INode>(value, containment).GetIndexOf(node => node == self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
@@ -163,7 +163,7 @@ public static class M1Extensions
                 // should not happen
                 throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
 
-            var nodes = M2Extensions.AsNodes<INode>(value).ToList();
+            var nodes = M2Extensions.AsNodes<INode>(value, containment).ToList();
             var index = nodes.IndexOf(self);
             if (index < 0)
                 // should not happen
@@ -273,16 +273,16 @@ public static class M1Extensions
         var result = self
             .CollectAllSetFeatures()
             .OfType<Containment>()
-            .Select(containment => (containment, self.Get(containment)))
-            .Where(tuple => tuple.Item2 is T || tuple.Item2 is IEnumerable e && M2Extensions.AreAll<T>(e))
-            .SelectMany(tuple => M2Extensions.AsNodes<T>(tuple.Item2))
+            .Select(containment => (containment: containment, value: self.Get(containment)))
+            .Where(tuple => tuple.value is T || tuple.value is IEnumerable e && M2Extensions.AreAll<T>(e))
+            .SelectMany(tuple => M2Extensions.AsNodes<T>(tuple.value, tuple.containment))
             .Select(c => !ReferenceEquals(c, self)
                 ? c
                 : throw new TreeShapeException(self,
                     $"{self.GetId()} contains itself as child"));
 
         if (includeAnnotations)
-            result = result.Concat(M2Extensions.AsNodes<T>(self.GetAnnotations()));
+            result = result.Concat(M2Extensions.AsNodes<T>(self.GetAnnotations(), null));
 
         if (includeSelf)
             result = result.Prepend(self);

@@ -188,7 +188,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprChild comment")]
 	public bool TryGetDeprChild([NotNullWhenAttribute(true)] out IReadOnlyList<DeprIface> deprChild)
 	{
-		deprChild = _deprChild;
+		deprChild = _deprChild.AsReadOnly();
 		return deprChild.Count != 0;
 	}
 
@@ -269,14 +269,13 @@ public partial class DeprConcept : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	[Obsolete("deprRef comment")]
-	public DeprAnnotation DeprRef { get => DeprRefTarget() ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
+	public DeprAnnotation DeprRef { get => ReferenceTargetNonNullTarget<DeprAnnotation>(_deprRef, DeprecatedLanguage.Instance.DeprConcept_deprRef) ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
 
-	private DeprAnnotation? DeprRefTarget() => ReferenceTargetNullableTarget<DeprAnnotation>(_deprRef);
 	/// <remarks>Required Single Reference</remarks>
         [Obsolete("deprRef comment")]
 	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)
 	{
-		deprRef = DeprRefTarget();
+		deprRef = ReferenceTargetNullableTarget<DeprAnnotation>(_deprRef, DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		return deprRef != null;
 	}
 

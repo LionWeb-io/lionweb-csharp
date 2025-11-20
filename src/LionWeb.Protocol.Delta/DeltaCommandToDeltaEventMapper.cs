@@ -79,7 +79,7 @@ public class DeltaCommandToDeltaEventMapper
         var child = (IWritableNode)_sharedNodeMap[childId];
         var parent = (IWritableNode)child.GetParent();
         var containment = parent.GetContainmentOf(child);
-        return M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList().IndexOf(child);
+        return M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList().IndexOf(child);
     }
 
     private Int32 GetAnnotationIndex(NodeId annotationId)

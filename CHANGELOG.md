@@ -10,7 +10,10 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Added
 * Moved `WebSocketServer` and `WebSocketClient` to separate project in core repo for reuse.
 * Added generic add/insert/remove node api for multiple `link` (references and containments) features.
-* `UnresolvedReferencesManager` to heal unresolved references once the target becomes available.
+* Added `UnresolvedReferencesManager` to heal unresolved references once the target becomes available.
+* Added generator configuration option `UnresolvedReferenceHandling`:
+  * `Throw` (default) :: Throw `UnresolvedReferenceException` on access to unresolved references.
+  * `ReturnAsNull`:: Return unresolved references as `null`.
 ### Fixed
 * Bug fix: Introduce check to validate that the deleted node's ID matches the actual node's ID during child deletion notification.
 * Bug fix: Notification emitter now checks whether a moved node is part of partition of not. If the moved node is a floating node – i.e. not part of a partition – and it replaces another node, then `ChildReplacedNotification` is emitted. If there is no replacement, then `ChildAddedNotification` is emitted.
@@ -19,6 +22,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Use `IReferenceTarget` both as return and parameter type of `IDeserializerHandler.UnresolvableReferenceTarget()`.
 ### Removed
 ### Deprecated
+* `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`. 
 ### Security
 
 ## [0.3.0] - 2025-10-13

@@ -361,7 +361,7 @@ public class Serializer : ISerializer
     }
 
     private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
-        pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
+        pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value, pair.Key) : [];
 
     #endregion
 }

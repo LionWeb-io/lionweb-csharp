@@ -90,7 +90,8 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
         AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
-    protected MethodDeclarationSyntax TryGet(ExpressionSyntax? storage = null, bool writeable = false) =>
+    protected MethodDeclarationSyntax TryGet(ExpressionSyntax? storage = null, ExpressionSyntax? result = null,
+        bool writeable = false) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
                     OutParam(Param(FeatureTryGetParam(),
@@ -103,23 +104,11 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
             .Xdoc(XdocDefault(feature))
             .WithBody(AsStatements([
                 Assignment(FeatureTryGetParam(), storage ?? FeatureField(feature)),
-                ReturnStatement(NotEquals(IdentifierName(FeatureTryGetParam()), Null()))
+                ReturnStatement(result ?? NotEquals(IdentifierName(FeatureTryGetParam()), Null()))
             ]));
 
-
-    protected MethodDeclarationSyntax TryGetMultiple(ExpressionSyntax? storage = null) =>
-        Method(FeatureTryGet(feature), AsType(typeof(bool)),
-                [
-                    OutParam(Param(
-                            FeatureTryGetParam(),
-                            AsType(typeof(IReadOnlyList<>), AsType(feature.GetFeatureType()))
-                        ))
-                        .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
-                ]
-            )
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocDefault(feature))
+    protected MethodDeclarationSyntax TryGetMultiple(ExpressionSyntax? storage = null, TypeSyntax? outType = null) =>
+        AbstractTryGetMultiple(outType)
             .WithBody(AsStatements([
                 Assignment(FeatureTryGetParam(), storage ?? FeatureField(feature)),
                 ReturnStatement(
@@ -129,6 +118,20 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
                     )
                 )
             ]));
+
+    protected MethodDeclarationSyntax AbstractTryGetMultiple(TypeSyntax? outType) =>
+        Method(FeatureTryGet(feature), AsType(typeof(bool)),
+                [
+                    OutParam(Param(
+                            FeatureTryGetParam(),
+                            AsType(typeof(IReadOnlyList<>), outType ?? AsType(feature.GetFeatureType()))
+                        ))
+                        .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
+                ]
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+            .Xdoc(XdocDefault(feature));
 
     private ParameterSyntax OutParam(ParameterSyntax parameterSyntax) =>
         parameterSyntax
@@ -169,14 +172,14 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    protected PropertyDeclarationSyntax SingleRequiredFeatureProperty(ExpressionSyntax? storage = null, bool writeable = false) =>
-        Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType(), writeable: writeable),
-                BinaryExpression(
-                    SyntaxKind.CoalesceExpression,
-                    storage ?? FeatureField(feature),
-                    ThrowExpression(NewCall([MetaProperty(feature)], AsType(typeof(UnsetFeatureException))))
+    protected PropertyDeclarationSyntax SingleRequiredFeatureProperty(TypeSyntax returnType,
+        ExpressionSyntax? getter = null, ExpressionSyntax? setter = null) =>
+        Property(FeatureProperty(feature).ToString(), returnType,
+                getter ?? NotNullOrThrow(
+                    FeatureField(feature),
+                    NewCall([MetaProperty(feature)], AsType(typeof(UnsetFeatureException)))
                 ),
-                InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]))
+                setter ?? InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]))
             )
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),
@@ -225,10 +228,10 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(feature));
 
-    protected PropertyDeclarationSyntax SingleOptionalFeatureProperty(ExpressionSyntax? storage = null, bool writeable = false) =>
+    protected PropertyDeclarationSyntax SingleOptionalFeatureProperty(ExpressionSyntax? getter = null, bool writeable = false) =>
         Property(FeatureProperty(feature).ToString(),
                 NullableType(AsType(feature.GetFeatureType(), writeable: writeable)),
-                storage ?? FeatureField(feature),
+                getter ?? FeatureField(feature),
                 InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]))
             )
             .WithAttributeLists(AsAttributes([
@@ -366,6 +369,6 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
     protected ExpressionSyntax FeatureSet() =>
         IdentifierName($"Set{feature.Name.ToFirstUpper()}");
 
-    private string FeatureTryGetParam() =>
+    protected string FeatureTryGetParam() =>
         _names.FeatureParam(feature);
 }

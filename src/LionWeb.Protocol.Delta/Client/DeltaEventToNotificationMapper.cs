@@ -160,7 +160,7 @@ public class DeltaEventToNotificationMapper
         var parent = ToNode(childDeletedEvent.Parent);
         var containment = ToContainment(childDeletedEvent.Containment, parent);
         return new ChildDeletedNotification(
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[childDeletedEvent.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[childDeletedEvent.Index],
             parent,
             containment,
             childDeletedEvent.Index,
@@ -174,7 +174,7 @@ public class DeltaEventToNotificationMapper
         var containment = ToContainment(childReplacedEvent.Containment, parent);
         return new ChildReplacedNotification(
             Deserialize(childReplacedEvent.NewChild),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[childReplacedEvent.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[childReplacedEvent.Index],
             parent,
             containment,
             childReplacedEvent.Index,

@@ -18,6 +18,7 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
+using Core.M2;
 using Core.M3;
 using Core.Notification.Partition.Emitter;
 using Core.Utilities;
@@ -41,7 +42,7 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
         if (IsReferenceType(property))
             setterBody.Insert(0, AsureNotNullCall());
 
-        var prop = SingleRequiredFeatureProperty();
+        var prop = SingleRequiredFeatureProperty(AsType(property.GetFeatureType()));
         var setter = RequiredFeatureSetter(setterBody);
 
         var members = new List<MemberDeclarationSyntax> { prop, TryGet() }.Concat(setter);

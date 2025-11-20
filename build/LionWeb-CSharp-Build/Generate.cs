@@ -55,6 +55,8 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var deprecatedLang = DeserializeExternalLanguage(lionWebVersion, "deprecated", specificLanguage).First();
     deprecatedLang.Name = "Deprecated";
     var testLanguage = DeserializeExternalLanguage(lionWebVersion, "testLanguage", specificLanguage).First();
+    var nullableReferencesTestLanguage = new DynamicLanguageCloner(lionWebVersion).Clone(testLanguage);
+    nullableReferencesTestLanguage.Name = "NullableReferencesTestLanguage";
     var shapesLanguage = ShapesDefinition.Language;
     shapesLanguage.Name = "Shapes";
     var aLang = testLanguagesDefinitions.ALang;
@@ -87,13 +89,18 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(namedLangReadInterfaces, $"{prefix}.NamedLangReadInterfaces"),
         new(generalNodeLang, $"{prefix}.GeneralNodeLang"),
         new(testLanguage, $"{prefix}.TestLanguage"),
+        new(nullableReferencesTestLanguage, $"{prefix}.NullableReferencesTestLang"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
         // Step 3: Uncomment the line below 
         // new(specificLanguage, $"Io.Lionweb.Mps.Specific.{lionWebVersionNamespace}")
     ];
-    
-    Dictionary<Language, GeneratorConfig> configs = new() { { namedLangReadInterfaces, new() {WritableInterfaces = false} } };
+
+    Dictionary<Language, GeneratorConfig> configs = new()
+    {
+        { namedLangReadInterfaces, new() { WritableInterfaces = false } },
+        { nullableReferencesTestLanguage, new() { UnresolvedReferenceHandling = UnresolvedReferenceHandling.ReturnAsNull } }
+    };
 
     if (sdtLang != null)
         names.Add(new(sdtLang, $"{prefix}.SDTLang"));

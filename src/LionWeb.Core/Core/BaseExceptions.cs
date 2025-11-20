@@ -186,8 +186,8 @@ public class UnsupportedStructuredDataTypeException : LionWebExceptionBase
     }
 }
 
-public class UnresolvedReferenceExpression(NodeId parent, Reference reference, ResolveInfo? resolveInfo, NodeId? targetId)
-    : LionWebExceptionBase($"node {parent}: reference {reference}: unresolved target '{resolveInfo}'/'{targetId}'");
+public class UnresolvedReferenceException(NodeId parent, Reference reference, IReferenceTarget referenceTarget)
+    : LionWebExceptionBase($"node {parent}: reference {reference}: unresolved target '{referenceTarget.ResolveInfo}'/'{referenceTarget.TargetId}'");
 
 /// <summary>
 /// Trying to operate on an object that's not an <see cref="INode"/>.

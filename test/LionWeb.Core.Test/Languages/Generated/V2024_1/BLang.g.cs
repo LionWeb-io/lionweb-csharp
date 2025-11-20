@@ -140,13 +140,12 @@ public partial class BConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
-	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => ARefTarget(); set => SetARef(value); }
+	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => ReferenceTargetNonNullTarget<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(_aRef, BLangLanguage.Instance.BConcept_ARef); set => SetARef(value); }
 
-	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARefTarget() => ReferenceTargetNullableTarget<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(_aRef);
 	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetARef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? aRef)
 	{
-		aRef = ARefTarget();
+		aRef = ReferenceTargetNullableTarget<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(_aRef, BLangLanguage.Instance.BConcept_ARef);
 		return aRef != null;
 	}
 

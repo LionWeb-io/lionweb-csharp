@@ -459,6 +459,18 @@ public static class AstExtensions
     public static BinaryExpressionSyntax NotEquals(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.NotEqualsExpression, left, right);
 
+    /// <returns><c>||</c></returns>
+    public static BinaryExpressionSyntax Or(ExpressionSyntax left, ExpressionSyntax right) =>
+        BinaryExpression(SyntaxKind.LogicalOrExpression, left, right);
+
+    /// <returns><paramref name="value"/> <c>?? throw</c> <paramref name="exception"/></returns>
+    public static ExpressionSyntax NotNullOrThrow(ExpressionSyntax value, ExpressionSyntax exception) =>
+        BinaryExpression(
+            SyntaxKind.CoalesceExpression,
+            value,
+            ThrowExpression(exception)
+        );
+    
     /// <returns><c>void</c></returns>
     public static PredefinedTypeSyntax Void() =>
         PredefinedType(Token(SyntaxKind.VoidKeyword));

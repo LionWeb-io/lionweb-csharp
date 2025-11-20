@@ -348,7 +348,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             node.Set(reference, single && targets.Count == 1 ? targets[0] : targets);
         } catch (InvalidValueException)
         {
-            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(targets.Select(r => r.Target).Where(t => t is not null)).ToList(), reference, node);
+            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(targets.Select(r => r.Target).Where(t => t is not null), reference).ToList(), reference, node);
             if (replacement != null)
                 node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
         }

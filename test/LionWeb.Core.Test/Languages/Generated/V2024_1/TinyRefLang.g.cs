@@ -14,7 +14,6 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-tinyRefLang", Version = "0")]
@@ -132,16 +131,10 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "UnsetFeatureException">If MultivaluedRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-multivaluedRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
-	public IReadOnlyList<INamed> MultivaluedRef { get => AsNonEmptyReadOnly<INamed>(MultivaluedRefTargets(), TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
+	public IReadOnlyList<INamed> MultivaluedRef { get => GetRequiredNonNullReferences<INamed>(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
 
-	private IImmutableList<INamed> MultivaluedRefTargets() => ReferenceTargetNullableTargets<INamed>(_multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
-        public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef)
-	{
-		multivaluedRef = MultivaluedRefTargets();
-		return multivaluedRef.Count != 0;
-	}
-
+        public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef) => TryGetReference<INamed>(_multivaluedRef, out multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
         public MyConcept AddMultivaluedRef(IEnumerable<INamed> nodes, INotificationId? notificationId = null)
@@ -179,7 +172,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNotClearing(safeNodes, MultivaluedRefTargets(), TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<INamed>(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef), TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		RemoveAll(safeNodes, _multivaluedRef, ReferenceRemover<INamed>(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef));
 		return this;
 	}
@@ -190,13 +183,12 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-singularRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public INamed SingularRef { get => SingularRefTarget() ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
+	public INamed SingularRef { get => ReferenceTargetNonNullTarget<INamed>(_singularRef, TinyRefLangLanguage.Instance.MyConcept_singularRef) ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
 
-	private INamed? SingularRefTarget() => ReferenceTargetNullableTarget<INamed>(_singularRef);
 	/// <remarks>Required Single Reference</remarks>
         public bool TryGetSingularRef([NotNullWhenAttribute(true)] out INamed? singularRef)
 	{
-		singularRef = SingularRefTarget();
+		singularRef = ReferenceTargetNullableTarget<INamed>(_singularRef, TinyRefLangLanguage.Instance.MyConcept_singularRef);
 		return singularRef != null;
 	}
 

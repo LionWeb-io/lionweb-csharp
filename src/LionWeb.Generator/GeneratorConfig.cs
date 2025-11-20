@@ -24,4 +24,19 @@ public record GeneratorConfig
     /// or <see cref="Core.IReadableNode"/> (if set to <c>false</c>).
     /// Defaults to <c>true</c>.
     public bool WritableInterfaces { get; init; } = true;
+
+    /// <inheritdoc cref="Generator.UnresolvedReferenceHandling"/>
+    /// Defaults to <see cref="Generator.UnresolvedReferenceHandling.Throw"/>.
+    public UnresolvedReferenceHandling UnresolvedReferenceHandling { get; init; } =
+        UnresolvedReferenceHandling.Throw;
+}
+
+/// How generated code should handle unresolved references.
+public enum UnresolvedReferenceHandling
+{
+    /// Throw <see cref="LionWeb.Core.UnresolvedReferenceException"/> on access to unresolved references.
+    Throw,
+
+    /// Return unresolved references as <c>null</c>.
+    ReturnAsNull
 }
