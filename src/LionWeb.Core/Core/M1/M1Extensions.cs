@@ -47,10 +47,15 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var index = M2Extensions.AsNodes<INode>(value, containment).GetIndexOf(node => node == self);
+        var siblings = containment.AsNodes<INode>(value).ToList();
+        var index = siblings.IndexOf(self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
+
+        var predecessorIndex = siblings.IndexOf(newPredecessor);
+        if (predecessorIndex >= 0 && predecessorIndex == index - 1)
+            return;
 
         parent.Insert(containment, index, [newPredecessor]);
     }
@@ -76,10 +81,15 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
-        var index = M2Extensions.AsNodes<INode>(value, containment).GetIndexOf(node => node == self);
+        var siblings = containment.AsNodes<INode>(value).ToList();
+        var index = siblings.IndexOf(self);
         if (index < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
+
+        var successorIndex = siblings.IndexOf(newSuccessor);
+        if (successorIndex >= 0 && successorIndex == index + 1)
+            return;
 
         parent.Insert(containment, index + 1, [newSuccessor]);
     }

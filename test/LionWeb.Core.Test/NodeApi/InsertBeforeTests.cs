@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi;
 
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -119,4 +120,27 @@ public class InsertBeforeTests
         };
         Assert.ThrowsException<InvalidValueException>(() => circle.InsertBefore(null));
     }
+
+    [TestMethod]
+    public void NoOp()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+
+        var parent = new LinkTestConcept("parent")
+        {
+            Containment_0_n = 
+            [
+                childA,
+                childB
+            ]
+        };
+        childB.InsertBefore(childA);
+
+        Assert.AreEqual(parent, childB.GetParent());
+        Assert.AreEqual(parent, childA.GetParent());
+
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA, childB }, parent.Containment_0_n.ToList());
+    }
+
 }
