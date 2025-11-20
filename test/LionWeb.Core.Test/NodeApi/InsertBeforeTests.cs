@@ -144,7 +144,7 @@ public class InsertBeforeTests
     }
 
     [TestMethod]
-    public void SelfBeforeNew()
+    public void SelfBeforeNewPredecessor()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -182,7 +182,7 @@ public class InsertBeforeTests
     }
 
     [TestMethod]
-    public void SelfImmediatelyBeforeNew()
+    public void SelfImmediatelyBeforeNewPredecessor()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -220,7 +220,7 @@ public class InsertBeforeTests
     }
 
     [TestMethod]
-    public void SelfAfterNew()
+    public void SelfAfterNewPredecessor()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");

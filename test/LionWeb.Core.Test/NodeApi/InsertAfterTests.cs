@@ -144,7 +144,7 @@ public class InsertAfterTests
     }
 
     [TestMethod]
-    public void SelfBeforeNew()
+    public void SelfBeforeNewSuccessor()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -182,7 +182,7 @@ public class InsertAfterTests
     }
 
     [TestMethod]
-    public void SelfAfterNew()
+    public void SelfAfterNewSuccessor()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -220,7 +220,7 @@ public class InsertAfterTests
     }
     
     [TestMethod]
-    public void SelfImmediatelyAfterNew()
+    public void SelfImmediatelyAfterNewSuccessor()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
