@@ -374,10 +374,9 @@ public class ReferenceTests_Unresolved_Null
         var parent = new LinkTestConcept("parent");
         parent.Set(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1,
             new ReferenceTarget(null, "target", null));
-        Assert.IsTrue(parent.TryGetReference_1(out var result));
+        Assert.IsFalse(parent.TryGetReference_1(out var result));
         Assert.IsNull(result);
     }
-
 
     [TestMethod]
     public void Single_Required_TryGet_Unassigned()
@@ -541,6 +540,20 @@ public class ReferenceTests_Unresolved_Null
     }
 
     [TestMethod]
+    public void Multiple_Optional_Get_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
+        AssertEqual([null, resolved], parent.Reference_0_n);
+    }
+
+    [TestMethod]
     public void Multiple_Optional_Get_Unassigned()
     {
         var parent = new LinkTestConcept("parent");
@@ -555,6 +568,21 @@ public class ReferenceTests_Unresolved_Null
             new List<ReferenceTarget> {new ReferenceTarget(null, "target", null)});
         Assert.IsTrue(parent.TryGetReference_0_n(out var result));
         AssertEqual([null], result);
+    }
+
+    [TestMethod]
+    public void Multiple_Optional_TryGet_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
+        Assert.IsTrue(parent.TryGetReference_0_n(out var result));
+        AssertEqual([null, resolved], result);
     }
 
     [TestMethod]
@@ -749,6 +777,20 @@ public class ReferenceTests_Unresolved_Null
     }
 
     [TestMethod]
+    public void Multiple_Required_Get_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
+        AssertEqual([null, resolved], parent.Reference_1_n);
+    }
+
+    [TestMethod]
     public void Multiple_Required_Get_Unassigned()
     {
         var parent = new LinkTestConcept("parent");
@@ -763,6 +805,21 @@ public class ReferenceTests_Unresolved_Null
             new List<ReferenceTarget> {new ReferenceTarget(null, "target", null)});
         Assert.IsTrue(parent.TryGetReference_1_n(out var result));
         AssertEqual([null], result);
+    }
+
+    [TestMethod]
+    public void Multiple_Required_TryGet_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
+        Assert.IsTrue(parent.TryGetReference_1_n(out var result));
+        AssertEqual([null, resolved], result);
     }
 
     [TestMethod]

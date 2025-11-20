@@ -540,6 +540,20 @@ public class ReferenceTests_Unresolved_Throw
     }
 
     [TestMethod]
+    public void Multiple_Optional_Get_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
+        Assert.ThrowsExactly<UnresolvedReferenceException>(() => parent.Reference_0_n);
+    }
+
+    [TestMethod]
     public void Multiple_Optional_Get_Unassigned()
     {
         var parent = new LinkTestConcept("parent");
@@ -552,6 +566,21 @@ public class ReferenceTests_Unresolved_Throw
         var parent = new LinkTestConcept("parent");
         parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
             new List<ReferenceTarget> {new ReferenceTarget(null, "target", null)});
+        Assert.IsFalse(parent.TryGetReference_0_n(out var result));
+        Assert.IsEmpty(result);
+    }
+
+    [TestMethod]
+    public void Multiple_Optional_TryGet_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
         Assert.IsFalse(parent.TryGetReference_0_n(out var result));
         Assert.IsEmpty(result);
     }
@@ -748,6 +777,20 @@ public class ReferenceTests_Unresolved_Throw
     }
 
     [TestMethod]
+    public void Multiple_Required_Get_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
+        Assert.ThrowsExactly<UnresolvedReferenceException>(() => parent.Reference_1_n);
+    }
+
+    [TestMethod]
     public void Multiple_Required_Get_Unassigned()
     {
         var parent = new LinkTestConcept("parent");
@@ -760,6 +803,21 @@ public class ReferenceTests_Unresolved_Throw
         var parent = new LinkTestConcept("parent");
         parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
             new List<ReferenceTarget> {new ReferenceTarget(null, "target", null)});
+        Assert.IsFalse(parent.TryGetReference_1_n(out var result));
+        Assert.IsEmpty(result);
+    }
+
+    [TestMethod]
+    public void Multiple_Required_TryGet_Partial()
+    {
+        var parent = new LinkTestConcept("parent");
+        var resolved = new  LinkTestConcept("resolved");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
+            new List<ReferenceTarget>
+            {
+                new ReferenceTarget(null, "target", null),
+                ReferenceTarget.FromNode(resolved),
+            });
         Assert.IsFalse(parent.TryGetReference_1_n(out var result));
         Assert.IsEmpty(result);
     }
