@@ -54,9 +54,15 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Node not contained in its parent");
 
         var predecessorIndex = siblings.IndexOf(newPredecessor);
-        if (predecessorIndex >= 0 && predecessorIndex == index - 1)
-            return;
+        if (predecessorIndex >= 0)
+        {
+            if (predecessorIndex == index - 1)
+                return;
 
+            if (predecessorIndex < index)
+                index--;
+        }
+        
         parent.Insert(containment, index, [newPredecessor]);
     }
 
@@ -88,8 +94,14 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Node not contained in its parent");
 
         var successorIndex = siblings.IndexOf(newSuccessor);
-        if (successorIndex >= 0 && successorIndex == index + 1)
-            return;
+        if (successorIndex >= 0)
+        {
+            if (successorIndex == index + 1)
+                return;
+
+            if (successorIndex < index)
+                index--;
+        }
 
         parent.Insert(containment, index + 1, [newSuccessor]);
     }
