@@ -804,7 +804,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetReference_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_0_1)
 	{
 		reference_0_1 = ReferenceTargetNullableTarget<LinkTestConcept>(_reference_0_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
-		return reference_0_1 != null;
+		return _reference_0_1 != null || reference_0_1 != null;
 	}
 
 	private LinkTestConcept SetReference_0_1(ReferenceTarget? value, INotificationId? notificationId = null)
@@ -885,7 +885,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
 		reference_1 = ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1);
-		return reference_1 != null;
+		return _reference_1 != null || reference_1 != null;
 	}
 
 	private LinkTestConcept SetReference_1(ReferenceTarget? value, INotificationId? notificationId = null)

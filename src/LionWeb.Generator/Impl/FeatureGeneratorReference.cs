@@ -35,6 +35,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
         TypeSyntax returnType;
         ExpressionSyntax getter;
         ExpressionSyntax setter;
+        ExpressionSyntax tryGetReturn;
         switch (config.UnresolvedReferenceHandling)
         {
             case UnresolvedReferenceHandling.Throw:
@@ -43,6 +44,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                     NewCall([MetaProperty(reference)], AsType(typeof(UnsetFeatureException)))
                 );
                 setter = InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]));
+                tryGetReturn = SingleTryGetParamNotNull();
                 break;
 
             case UnresolvedReferenceHandling.ReturnAsNull:
@@ -54,6 +56,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                         NewCall([MetaProperty(reference), IdentifierName("value")],
                             AsType(typeof(InvalidValueException))))
                 ]));
+                tryGetReturn = SingleFieldOrTryGetParamNotNull();
                 break;
 
             default:
@@ -66,7 +69,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 SingleReferenceField(),
                 SingleRequiredFeatureProperty(returnType, getter, setter)
                     .Xdoc(XdocThrowsIfSetToNull()),
-                TryGet(ReferenceTargetNullableTargetCall()),
+                TryGet(ReferenceTargetNullableTargetCall(), tryGetReturn),
                 SingleReferenceSetter([
                     ExpressionStatement(CallGeneric("AssureNotNullInstance",
                         AsType(reference.GetFeatureType()),
@@ -86,6 +89,14 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
             );
     }
+
+    private BinaryExpressionSyntax SingleFieldOrTryGetParamNotNull() =>
+        Or(
+            NotEquals(FeatureField(reference), Null()),
+            SingleTryGetParamNotNull()
+        );
+
+    private BinaryExpressionSyntax SingleTryGetParamNotNull() => NotEquals(IdentifierName(FeatureTryGetParam()), Null());
 
     private InvocationExpressionSyntax ReferenceTargetNullableTargetCall() =>
         CallGeneric("ReferenceTargetNullableTarget",
@@ -117,17 +128,29 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
 
     public IEnumerable<MemberDeclarationSyntax> OptionalSingleReference()
     {
-        ExpressionSyntax getter = config.UnresolvedReferenceHandling switch
+        ExpressionSyntax getter;
+        ExpressionSyntax tryGetReturn;
+        switch (config.UnresolvedReferenceHandling)
         {
-            UnresolvedReferenceHandling.ReturnAsNull => ReferenceTargetNullableTargetCall(),
-            UnresolvedReferenceHandling.Throw => ReferenceTargetNonNullTargetCall(),
-            _ => throw new ArgumentOutOfRangeException(config.UnresolvedReferenceHandling.ToString())
-        };
+            case UnresolvedReferenceHandling.Throw:
+                getter = ReferenceTargetNonNullTargetCall();
+                tryGetReturn = SingleTryGetParamNotNull();
+                break;
+
+            case UnresolvedReferenceHandling.ReturnAsNull:
+                getter = ReferenceTargetNullableTargetCall();
+                tryGetReturn = SingleFieldOrTryGetParamNotNull();
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(config.UnresolvedReferenceHandling.ToString());
+        }
+
         return new List<MemberDeclarationSyntax>
             {
                 SingleReferenceField(),
                 SingleOptionalFeatureProperty(getter),
-                TryGet(ReferenceTargetNullableTargetCall()),
+                TryGet(ReferenceTargetNullableTargetCall(), tryGetReturn),
                 SingleReferenceSetter([
                     ExpressionStatement(CallGeneric("AssureNullableInstance",
                         AsType(reference.GetFeatureType()),
