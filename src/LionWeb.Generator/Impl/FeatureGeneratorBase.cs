@@ -90,8 +90,7 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
         AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
-    protected MethodDeclarationSyntax TryGet(ExpressionSyntax? storage = null, ExpressionSyntax? result = null,
-        bool writeable = false) =>
+    protected MethodDeclarationSyntax TryGet(ExpressionSyntax? storage = null, bool writeable = false) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
                     OutParam(Param(FeatureTryGetParam(),
@@ -104,9 +103,8 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
             .Xdoc(XdocDefault(feature))
             .WithBody(AsStatements([
                 Assignment(FeatureTryGetParam(), storage ?? FeatureField(feature)),
-                ReturnStatement(result ?? NotEquals(IdentifierName(FeatureTryGetParam()), Null()))
+                ReturnStatement(NotEquals(IdentifierName(FeatureTryGetParam()), Null()))
             ]));
-
 
     protected MethodDeclarationSyntax TryGetMultiple(ExpressionSyntax? storage = null, TypeSyntax? outType = null) =>
         AbstractTryGetMultiple(outType)

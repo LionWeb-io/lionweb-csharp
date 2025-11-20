@@ -35,7 +35,6 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
         TypeSyntax returnType;
         ExpressionSyntax getter;
         ExpressionSyntax setter;
-        ExpressionSyntax tryGetReturn;
         switch (config.UnresolvedReferenceHandling)
         {
             case UnresolvedReferenceHandling.Throw:
@@ -44,7 +43,6 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                     NewCall([MetaProperty(reference)], AsType(typeof(UnsetFeatureException)))
                 );
                 setter = InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]));
-                tryGetReturn = NotEquals(IdentifierName(FeatureTryGetParam()), Null());
                 break;
 
             case UnresolvedReferenceHandling.ReturnAsNull:
@@ -56,10 +54,6 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                         NewCall([MetaProperty(reference), IdentifierName("value")],
                             AsType(typeof(InvalidValueException))))
                 ]));
-                tryGetReturn = Or(
-                    NotEquals(FeatureField(reference), Null()),
-                    NotEquals(IdentifierName(FeatureTryGetParam()), Null())
-                );
                 break;
 
             default:
@@ -72,7 +66,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 SingleReferenceField(),
                 SingleRequiredFeatureProperty(returnType, getter, setter)
                     .Xdoc(XdocThrowsIfSetToNull()),
-                TryGet(ReferenceTargetNullableTargetCall(), tryGetReturn),
+                TryGet(ReferenceTargetNullableTargetCall()),
                 SingleReferenceSetter([
                     ExpressionStatement(CallGeneric("AssureNotNullInstance",
                         AsType(reference.GetFeatureType()),

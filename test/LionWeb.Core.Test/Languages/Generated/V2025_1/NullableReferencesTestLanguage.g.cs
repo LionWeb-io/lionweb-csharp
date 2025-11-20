@@ -672,10 +672,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNotNullMembers(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
 		if (_containment_0_n.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, null, notificationId);
-		emitter.CollectOldData();
-		_containment_0_n.AddRange(SetSelfParent(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, [safeNode], _containment_0_n, null, notificationId);
+			emitter.CollectOldData();
+			_containment_0_n.AddRange(SetSelfParent([safeNode], NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -752,10 +756,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNonEmpty(safeNodes, _containment_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
 		if (_containment_1_n.SequenceEqual(safeNodes))
 			return this;
-		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, null, notificationId);
-		emitter.CollectOldData();
-		_containment_1_n.AddRange(SetSelfParent(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, [safeNode], _containment_1_n, null, notificationId);
+			emitter.CollectOldData();
+			_containment_1_n.AddRange(SetSelfParent([safeNode], NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
+			emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -877,7 +885,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public bool TryGetReference_1([NotNullWhenAttribute(true)] out LinkTestConcept? reference_1)
 	{
 		reference_1 = ReferenceTargetNullableTarget<LinkTestConcept>(_reference_1, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1);
-		return _reference_1 != null || reference_1 != null;
+		return reference_1 != null;
 	}
 
 	private LinkTestConcept SetReference_1(ReferenceTarget? value, INotificationId? notificationId = null)
