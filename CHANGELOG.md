@@ -22,6 +22,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Use `IReferenceTarget` both as return and parameter type of `IDeserializerHandler.UnresolvableReferenceTarget()`.
 ### Removed
 ### Deprecated
+* `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`. 
 ### Security
 
 ## [0.3.0] - 2025-10-13
