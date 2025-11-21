@@ -360,22 +360,6 @@ public static class M2Extensions
         basis.AllGeneralizations(includeSelf).Contains(candidate, new LanguageEntityIdentityComparer());
 
     /// <summary>
-    /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;.
-    /// </summary>
-    /// <param name="link"><paramref name="value"/>'s origin Link.</param>
-    /// <param name="value">Untyped <paramref name="link"/> value.</param>
-    /// <typeparam name="T">Type of nodes in <paramref name="value"/>.</typeparam>
-    /// <returns><paramref name="value"/> re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;.</returns>
-    /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;</exception>
-    public static IEnumerable<T> AsNodes<T>(this Link link, object? value) where T : IReadableNode
-        => (link.Multiple, value) switch
-        {
-            (true, IEnumerable e) => CastIterator<T>(link, e),
-            (false, T n) => [n],
-            var (_, v) => throw new InvalidValueException(link, v)
-        };
-
-    /// <summary>
     /// Re-types <paramref name="value"/> as IEnumerable&lt;ReferenceTarget&gt;.
     /// Wraps <see cref="IReadableNode"/>s of type <typeparamref name="T"/>, and passes through <see cref="ReferenceTarget"/>s. 
     /// </summary>
@@ -435,6 +419,22 @@ public static class M2Extensions
             IEnumerable e => CastIterator<T>(null, e),
             T n => [n],
             _ => throw new InvalidValueException(feature, value)
+        };
+
+    /// <summary>
+    /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;.
+    /// </summary>
+    /// <param name="link"><paramref name="value"/>'s origin Link.</param>
+    /// <param name="value">Untyped <paramref name="link"/> value.</param>
+    /// <typeparam name="T">Type of nodes in <paramref name="value"/>.</typeparam>
+    /// <returns><paramref name="value"/> re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;.</returns>
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;</exception>
+    public static IEnumerable<T> AsNodes<T>(this Link link, object? value) where T : IReadableNode
+        => (link.Multiple, value) switch
+        {
+            (true, IEnumerable e) => CastIterator<T>(link, e),
+            (false, T n) => [n],
+            var (_, v) => throw new InvalidValueException(link, v)
         };
 
     private static IEnumerable<T> CastIterator<T>(Link? link, IEnumerable source)
