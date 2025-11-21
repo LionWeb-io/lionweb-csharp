@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using System.Collections;
 
 [TestClass]
@@ -164,6 +165,56 @@ public class ContainmentTests_Multiple_Optional
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(line));
         CollectionAssert.AreEqual(new List<IShape> { circleA, circleB, line }, parent.Shapes.ToList());
+    }
+
+    [TestMethod]
+    public void Single_Insert_MoveForward()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+        var childC = new LinkTestConcept("childC");
+
+        var parent = new LinkTestConcept("parent")
+        {
+            Containment_0_n = 
+            [
+                childA,
+                childB,
+                childC
+            ]
+        };
+        parent.InsertContainment_0_n(2, [childA]);
+
+        Assert.AreEqual(parent, childA.GetParent());
+        Assert.AreEqual(parent, childB.GetParent());
+        Assert.AreEqual(parent, childC.GetParent());
+
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB, childC, childA }, parent.Containment_0_n.ToList());
+    }
+
+    [TestMethod]
+    public void Single_Insert_MoveBackward()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+        var childC = new LinkTestConcept("childC");
+
+        var parent = new LinkTestConcept("parent")
+        {
+            Containment_0_n = 
+            [
+                childA,
+                childB,
+                childC
+            ]
+        };
+        parent.InsertContainment_0_n(1, [childC]);
+
+        Assert.AreEqual(parent, childA.GetParent());
+        Assert.AreEqual(parent, childB.GetParent());
+        Assert.AreEqual(parent, childC.GetParent());
+
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA, childC, childB }, parent.Containment_0_n.ToList());
     }
 
     #endregion

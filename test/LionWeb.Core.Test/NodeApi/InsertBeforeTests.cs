@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi;
 
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -118,5 +119,141 @@ public class InsertBeforeTests
             ]
         };
         Assert.ThrowsException<InvalidValueException>(() => circle.InsertBefore(null));
+    }
+
+    [TestMethod]
+    public void NoOp()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+
+        var parent = new LinkTestConcept("parent")
+        {
+            Containment_0_n =
+            [
+                childA,
+                childB
+            ]
+        };
+        childB.InsertBefore(childA);
+
+        Assert.AreEqual(parent, childB.GetParent());
+        Assert.AreEqual(parent, childA.GetParent());
+
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA, childB }, parent.Containment_0_n.ToList());
+    }
+
+    [TestMethod]
+    public void SelfBeforeNewPredecessor()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+        var childC = new LinkTestConcept("childC");
+        var childD = new LinkTestConcept("childD");
+        var childE = new LinkTestConcept("childE");
+
+        var parent = new LinkTestConcept("parent")
+        {
+            Containment_0_n =
+            [
+                childA,
+                childB,
+                childC,
+                childD,
+                childE
+            ]
+        };
+        childB.InsertBefore(childD);
+
+        Assert.AreEqual(parent, childA.GetParent());
+        Assert.AreEqual(parent, childB.GetParent());
+        Assert.AreEqual(parent, childC.GetParent());
+        Assert.AreEqual(parent, childD.GetParent());
+        Assert.AreEqual(parent, childE.GetParent());
+
+        CollectionAssert.AreEqual(new List<LinkTestConcept>
+        {
+            childA,
+            childD,
+            childB,
+            childC,
+            childE
+        }, parent.Containment_0_n.ToList());
+    }
+
+    [TestMethod]
+    public void SelfImmediatelyBeforeNewPredecessor()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+        var childC = new LinkTestConcept("childC");
+        var childD = new LinkTestConcept("childD");
+        var childE = new LinkTestConcept("childE");
+
+        var parent = new LinkTestConcept("parent")
+        {
+            Containment_0_n =
+            [
+                childA,
+                childB,
+                childC,
+                childD,
+                childE
+            ]
+        };
+        childB.InsertBefore(childC);
+
+        Assert.AreEqual(parent, childA.GetParent());
+        Assert.AreEqual(parent, childB.GetParent());
+        Assert.AreEqual(parent, childC.GetParent());
+        Assert.AreEqual(parent, childD.GetParent());
+        Assert.AreEqual(parent, childE.GetParent());
+
+        CollectionAssert.AreEqual(new List<LinkTestConcept>
+        {
+            childA,
+            childC,
+            childB,
+            childD,
+            childE
+        }, parent.Containment_0_n.ToList());
+    }
+
+    [TestMethod]
+    public void SelfAfterNewPredecessor()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+        var childC = new LinkTestConcept("childC");
+        var childD = new LinkTestConcept("childD");
+        var childE = new LinkTestConcept("childE");
+
+        var parent = new LinkTestConcept("parent")
+        {
+            Containment_0_n =
+            [
+                childA,
+                childB,
+                childC,
+                childD,
+                childE
+            ]
+        };
+        childD.InsertBefore(childB);
+
+        Assert.AreEqual(parent, childA.GetParent());
+        Assert.AreEqual(parent, childB.GetParent());
+        Assert.AreEqual(parent, childC.GetParent());
+        Assert.AreEqual(parent, childD.GetParent());
+        Assert.AreEqual(parent, childE.GetParent());
+
+        CollectionAssert.AreEqual(new List<LinkTestConcept>
+        {
+            childA,
+            childC,
+            childB,
+            childD,
+            childE
+        }, parent.Containment_0_n.ToList());
     }
 }

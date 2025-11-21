@@ -26,6 +26,7 @@ using Notification.Partition.Emitter;
 using Notification.Pipe;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -337,6 +338,7 @@ public interface IStructuredDataTypeInstance
 public interface INode : INotifiableNode<INode>;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
+[DebuggerDisplay("{GetType().Name}[{GetId()}]")]
 public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
