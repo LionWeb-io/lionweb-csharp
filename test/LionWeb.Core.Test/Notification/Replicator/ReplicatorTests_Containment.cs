@@ -1544,4 +1544,64 @@ public class ReplicatorTests_Containment : ReplicatorTestsBase
 
         AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
     }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainment_NullReferenceException()
+    {
+        var moved = new LinkTestConcept("moved")
+        {
+            Containment_0_n = [new LinkTestConcept("a"), new LinkTestConcept("b")]
+        };
+        
+        var subtree = new LinkTestConcept("subtree")
+        {
+            Containment_1 = moved
+        };
+        
+        var originalPartition = new LinkTestConcept("partition")
+        {
+            Containment_1 = subtree
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+        
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        Assert.ThrowsExactly<NullReferenceException>(() => originalPartition.Containment_0_1.ReplaceWith(moved));
+    }
+
+    [TestMethod]
+    public void ChildAdded_and_ChildMovedAndReplacedFromOtherContainment_passes()
+    {
+        var moved = new LinkTestConcept("moved")
+        {
+            Containment_0_n = [new LinkTestConcept("a"), new LinkTestConcept("b")]
+        };
+        
+        var subtree = new LinkTestConcept("subtree")
+        {
+            Containment_1 = moved
+        };
+
+        var originalPartition = new LinkTestConcept("partition");
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+        
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        originalPartition.Containment_0_1 = subtree;
+        subtree.ReplaceWith(moved);
+        
+        Assert.AreEqual(2, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[1]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+
 }

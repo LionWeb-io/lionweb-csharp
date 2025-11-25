@@ -28,6 +28,35 @@ using Core.Test.Notification;
 public class NotificationsTestSerialized : DeltaTestsBase
 {
     [TestMethod]
+    public void ChildAdded_and_ChildMovedAndReplacedFromOtherContainment_passes()
+    {
+        var moved = new LinkTestConcept("moved")
+        {
+            Containment_0_n = [new LinkTestConcept("a"), new LinkTestConcept("b")]
+        };
+        
+        var subtree = new LinkTestConcept("subtree")
+        {
+            Containment_1 = moved
+        };
+
+        var originalPartition = new LinkTestConcept("partition");
+        
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
+        
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        originalPartition.Containment_0_1 = subtree;
+        subtree.ReplaceWith(moved);
+        
+        Assert.AreEqual(2, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[1]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
     public void PropertyAdded()
     {
         var circle = new Circle("c");
