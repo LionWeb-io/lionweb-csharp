@@ -15,14 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification;
+namespace LionWeb.Core.Test.Notification.Replicator;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using NotificationId = string;
 
 [TestClass]
-public class ReplicatorTests_MultiPartition : ReplicatorTestsBase
+public class MultiPartitionTests : ReplicatorTestsBase
 {
     #region Children
 

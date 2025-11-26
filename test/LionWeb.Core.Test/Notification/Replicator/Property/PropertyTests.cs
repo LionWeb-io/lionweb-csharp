@@ -1,14 +1,12 @@
-﻿namespace LionWeb.Core.Test.Notification;
+﻿namespace LionWeb.Core.Test.Notification.Replicator;
 
-using Core.Notification;
-using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
-public class ReplicatorTests_Property : ReplicatorTestsBase
+public class PropertyTests : ReplicatorTestsBase
 {
-    #region Properties
-
     [TestMethod]
     public void PropertyAdded()
     {
@@ -87,6 +85,4 @@ public class ReplicatorTests_Property : ReplicatorTestsBase
         });
 
     }
-
-    #endregion
 }
