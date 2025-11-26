@@ -15,14 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Single.Listener;
 
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
 [TestClass]
-public class ReferenceTests_Single_Listener
+public class ListenerTests
 {
     [TestMethod]
     public void ReferenceAdded_Optional()
