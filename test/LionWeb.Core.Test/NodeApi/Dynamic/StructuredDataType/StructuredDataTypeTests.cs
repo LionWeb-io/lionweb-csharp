@@ -15,14 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Dynamic;
+namespace LionWeb.Core.Test.NodeApi.Dynamic.StructuredDataType;
 
 using M1;
 using M2;
 using M3;
 
 [TestClass]
-public class StructuredDataTypesTests
+public class StructuredDataTypeTests : StructuredDataTypeTestBase
 {
     #region EqualsHashCode
 
@@ -437,116 +437,4 @@ public class StructuredDataTypesTests
     }
 
     #endregion
-
-
-    private DynamicLanguage _sdtLang;
-
-    [TestInitialize]
-    public void LoadSdtLanguage()
-    {
-        _sdtLang = LanguagesUtils
-            .LoadLanguages("LionWeb.Core.Test", "LionWeb.Core.Test.Languages.defChunks.sdtLang.json",
-                LionWebVersions.v2024_1)
-            .First();
-    }
-
-    private DynamicNode NewSdtConcept(string id) =>
-        _sdtLang.GetFactory().CreateNode(id, _sdtLang.ClassifierByKey("key-SDTConcept")) as DynamicNode ??
-        throw new AssertFailedException();
-
-    private Property SdtConcept_decimal =>
-        _sdtLang.ClassifierByKey("key-SDTConcept").FeatureByKey("key-SDTDecimalField") as Property ??
-        throw new AssertFailedException();
-
-    private IStructuredDataTypeInstance NewDecimal(int dec, int frac)
-    {
-        var decSdt = Decimal_();
-        var decValue = _sdtLang.GetFactory().CreateStructuredDataTypeInstance(decSdt,
-            new FieldValues { { DecimalInt(), dec }, { DecimalFrac(), frac }, }
-        );
-
-        return decValue;
-    }
-
-    private StructuredDataType Decimal_() => _sdtLang.StructuredDataTypeByKey("key-SDTDecimal");
-
-    private Field DecimalInt() => Decimal_().FieldByKey("key-SDTInt");
-    private Field DecimalFrac() => Decimal_().FieldByKey("key-SDTFrac");
-
-    private IStructuredDataTypeInstance NewDecimal()
-    {
-        var decSdt = Decimal_();
-        var decValue = _sdtLang.GetFactory().CreateStructuredDataTypeInstance(decSdt,
-            new FieldValues { }
-        );
-
-        return decValue;
-    }
-
-    private IStructuredDataTypeInstance NewE() =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
-            new FieldValues { }
-        );
-
-    private IStructuredDataTypeInstance NewE(IStructuredDataTypeInstance e2F) =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
-            new FieldValues { { E_e2f(), e2F }, }
-        );
-
-    private IStructuredDataTypeInstance NewE(string name) =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
-            new FieldValues { { E_name(), name }, }
-        );
-
-
-    private IStructuredDataTypeInstance NewE(IStructuredDataTypeInstance e2F, string? name) =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
-            new FieldValues { { E_e2f(), e2F }, { E_name(), name }, }
-        );
-
-    private IStructuredDataTypeInstance NewF(string name) =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(F_(),
-            new FieldValues { { F_name(), name }, }
-        );
-
-    private StructuredDataType E_() => _sdtLang.StructuredDataTypeByKey("key-SDE");
-    private StructuredDataType F_() => _sdtLang.StructuredDataTypeByKey("key-SDF");
-    private Field F_name() => F_().FieldByKey("key-SDTfName");
-    private Field E_e2f() => E_().FieldByKey("key-SDTf");
-    private Field E_name() => E_().FieldByKey("key-SDTeName");
-
-    private Enumeration Currency_() => _sdtLang.Enumerations().FirstOrDefault(c => c.Key == "key-SDTCurrency")!;
-
-    private EnumerationLiteral Currency(string currency) =>
-        Currency_().Literals.FirstOrDefault(l => l.Name == currency)!;
-
-    private Enum CurrencyValue(string currency) => _sdtLang.GetFactory().GetEnumerationLiteral(Currency(currency));
-    private Enum CurrencyEUR() => CurrencyValue("EUR");
-
-    private StructuredDataType Amount_() => _sdtLang.StructuredDataTypeByKey("key-SDTAmount");
-    private Field Amount_value() => Amount_().FieldByKey("key-SDTValue");
-    private Field Amount_digital() => Amount_().FieldByKey("key-SDTDigital");
-    private Field Amount_currency() => Amount_().FieldByKey("key-SDTCurr");
-
-    private IStructuredDataTypeInstance NewAmount() =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(Amount_(),
-            new FieldValues { }
-        );
-
-    private IStructuredDataTypeInstance NewAmount(Enum cur) =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(
-            Amount_(),
-            new FieldValues { { Amount_currency(), cur } }
-        );
-
-
-    private IStructuredDataTypeInstance NewAmount(int dec, int frac, string currency, bool digital) =>
-        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(Amount_(),
-            new FieldValues
-            {
-                { Amount_value(), NewDecimal(dec, frac) },
-                { Amount_currency(), CurrencyValue(currency) },
-                { Amount_digital(), digital }
-            }
-        );
 }
