@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Lenient;
+namespace LionWeb.Core.Test.NodeApi.Lenient.Property;
 
 [TestClass]
-public class PropertyTests_Enum_Optional : LenientNodeTestsBase
+public class EnumOptionalTests : LenientNodeTestsBase
 {
     #region Single
 

@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Lenient;
+namespace LionWeb.Core.Test.NodeApi.Lenient.Property;
 
 [TestClass]
-public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
+public class StringOptionalTests : LenientNodeTestsBase
 {
     #region Single
 
@@ -26,35 +26,35 @@ public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
     public void Reflective()
     {
         var parent = newDocumentation("od");
-        var value = true;
-        parent.Set(Documentation_technical, value);
-        Assert.AreEqual(true, parent.Get(Documentation_technical));
+        var value = "Hi";
+        parent.Set(Documentation_text, value);
+        Assert.AreEqual("Hi", parent.Get(Documentation_text));
     }
 
     [TestMethod]
     public void Get_Reflective()
     {
         var parent = newDocumentation("od");
-        parent.Set(Documentation_technical, true);
-        Assert.AreEqual(true, parent.Get(Documentation_technical));
+        parent.Set(Documentation_text, "Hi");
+        Assert.AreEqual("Hi", parent.Get(Documentation_text));
     }
 
     [TestMethod]
-    public void False_Reflective()
+    public void Bye_Reflective()
     {
         var parent = newDocumentation("od");
-        var value = false;
-        parent.Set(Documentation_technical, value);
-        Assert.AreEqual(false, parent.Get(Documentation_technical));
+        var value = "Bye";
+        parent.Set(Documentation_text, value);
+        Assert.AreEqual("Bye", parent.Get(Documentation_text));
     }
 
     [TestMethod]
-    public void String_Reflective()
+    public void Boolean_Reflective()
     {
         var parent = newDocumentation("od");
-        var value = "10";
-        parent.Set(Documentation_technical, value);
-        Assert.AreEqual("10", parent.Get(Documentation_technical));
+        var value = true;
+        parent.Set(Documentation_text, value);
+        Assert.AreEqual(true, parent.Get(Documentation_text));
     }
 
     [TestMethod]
@@ -62,8 +62,8 @@ public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = 10;
-        parent.Set(Documentation_technical, value);
-        Assert.AreEqual(10, parent.Get(Documentation_technical));
+        parent.Set(Documentation_text, value);
+        Assert.AreEqual(10, parent.Get(Documentation_text));
     }
 
     #endregion
@@ -75,15 +75,15 @@ public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
     {
         var parent = newDocumentation("od");
         object value = null;
-        parent.Set(Documentation_technical, null);
-        Assert.AreEqual(null, parent.Get(Documentation_technical));
+        parent.Set(Documentation_text, null);
+        Assert.AreEqual(null, parent.Get(Documentation_text));
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
         var parent = newDocumentation("od");
-        Assert.AreEqual(null, parent.Get(Documentation_technical));
+        Assert.AreEqual(null, parent.Get(Documentation_text));
     }
 
     #endregion
@@ -91,12 +91,12 @@ public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
     #region metamodelViolation
 
     [TestMethod]
-    public void Booleans_Reflective()
+    public void Strings_Reflective()
     {
         var parent = newDocumentation("od");
-        var value = new List<bool> { true, false };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Documentation_technical, value));
-        Assert.AreEqual(null, parent.Get(Documentation_technical));
+        var value = new List<string> { "a", "b" };
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Documentation_text, value));
+        Assert.AreEqual(null, parent.Get(Documentation_text));
     }
 
     [TestMethod]
@@ -104,8 +104,8 @@ public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = newCoord("c");
-        parent.Set(Documentation_technical, value);
-        Assert.AreSame(value, parent.Get(Documentation_technical));
+        parent.Set(Documentation_text, value);
+        Assert.AreSame(value, parent.Get(Documentation_text));
     }
 
     [TestMethod]
@@ -115,9 +115,9 @@ public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var value = new List<IReadableNode> { valueA, valueB };
-        parent.Set(Documentation_technical, value);
+        parent.Set(Documentation_text, value);
         CollectionAssert.AreEqual(new List<IReadableNode>() { valueA, valueB },
-            parent.Get(Documentation_technical) as List<IReadableNode>);
+            parent.Get(Documentation_text) as List<IReadableNode>);
     }
 
     #endregion
