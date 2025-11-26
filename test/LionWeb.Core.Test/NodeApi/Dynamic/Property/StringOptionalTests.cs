@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Dynamic;
+namespace LionWeb.Core.Test.NodeApi.Dynamic.Property;
 
 [TestClass]
-public class PropertyTests_String_Optional : DynamicNodeTestsBase
+public class StringOptionalTests : DynamicNodeTestsBase
 {
     #region Single
 

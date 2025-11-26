@@ -15,13 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Dynamic;
+namespace LionWeb.Core.Test.NodeApi.Dynamic.Property;
 
 using M2;
 using M3;
 
 [TestClass]
-public class PropertyTests_VersionSpecifics
+public class VersionSpecificTests
 {
     int id = 0;
 

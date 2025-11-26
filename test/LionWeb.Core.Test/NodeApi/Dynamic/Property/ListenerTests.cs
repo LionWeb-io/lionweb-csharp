@@ -15,13 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Dynamic;
+namespace LionWeb.Core.Test.NodeApi.Dynamic.Property;
 
 using Core.Notification.Partition;
 using Notification;
 
 [TestClass]
-public class PropertyTests_Listener : DynamicNodeTestsBase
+public class ListenerTests : DynamicNodeTestsBase
 {
     [TestMethod]
     public void PropertyAdded()
