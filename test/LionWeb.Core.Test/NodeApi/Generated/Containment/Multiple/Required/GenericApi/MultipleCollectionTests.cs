@@ -15,398 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.GenericApi;
 
 using Languages.Generated.V2024_1.Shapes.M2;
 
 [TestClass]
-public class ContainmentTests_Multiple_Required_GenericApi
+public class MultipleCollectionTests
 {
-    #region Single
-
     [TestMethod]
-    public void Single_Add()
-    {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, [line]);
-        Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-    }
-
-    #region Insert
-
-    [TestMethod]
-    public void Single_Insert_Empty()
-    {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, [line]);
-        Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-    }
-
-    [TestMethod]
-    public void Single_Insert_Empty_UnderBounds()
-    {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, -1, [line]));
-        Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
-    }
-
-    [TestMethod]
-    public void Single_Insert_Empty_OverBounds()
-    {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 1, [line]));
-        Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
-    }
-
-    [TestMethod]
-    public void Single_Insert_One_Before()
-    {
-        var circle = new Circle("cId");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, [line]);
-        Assert.AreSame(parent, circle.GetParent());
-        Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circle }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Insert_One_After()
-    {
-        var circle = new Circle("cId");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 1, [line]);
-        Assert.AreSame(parent, circle.GetParent());
-        Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circle, line }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Insert_Two_Before()
-    {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, [line]);
-        Assert.AreSame(parent, circleA.GetParent());
-        Assert.AreSame(parent, circleB.GetParent());
-        Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circleA, circleB }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Insert_Two_Between()
-    {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 1, [line]);
-        Assert.AreSame(parent, circleA.GetParent());
-        Assert.AreSame(parent, circleB.GetParent());
-        Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, line, circleB }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Insert_Two_After()
-    {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 2, [line]);
-        Assert.AreSame(parent, circleA.GetParent());
-        Assert.AreSame(parent, circleB.GetParent());
-        Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB, line }, parent.Parts.ToList());
-    }
-
-    #endregion
-
-    #region Remove
-
-    [TestMethod]
-    public void Single_Remove_Empty()
-    {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, [line]));
-        Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
-    }
-
-    [TestMethod]
-    public void Single_Remove_NotContained()
-    {
-        var circle = new Circle("myC");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var line = new Line("myId");
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, [line]);
-        Assert.AreSame(parent, circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Remove_Only()
-    {
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line] };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, [line]));
-        Assert.AreSame(parent, line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { line }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Remove_First()
-    {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line, circle] };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, [line]);
-        Assert.AreSame(parent, circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Remove_Last()
-    {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circle, line] };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, [line]);
-        Assert.AreSame(parent, circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void Single_Remove_Between()
-    {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, [line]);
-        Assert.AreSame(parent, circleA.GetParent());
-        Assert.AreSame(parent, circleB.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Parts.ToList());
-    }
-
-    #endregion
-
-    #endregion
-
-    #region Null
-
-    [TestMethod]
-    public void Null()
-    {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.CompositeShape_parts, null));
-    }
-
-    [TestMethod]
-    public void Null_Insert_Empty()
-    {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, null));
-    }
-
-    [TestMethod]
-    public void Null_Insert_Empty_OutOfBounds()
-    {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 1, [null]));
-    }
-
-    [TestMethod]
-    public void Null_Remove_Empty()
-    {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(null));
-    }
-
-    #endregion
-
-    #region EmptyCollection
-
-    [TestMethod]
-    public void EmptyArray()
-    {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[0];
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
-    }
-
-
-    [TestMethod]
-    public void Insert_EmptyArray()
-    {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[0];
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
-    }
-
-    [TestMethod]
-    public void Remove_EmptyArray()
-    {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[0];
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
-    }
-
-    #endregion
-
-    #region NullCollection
-
-    [TestMethod]
-    public void NullArray()
-    {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
-    }
-
-    [TestMethod]
-    public void Insert_NullArray()
-    {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
-    }
-
-    [TestMethod]
-    public void Remove_NullArray()
-    {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
-    }
-
-    #endregion
-
-    #region SingleCollection
-
-    [TestMethod]
-    public void SingleArray()
-    {
-        var parent = new CompositeShape("cs");
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values);
-        Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(value));
-    }
-
-    [TestMethod]
-    public void Insert_SingleArray()
-    {
-        var parent = new CompositeShape("cs");
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
-        Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(value));
-    }
-
-    #region Remove
-
-    [TestMethod]
-    public void SingleArray_Remove_Empty()
-    {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        var values = new IShape[] { line };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
-    }
-
-    [TestMethod]
-    public void SingleArray_Remove_Only()
-    {
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line] };
-        var values = new IShape[] { line };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.AreSame(parent, line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { line }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void SingleArray_Remove_First()
-    {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line, circle] };
-        var values = new IShape[] { line };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
-        Assert.AreSame(parent, circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void SingleArray_Remove_Last()
-    {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circle, line] };
-        var values = new IShape[] { line };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
-        Assert.AreSame(parent, circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
-    }
-
-    [TestMethod]
-    public void SingleArray_Remove_Between()
-    {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        var values = new IShape[] { line };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
-        Assert.AreSame(parent, circleA.GetParent());
-        Assert.AreSame(parent, circleB.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Parts.ToList());
-    }
-
-    #endregion
-
-    #endregion
-
-    #region MultipleCollection
-
-    [TestMethod]
-    public void MultipleArray()
+    public void Array()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -422,7 +39,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     #region Insert
 
     [TestMethod]
-    public void Multiple_Insert_ListMatchingType()
+    public void Insert_ListMatchingType()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -435,7 +52,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_ListSubtype()
+    public void Insert_ListSubtype()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -448,7 +65,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_Set()
+    public void Insert_Set()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -461,7 +78,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_SingleEnumerable()
+    public void Insert_SingleEnumerable()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -474,7 +91,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_Empty()
+    public void Insert_Empty()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -487,7 +104,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_One_Before()
+    public void Insert_One_Before()
     {
         var circle = new Circle("cId");
         var parent = new CompositeShape("cs") { Parts = [circle] };
@@ -502,7 +119,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_One_After()
+    public void Insert_One_After()
     {
         var circle = new Circle("cId");
         var parent = new CompositeShape("cs") { Parts = [circle] };
@@ -517,7 +134,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_Two_Before()
+    public void Insert_Two_Before()
     {
         var circleA = new Circle("cIdA");
         var circleB = new Circle("cIdB");
@@ -534,7 +151,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_Two_Between()
+    public void Insert_Two_Between()
     {
         var circleA = new Circle("cIdA");
         var circleB = new Circle("cIdB");
@@ -551,7 +168,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Insert_Two_After()
+    public void Insert_Two_After()
     {
         var circleA = new Circle("cIdA");
         var circleB = new Circle("cIdB");
@@ -572,7 +189,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     #region Remove
 
     [TestMethod]
-    public void Multiple_Remove_ListMatchingType()
+    public void Remove_ListMatchingType()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -586,7 +203,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_ListSubtype()
+    public void Remove_ListSubtype()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -600,7 +217,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_Set()
+    public void Remove_Set()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -614,7 +231,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_SingleEnumerable()
+    public void Remove_SingleEnumerable()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -628,7 +245,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_Empty()
+    public void Remove_Empty()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -642,7 +259,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_Only()
+    public void Remove_Only()
     {
         var valueA = new Line("sA");
         var valueB = new Line("sB");
@@ -655,7 +272,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_NonContained()
+    public void Remove_NonContained()
     {
         var circleA = new Circle("cA");
         var circleB = new Circle("cB");
@@ -672,7 +289,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_HalfContained()
+    public void Remove_HalfContained()
     {
         var circleA = new Circle("cA");
         var circleB = new Circle("cB");
@@ -687,7 +304,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_First()
+    public void Remove_First()
     {
         var circle = new Circle("cId");
         var valueA = new Line("sA");
@@ -702,7 +319,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_Last()
+    public void Remove_Last()
     {
         var circle = new Circle("cId");
         var valueA = new Line("sA");
@@ -717,7 +334,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_Between()
+    public void Remove_Between()
     {
         var circleA = new Circle("cIdA");
         var circleB = new Circle("cIdB");
@@ -734,7 +351,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void Multiple_Remove_Mixed()
+    public void Remove_Mixed()
     {
         var circleA = new Circle("cIdA");
         var circleB = new Circle("cIdB");
@@ -753,7 +370,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     #endregion
 
     [TestMethod]
-    public void MultipleListMatchingType()
+    public void ListMatchingType()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -767,7 +384,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void MultipleListSubtype()
+    public void ListSubtype()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -781,7 +398,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
     }
 
     [TestMethod]
-    public void MultipleSet()
+    public void Set()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -796,7 +413,7 @@ public class ContainmentTests_Multiple_Required_GenericApi
 
 
     [TestMethod]
-    public void MultipleSingleEnumerable()
+    public void SingleEnumerable()
     {
         var parent = new CompositeShape("cs");
         var valueA = new Line("sA");
@@ -808,6 +425,4 @@ public class ContainmentTests_Multiple_Required_GenericApi
         Assert.AreSame(parent, valueB.GetParent());
         Assert.IsTrue(parent.Parts.Contains(valueB));
     }
-
-    #endregion
 }
