@@ -15,17 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Required.Listener;
 
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
 [TestClass]
-public class ContainmentTests_Single_Required_Listener
+public class SingleTests
 {
-    #region Single
-
     [TestMethod]
     public void Single()
     {
@@ -43,7 +41,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_Setter()
+    public void Setter()
     {
         var offsetDuplicate = new OffsetDuplicate("od");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
@@ -65,7 +63,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_Reflective()
+    public void Reflective()
     {
         var offsetDuplicate = new OffsetDuplicate("od");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
@@ -87,7 +85,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent()
+    public void FromOtherParent()
     {
         var offsetDuplicate = new OffsetDuplicate("od");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
@@ -104,7 +102,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent_Reflective()
+    public void FromOtherParent_Reflective()
     {
         var offsetDuplicate = new OffsetDuplicate("od");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
@@ -121,7 +119,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent_Replace()
+    public void FromOtherParent_Replace()
     {
         var replacedCoord = new Coord("replaced");
         var offsetDuplicate = new OffsetDuplicate("od") { Offset = replacedCoord };
@@ -139,7 +137,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent_Replace_Reflective()
+    public void FromOtherParent_Replace_Reflective()
     {
         var replacedCoord = new Coord("replaced");
         var offsetDuplicate = new OffsetDuplicate("od") { Offset = replacedCoord };
@@ -157,7 +155,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent()
+    public void FromSameParent()
     {
         var coord = new Coord("myId");
         var offsetDuplicate = new OffsetDuplicate("od") { Fixpoints = [coord] };
@@ -181,7 +179,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent_Reflective()
+    public void FromSameParent_Reflective()
     {
         var coord = new Coord("myId");
         var offsetDuplicate = new OffsetDuplicate("od") { Fixpoints = [coord] };
@@ -205,7 +203,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent_Replace()
+    public void FromSameParent_Replace()
     {
         var replacedCoord = new Coord("replacedCoord");
         var coord = new Coord("myId");
@@ -231,7 +229,7 @@ public class ContainmentTests_Single_Required_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent_Replace_Reflective()
+    public void FromSameParent_Replace_Reflective()
     {
         var replacedCoord = new Coord("replacedCoord");
         var coord = new Coord("myId");
@@ -342,50 +340,6 @@ public class ContainmentTests_Single_Required_Listener
         parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, oldCoord);
-
-        Assert.AreEqual(0, notifications);
-    }
-
-    #endregion
-
-    #endregion
-
-    #region Null
-
-    [TestMethod]
-    public void Null()
-    {
-        var offsetDuplicate = new OffsetDuplicate("od");
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
-
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
-
-        Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
-
-        Assert.AreEqual(0, notifications);
-    }
-
-    [TestMethod]
-    public void Null_Existing()
-    {
-        var offsetDuplicate = new OffsetDuplicate("od") { Offset = new Coord("myId") };
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
-
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
-
-        Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
         Assert.AreEqual(0, notifications);
     }
