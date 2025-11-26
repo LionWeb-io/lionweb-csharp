@@ -503,7 +503,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             Filter.UnregisterNotificationId(notificationId);
         }
     }
-    
+
+    #region CheckMatchingNodeIdForReplacedNode
+
     private void CheckMatchingNodeIdForReplacedNode(AnnotationMovedAndReplacedFromOtherParentNotification notification)
     {
         var localParent = notification.NewParent;
@@ -712,4 +714,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 $"in containment {notification.Containment} at index {notification.NewIndex}");
         }
     }
+
+    #endregion
+
 }
