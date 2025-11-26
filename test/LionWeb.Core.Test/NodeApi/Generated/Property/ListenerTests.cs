@@ -15,14 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
 [TestClass]
-public class PropertyTests_Listener
+public class ListenerTests
 {
     [TestMethod]
     public void PropertyAdded_Optional()

@@ -15,12 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
+using Languages.Generated.V2023_1.Shapes.M2;
 using M3;
 
 [TestClass]
-public class PropertyTests_VersionSpecifics
+public class VersionSpecificsTests
 {
     [TestMethod]
     [DataRow(typeof(IVersion2023_1))]
@@ -72,7 +73,7 @@ public class PropertyTests_VersionSpecifics
 
     private INode newDocumentation(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Languages.Generated.V2023_1.Shapes.M2.Documentation(id),
+        IVersion2023_1 => new Documentation(id),
         IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Documentation(id),
         IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Documentation(id),
         var v => throw new UnsupportedVersionException(v)
@@ -80,7 +81,7 @@ public class PropertyTests_VersionSpecifics
 
     private Feature Documentation_text(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => Languages.Generated.V2023_1.Shapes.M2.ShapesLanguage.Instance.Documentation_text,
+        IVersion2023_1 => ShapesLanguage.Instance.Documentation_text,
         IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_text,
         IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_text,
         var v => throw new UnsupportedVersionException(v)
@@ -88,7 +89,7 @@ public class PropertyTests_VersionSpecifics
 
     private Feature Documentation_technical(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => Languages.Generated.V2023_1.Shapes.M2.ShapesLanguage.Instance.Documentation_technical,
+        IVersion2023_1 => ShapesLanguage.Instance.Documentation_technical,
         IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_technical,
         IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_technical,
         var v => throw new UnsupportedVersionException(v)
@@ -96,7 +97,7 @@ public class PropertyTests_VersionSpecifics
 
     private INode newCircle(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Languages.Generated.V2023_1.Shapes.M2.Circle(id),
+        IVersion2023_1 => new Circle(id),
         IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Circle(id),
         IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Circle(id),
         var v => throw new UnsupportedVersionException(v)
@@ -104,7 +105,7 @@ public class PropertyTests_VersionSpecifics
 
     private Feature Circle_r(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => Languages.Generated.V2023_1.Shapes.M2.ShapesLanguage.Instance.Circle_r,
+        IVersion2023_1 => ShapesLanguage.Instance.Circle_r,
         IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Circle_r,
         IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Circle_r,
         var v => throw new UnsupportedVersionException(v)
@@ -112,7 +113,7 @@ public class PropertyTests_VersionSpecifics
 
     private INode newMaterialGroup(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Languages.Generated.V2023_1.Shapes.M2.MaterialGroup(id),
+        IVersion2023_1 => new MaterialGroup(id),
         IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.MaterialGroup(id),
         IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.MaterialGroup(id),
         var v => throw new UnsupportedVersionException(v)
@@ -120,7 +121,7 @@ public class PropertyTests_VersionSpecifics
 
     private object? MatterState_liquid(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => Languages.Generated.V2023_1.Shapes.M2.MatterState.liquid,
+        IVersion2023_1 => MatterState.liquid,
         IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.MatterState.liquid,
         IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.MatterState.liquid,
         var v => throw new UnsupportedVersionException(v)
@@ -128,7 +129,7 @@ public class PropertyTests_VersionSpecifics
 
     private Feature MaterialGroup_matterState(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => Languages.Generated.V2023_1.Shapes.M2.ShapesLanguage.Instance.MaterialGroup_matterState,
+        IVersion2023_1 => ShapesLanguage.Instance.MaterialGroup_matterState,
         IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.MaterialGroup_matterState,
         IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.MaterialGroup_matterState,
         var v => throw new UnsupportedVersionException(v)
