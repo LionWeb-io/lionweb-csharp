@@ -22,7 +22,7 @@ using M2;
 using M3;
 
 [TestClass]
-public class ReferenceTests_VersionSpecifics : DynamicNodeTestsBase
+public class VersionSpecificsTests : DynamicNodeTestsBase
 {
     [TestMethod]
     [DataRow(typeof(IVersion2023_1))]
