@@ -15,17 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional.Listener;
 
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
 [TestClass]
-public class ContainmentTests_Single_Optional_Listener
+public class SingleTests
 {
-    #region Single
-
     [TestMethod]
     public void Single()
     {
@@ -48,7 +46,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_Setter()
+    public void Setter()
     {
         var parent = new Geometry("g");
         var doc = new Documentation("myId");
@@ -69,7 +67,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_Reflective()
+    public void Reflective()
     {
         var parent = new Geometry("g");
         var doc = new Documentation("myId");
@@ -90,7 +88,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent()
+    public void FromOtherParent()
     {
         var parent = new Geometry("g");
 
@@ -107,7 +105,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent_Reflective()
+    public void FromOtherParent_Reflective()
     {
         var parent = new Geometry("g");
 
@@ -124,7 +122,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent_Replace()
+    public void FromOtherParent_Replace()
     {
         var replacedDoc = new Documentation("replacedDoc");
         var parent = new Geometry("g") { Documentation = replacedDoc };
@@ -142,7 +140,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromOtherParent_Replace_Reflective()
+    public void FromOtherParent_Replace_Reflective()
     {
         var replacedDoc = new Documentation("replacedDoc");
         var parent = new Geometry("g") { Documentation = replacedDoc };
@@ -160,7 +158,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent()
+    public void FromSameParent()
     {
         var doc = new Documentation("myId");
         var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
@@ -184,7 +182,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent_Reflective()
+    public void FromSameParent_Reflective()
     {
         var doc = new Documentation("myId");
         var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
@@ -208,7 +206,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent_Replace()
+    public void FromSameParent_Replace()
     {
         var replacedDoc = new Documentation("replacedDoc");
         var doc = new Documentation("myId");
@@ -234,7 +232,7 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
-    public void Single_FromSameParent_Replace_Reflective()
+    public void FromSameParent_Replace_Reflective()
     {
         var replacedDoc = new Documentation("replacedDoc");
         var doc = new Documentation("myId");
@@ -343,90 +341,6 @@ public class ContainmentTests_Single_Optional_Listener
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, oldDoc);
 
         Assert.AreEqual(0, notifications);
-    }
-
-    #endregion
-
-    #endregion
-
-    #region Null
-
-    [TestMethod]
-    public void Null()
-    {
-        var parent = new Geometry("g");
-
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
-
-        parent.Documentation = null;
-
-        Assert.AreEqual(0, notifications);
-    }
-
-    [TestMethod]
-    public void Null_Reflective()
-    {
-        var parent = new Geometry("g");
-
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
-
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
-
-        Assert.AreEqual(0, notifications);
-    }
-
-    [TestMethod]
-    public void Null_Existing()
-    {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
-
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(oldDoc, args.DeletedChild);
-        });
-
-        parent.Documentation = null;
-
-        Assert.AreEqual(1, notifications);
-    }
-
-    [TestMethod]
-    public void Null_Existing_Reflective()
-    {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
-
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(oldDoc, args.DeletedChild);
-        });
-
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
-
-        Assert.AreEqual(1, notifications);
     }
 
     #endregion
