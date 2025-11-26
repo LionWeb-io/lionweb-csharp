@@ -15,13 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.StructuredDataType;
 
 using Languages.Generated.V2024_1.SDTLang;
 using M3;
 
 [TestClass]
-public class StructuredDataTypesTests
+public class StructuredDataTypeTests : StructuredDataTypeTestBase
 {
     #region EqualsHashCode
 
@@ -433,33 +433,4 @@ public class StructuredDataTypesTests
             "A { A2b = B { B2d = D { Name = D1 }, Name = B1 }, A2c = C { C2d = D { Name = D2 }, C2e = E { E2f = F { Name = F1 }, Name = E1 }, Name = C1 }, Name = A1 }",
             a.ToString());
     }
-
-    private SDTConcept NewSdtConcept(string id) => new SDTConcept(id);
-
-    private Property SdtConcept_decimal => SDTLangLanguage.Instance.SDTConcept_decimal;
-    private Field DecimalInt() => SDTLangLanguage.Instance.Decimal_int;
-    private Field DecimalFrac() => SDTLangLanguage.Instance.Decimal_frac;
-
-    private Decimal NewDecimal(int dec, int frac) => new Decimal(frac, dec);
-    private Decimal NewDecimal() => new();
-    private E NewE(F e2F) => new() { E2f = e2F };
-    private E NewE(string name) => new() { Name = name };
-    private E NewE(F e2F, string? name) => new() { E2f = e2F, Name = name! };
-    private F NewF(string name) => new(name);
-    private Field E_e2f() => SDTLangLanguage.Instance.E_e2f;
-    private Field E_name() => SDTLangLanguage.Instance.E_name;
-    private Currency CurrencyEUR() => Currency.EUR;
-
-    private Field Amount_value() => SDTLangLanguage.Instance.Amount_value;
-    private Field Amount_digital() => SDTLangLanguage.Instance.Amount_digital;
-    private Field Amount_currency() => SDTLangLanguage.Instance.Amount_currency;
-
-    private Amount NewAmount() => new();
-    private Amount NewAmount(Currency cur) => new() { Currency = cur };
-    private Amount NewAmount(int dec, int frac, string currency, bool digital)
-        => new Amount(
-            Enum.TryParse<Currency>(currency, out var result) ? result : null,
-            digital,
-            NewDecimal(dec, frac)
-        );
 }
