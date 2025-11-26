@@ -15,12 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment;
 
+using Languages.Generated.V2023_1.Shapes.M2;
 using M3;
 
 [TestClass]
-public class ContainmentTests_VersionSpecifics
+public class VersionSpecificsTests
 {
     [TestMethod]
     [DataRow(typeof(IVersion2023_1))]
@@ -95,7 +96,7 @@ public class ContainmentTests_VersionSpecifics
 
     private INode newLine(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Languages.Generated.V2023_1.Shapes.M2.Line(id),
+        IVersion2023_1 => new Line(id),
         IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Line(id),
         IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Line(id),
         var v => throw new UnsupportedVersionException(v)
@@ -103,7 +104,7 @@ public class ContainmentTests_VersionSpecifics
 
     private INode newBillOfMaterials(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Languages.Generated.V2023_1.Shapes.M2.BillOfMaterials(id),
+        IVersion2023_1 => new BillOfMaterials(id),
         IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.BillOfMaterials(id),
         IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.BillOfMaterials(id),
         var v => throw new UnsupportedVersionException(v)
@@ -111,7 +112,7 @@ public class ContainmentTests_VersionSpecifics
 
     private INode newDocumentation(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Languages.Generated.V2023_1.Shapes.M2.Documentation(id),
+        IVersion2023_1 => new Documentation(id),
         IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Documentation(id),
         IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Documentation(id),
         var v => throw new UnsupportedVersionException(v)
@@ -119,7 +120,7 @@ public class ContainmentTests_VersionSpecifics
     
     private INode newGeometry(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Languages.Generated.V2023_1.Shapes.M2.Geometry(id),
+        IVersion2023_1 => new Geometry(id),
         IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Geometry(id),
         IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Geometry(id),
         var v => throw new UnsupportedVersionException(v)
@@ -127,7 +128,7 @@ public class ContainmentTests_VersionSpecifics
     
     private Feature Geometry_shapes(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => Languages.Generated.V2023_1.Shapes.M2.ShapesLanguage.Instance.Geometry_shapes,
+        IVersion2023_1 => ShapesLanguage.Instance.Geometry_shapes,
         IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Geometry_shapes,
         IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Geometry_shapes,
         var v => throw new UnsupportedVersionException(v)
