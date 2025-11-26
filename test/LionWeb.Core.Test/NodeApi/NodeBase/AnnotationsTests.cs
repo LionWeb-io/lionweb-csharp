@@ -15,141 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi;
+namespace LionWeb.Core.Test.NodeApi.NodeBase;
 
 using Languages.Generated.V2023_1.Shapes.M2;
+using NodeBase = Core.NodeBase;
 
 [TestClass]
-public class NodeBaseTests
+public class AnnotationsTests
 {
-    #region Set
-
-    [TestMethod]
-    public void Set_NodeBase()
-    {
-        var coord = new Coord("coord");
-        
-        NodeBase shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-    
-    [TestMethod]
-    public void Set_INode()
-    {
-        var coord = new Coord("coord");
-        
-        INode shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-    
-    [TestMethod]
-    public void Set_INotifiableNode()
-    {
-        var coord = new Coord("coord");
-        
-        INotifiableNode shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-
-    [TestMethod]
-    public void Set_INotifiableNode_Generic()
-    {
-        var coord = new Coord("coord");
-        
-        INotifiableNode<INode> shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-
-    [TestMethod]
-    public void Set_IWritableNode()
-    {
-        var coord = new Coord("coord");
-        
-        IWritableNode shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-    
-    [TestMethod]
-    public void Set_IWritableNode_Generic()
-    {
-        var coord = new Coord("coord");
-        
-        IWritableNode<INode> shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-    
-    #endregion
-    
-    #region Set method with notificationId parameter set to null
-
-    [TestMethod]
-    public void Set_NodeBase_with_null_notificationId()
-    {
-        var coord = new Coord("coord");
-        
-        NodeBase shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord, null);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-    
-    [TestMethod]
-    public void Set_INode_with_null_notificationId()
-    {
-        var coord = new Coord("coord");
-        
-        INode shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord, null);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-    
-    [TestMethod]
-    public void Set_INotifiableNode_with_null_notificationId()
-    {
-        var coord = new Coord("coord");
-        
-        INotifiableNode shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord, null);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-
-    [TestMethod]
-    public void Set_INotifiableNode_Generic_with_null_notificationId()
-    {
-        var coord = new Coord("coord");
-        
-        INotifiableNode<INode> shape = new Circle("geom");
-        shape.Set(ShapesLanguage.Instance.Circle_center, coord, null);
-
-        Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
-        Assert.IsTrue(shape.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
-    }
-    
-    #endregion
-    
     #region AddAnnotations
 
     [TestMethod]
