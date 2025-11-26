@@ -1,0 +1,83 @@
+﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// 
+// SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
+// SPDX-License-Identifier: Apache-2.0
+
+namespace LionWeb.Core.Test.NodeApi.TreeTraversal;
+
+using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
+using M1;
+using M3;
+
+[TestClass]
+public class PrecedingSiblingTests
+{
+    [TestMethod]
+    public void PrecedingSibling()
+    {
+        var circleA = new Circle("a");
+        var circleB = new Circle("b");
+        var circleC = new Circle("c");
+        var circleD = new Circle("d");
+        var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
+        CollectionAssert.AreEqual(new List<INode> { circleA, circleB }, circleC.PrecedingSiblings().ToList());
+    }
+
+    [TestMethod]
+    public void Self()
+    {
+        var circleA = new Circle("a");
+        var circleB = new Circle("b");
+        var circleC = new Circle("c");
+        var circleD = new Circle("d");
+        var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
+        CollectionAssert.AreEqual(new List<INode> { circleA, circleB, circleC },
+            circleC.PrecedingSiblings(true).ToList());
+    }
+
+    [TestMethod]
+    public void NoParent()
+    {
+        var circleA = new Circle("a");
+        Assert.ThrowsException<TreeShapeException>(() => circleA.PrecedingSiblings());
+    }
+
+    [TestMethod]
+    public void SingleContainment()
+    {
+        var coord = new Coord("a");
+        var circle = new Circle("b") { Center = coord };
+        Assert.ThrowsException<TreeShapeException>(() => coord.PrecedingSiblings());
+    }
+
+    [TestMethod]
+    public void NoPrecedingSibling()
+    {
+        var circleA = new Circle("a");
+        var circleB = new Circle("b");
+        var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
+        CollectionAssert.AreEqual(new List<INode> { }, circleA.PrecedingSiblings().ToList());
+    }
+
+    [TestMethod]
+    public void NoPrecedingSibling_Self()
+    {
+        var circleA = new Circle("a");
+        var circleB = new Circle("b");
+        var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
+        CollectionAssert.AreEqual(new List<INode> { circleA }, circleA.PrecedingSiblings(true).ToList());
+    }
+}
