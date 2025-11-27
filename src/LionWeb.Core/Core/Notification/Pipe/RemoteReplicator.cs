@@ -145,24 +145,46 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
 
         var commonNodes = _existingNodes.Keys.Intersect(newNodes).ToList();
-        
-        if (commonNodes.Any())
+
+        if (commonNodes.Count == 0)
         {
-            switch (newNodeNotification)
-            {
-                case PartitionAddedNotification partitionAddedNotification:
-                    throw new InvalidNotificationException(partitionAddedNotification, 
-                        $"Trying to add existing node with ids: {string.Join(",", commonNodes)}");
-                
-                case ChildAddedNotification childAddedNotification:
-                    throw new InvalidNotificationException(childAddedNotification, 
-                        $"Trying to add existing node with ids {string.Join(",", commonNodes)}");
-            }
+            return;
         }
 
+        switch (newNodeNotification)
+        {
+            case PartitionAddedNotification partitionAddedNotification:
+                throw new InvalidNotificationException(partitionAddedNotification,
+                    $"Trying to add existing node(s) with ids: {string.Join(",", commonNodes)}");
+
+            case ChildAddedNotification childAddedNotification:
+                throw new InvalidNotificationException(childAddedNotification,
+                    $"Trying to add existing node(s) with ids: {string.Join(",", commonNodes)}");
+
+            case ChildReplacedNotification childReplacedNotification:
+                {
+                    HashSet<NodeId> replacedNodes = [];
+
+                    foreach (var node in M1Extensions.Descendants(childReplacedNotification.ReplacedChild, true, true))
+                    {
+                        replacedNodes.Add(node.GetId());
+                    }
+
+                    var nodes = new HashSet<NodeId>(commonNodes);
+                    nodes.ExceptWith(replacedNodes);
+
+                    if (nodes.Count != 0)
+                    {
+                        throw new InvalidNotificationException(childReplacedNotification,
+                            $"Trying to add existing node(s) with ids: {string.Join(",", commonNodes)}");
+                    }
+
+                    break;
+                }
+        }
+        
     }
-
-
+    
     #region Partitions
 
     private void OnRemoteNewPartition(PartitionAddedNotification notification)
@@ -235,10 +257,14 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             CheckMatchingNodeIdForDeletedNode(notification);
-            notification.DeletedChild.DetachFromParent();
+            // TODO: DetachFromParent() does not update sharedNodeMap 
+            notification.DeletedChild.DetachFromParent(); 
         });
 
-    private void OnRemoteChildReplaced(ChildReplacedNotification notification) =>
+    private void OnRemoteChildReplaced(ChildReplacedNotification notification)
+    {
+        CheckIfNewNodeContainsExistingNodes(notification);
+        
         SuppressNotificationForwarding(notification, () =>
         {
             var newChild = (INode)notification.NewChild;
@@ -248,6 +274,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
             replacedChild.ReplaceWith(newChild);
         });
+    }
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
