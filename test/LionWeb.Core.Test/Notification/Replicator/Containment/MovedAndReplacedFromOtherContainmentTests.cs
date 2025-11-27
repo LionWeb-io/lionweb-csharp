@@ -36,7 +36,12 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
         };
         var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(moved.GetId()));
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
@@ -47,6 +52,9 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
 
         AssertEquals([originalPartition], [clonedPartition]);
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(moved.GetId()));
     }
 
     [TestMethod]

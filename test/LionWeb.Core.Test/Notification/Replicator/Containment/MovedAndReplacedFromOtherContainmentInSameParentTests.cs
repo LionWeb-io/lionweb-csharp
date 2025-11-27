@@ -29,9 +29,11 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
     [TestMethod]
     public void Single()
     {
+        var replaced = new Coord("replaced");
+        var moved = new Coord("moved");
         var line = new Line("l")
         {
-            Start = new Coord("moved"), End = new Coord("replaced")
+            Start = moved, End = replaced
         };
         var originalPartition = new Geometry("a") { Shapes = [line] };
         var clonedPartition = ClonePartition(originalPartition);
@@ -39,7 +41,12 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(moved.GetId()));
 
         line.End = line.Start;
 
@@ -47,6 +54,9 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(notificationObserver.Notifications[0]);
 
         AssertEquals([originalPartition], [clonedPartition]);
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(moved.GetId()));
     }
 
     [TestMethod]

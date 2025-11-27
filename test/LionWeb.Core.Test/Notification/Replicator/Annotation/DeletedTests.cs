@@ -32,11 +32,18 @@ public class DeletedTests : ReplicatorTestsBase
         originalPartition.AddAnnotations([deleted]);
 
         var clonedPartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(deleted.GetId()));
 
         originalPartition.RemoveAnnotations([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(deleted.GetId()));
     }
 
     [TestMethod]

@@ -28,18 +28,24 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
+        var replaced = new Documentation("replaced") { Text = "a" };
         var originalPartition = new Geometry("a")
         {
-            Documentation = new Documentation("replaced") { Text = "a" }
+            Documentation = replaced
         };
         var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
 
         var added = new Documentation("added")
         {
             Text = "added"
         };
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsFalse(sharedNodeMap.ContainsKey(added.GetId()));
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
@@ -49,6 +55,9 @@ public class ReplacedTests : ReplicatorTestsBase
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(added.GetId()));
     }
 
     [TestMethod]
@@ -111,9 +120,15 @@ public class ReplacedTests : ReplicatorTestsBase
         };
         var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
 
         var replacement = new Line("replacement");
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replacement.GetId()));
+        
         var childReplacedNotification = new ChildReplacedNotification(replacement, replaced, originalPartition, 
             ShapesLanguage.Instance.Geometry_shapes, 0, new NumericNotificationId("childReplacedNotification", 0));
 
@@ -121,6 +136,9 @@ public class ReplacedTests : ReplicatorTestsBase
 
         Assert.AreEqual(1, clonedPartition.Shapes.Count);
         Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[0].GetId());
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
     }
 
     [TestMethod]
@@ -136,7 +154,12 @@ public class ReplacedTests : ReplicatorTestsBase
         };
         var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replacement.GetId()));
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
@@ -146,6 +169,9 @@ public class ReplacedTests : ReplicatorTestsBase
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
     }
 
     [TestMethod]
