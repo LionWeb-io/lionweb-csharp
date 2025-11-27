@@ -34,7 +34,7 @@ public class RemoveTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts([line]));
 
         Assert.AreEqual(0, notifications);
     }
@@ -49,7 +49,7 @@ public class RemoveTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { }));
 
         Assert.AreEqual(0, notifications);
@@ -81,7 +81,7 @@ public class RemoveTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts([line]));
 
         Assert.AreEqual(0, notifications);
     }

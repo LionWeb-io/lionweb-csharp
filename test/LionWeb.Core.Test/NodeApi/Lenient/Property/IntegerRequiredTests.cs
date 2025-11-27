@@ -76,14 +76,14 @@ public class IntegerRequiredTests : LenientNodeTestsBase
         var parent = newCircle("od");
         object value = null;
         parent.Set(Circle_r, value);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
         var parent = newCircle("od");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     #endregion
@@ -95,8 +95,8 @@ public class IntegerRequiredTests : LenientNodeTestsBase
     {
         var parent = newCircle("od");
         var value = new List<int> { 1, -1 };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Circle_r, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     [TestMethod]

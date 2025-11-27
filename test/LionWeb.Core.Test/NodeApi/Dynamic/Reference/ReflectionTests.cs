@@ -51,7 +51,7 @@ public class ReflectionTests : DynamicNodeTestsBase
     public void GetInheritedProperty_Unset()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
     }
 
     #endregion

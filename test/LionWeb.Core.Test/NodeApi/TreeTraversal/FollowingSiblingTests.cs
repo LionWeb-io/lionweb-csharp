@@ -51,7 +51,7 @@ public class FollowingSiblingTests
     public void NoParent()
     {
         var circleA = new Circle("a");
-        Assert.ThrowsException<TreeShapeException>(() => circleA.FollowingSiblings());
+        Assert.ThrowsExactly<TreeShapeException>(() => circleA.FollowingSiblings());
     }
 
     [TestMethod]
@@ -59,7 +59,7 @@ public class FollowingSiblingTests
     {
         var coord = new Coord("a");
         var circle = new Circle("b") { Center = coord };
-        Assert.ThrowsException<TreeShapeException>(() => coord.FollowingSiblings());
+        Assert.ThrowsExactly<TreeShapeException>(() => coord.FollowingSiblings());
     }
 
     [TestMethod]

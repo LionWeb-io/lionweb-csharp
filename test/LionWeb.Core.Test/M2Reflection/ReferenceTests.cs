@@ -49,7 +49,7 @@ public class ReferenceTests : M2ReflectionTestsBase
         Assert.AreEqual(refe.Optional, refe.Get(FeatureOptional));
         Assert.AreEqual(refe.Multiple, refe.Get(LinkMultiple));
         Assert.AreEqual(refe.Type, refe.Get(LinkType));
-        Assert.ThrowsException<UnknownFeatureException>(() => refe.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => refe.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -57,9 +57,9 @@ public class ReferenceTests : M2ReflectionTestsBase
     {
         refe.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", refe.Name);
-        Assert.ThrowsException<InvalidValueException>(() => refe.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => refe.Set(INamedName, null));
         Assert.AreEqual("Hello", refe.Name);
-        Assert.ThrowsException<InvalidValueException>(() => refe.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => refe.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -79,9 +79,9 @@ public class ReferenceTests : M2ReflectionTestsBase
         var reference = refe;
         reference.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", reference.Key);
-        Assert.ThrowsException<InvalidValueException>(() => reference.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => reference.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", reference.Key);
-        Assert.ThrowsException<InvalidValueException>(() => reference.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => reference.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public class ReferenceTests : M2ReflectionTestsBase
         Assert.AreEqual(true, refe.Optional);
         refe.Set(FeatureOptional, false);
         Assert.AreEqual(false, refe.Optional);
-        Assert.ThrowsException<InvalidValueException>(() => refe.Set(FeatureOptional, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => refe.Set(FeatureOptional, null));
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class ReferenceTests : M2ReflectionTestsBase
         Assert.AreEqual(true, refe.Multiple);
         refe.Set(LinkMultiple, false);
         Assert.AreEqual(false, refe.Multiple);
-        Assert.ThrowsException<InvalidValueException>(() => refe.Set(LinkMultiple, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => refe.Set(LinkMultiple, null));
     }
 
     [TestMethod]
@@ -144,7 +144,7 @@ public class ReferenceTests : M2ReflectionTestsBase
     {
         refe.Set(LinkType, ann);
         Assert.AreEqual(ann, refe.Type);
-        Assert.ThrowsException<InvalidValueException>(() => refe.Set(LinkType, lang));
+        Assert.ThrowsExactly<InvalidValueException>(() => refe.Set(LinkType, lang));
         Assert.AreEqual(ann, refe.Type);
     }
 
@@ -163,6 +163,6 @@ public class ReferenceTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => refe.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => refe.Set(LanguageVersion, "asdf"));
     }
 }

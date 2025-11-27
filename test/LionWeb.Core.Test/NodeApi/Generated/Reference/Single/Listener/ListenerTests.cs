@@ -222,7 +222,7 @@ public class ListenerTests
             Assert.AreEqual(ReferenceTarget.FromNode(reference), args.DeletedTarget);
         });
 
-        Assert.ThrowsException<InvalidValueException>(() => source.Source = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => source.Source = null);
 
         Assert.AreEqual(0, notifications);
     }
@@ -246,7 +246,7 @@ public class ListenerTests
             Assert.AreEqual(ReferenceTarget.FromNode(reference), args.DeletedTarget);
         });
 
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, null));
 
         Assert.AreEqual(0, notifications);

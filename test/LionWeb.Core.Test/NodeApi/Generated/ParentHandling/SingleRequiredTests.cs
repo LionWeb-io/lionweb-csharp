@@ -35,7 +35,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Offset);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
     }
 
     [TestMethod]
@@ -50,7 +50,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Offset);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -65,7 +65,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Offset);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
     }
 
     [TestMethod]
@@ -80,7 +80,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Offset);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -99,7 +99,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Center);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
     }
 
     [TestMethod]
@@ -114,7 +114,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Center);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -129,7 +129,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Center);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
     }
 
     [TestMethod]
@@ -144,7 +144,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Center);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -190,7 +190,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.End);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Start);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
     }
 
     [TestMethod]
@@ -204,7 +204,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.End);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Start);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -218,7 +218,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.End);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Start);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
     }
 
     [TestMethod]
@@ -232,7 +232,7 @@ public class SingleRequiredTests
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.End);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Start);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
         Assert.IsNull(orphan.GetParent());
     }
 

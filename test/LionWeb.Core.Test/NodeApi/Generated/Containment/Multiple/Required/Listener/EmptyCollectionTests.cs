@@ -34,7 +34,7 @@ public class EmptyCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => compositeShape.AddParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.AddParts(values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -49,7 +49,7 @@ public class EmptyCollectionTests
         parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
 
         var values = new IShape[0];
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
 
         Assert.AreEqual(0, notifications);
@@ -65,7 +65,7 @@ public class EmptyCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => compositeShape.InsertParts(0, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.InsertParts(0, values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -86,7 +86,7 @@ public class EmptyCollectionTests
         parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
         parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -108,7 +108,7 @@ public class EmptyCollectionTests
         parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
 
         var values = new List<Coord>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
 
         Assert.AreEqual(0, notifications);

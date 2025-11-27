@@ -178,6 +178,6 @@ public class MultipleCollectionTests : LenientNodeTestsBase
     public void ResultUnmodifiable_Unset()
     {
         var parent = newMaterialGroup("g");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(MaterialGroup_materials));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(MaterialGroup_materials));
     }
 }

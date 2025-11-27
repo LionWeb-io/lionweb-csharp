@@ -78,7 +78,7 @@ public class MigrationInstanceOfTests : MigrationTestsBase
         var migration = new IsInstanceOfMigration(ShapesLanguage.Instance.IShape);
 
         migrator.RegisterMigration(migration);
-        await Assert.ThrowsExceptionAsync<UnknownLookupException>(() =>
+        await Assert.ThrowsExactlyAsync<UnknownLookupException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }
 

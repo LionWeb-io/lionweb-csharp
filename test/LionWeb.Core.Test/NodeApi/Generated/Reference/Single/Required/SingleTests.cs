@@ -128,31 +128,31 @@ public class SingleTests
     public void Null()
     {
         var parent = new OffsetDuplicate("od");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Source = null);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Source);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Source = null);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Source);
     }
 
     [TestMethod]
     public void Null_Setter()
     {
         var parent = new OffsetDuplicate("od");
-        Assert.ThrowsException<InvalidValueException>(() => parent.SetSource(null));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Source);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.SetSource(null));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Source);
     }
 
     [TestMethod]
     public void Null_Reflective()
     {
         var parent = new OffsetDuplicate("od");
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_source, null));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Source);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Source);
     }
 
     [TestMethod]
     public void Null_Constructor()
     {
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => new OffsetDuplicate("od") { Source = null });
     }
 

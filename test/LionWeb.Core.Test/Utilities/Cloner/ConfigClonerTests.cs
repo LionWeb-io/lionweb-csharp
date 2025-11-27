@@ -86,7 +86,7 @@ public class ConfigClonerTests : ClonerTestsBase
         Assert.AreSame(actualGeometry, actualDuplicate.GetParent());
         Assert.AreEqual("Duplicate", actualDuplicate.Name);
         Assert.AreSame(line, actualDuplicate.Source);
-        Assert.ThrowsException<UnsetFeatureException>(() => actualDuplicate.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => actualDuplicate.Offset);
 
         Assert.IsInstanceOfType<Documentation>(actual[doc]);
         Assert.AreNotSame(doc, actual[doc]);

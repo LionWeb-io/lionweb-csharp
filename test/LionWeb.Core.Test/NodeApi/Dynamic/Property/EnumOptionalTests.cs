@@ -53,7 +53,7 @@ public class EnumOptionalTests : DynamicNodeTestsBase
     {
         var parent = newMaterialGroup("od");
         var value = true;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.Get(MaterialGroup_matterState));
     }
 
@@ -69,7 +69,7 @@ public class EnumOptionalTests : DynamicNodeTestsBase
     {
         var parent = newMaterialGroup("od");
         var value = TestEnum.a;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.Get(MaterialGroup_matterState));
     }
 
@@ -78,7 +78,7 @@ public class EnumOptionalTests : DynamicNodeTestsBase
     {
         var parent = newMaterialGroup("od");
         var value = TestEnum.solid;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.Get(MaterialGroup_matterState));
     }
 
@@ -87,7 +87,7 @@ public class EnumOptionalTests : DynamicNodeTestsBase
     {
         var parent = newMaterialGroup("od");
         var value = TestEnum.gas;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.Get(MaterialGroup_matterState));
     }
 
@@ -96,7 +96,7 @@ public class EnumOptionalTests : DynamicNodeTestsBase
     {
         var parent = newMaterialGroup("od");
         var value = 10;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.Get(MaterialGroup_matterState));
     }
 

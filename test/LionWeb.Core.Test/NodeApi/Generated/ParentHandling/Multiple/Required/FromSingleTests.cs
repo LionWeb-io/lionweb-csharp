@@ -35,7 +35,7 @@ public class FromSingleTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.EvilPart);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.EvilPart);
     }
 
     [TestMethod]
@@ -49,7 +49,7 @@ public class FromSingleTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.EvilPart);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.EvilPart);
     }
 
     [TestMethod]
@@ -63,7 +63,7 @@ public class FromSingleTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.EvilPart);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.EvilPart);
     }
 
     #endregion
@@ -80,7 +80,7 @@ public class FromSingleTests
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, parent.Parts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.EvilPart);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.EvilPart);
     }
 
     [TestMethod]
@@ -93,7 +93,7 @@ public class FromSingleTests
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, parent.Parts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.EvilPart);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.EvilPart);
     }
 
     [TestMethod]
@@ -106,7 +106,7 @@ public class FromSingleTests
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, parent.Parts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.EvilPart);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.EvilPart);
     }
 
     #endregion

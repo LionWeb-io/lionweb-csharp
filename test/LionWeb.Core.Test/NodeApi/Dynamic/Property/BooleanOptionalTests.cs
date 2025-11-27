@@ -53,7 +53,7 @@ public class BooleanOptionalTests : DynamicNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = "10";
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Documentation_technical, value));
         Assert.AreEqual(null, parent.Get(Documentation_technical));
     }
@@ -63,7 +63,7 @@ public class BooleanOptionalTests : DynamicNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = 10;
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Documentation_technical, value));
         Assert.AreEqual(null, parent.Get(Documentation_technical));
     }

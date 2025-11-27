@@ -76,7 +76,7 @@ public class TextualizerTests
 
         // shows that INamed_name is declared as a set feature, but its getter still throws:
         Assert.IsTrue(concept.CollectAllSetFeatures().Contains(_builtIns.INamed_name));
-        Assert.ThrowsException<UnsetFeatureException>(() => concept.Name);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => concept.Name);
 
         var property = new DynamicProperty("prop", _lionWebVersion, concept) { Key = "key-prop" };
         property.Type = _builtIns.String;

@@ -25,6 +25,6 @@ public class NullTests : LenientNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         parent.Set(OffsetDuplicate_offset, null);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
     }
 }

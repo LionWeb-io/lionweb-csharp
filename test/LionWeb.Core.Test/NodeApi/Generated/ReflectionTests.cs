@@ -49,7 +49,7 @@ public class ReflectionTests
     public void GetInheritedProperty_Unset()
     {
         var node = new Circle("id");
-        Assert.ThrowsException<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
     }
 
     [TestMethod]

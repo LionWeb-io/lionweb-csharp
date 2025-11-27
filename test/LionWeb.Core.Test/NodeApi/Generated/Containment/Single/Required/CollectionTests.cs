@@ -30,7 +30,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new Coord[0];
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -39,7 +39,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new ArrayList();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -48,7 +48,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new List<Coord>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -57,7 +57,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new HashSet<Coord>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -66,7 +66,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new List<Line>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -79,7 +79,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new Coord[] { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -88,7 +88,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -97,7 +97,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new List<Coord>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -106,7 +106,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new List<Line>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -115,7 +115,7 @@ public class CollectionTests
     {
         var parent = new OffsetDuplicate("od");
         var values = new HashSet<Coord>() { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -130,9 +130,9 @@ public class CollectionTests
         var value = new Coord("s");
         var values = new Coord[] { value };
 
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(value.GetParent());
     }
 
@@ -142,9 +142,9 @@ public class CollectionTests
         var parent = new OffsetDuplicate("od");
         var value = new Coord("s");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(value.GetParent());
     }
 
@@ -154,9 +154,9 @@ public class CollectionTests
         var parent = new OffsetDuplicate("od");
         var value = new Coord("s");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(value.GetParent());
     }
 
@@ -166,9 +166,9 @@ public class CollectionTests
         var parent = new OffsetDuplicate("od");
         var value = new Coord("s");
         var values = new List<Coord>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(value.GetParent());
     }
 
@@ -178,9 +178,9 @@ public class CollectionTests
         var parent = new OffsetDuplicate("od");
         var value = new Coord("s");
         var values = new HashSet<Coord>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(value.GetParent());
     }
 
@@ -190,7 +190,7 @@ public class CollectionTests
         var parent = new OffsetDuplicate("od");
         var value = new Line("c");
         var values = new List<Line>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -200,7 +200,7 @@ public class CollectionTests
         var parent = new OffsetDuplicate("od");
         var value = new Coord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 
@@ -210,7 +210,7 @@ public class CollectionTests
         var parent = new OffsetDuplicate("od");
         var value = new Coord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
     }
 

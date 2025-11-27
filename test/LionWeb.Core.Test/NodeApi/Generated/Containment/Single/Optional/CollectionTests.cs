@@ -30,7 +30,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new Documentation[0];
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -39,7 +39,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new ArrayList();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -48,7 +48,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new List<Documentation>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -57,7 +57,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new HashSet<Documentation>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -66,7 +66,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new List<Coord>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -79,7 +79,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new Documentation[] { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -88,7 +88,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -97,7 +97,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new List<Documentation>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -106,7 +106,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new List<Coord>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -115,7 +115,7 @@ public class CollectionTests
     {
         var parent = new Geometry("g");
         var values = new HashSet<Documentation>() { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -130,7 +130,7 @@ public class CollectionTests
         var value = new Documentation("s");
         var values = new Documentation[] { value };
 
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(value.GetParent());
@@ -142,7 +142,7 @@ public class CollectionTests
         var parent = new Geometry("g");
         var value = new Documentation("s");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(value.GetParent());
@@ -154,7 +154,7 @@ public class CollectionTests
         var parent = new Geometry("g");
         var value = new Documentation("s");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(value.GetParent());
@@ -166,7 +166,7 @@ public class CollectionTests
         var parent = new Geometry("g");
         var value = new Documentation("s");
         var values = new List<Documentation>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(value.GetParent());
@@ -178,7 +178,7 @@ public class CollectionTests
         var parent = new Geometry("g");
         var value = new Documentation("s");
         var values = new HashSet<Documentation>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(value.GetParent());
@@ -190,7 +190,7 @@ public class CollectionTests
         var parent = new Geometry("g");
         var value = new Coord("c");
         var values = new List<Coord>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -200,7 +200,7 @@ public class CollectionTests
         var parent = new Geometry("g");
         var value = new Coord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 
@@ -210,7 +210,7 @@ public class CollectionTests
         var parent = new Geometry("g");
         var value = new Coord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
     }
 

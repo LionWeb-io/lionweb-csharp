@@ -127,9 +127,9 @@ public class MultipleCollectionTests : LenientNodeTestsBase
         var valueA = "cA";
         var valueB = "cB";
         var values = new List<string>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -177,6 +177,6 @@ public class MultipleCollectionTests : LenientNodeTestsBase
     public void ResultUnmodifiable_Unset()
     {
         var parent = newCompositeShape("g");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(CompositeShape_parts));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(CompositeShape_parts));
     }
 }

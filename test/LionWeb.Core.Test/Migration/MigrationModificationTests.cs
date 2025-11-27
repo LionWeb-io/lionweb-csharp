@@ -114,7 +114,7 @@ public class MigrationModificationTests : MigrationTestsBase
         var migration = new MigrationBaseMigration(ShapesLanguage.Instance.Line);
 
         migrator.RegisterMigration(migration);
-        await Assert.ThrowsExceptionAsync<UnknownLookupException>(async () =>
+        await Assert.ThrowsExactlyAsync<UnknownLookupException>(async () =>
             await migrator.MigrateAsync(inputStream, Stream.Null));
     }
 

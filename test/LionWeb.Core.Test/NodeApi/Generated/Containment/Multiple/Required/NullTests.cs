@@ -26,41 +26,41 @@ public class NullTests
     public void Null()
     {
         var parent = new CompositeShape("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddParts(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddParts(null));
     }
 
     [TestMethod]
     public void Reflective()
     {
         var parent = new CompositeShape("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, null));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        Assert.ThrowsException<InvalidValueException>(() => new CompositeShape("cs") { Parts = null });
+        Assert.ThrowsExactly<InvalidValueException>(() => new CompositeShape("cs") { Parts = null });
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
         var parent = new CompositeShape("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertParts(0, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertParts(0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
         var parent = new CompositeShape("cs");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertParts(1, null));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(1, null));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
         var parent = new CompositeShape("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(null));
     }
 
     [TestMethod]

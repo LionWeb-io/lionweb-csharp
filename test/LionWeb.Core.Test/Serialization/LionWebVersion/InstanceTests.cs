@@ -49,7 +49,7 @@ public class InstanceTests : LionWebVersionsTestBase
         DynamicLanguage language = Serialize(LionWebVersions.v2023_1, out INode conceptNodeA, out INode conceptNodeB,
             out SerializationChunk chunk);
 
-        Assert.ThrowsException<VersionMismatchException>(() => Deserialize(language, LionWebVersions.v2024_1, chunk));
+        Assert.ThrowsExactly<VersionMismatchException>(() => Deserialize(language, LionWebVersions.v2024_1, chunk));
     }
 
     [TestMethod]
@@ -58,7 +58,7 @@ public class InstanceTests : LionWebVersionsTestBase
         DynamicLanguage language = Serialize(LionWebVersions.v2024_1, out INode conceptNodeA, out INode conceptNodeB,
             out SerializationChunk chunk);
 
-        Assert.ThrowsException<VersionMismatchException>(() => Deserialize(language, LionWebVersions.v2023_1, chunk));
+        Assert.ThrowsExactly<VersionMismatchException>(() => Deserialize(language, LionWebVersions.v2023_1, chunk));
     }
 
     [TestMethod]
@@ -93,7 +93,7 @@ public class InstanceTests : LionWebVersionsTestBase
             .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
-        Assert.ThrowsException<VersionMismatchException>(() => serializer.SerializeToChunk(input));
+        Assert.ThrowsExactly<VersionMismatchException>(() => serializer.SerializeToChunk(input));
     }
 
     [TestMethod]
@@ -120,7 +120,7 @@ public class InstanceTests : LionWebVersionsTestBase
             .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
-        Assert.ThrowsException<VersionMismatchException>(() => serializer.SerializeToChunk(input));
+        Assert.ThrowsExactly<VersionMismatchException>(() => serializer.SerializeToChunk(input));
     }
 
     [TestMethod]
@@ -145,7 +145,7 @@ public class InstanceTests : LionWebVersionsTestBase
             .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
-        Assert.ThrowsException<VersionMismatchException>(() => serializer.SerializeToChunk([node23, node24]));
+        Assert.ThrowsExactly<VersionMismatchException>(() => serializer.SerializeToChunk([node23, node24]));
     }
 
     [TestMethod]
@@ -184,7 +184,7 @@ public class InstanceTests : LionWebVersionsTestBase
         var lang24 = CreateLanguage("2024_1_", LionWebVersions.v2024_1);
         lang24.Version = "xx2024.1";
 
-        Assert.ThrowsException<VersionMismatchException>(() =>
+        Assert.ThrowsExactly<VersionMismatchException>(() =>
             new DeserializerBuilder()
                 .WithLanguage(lang23)
                 .WithLanguage(lang24)

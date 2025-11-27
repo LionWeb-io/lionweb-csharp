@@ -129,7 +129,7 @@ public class SingleRefClonerTests
         Assert.AreNotSame(offsetDuplicate, actualDuplicate);
         Assert.AreNotEqual(offsetDuplicate.GetId(), actualDuplicate.GetId());
 
-        Assert.ThrowsException<UnsetFeatureException>(() => actualDuplicate.Source);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => actualDuplicate.Source);
     }
 
     [TestMethod]

@@ -118,7 +118,7 @@ public class LanguageTests : LionWebVersionsTestBase
 
         SerializationChunk chunk = serializer.SerializeToChunk(language.Descendants(true, true));
 
-        Assert.ThrowsException<VersionMismatchException>(() => new LanguageDeserializerBuilder()
+        Assert.ThrowsExactly<VersionMismatchException>(() => new LanguageDeserializerBuilder()
             .WithLionWebVersion(LionWebVersions.v2024_1)
             .WithCompressedIds(new(KeepOriginal: true))
             .Build()
@@ -165,7 +165,7 @@ public class LanguageTests : LionWebVersionsTestBase
 
         SerializationChunk chunk = serializer.SerializeToChunk(language.Descendants(true, true));
 
-        Assert.ThrowsException<VersionMismatchException>(() => new LanguageDeserializerBuilder()
+        Assert.ThrowsExactly<VersionMismatchException>(() => new LanguageDeserializerBuilder()
             .WithLionWebVersion(LionWebVersions.v2023_1)
             .WithCompressedIds(new(KeepOriginal: true))
             .Build()
@@ -183,7 +183,7 @@ public class LanguageTests : LionWebVersionsTestBase
             .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
-        Assert.ThrowsException<VersionMismatchException>(() =>
+        Assert.ThrowsExactly<VersionMismatchException>(() =>
             serializer.SerializeToChunk(language.Descendants(true, true))
         );
     }
@@ -198,7 +198,7 @@ public class LanguageTests : LionWebVersionsTestBase
             .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
-        Assert.ThrowsException<VersionMismatchException>(() =>
+        Assert.ThrowsExactly<VersionMismatchException>(() =>
             serializer.SerializeToChunk(language.Descendants(true, true))
         );
     }

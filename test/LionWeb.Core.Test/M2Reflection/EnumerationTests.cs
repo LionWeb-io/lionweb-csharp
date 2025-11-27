@@ -40,7 +40,7 @@ public class EnumerationTests : M2ReflectionTestsBase
         Assert.AreEqual(enm.Key, enm.Get(IKeyedKey));
         CollectionAssert.AreEqual(enm.Literals.ToList(),
             (enm.Get(EnumerationLiterals) as IReadOnlyList<EnumerationLiteral>).ToList());
-        Assert.ThrowsException<UnknownFeatureException>(() => enm.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => enm.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -48,9 +48,9 @@ public class EnumerationTests : M2ReflectionTestsBase
     {
         enm.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", enm.Name);
-        Assert.ThrowsException<InvalidValueException>(() => enm.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => enm.Set(INamedName, null));
         Assert.AreEqual("Hello", enm.Name);
-        Assert.ThrowsException<InvalidValueException>(() => enm.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => enm.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -70,9 +70,9 @@ public class EnumerationTests : M2ReflectionTestsBase
         var enumeration = enm;
         enumeration.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", enumeration.Key);
-        Assert.ThrowsException<InvalidValueException>(() => enumeration.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => enumeration.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", enumeration.Key);
-        Assert.ThrowsException<InvalidValueException>(() => enumeration.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => enumeration.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -95,7 +95,7 @@ public class EnumerationTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { litA, litB }, enm.Literals.ToList());
         enm.Set(EnumerationLiterals, Enumerable.Empty<EnumerationLiteral>());
         CollectionAssert.AreEqual(Enumerable.Empty<EnumerationLiteral>().ToList(), enm.Literals.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => enm.Set(EnumerationLiterals, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => enm.Set(EnumerationLiterals, null));
     }
 
     [TestMethod]
@@ -113,6 +113,6 @@ public class EnumerationTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => enm.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => enm.Set(LanguageVersion, "asdf"));
     }
 }

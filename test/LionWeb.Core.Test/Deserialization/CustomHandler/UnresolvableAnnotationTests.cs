@@ -141,6 +141,6 @@ public class UnresolvableAnnotationTests
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsExactly<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 }

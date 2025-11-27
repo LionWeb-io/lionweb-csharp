@@ -25,7 +25,7 @@ public class MetamodelViolationTests : LenientNodeTestsBase
     {
         var parent = newLine("od");
         var value = "a";
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, value));
         Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -34,7 +34,7 @@ public class MetamodelViolationTests : LenientNodeTestsBase
     {
         var parent = newLine("od");
         var value = -10;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, value));
         Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Count() == 0);
     }
 }

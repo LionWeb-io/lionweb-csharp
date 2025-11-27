@@ -63,7 +63,7 @@ public class ReflectionTests : LenientNodeTestsBase
     public void GetInheritedProperty_Unset()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
     }
 
     #endregion
@@ -146,24 +146,24 @@ public class ReflectionTests : LenientNodeTestsBase
     public void SetValueTypeListProperty()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             node.Set(Documentation_text, new List<TestStruct> { new TestStruct(2, "hi") }));
-        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => node.Get(Documentation_text));
     }
 
     [TestMethod]
     public void SetObjectProperty()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() => node.Set(Documentation_text, new object()));
-        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
+        Assert.ThrowsExactly<InvalidValueException>(() => node.Set(Documentation_text, new object()));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => node.Get(Documentation_text));
     }
 
     [TestMethod]
     public void GetUnknownProperty_Unset()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => node.Get(Documentation_text));
     }
 
     #endregion
@@ -191,24 +191,24 @@ public class ReflectionTests : LenientNodeTestsBase
     public void SetValueTypeListContainment()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             node.Set(MaterialGroup_defaultShape, new List<TestStruct> { new TestStruct(2, "hi") }));
-        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
     }
 
     [TestMethod]
     public void SetObjectContainment()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new object()));
-        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
+        Assert.ThrowsExactly<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new object()));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
     }
 
     [TestMethod]
     public void GetUnknownContainment_Unset()
     {
         var parent = newCircle("id");
-        Assert.ThrowsException<UnknownFeatureException>(() => parent.Get(MaterialGroup_defaultShape));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => parent.Get(MaterialGroup_defaultShape));
     }
 
     [TestMethod]
@@ -219,7 +219,7 @@ public class ReflectionTests : LenientNodeTestsBase
         parent.Set(MaterialGroup_defaultShape, child);
         child.DetachFromParent();
         Assert.IsNull(child.GetParent());
-        Assert.ThrowsException<UnknownFeatureException>(() => parent.Get(MaterialGroup_defaultShape));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => parent.Get(MaterialGroup_defaultShape));
         Assert.AreEqual(null, parent.GetContainmentOf(child));
         Assert.IsFalse(parent.CollectAllSetFeatures().Any());
     }

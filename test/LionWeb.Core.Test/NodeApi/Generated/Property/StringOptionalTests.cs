@@ -72,7 +72,7 @@ public class StringOptionalTests
     {
         var parent = new Documentation("od");
         var value = true;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Documentation_text, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Documentation_text, value));
         Assert.AreEqual(null, parent.Text);
     }
 
@@ -81,7 +81,7 @@ public class StringOptionalTests
     {
         var parent = new Documentation("od");
         var value = 10;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Documentation_text, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Documentation_text, value));
         Assert.AreEqual(null, parent.Text);
     }
 

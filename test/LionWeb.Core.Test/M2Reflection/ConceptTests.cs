@@ -54,7 +54,7 @@ public class ConceptTests : M2ReflectionTestsBase
         Assert.AreEqual(conc.Extends, conc.Get(ConceptExtends));
         CollectionAssert.AreEqual(conc.Implements.ToList(),
             (conc.Get(ConceptImplements) as IReadOnlyList<Interface>).ToList());
-        Assert.ThrowsException<UnknownFeatureException>(() => conc.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => conc.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -62,9 +62,9 @@ public class ConceptTests : M2ReflectionTestsBase
     {
         conc.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", conc.Name);
-        Assert.ThrowsException<InvalidValueException>(() => conc.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => conc.Set(INamedName, null));
         Assert.AreEqual("Hello", conc.Name);
-        Assert.ThrowsException<InvalidValueException>(() => conc.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => conc.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -86,7 +86,7 @@ public class ConceptTests : M2ReflectionTestsBase
         Assert.AreEqual("myKey", concept.Key);
         concept.Set(IKeyedKey, "otherKey");
         Assert.AreEqual("otherKey", concept.Key);
-        Assert.ThrowsException<InvalidValueException>(() => concept.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => concept.Set(IKeyedKey, null));
     }
 
     [TestMethod]
@@ -109,7 +109,7 @@ public class ConceptTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { propA, refB }, conc.Features.ToList());
         conc.Set(ClassifierFeatures, Enumerable.Empty<Feature>());
         CollectionAssert.AreEqual(Enumerable.Empty<Feature>().ToList(), conc.Features.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => conc.Set(ClassifierFeatures, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => conc.Set(ClassifierFeatures, null));
     }
 
     [TestMethod]
@@ -131,7 +131,7 @@ public class ConceptTests : M2ReflectionTestsBase
         Assert.AreEqual(true, conc.Abstract);
         conc.Set(ConceptAbstract, false);
         Assert.AreEqual(false, conc.Abstract);
-        Assert.ThrowsException<InvalidValueException>(() => conc.Set(ConceptAbstract, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => conc.Set(ConceptAbstract, null));
     }
 
     [TestMethod]
@@ -153,7 +153,7 @@ public class ConceptTests : M2ReflectionTestsBase
         Assert.AreEqual(true, conc.Partition);
         conc.Set(ConceptPartition, false);
         Assert.AreEqual(false, conc.Partition);
-        Assert.ThrowsException<InvalidValueException>(() => conc.Set(ConceptPartition, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => conc.Set(ConceptPartition, null));
     }
 
     [TestMethod]
@@ -176,7 +176,7 @@ public class ConceptTests : M2ReflectionTestsBase
         Assert.AreEqual(sup, conc.Extends);
         conc.Set(ConceptExtends, null);
         Assert.AreEqual(null, conc.Extends);
-        Assert.ThrowsException<InvalidValueException>(() => conc.Set(ConceptExtends, lang));
+        Assert.ThrowsExactly<InvalidValueException>(() => conc.Set(ConceptExtends, lang));
     }
 
     [TestMethod]
@@ -200,7 +200,7 @@ public class ConceptTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { ifaceA, ifaceB }, conc.Implements.ToList());
         conc.Set(ConceptImplements, Enumerable.Empty<Interface>());
         CollectionAssert.AreEqual(Enumerable.Empty<Interface>().ToList(), conc.Implements.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => conc.Set(ConceptImplements, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => conc.Set(ConceptImplements, null));
     }
 
     [TestMethod]
@@ -218,6 +218,6 @@ public class ConceptTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => conc.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => conc.Set(LanguageVersion, "asdf"));
     }
 }

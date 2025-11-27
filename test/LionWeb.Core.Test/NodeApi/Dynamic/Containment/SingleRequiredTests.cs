@@ -55,9 +55,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     public void Null_Reflective()
     {
         var parent = newOffsetDuplicate("od");
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, null));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
     }
 
     #endregion
@@ -69,7 +69,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new DynamicNode[0];
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -78,7 +78,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new ArrayList();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -87,7 +87,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new List<DynamicNode>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -96,7 +96,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new HashSet<DynamicNode>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -105,7 +105,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new List<string>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -118,7 +118,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new DynamicNode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -127,7 +127,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -136,7 +136,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new List<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -145,7 +145,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new List<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -154,7 +154,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new HashSet<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -169,9 +169,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var value = newCoord("s");
         var values = new DynamicNode[] { value };
 
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(value.GetParent());
     }
 
@@ -181,9 +181,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var value = newCoord("s");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(value.GetParent());
     }
 
@@ -193,9 +193,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var value = newCoord("s");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(value.GetParent());
     }
 
@@ -205,9 +205,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var value = newCoord("s");
         var values = new List<DynamicNode>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(value.GetParent());
     }
 
@@ -217,9 +217,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var value = newCoord("s");
         var values = new HashSet<DynamicNode>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(value.GetParent());
     }
 
@@ -229,7 +229,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var value = newLine("c");
         var values = new List<DynamicNode>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -239,7 +239,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var value = newCoord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -249,7 +249,7 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var value = newCoord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
     }
 
@@ -264,9 +264,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newCoord("sA");
         var valueB = newCoord("sB");
         var values = new DynamicNode[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -278,9 +278,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newCoord("sA");
         var valueB = newCoord("sB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -292,9 +292,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newCoord("sA");
         var valueB = newCoord("sB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -306,9 +306,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newCoord("sA");
         var valueB = newCoord("sB");
         var values = new List<DynamicNode>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -320,9 +320,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newCoord("sA");
         var valueB = newCoord("sB");
         var values = new HashSet<DynamicNode>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -334,9 +334,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newLine("cA");
         var valueB = newLine("cB");
         var values = new List<DynamicNode>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -348,9 +348,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newLine("cA");
         var valueB = newLine("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -362,9 +362,9 @@ public class SingleRequiredTests : DynamicNodeTestsBase
         var valueA = newLine("cA");
         var valueB = newLine("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(OffsetDuplicate_offset));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }

@@ -55,7 +55,7 @@ public class DeserializationNameTests
             .WithReferenceResolveInfoHandling(ReferenceResolveInfoHandling.NameIfUnique)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(chunk));
+        Assert.ThrowsExactly<DeserializerException>(() => deserializer.Deserialize(chunk));
     }
 
     [TestMethod]
@@ -69,7 +69,7 @@ public class DeserializationNameTests
             .WithReferenceResolveInfoHandling(ReferenceResolveInfoHandling.None)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(chunk));
+        Assert.ThrowsExactly<DeserializerException>(() => deserializer.Deserialize(chunk));
     }
 
     private SerializationChunk NonUniqueNameChunk()

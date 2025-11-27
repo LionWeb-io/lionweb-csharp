@@ -38,7 +38,7 @@ public class FieldTests : M2ReflectionTestsBase
     {
         Assert.AreEqual(fld.Name, fld.Get(INamedName));
         Assert.AreEqual(fld.Key, fld.Get(IKeyedKey));
-        Assert.ThrowsException<UnknownFeatureException>(() => fld.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => fld.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -46,9 +46,9 @@ public class FieldTests : M2ReflectionTestsBase
     {
         fld.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", fld.Name);
-        Assert.ThrowsException<InvalidValueException>(() => fld.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => fld.Set(INamedName, null));
         Assert.AreEqual("Hello", fld.Name);
-        Assert.ThrowsException<InvalidValueException>(() => fld.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => fld.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -67,9 +67,9 @@ public class FieldTests : M2ReflectionTestsBase
     {
         fld.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", fld.Key);
-        Assert.ThrowsException<InvalidValueException>(() => fld.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => fld.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", fld.Key);
-        Assert.ThrowsException<InvalidValueException>(() => fld.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => fld.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -86,7 +86,7 @@ public class FieldTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => fld.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => fld.Set(LanguageVersion, "asdf"));
     }
 
     [TestMethod]
@@ -94,7 +94,7 @@ public class FieldTests : M2ReflectionTestsBase
     {
         fld.Set(FieldType, prim);
         Assert.AreEqual(prim, fld.Type);
-        Assert.ThrowsException<InvalidValueException>(() => fld.Set(FieldType, lang));
+        Assert.ThrowsExactly<InvalidValueException>(() => fld.Set(FieldType, lang));
         Assert.AreEqual(prim, fld.Type);
     }
 

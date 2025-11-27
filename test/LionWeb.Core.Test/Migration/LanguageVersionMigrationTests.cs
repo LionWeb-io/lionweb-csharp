@@ -36,7 +36,7 @@ public class LanguageVersionMigrationTests
     {
         var input = new Circle("c");
 
-        await Assert.ThrowsExceptionAsync<IllegalMigrationStateException>(() => Migrate([input],
+        await Assert.ThrowsExactlyAsync<IllegalMigrationStateException>(() => Migrate([input],
             [new LanguageVersionMigration.VersionMapping(ShapesLanguage.Instance, ShapesLanguage.Instance.Version)]));
     }
 

@@ -129,7 +129,7 @@ public class EnumOptionalTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("od");
         var value = new List<Enum> { MatterState_Liquid, MatterState_Gas };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.Get(MaterialGroup_matterState));
     }
 

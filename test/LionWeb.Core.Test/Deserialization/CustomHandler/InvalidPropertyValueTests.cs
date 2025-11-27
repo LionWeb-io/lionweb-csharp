@@ -160,6 +160,6 @@ public class InvalidPropertyValueTests
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsExactly<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
     }
 }

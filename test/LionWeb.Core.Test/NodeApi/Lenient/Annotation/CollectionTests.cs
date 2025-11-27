@@ -96,7 +96,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddAnnotations(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddAnnotations(values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
 
@@ -105,7 +105,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -115,7 +115,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertAnnotations(0, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertAnnotations(0, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
 
@@ -124,7 +124,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveAnnotations(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveAnnotations(values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
 
@@ -133,7 +133,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -143,7 +143,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var values = new List<INode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -153,7 +153,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var values = new HashSet<INode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }

@@ -185,7 +185,7 @@ public class UnknownFeatureTests
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
     }
 
     [TestMethod]

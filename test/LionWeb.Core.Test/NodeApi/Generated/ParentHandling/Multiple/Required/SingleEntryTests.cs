@@ -35,7 +35,7 @@ public class SingleEntryTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Parts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Parts.Count);
     }
 
     [TestMethod]
@@ -49,7 +49,7 @@ public class SingleEntryTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Parts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Parts.Count);
     }
 
     [TestMethod]
@@ -63,7 +63,7 @@ public class SingleEntryTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Parts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Parts.Count);
     }
 
     #endregion
@@ -81,7 +81,7 @@ public class SingleEntryTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Parts.Count);
     }
 
     [TestMethod]
@@ -95,7 +95,7 @@ public class SingleEntryTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Parts.Count);
     }
 
     [TestMethod]
@@ -109,7 +109,7 @@ public class SingleEntryTests
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Parts.Count);
     }
 
     #endregion
@@ -126,7 +126,7 @@ public class SingleEntryTests
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, parent.DisabledParts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count);
     }
 
     [TestMethod]
@@ -139,7 +139,7 @@ public class SingleEntryTests
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, parent.DisabledParts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count);
     }
 
     [TestMethod]
@@ -152,7 +152,7 @@ public class SingleEntryTests
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, parent.DisabledParts.ToList());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count);
     }
 
     #endregion
@@ -189,7 +189,7 @@ public class SingleEntryTests
         var child = new Line("myId");
         var parent = new CompositeShape("src") { Parts = [child] };
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertParts(1, [child]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(1, [child]));
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { child }, parent.Parts.ToList());

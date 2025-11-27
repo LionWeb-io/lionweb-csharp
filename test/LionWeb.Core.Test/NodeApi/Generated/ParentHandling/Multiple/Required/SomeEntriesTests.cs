@@ -216,7 +216,7 @@ public class SomeEntriesTests
         var childB = new Line("b");
         var parent = new CompositeShape("src") { Parts = [childA, childB] };
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertParts(2, [childA]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(2, [childA]));
 
         Assert.AreSame(parent, childA.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { childA, childB }, parent.Parts.ToList());

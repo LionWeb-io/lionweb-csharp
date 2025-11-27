@@ -110,7 +110,7 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
     {
         var parent = NewSdtConcept("od");
         var value = NewAmount(11, 22, "EUR", true);
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
     }
 
@@ -119,7 +119,7 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
     {
         var parent = NewSdtConcept("od");
         var value = true;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
     }
 
@@ -128,7 +128,7 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
     {
         var parent = NewSdtConcept("od");
         var value = 10;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
     }
 
@@ -175,7 +175,7 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
 
         var chunk = new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build()
             .SerializeToChunk([language]);
-        Assert.ThrowsException<UnsupportedStructuredDataTypeException>(() =>
+        Assert.ThrowsExactly<UnsupportedStructuredDataTypeException>(() =>
             new LanguageDeserializerBuilder().WithLionWebVersion(lionWebVersion).Build().Deserialize(chunk));
     }
 
@@ -188,7 +188,7 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
     {
         var dec = NewDecimal();
 
-        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(DecimalInt()));
+        Assert.ThrowsExactly<UnsetFieldException>(() => dec.Get(DecimalInt()));
     }
 
     [TestMethod]
@@ -228,8 +228,8 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
     {
         var dec = NewDecimal();
 
-        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(DecimalInt()));
-        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(DecimalFrac()));
+        Assert.ThrowsExactly<UnsetFieldException>(() => dec.Get(DecimalInt()));
+        Assert.ThrowsExactly<UnsetFieldException>(() => dec.Get(DecimalFrac()));
     }
 
     #endregion
@@ -290,7 +290,7 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
         var e = NewE(NewF("test"));
 
         Assert.AreEqual(NewF("test"), e.Get(E_e2f()));
-        Assert.ThrowsException<UnsetFieldException>(() => e.Get(E_name()));
+        Assert.ThrowsExactly<UnsetFieldException>(() => e.Get(E_name()));
     }
 
     [TestMethod]
@@ -369,7 +369,7 @@ public class StructuredDataTypeTests : StructuredDataTypeTestBase
         var e = NewE(NewF("test"), null);
 
         Assert.AreEqual(NewF("test"), e.Get(E_e2f()));
-        Assert.ThrowsException<UnsetFieldException>(() => e.Get(E_name()));
+        Assert.ThrowsExactly<UnsetFieldException>(() => e.Get(E_name()));
     }
 
     #endregion

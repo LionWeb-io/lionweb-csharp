@@ -53,32 +53,32 @@ public class IdTests
     [TestMethod]
     public void SetId_Constructor_null()
     {
-        Assert.ThrowsException<InvalidIdException>(() => new Line(null));
+        Assert.ThrowsExactly<InvalidIdException>(() => new Line(null));
     }
 
     [TestMethod]
     public void SetId_Dynamic_null()
     {
-        Assert.ThrowsException<InvalidIdException>(() => new DynamicNode(null, ShapesLanguage.Instance.Line));
+        Assert.ThrowsExactly<InvalidIdException>(() => new DynamicNode(null, ShapesLanguage.Instance.Line));
     }
 
     [TestMethod]
     public void SetId_Factory_null()
     {
-        Assert.ThrowsException<InvalidIdException>(() => ShapesLanguage.Instance.GetFactory().NewLine(null));
+        Assert.ThrowsExactly<InvalidIdException>(() => ShapesLanguage.Instance.GetFactory().NewLine(null));
     }
 
     [TestMethod]
     public void SetId_Factory_Reflective_null()
     {
-        Assert.ThrowsException<InvalidIdException>(() =>
+        Assert.ThrowsExactly<InvalidIdException>(() =>
             ShapesLanguage.Instance.GetFactory().CreateNode(null, ShapesLanguage.Instance.Line));
     }
 
     [TestMethod]
     public void SetId_Constructor_invalid_dot()
     {
-        Assert.ThrowsException<InvalidIdException>(() => new Line("my.id")
+        Assert.ThrowsExactly<InvalidIdException>(() => new Line("my.id")
         {
             End = null
         });
@@ -87,32 +87,32 @@ public class IdTests
     [TestMethod]
     public void SetId_Factory_invalid_dot()
     {
-        Assert.ThrowsException<InvalidIdException>(() => ShapesLanguage.Instance.GetFactory().NewLine("my.id"));
+        Assert.ThrowsExactly<InvalidIdException>(() => ShapesLanguage.Instance.GetFactory().NewLine("my.id"));
     }
 
     [TestMethod]
     public void SetId_Factory_Reflective_invalid_dot()
     {
-        Assert.ThrowsException<InvalidIdException>(() =>
+        Assert.ThrowsExactly<InvalidIdException>(() =>
             ShapesLanguage.Instance.GetFactory().CreateNode("my.id", ShapesLanguage.Instance.Line));
     }
 
     [TestMethod]
     public void SetId_Constructor_invalid_equal()
     {
-        Assert.ThrowsException<InvalidIdException>(() => new Line("myid="));
+        Assert.ThrowsExactly<InvalidIdException>(() => new Line("myid="));
     }
 
     [TestMethod]
     public void SetId_Factory_invalid_equal()
     {
-        Assert.ThrowsException<InvalidIdException>(() => ShapesLanguage.Instance.GetFactory().NewLine("myid="));
+        Assert.ThrowsExactly<InvalidIdException>(() => ShapesLanguage.Instance.GetFactory().NewLine("myid="));
     }
 
     [TestMethod]
     public void SetId_Factory_Reflective_invalid_equal()
     {
-        Assert.ThrowsException<InvalidIdException>(() =>
+        Assert.ThrowsExactly<InvalidIdException>(() =>
             ShapesLanguage.Instance.GetFactory().CreateNode("myid=", ShapesLanguage.Instance.Line));
     }
 

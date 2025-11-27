@@ -95,7 +95,7 @@ public class StringOptionalTests : LenientNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = new List<string> { "a", "b" };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Documentation_text, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Documentation_text, value));
         Assert.AreEqual(null, parent.Get(Documentation_text));
     }
 

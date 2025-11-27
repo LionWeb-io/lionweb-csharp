@@ -30,7 +30,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newMaterialGroup("cs");
         var values = new LenientNode[0];
         parent.Set(MaterialGroup_materials, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -40,7 +40,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newMaterialGroup("cs");
         var values = new ArrayList();
         parent.Set(MaterialGroup_materials, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -50,7 +50,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newMaterialGroup("cs");
         var values = new List<LenientNode>();
         parent.Set(MaterialGroup_materials, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -60,7 +60,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newMaterialGroup("cs");
         var values = new List<LenientNode>();
         parent.Set(MaterialGroup_materials, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -70,7 +70,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newMaterialGroup("cs");
         var values = new HashSet<LenientNode>();
         parent.Set(MaterialGroup_materials, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -80,7 +80,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newMaterialGroup("cs");
         var values = new List<string>();
         parent.Set(MaterialGroup_materials, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -92,7 +92,7 @@ public class CollectionTests : LenientNodeTestsBase
         parent.Set(MaterialGroup_materials, new List<LenientNode> { value });
         var values = new List<LenientNode>();
         parent.Set(MaterialGroup_materials, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -105,9 +105,9 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("cs");
         var values = new LenientNode[] { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -116,9 +116,9 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("cs");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -127,9 +127,9 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("cs");
         var values = new List<LenientNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -138,9 +138,9 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("cs");
         var values = new List<LenientNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -149,9 +149,9 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("cs");
         var values = new List<string>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -160,9 +160,9 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("cs");
         var values = new HashSet<LenientNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 

@@ -132,7 +132,7 @@ public class ListenerTests
             Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
             Assert.AreEqual("hello", args.OldValue);
         });
-        Assert.ThrowsException<InvalidValueException>(() => circle.Uuid = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => circle.Uuid = null);
 
         Assert.AreEqual(0, notifications);
     }

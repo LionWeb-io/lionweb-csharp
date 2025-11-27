@@ -38,7 +38,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<DynamicNode> { child }, target.Get(CompositeShape_parts) as IList);
-        Assert.ThrowsException<UnsetFeatureException>(() => (source.Get(CompositeShape_parts) as IList).Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => (source.Get(CompositeShape_parts) as IList).Count);
     }
 
     #endregion
@@ -57,7 +57,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<DynamicNode> { child }, target.Get(Geometry_shapes) as IList);
-        Assert.ThrowsException<UnsetFeatureException>(() => (source.Get(CompositeShape_parts) as IList).Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => (source.Get(CompositeShape_parts) as IList).Count);
     }
 
     #endregion
@@ -75,7 +75,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<DynamicNode> { child }, parent.Get(CompositeShape_disabledParts) as IList);
-        Assert.ThrowsException<UnsetFeatureException>(() => (parent.Get(CompositeShape_parts) as IList).Count);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => (parent.Get(CompositeShape_parts) as IList).Count);
     }
 
     #endregion
@@ -196,7 +196,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
 
         Assert.AreSame(target, child.GetParent());
         CollectionAssert.AreEqual(new List<DynamicNode> { child }, target.Get(Geometry_shapes) as IList);
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Get(CompositeShape_evilPart));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Get(CompositeShape_evilPart));
     }
 
     #endregion
@@ -214,7 +214,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
 
         Assert.AreSame(parent, child.GetParent());
         CollectionAssert.AreEqual(new List<DynamicNode> { child }, parent.Get(CompositeShape_parts) as IList);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(CompositeShape_evilPart));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(CompositeShape_evilPart));
     }
 
     #endregion
@@ -255,7 +255,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.Get(CompositeShape_evilPart));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(CompositeShape_parts) as IList);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(CompositeShape_parts) as IList);
     }
 
     #endregion

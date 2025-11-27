@@ -43,7 +43,7 @@ public class ModelMigratorTests : MigrationTestsBase
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []) { MaxMigrationRounds = 17 };
         migrator.RegisterMigration(new InfiniteMigration());
 
-        await Assert.ThrowsExceptionAsync<MaxMigrationRoundsExceededException>(() =>
+        await Assert.ThrowsExactlyAsync<MaxMigrationRoundsExceededException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
@@ -127,7 +127,7 @@ public class ModelMigratorTests : MigrationTestsBase
     [TestMethod]
     public void InvalidSerializerBuilder()
     {
-        Assert.ThrowsException<VersionMismatchException>(() =>
+        Assert.ThrowsExactly<VersionMismatchException>(() =>
             new ModelMigrator(LionWebVersions.v2023_1, [])
             {
                 SerializerBuilder = new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2024_1)
@@ -137,7 +137,7 @@ public class ModelMigratorTests : MigrationTestsBase
     [TestMethod]
     public void InvalidDeserializerBuilder()
     {
-        Assert.ThrowsException<VersionMismatchException>(() =>
+        Assert.ThrowsExactly<VersionMismatchException>(() =>
             new ModelMigrator(LionWebVersions.v2023_1, [])
             {
                 DeserializerBuilder = new DeserializerBuilder().WithLionWebVersion(LionWebVersions.v2024_1)
@@ -147,7 +147,7 @@ public class ModelMigratorTests : MigrationTestsBase
     [TestMethod]
     public void DeserializerSerializerMismatch()
     {
-        Assert.ThrowsException<VersionMismatchException>(() =>
+        Assert.ThrowsExactly<VersionMismatchException>(() =>
             new ModelMigrator(LionWebVersions.v2024_1_Compatible, [])
             {
                 DeserializerBuilder = new DeserializerBuilder().WithLionWebVersion(LionWebVersions.v2024_1),
@@ -158,7 +158,7 @@ public class ModelMigratorTests : MigrationTestsBase
     [TestMethod]
     public void SerializerDeserializerMismatch()
     {
-        Assert.ThrowsException<VersionMismatchException>(() =>
+        Assert.ThrowsExactly<VersionMismatchException>(() =>
             new ModelMigrator(LionWebVersions.v2024_1_Compatible, [])
             {
                 SerializerBuilder = new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1),
@@ -320,7 +320,7 @@ public class ModelMigratorTests : MigrationTestsBase
 
         migrator.RegisterMigration(new RootNodesMigration([new LenientNode("a", ShapesLanguage.Instance.Line), null]));
 
-        await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
+        await Assert.ThrowsExactlyAsync<InvalidRootNodesException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
@@ -338,7 +338,7 @@ public class ModelMigratorTests : MigrationTestsBase
 
         migrator.RegisterMigration(new RootNodesMigration([parent, child]));
 
-        await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
+        await Assert.ThrowsExactlyAsync<InvalidRootNodesException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
@@ -355,7 +355,7 @@ public class ModelMigratorTests : MigrationTestsBase
 
         migrator.RegisterMigration(new RootNodesMigration([parent, child]));
 
-        await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
+        await Assert.ThrowsExactlyAsync<InvalidRootNodesException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }
 

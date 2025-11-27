@@ -216,7 +216,7 @@ public class SomeEntriesTests
         var childB = new MaterialGroup("b");
         var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertGroups(2, [childA]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertGroups(2, [childA]));
 
         Assert.AreSame(parent, childA.GetParent());
         CollectionAssert.AreEqual(new List<MaterialGroup> { childA, childB }, parent.Groups.ToList());

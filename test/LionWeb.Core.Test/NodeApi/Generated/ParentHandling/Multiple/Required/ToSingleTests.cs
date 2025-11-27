@@ -66,7 +66,7 @@ public class ToSingleTests
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.EvilPart);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts);
     }
 
     [TestMethod]
@@ -79,7 +79,7 @@ public class ToSingleTests
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.EvilPart);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts);
     }
 
     #endregion

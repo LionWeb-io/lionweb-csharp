@@ -38,7 +38,7 @@ public class EnumerationLiteralTests : M2ReflectionTestsBase
     {
         Assert.AreEqual(enLit.Name, enLit.Get(INamedName));
         Assert.AreEqual(enLit.Key, enLit.Get(IKeyedKey));
-        Assert.ThrowsException<UnknownFeatureException>(() => enLit.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => enLit.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -46,9 +46,9 @@ public class EnumerationLiteralTests : M2ReflectionTestsBase
     {
         enLit.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", enLit.Name);
-        Assert.ThrowsException<InvalidValueException>(() => enLit.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => enLit.Set(INamedName, null));
         Assert.AreEqual("Hello", enLit.Name);
-        Assert.ThrowsException<InvalidValueException>(() => enLit.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => enLit.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -68,9 +68,9 @@ public class EnumerationLiteralTests : M2ReflectionTestsBase
         var literal = enLit;
         literal.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", literal.Key);
-        Assert.ThrowsException<InvalidValueException>(() => literal.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => literal.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", literal.Key);
-        Assert.ThrowsException<InvalidValueException>(() => literal.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => literal.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -87,6 +87,6 @@ public class EnumerationLiteralTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => enLit.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => enLit.Set(LanguageVersion, "asdf"));
     }
 }

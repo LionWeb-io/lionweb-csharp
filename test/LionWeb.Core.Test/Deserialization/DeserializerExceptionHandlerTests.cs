@@ -32,7 +32,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void unknown_classifier()
     {
-        Assert.ThrowsException<UnsupportedClassifierException>(() =>
+        Assert.ThrowsExactly<UnsupportedClassifierException>(() =>
             new DeserializerExceptionHandler().UnknownClassifier(
                 CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(true, false)),
                 ICompressedId.Create("a", new CompressedIdConfig(true, true))));
@@ -41,7 +41,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void duplicate_node_id()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().DuplicateNodeId(
                 ICompressedId.Create("a", new CompressedIdConfig(true, true)),
                 new Line("line"),
@@ -51,7 +51,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void unknown_feature()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() =>
+        Assert.ThrowsExactly<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().UnknownFeature<Containment>(
                 CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
                 new DynamicConcept("concept", _lionWebVersion, new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
@@ -61,7 +61,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void invalid_feature()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() =>
+        Assert.ThrowsExactly<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().InvalidFeature<Containment>(
                 CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
                 new DynamicConcept("concept", _lionWebVersion, new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
@@ -71,7 +71,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void invalid_link_value()
     {
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             new DeserializerExceptionHandler().InvalidLinkValue<Containment>(
                 [],
                 new DynamicReference("dyn-reference", _lionWebVersion, 
@@ -94,21 +94,21 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void invalid_containment()
     {
-        Assert.ThrowsException<UnsupportedClassifierException>(() =>
+        Assert.ThrowsExactly<UnsupportedClassifierException>(() =>
             new LanguageDeserializerExceptionHandler().InvalidContainment(new Line("line")));
     }
 
     [TestMethod]
     public void invalid_reference()
     {
-        Assert.ThrowsException<UnsupportedClassifierException>(() =>
+        Assert.ThrowsExactly<UnsupportedClassifierException>(() =>
             new DeserializerExceptionHandler().InvalidReference(new Line("line")));
     }
 
     [TestMethod]
     public void unresolvable_child()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableChild(
                 ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
                 new DynamicContainment("dyn-containment", _lionWebVersion,
@@ -119,7 +119,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void unresolvable_reference_target()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableReferenceTarget(
                 new ReferenceTarget(null, "a", null),
                 new DynamicReference("dyn-reference", _lionWebVersion,
@@ -130,7 +130,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void unresolvable_annotation()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableAnnotation(
                 ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
                 new Line("line")));
@@ -139,14 +139,14 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void invalid_annotation()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().InvalidAnnotation(new Documentation("doc"), new Line("line")));
     }
 
     [TestMethod]
     public void circular_containment()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().CircularContainment(
                 new Line("line"),
                 new Line("line")));
@@ -155,7 +155,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void duplicate_containment()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().DuplicateContainment(
                 new Line("line"),
                 new Line("line"),
@@ -165,14 +165,14 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void invalid_annotation_parent()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new LanguageDeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("doc"), new Line("line")));
     }
 
     [TestMethod]
     public void unknown_enumeration_literal()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnknownEnumerationLiteral(
                 "a",
                 new DynamicEnumeration("dyn-enum", _lionWebVersion, new DynamicLanguage("dyn-lang-1", _lionWebVersion)),
@@ -185,7 +185,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void unknown_datatype()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
         {
             var concept = new DynamicConcept("dyn-concept", _lionWebVersion, new DynamicLanguage("dyn-lang", _lionWebVersion));
             return new DeserializerExceptionHandler().UnknownDatatype("a", concept,
@@ -197,7 +197,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void invalid_property_value()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().InvalidPropertyValue<int>(
                 "a",
                 new DynamicProperty("dyn-property", _lionWebVersion,
@@ -208,7 +208,7 @@ public class DeserializerExceptionHandlerTests
     [TestMethod]
     public void skip_deserializing_dependent_node()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
+        Assert.ThrowsExactly<DeserializerException>(() =>
             new DeserializerExceptionHandler().SkipDeserializingDependentNode(ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true))));
     }
 }

@@ -30,7 +30,7 @@ public class MultipleCollectionTests
         var valueA = new Documentation("sA");
         var valueB = new Documentation("sB");
         var values = new Documentation[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());
@@ -44,7 +44,7 @@ public class MultipleCollectionTests
         var valueA = new Documentation("sA");
         var valueB = new Documentation("sB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());
@@ -58,7 +58,7 @@ public class MultipleCollectionTests
         var valueA = new Documentation("sA");
         var valueB = new Documentation("sB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());
@@ -72,7 +72,7 @@ public class MultipleCollectionTests
         var valueA = new Documentation("sA");
         var valueB = new Documentation("sB");
         var values = new List<Documentation>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());
@@ -86,7 +86,7 @@ public class MultipleCollectionTests
         var valueA = new Documentation("sA");
         var valueB = new Documentation("sB");
         var values = new HashSet<Documentation>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());
@@ -100,7 +100,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new List<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());
@@ -114,7 +114,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());
@@ -128,7 +128,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
         Assert.IsNull(parent.Documentation);
         Assert.IsNull(valueA.GetParent());

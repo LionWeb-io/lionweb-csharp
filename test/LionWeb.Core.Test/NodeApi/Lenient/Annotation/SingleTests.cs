@@ -117,7 +117,7 @@ public class SingleTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(-1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(-1, [bom]));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -127,7 +127,7 @@ public class SingleTests : LenientNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, [bom]));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }

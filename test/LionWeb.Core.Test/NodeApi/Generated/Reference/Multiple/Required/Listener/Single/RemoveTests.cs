@@ -35,7 +35,7 @@ public class RemoveTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
         Assert.AreEqual(0, notifications);
     }
@@ -51,7 +51,7 @@ public class RemoveTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { }));
 
         Assert.AreEqual(0, notifications);
@@ -85,7 +85,7 @@ public class RemoveTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
         Assert.AreEqual(0, notifications);
     }
@@ -101,7 +101,7 @@ public class RemoveTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
         Assert.AreEqual(0, notifications);
     }

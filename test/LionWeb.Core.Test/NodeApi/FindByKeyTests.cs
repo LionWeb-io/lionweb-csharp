@@ -101,13 +101,13 @@ public class FindByKeyTests
     public void WrongType()
     {
         var language = SDTLangLanguage.Instance;
-        Assert.ThrowsException<KeyNotFoundException>(() => language.FindByKey<EnumerationLiteral>(language.A_a2b.Key));
+        Assert.ThrowsExactly<KeyNotFoundException>(() => language.FindByKey<EnumerationLiteral>(language.A_a2b.Key));
     }
 
     [TestMethod]
     public void UnknownKey()
     {
         var language = ShapesLanguage.Instance;
-        Assert.ThrowsException<KeyNotFoundException>(() => language.FindByKey<IKeyed>("asdf"));
+        Assert.ThrowsExactly<KeyNotFoundException>(() => language.FindByKey<IKeyed>("asdf"));
     }
 }
