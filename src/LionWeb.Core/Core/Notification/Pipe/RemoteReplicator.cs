@@ -36,7 +36,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     protected readonly IdFilteringNotificationFilter Filter;
 
-    private readonly SharedNodeMap _existingNodes;
+    private readonly SharedNodeMap _sharedNodeMap;
 
     public RemoteReplicator(
         IForest? localForest,
@@ -46,7 +46,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     {
         _localForest = localForest;
         Filter = filter;
-        _existingNodes = sharedNodeMap;
+        _sharedNodeMap = sharedNodeMap;
     }
 
     /// <inheritdoc />
@@ -144,9 +144,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             newNodes.Add(node.GetId());
         }
 
-        var commonNodes = _existingNodes.Keys.Intersect(newNodes).ToList();
+        var existingNodes = _sharedNodeMap.Keys.Intersect(newNodes).ToList();
 
-        if (commonNodes.Count == 0)
+        if (existingNodes.Count == 0)
         {
             return;
         }
@@ -155,11 +155,11 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             case PartitionAddedNotification partitionAddedNotification:
                 throw new InvalidNotificationException(partitionAddedNotification,
-                    $"Trying to add existing node(s) with ids: {string.Join(",", commonNodes)}");
+                    $"Trying to add existing node(s) with ids: {string.Join(",", existingNodes)}");
 
             case ChildAddedNotification childAddedNotification:
                 throw new InvalidNotificationException(childAddedNotification,
-                    $"Trying to add existing node(s) with ids: {string.Join(",", commonNodes)}");
+                    $"Trying to add existing node(s) with ids: {string.Join(",", existingNodes)}");
 
             case ChildReplacedNotification childReplacedNotification:
                 {
@@ -170,13 +170,12 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                         replacedNodes.Add(node.GetId());
                     }
 
-                    var nodes = new HashSet<NodeId>(commonNodes);
-                    nodes.ExceptWith(replacedNodes);
+                    var remainingNodes = existingNodes.ExceptBy(replacedNodes, s => s).ToList();
 
-                    if (nodes.Count != 0)
+                    if (remainingNodes.Count != 0)
                     {
                         throw new InvalidNotificationException(childReplacedNotification,
-                            $"Trying to add existing node(s) with ids: {string.Join(",", commonNodes)}");
+                            $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
                     }
 
                     break;
