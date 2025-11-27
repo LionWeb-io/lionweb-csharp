@@ -135,21 +135,21 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
     }
 
-    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification)
+    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> acceptableNewNodes)
     {
-        HashSet<NodeId> newNodes = [];
+        HashSet<NodeId> newNodes = M1Extensions
+            .Descendants(newNodeNotification.NewNode, true, true)
+            .Select(node => node.GetId())
+            .ToHashSet();
 
-        foreach (var node in M1Extensions.Descendants(newNodeNotification.NewNode, true, true))
-        {
-            newNodes.Add(node.GetId());
-        }
+        var hasIntersection = _sharedNodeMap.NodeIds.ToHashSet().Overlaps(newNodes);
 
-        var existingNodes = _sharedNodeMap.Keys.Intersect(newNodes).ToList();
-
-        if (existingNodes.Count == 0)
+        if (!hasIntersection)
         {
             return;
         }
+
+        var existingNodes = _sharedNodeMap.NodeIds.Intersect(newNodes).ToList();
 
         switch (newNodeNotification)
         {
@@ -163,14 +163,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
             case ChildReplacedNotification childReplacedNotification:
                 {
-                    HashSet<NodeId> replacedNodes = [];
-
-                    foreach (var node in M1Extensions.Descendants(childReplacedNotification.ReplacedChild, true, true))
-                    {
-                        replacedNodes.Add(node.GetId());
-                    }
-
-                    var remainingNodes = existingNodes.ExceptBy(replacedNodes, s => s).ToList();
+                    var remainingNodes = existingNodes.ExceptBy(acceptableNewNodes, s => s).ToList();
 
                     if (remainingNodes.Count != 0)
                     {
@@ -181,14 +174,13 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                     break;
                 }
         }
-        
     }
     
     #region Partitions
 
     private void OnRemoteNewPartition(PartitionAddedNotification notification)
     {
-        CheckIfNewNodeContainsExistingNodes(notification);
+        CheckIfNewNodeContainsExistingNodes(notification, []);
    
         SuppressNotificationForwarding(notification, () =>
         {
@@ -237,7 +229,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     private void OnRemoteChildAdded(ChildAddedNotification notification)
     {
-        CheckIfNewNodeContainsExistingNodes(notification);
+        CheckIfNewNodeContainsExistingNodes(notification, []);
         
         SuppressNotificationForwarding(notification, () =>
         {
@@ -262,7 +254,12 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     private void OnRemoteChildReplaced(ChildReplacedNotification notification)
     {
-        CheckIfNewNodeContainsExistingNodes(notification);
+        HashSet<NodeId> replacedNodes = M1Extensions
+            .Descendants(notification.ReplacedChild, true, true)
+            .Select(node => node.GetId())
+            .ToHashSet();
+        
+        CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
         
         SuppressNotificationForwarding(notification, () =>
         {
