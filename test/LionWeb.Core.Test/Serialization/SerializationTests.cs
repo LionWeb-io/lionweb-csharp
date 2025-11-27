@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Test.Serialization;
 
 using Core.Serialization;
-using Core.Utilities;
 using Languages.Generated.V2024_1.Mixed.MixedConceptLang;
 using Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang;
 using Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang;
@@ -30,21 +29,12 @@ using M1;
 using M2;
 using M3;
 using System.Collections;
-using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class SerializationTests
+public class SerializationTests : SerializationTestsBase
 {
-    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
-    private readonly Language _language;
-
-    public SerializationTests()
-    {
-        _language = ShapesLanguage.Instance;
-    }
-
     [TestMethod]
-    public void test_serialization_shapes_model()
+    public void Shapes_model()
     {
         INode rootNode = new ExampleModels(_lionWebVersion).ExampleModel(_language);
 
@@ -60,7 +50,7 @@ public class SerializationTests
     }
 
     [TestMethod]
-    public void test_no_double_serialization()
+    public void No_double_serialization()
     {
         var geometry = new ExampleModels(_lionWebVersion).ExampleModel(_language);
         var shape0 = (geometry.Get(_language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes")) as IEnumerable)
@@ -73,7 +63,7 @@ public class SerializationTests
     }
 
     [TestMethod]
-    public void test_optional_string_property_serialization()
+    public void Optional_string_property_serialization()
     {
         var documentation = ((ShapesFactory)_language.GetFactory()).CreateDocumentation();
         var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
@@ -98,8 +88,7 @@ public class SerializationTests
             .Build()
             .Deserialize(serializationChunk);
 
-        var comparer = new Comparer([line, refGeo], nodes);
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+        AssertEquals([line, refGeo], nodes);
     }
 
     [TestMethod]
@@ -114,8 +103,7 @@ public class SerializationTests
             .Build()
             .Deserialize(serializationChunk);
 
-        var comparer = new Comparer([compositeShape], nodes);
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+        AssertEquals([compositeShape], nodes);
     }
 
     [TestMethod]
@@ -130,8 +118,7 @@ public class SerializationTests
             .Build()
             .Deserialize(serializationChunk);
 
-        var comparer = new Comparer([materialGroup], nodes);
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+        AssertEquals([materialGroup], nodes);
     }
 
     [TestMethod]
@@ -336,8 +323,7 @@ public class SerializationTests
             .Build()
             .Deserialize(serializedNodes);
 
-        var comparer = new Comparer([node], nodes);
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+        AssertEquals([node], nodes);
     }
 
     [TestMethod]
@@ -368,264 +354,5 @@ public class SerializationTests
             new() { Key = "key-mixedDirectSdtLang", Version = "1" },
             new() { Key = "key-mixedNestedSdtLang", Version = "1" },
         }, serializer.UsedLanguages.ToList());
-    }
-
-    [TestMethod]
-    public void EmptyFeatures_Serialize()
-    {
-        var circle = new Circle("circle");
-        var node = new OffsetDuplicate("od") { Uuid = "abc", Source = circle, Docs = new Documentation("docs") };
-
-        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).WithSerializedEmptyFeatures(true)
-            .Build();
-
-        var chunk = serializer.SerializeToChunk([node, circle]);
-
-        var lang = ShapesLanguage.Instance;
-        var langKey = lang.Key;
-        var langVersion = lang.Version;
-        var expected = new SerializationChunk
-        {
-            SerializationFormatVersion = _lionWebVersion.VersionString,
-            Languages = [new SerializedLanguageReference { Key = langKey, Version = langVersion }],
-            Nodes =
-            [
-                new SerializedNode
-                {
-                    Id = "od",
-                    Classifier = lang.OffsetDuplicate.ToMetaPointer(),
-                    Properties =
-                    [
-                        new SerializedProperty { Property = lang.IShape_uuid.ToMetaPointer(), Value = "abc" },
-                        new SerializedProperty
-                        {
-                            Property = _lionWebVersion.BuiltIns.INamed_name.ToMetaPointer(), Value = null
-                        },
-                    ],
-                    Containments =
-                    [
-                        new SerializedContainment
-                        {
-                            Containment = lang.OffsetDuplicate_docs.ToMetaPointer(), Children = ["docs"]
-                        },
-                        new SerializedContainment
-                        {
-                            Containment = lang.IShape_fixpoints.ToMetaPointer(), Children = []
-                        },
-                        new SerializedContainment
-                        {
-                            Containment = lang.OffsetDuplicate_secretDocs.ToMetaPointer(), Children = []
-                        },
-                        new SerializedContainment
-                        {
-                            Containment = lang.OffsetDuplicate_offset.ToMetaPointer(), Children = []
-                        },
-                        new SerializedContainment { Containment = lang.Shape_shapeDocs.ToMetaPointer(), Children = [] },
-                    ],
-                    References =
-                    [
-                        new SerializedReference
-                        {
-                            Reference = lang.OffsetDuplicate_source.ToMetaPointer(),
-                            Targets =
-                            [
-                                new SerializedReferenceTarget { Reference = "circle", ResolveInfo = null }
-                            ]
-                        },
-                        new SerializedReference
-                        {
-                            Reference = lang.OffsetDuplicate_altSource.ToMetaPointer(), Targets = []
-                        }
-                    ],
-                    Annotations = [],
-                    Parent = null
-                },
-                new SerializedNode
-                {
-                    Id = "docs",
-                    Classifier = lang.Documentation.ToMetaPointer(),
-                    Properties =
-                    [
-                        new SerializedProperty
-                        {
-                            Property = lang.Documentation_technical.ToMetaPointer(), Value = null
-                        },
-                        new SerializedProperty { Property = lang.Documentation_text.ToMetaPointer(), Value = null },
-                    ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
-                    Parent = "od"
-                },
-                new SerializedNode
-                {
-                    Id = "circle",
-                    Classifier = lang.Circle.ToMetaPointer(),
-                    Properties =
-                    [
-                        new SerializedProperty { Property = lang.IShape_uuid.ToMetaPointer(), Value = null },
-                        new SerializedProperty { Property = lang.Circle_r.ToMetaPointer(), Value = null },
-                        new SerializedProperty
-                        {
-                            Property = _lionWebVersion.BuiltIns.INamed_name.ToMetaPointer(), Value = null
-                        },
-                    ],
-                    Containments =
-                    [
-                        new SerializedContainment { Containment = lang.Circle_center.ToMetaPointer(), Children = [] },
-                        new SerializedContainment
-                        {
-                            Containment = lang.IShape_fixpoints.ToMetaPointer(), Children = []
-                        },
-                        new SerializedContainment { Containment = lang.Shape_shapeDocs.ToMetaPointer(), Children = [] },
-                    ],
-                    References = [],
-                    Annotations = [],
-                    Parent = null
-                }
-            ]
-        };
-
-        AssertEquals(expected, chunk);
-    }
-
-    [TestMethod]
-    public void EmptyFeatures_Skip()
-    {
-        var circle = new Circle("circle");
-        var node = new OffsetDuplicate("od") { Uuid = "abc", Source = circle, Docs = new Documentation("docs") };
-
-        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).WithSerializedEmptyFeatures(false)
-            .Build();
-
-        var chunk = serializer.SerializeToChunk([node, circle]);
-
-        var langKey = ShapesLanguage.Instance.Key;
-        var langVersion = ShapesLanguage.Instance.Version;
-        var expected = new SerializationChunk
-        {
-            SerializationFormatVersion = _lionWebVersion.VersionString,
-            Languages = [new SerializedLanguageReference { Key = langKey, Version = langVersion }],
-            Nodes =
-            [
-                new SerializedNode
-                {
-                    Id = "od",
-                    Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.OffsetDuplicate.Key),
-                    Properties =
-                    [
-                        new SerializedProperty
-                        {
-                            Property = new MetaPointer(langKey, langVersion,
-                                ShapesLanguage.Instance.IShape_uuid.Key),
-                            Value = "abc"
-                        }
-                    ],
-                    Containments =
-                    [
-                        new SerializedContainment
-                        {
-                            Containment = new MetaPointer(langKey, langVersion,
-                                ShapesLanguage.Instance.OffsetDuplicate_docs.Key),
-                            Children = ["docs"]
-                        }
-                    ],
-                    References =
-                    [
-                        new SerializedReference
-                        {
-                            Reference = new MetaPointer(langKey, langVersion,
-                                ShapesLanguage.Instance.OffsetDuplicate_source.Key),
-                            Targets =
-                            [
-                                new SerializedReferenceTarget { Reference = "circle", ResolveInfo = null }
-                            ]
-                        }
-                    ],
-                    Annotations = [],
-                    Parent = null
-                },
-                new SerializedNode
-                {
-                    Id = "docs",
-                    Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.Documentation.Key),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
-                    Parent = "od"
-                },
-                new SerializedNode
-                {
-                    Id = "circle",
-                    Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.Circle.Key),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
-                    Parent = null
-                }
-            ]
-        };
-
-        AssertEquals(expected, chunk);
-    }
-
-    private void AssertEquals(SerializationChunk expected, SerializationChunk actual)
-    {
-        Assert.AreEqual(expected.SerializationFormatVersion, actual.SerializationFormatVersion);
-        CollectionAssert.AreEqual(expected.Languages, actual.Languages);
-        Assert.AreEqual(expected.Nodes.Length, actual.Nodes.Length);
-        var expectedNodes = expected.Nodes.GetEnumerator();
-        var actualNodes = actual.Nodes.GetEnumerator();
-        while (expectedNodes.MoveNext() && actualNodes.MoveNext())
-        {
-            var expectedNode = (SerializedNode)expectedNodes.Current!;
-            var actualNode = (SerializedNode)actualNodes.Current!;
-            Assert.AreEqual(expectedNode.Id, actualNode.Id);
-            Assert.AreEqual(expectedNode.Classifier, actualNode.Classifier);
-            CollectionAssert.AreEqual(
-                expectedNode.Properties.OrderBy(p => p.Property.Key).ToList(),
-                actualNode.Properties.OrderBy(p => p.Property.Key).ToList()
-            );
-
-            Assert.AreEqual(expectedNode.Containments.Length, actualNode.Containments.Length);
-            using var expectedContainments = expectedNode.Containments.OrderBy(c => c.Containment.Key).GetEnumerator();
-            using var actualContainments = actualNode.Containments.OrderBy(c => c.Containment.Key).GetEnumerator();
-            while (expectedContainments.MoveNext() && actualContainments.MoveNext())
-            {
-                var expectedContainment = expectedContainments.Current;
-                var actualContainment = actualContainments.Current;
-                Assert.AreEqual(expectedContainment.Containment, actualContainment.Containment);
-                CollectionAssert.AreEqual(expectedContainment.Children, actualContainment.Children);
-            }
-
-            Assert.AreEqual(expectedNode.References.Length, actualNode.References.Length);
-            using var expectedReferences = expectedNode.References.OrderBy(r => r.Reference.Key).GetEnumerator();
-            using var actualReferences = actualNode.References.OrderBy(r => r.Reference.Key).GetEnumerator();
-            while (expectedReferences.MoveNext() && actualReferences.MoveNext())
-            {
-                var expectedReference = expectedReferences.Current;
-                var actualReference = actualReferences.Current;
-                Assert.AreEqual(expectedReference.Reference, actualReference.Reference);
-                CollectionAssert.AreEqual(expectedReference.Targets, actualReference.Targets);
-            }
-
-            CollectionAssert.AreEqual(expectedNode.Annotations, actualNode.Annotations);
-
-            Assert.AreEqual(expectedNode.Parent, actualNode.Parent);
-        }
-    }
-
-    private TestContext testContextInstance;
-
-    /// <summary>
-    /// Gets or sets the test context which provides
-    /// information about and functionality for the current test run.
-    /// </summary>
-    public TestContext TestContext
-    {
-        get { return testContextInstance; }
-        set { testContextInstance = value; }
     }
 }
