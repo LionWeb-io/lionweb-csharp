@@ -35,7 +35,7 @@ public class SingleTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, bom));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, bom));
         Assert.AreSame(null, bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -57,7 +57,7 @@ public class SingleTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(-1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(-1, [bom]));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -67,7 +67,7 @@ public class SingleTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, [bom]));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }

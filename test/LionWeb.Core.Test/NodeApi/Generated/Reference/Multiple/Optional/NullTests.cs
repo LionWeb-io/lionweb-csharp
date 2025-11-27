@@ -26,42 +26,42 @@ public class NullTests
     public void Null()
     {
         var parent = new ReferenceGeometry("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddShapes(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddShapes(null));
     }
 
     [TestMethod]
     public void Reflective()
     {
         var parent = new ReferenceGeometry("g");
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, null));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        Assert.ThrowsException<InvalidValueException>(() => new ReferenceGeometry("g") { Shapes = [null] });
+        Assert.ThrowsExactly<InvalidValueException>(() => new ReferenceGeometry("g") { Shapes = [null] });
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
         var parent = new ReferenceGeometry("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertShapes(0, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertShapes(0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
         var parent = new ReferenceGeometry("g");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertShapes(1, null));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertShapes(1, null));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
         var parent = new ReferenceGeometry("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveShapes(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveShapes(null));
     }
 
     [TestMethod]

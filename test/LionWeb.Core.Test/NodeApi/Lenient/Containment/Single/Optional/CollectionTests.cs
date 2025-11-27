@@ -78,7 +78,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new LenientNode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -87,7 +87,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -96,7 +96,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<LenientNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -105,7 +105,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<string>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -114,7 +114,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new HashSet<LenientNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 

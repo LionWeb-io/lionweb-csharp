@@ -26,31 +26,31 @@ public class NullTests
     public void Null()
     {
         var parent = new OffsetDuplicate("od");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Offset = null);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Offset = null);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
     }
 
     [TestMethod]
     public void Setter()
     {
         var parent = new OffsetDuplicate("od");
-        Assert.ThrowsException<InvalidValueException>(() => parent.SetOffset(null));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.SetOffset(null));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
     }
 
     [TestMethod]
     public void Reflective()
     {
         var parent = new OffsetDuplicate("od");
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, null));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => new OffsetDuplicate("od") { Offset = null });
     }
 

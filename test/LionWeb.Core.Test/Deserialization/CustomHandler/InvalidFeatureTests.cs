@@ -140,7 +140,7 @@ public class InvalidFeatureTests
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
     }
 
     /// <summary>

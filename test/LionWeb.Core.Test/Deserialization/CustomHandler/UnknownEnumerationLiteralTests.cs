@@ -168,6 +168,6 @@ public class UnknownEnumerationLiteralTests
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(WithEnumLanguage.Instance)
             .Build();
-        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsExactly<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
     }
 }

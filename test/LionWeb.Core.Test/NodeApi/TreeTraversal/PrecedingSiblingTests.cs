@@ -52,7 +52,7 @@ public class PrecedingSiblingTests
     public void NoParent()
     {
         var circleA = new Circle("a");
-        Assert.ThrowsException<TreeShapeException>(() => circleA.PrecedingSiblings());
+        Assert.ThrowsExactly<TreeShapeException>(() => circleA.PrecedingSiblings());
     }
 
     [TestMethod]
@@ -60,7 +60,7 @@ public class PrecedingSiblingTests
     {
         var coord = new Coord("a");
         var circle = new Circle("b") { Center = coord };
-        Assert.ThrowsException<TreeShapeException>(() => coord.PrecedingSiblings());
+        Assert.ThrowsExactly<TreeShapeException>(() => coord.PrecedingSiblings());
     }
 
     [TestMethod]

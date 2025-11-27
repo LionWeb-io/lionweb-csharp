@@ -167,7 +167,7 @@ public class MultipleCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -184,7 +184,7 @@ public class MultipleCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
         Assert.AreEqual(0, notifications);
     }

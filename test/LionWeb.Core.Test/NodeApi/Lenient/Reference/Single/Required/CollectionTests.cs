@@ -30,7 +30,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var values = new LenientNode[0];
         parent.Set(OffsetDuplicate_source, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             parent.Get(OffsetDuplicate_source));
     }
 
@@ -40,7 +40,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var values = new ArrayList();
         parent.Set(OffsetDuplicate_source, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             parent.Get(OffsetDuplicate_source));
     }
 
@@ -50,7 +50,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var values = new List<LenientNode>();
         parent.Set(OffsetDuplicate_source, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             parent.Get(OffsetDuplicate_source));
     }
 
@@ -60,7 +60,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var values = new HashSet<LenientNode>();
         parent.Set(OffsetDuplicate_source, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             parent.Get(OffsetDuplicate_source));
     }
 
@@ -70,7 +70,7 @@ public class CollectionTests : LenientNodeTestsBase
         var parent = newOffsetDuplicate("od");
         var values = new List<string>();
         parent.Set(OffsetDuplicate_source, values);
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             parent.Get(OffsetDuplicate_source));
     }
 
@@ -83,7 +83,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new LenientNode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_source, values));
     }
 
@@ -92,7 +92,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_source, values));
     }
 
@@ -101,7 +101,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new List<LenientNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_source, values));
     }
 
@@ -110,7 +110,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new List<string>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(OffsetDuplicate_source, values));
     }
 
@@ -119,7 +119,7 @@ public class CollectionTests : LenientNodeTestsBase
     {
         var parent = newOffsetDuplicate("od");
         var values = new HashSet<LenientNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(OffsetDuplicate_source, values));
     }
 

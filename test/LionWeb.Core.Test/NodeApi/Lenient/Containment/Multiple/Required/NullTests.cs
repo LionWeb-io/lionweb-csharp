@@ -25,7 +25,7 @@ public class NullTests : LenientNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         parent.Set(CompositeShape_parts, null);
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 }

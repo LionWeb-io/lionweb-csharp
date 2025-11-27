@@ -37,9 +37,9 @@ public class SingleTests
     {
         var parent = new CompositeShape("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, line));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, line));
         Assert.AreSame(null, line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
     }
 
     [TestMethod]
@@ -77,9 +77,9 @@ public class SingleTests
     {
         var parent = new CompositeShape("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertParts(-1, [line]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(-1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
     }
 
     [TestMethod]
@@ -87,9 +87,9 @@ public class SingleTests
     {
         var parent = new CompositeShape("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertParts(1, [line]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
     }
 
     [TestMethod]
@@ -172,9 +172,9 @@ public class SingleTests
     {
         var parent = new CompositeShape("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts([line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
     }
 
     [TestMethod]
@@ -194,7 +194,7 @@ public class SingleTests
     {
         var line = new Line("myId");
         var parent = new CompositeShape("cs") { Parts = [line] };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts([line]));
         Assert.AreSame(parent, line.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { line }, parent.Parts.ToList());
     }

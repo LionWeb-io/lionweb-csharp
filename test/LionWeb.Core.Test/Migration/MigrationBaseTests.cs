@@ -34,7 +34,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
         var migration = new LanguageRegistryInInitializeMigration();
 
-        Assert.ThrowsException<IllegalMigrationStateException>(() => migrator.RegisterMigration(migration));
+        Assert.ThrowsExactly<IllegalMigrationStateException>(() => migrator.RegisterMigration(migration));
     }
 
     private class LanguageRegistryInInitializeMigration() : MigrationBase<ShapesLanguage>(

@@ -34,7 +34,7 @@ public class SingleRequiredTests : LenientNodeTestsBase
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Get(OffsetDuplicate_offset));
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
     }
 
     [TestMethod]
@@ -51,7 +51,7 @@ public class SingleRequiredTests : LenientNodeTestsBase
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Get(OffsetDuplicate_offset));
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -71,7 +71,7 @@ public class SingleRequiredTests : LenientNodeTestsBase
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Get(Circle_center));
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
     }
 
     [TestMethod]
@@ -88,7 +88,7 @@ public class SingleRequiredTests : LenientNodeTestsBase
 
         Assert.AreSame(target, child.GetParent());
         Assert.AreSame(child, target.Get(Circle_center));
-        Assert.ThrowsException<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Get(OffsetDuplicate_offset));
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -124,7 +124,7 @@ public class SingleRequiredTests : LenientNodeTestsBase
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.Get(Line_end));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Line_start));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Line_start));
     }
 
     [TestMethod]
@@ -140,7 +140,7 @@ public class SingleRequiredTests : LenientNodeTestsBase
 
         Assert.AreSame(parent, child.GetParent());
         Assert.AreSame(child, parent.Get(Line_end));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Line_start));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Line_start));
         Assert.IsNull(orphan.GetParent());
     }
 

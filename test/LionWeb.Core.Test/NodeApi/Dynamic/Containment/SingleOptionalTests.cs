@@ -68,7 +68,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new DynamicNode[0];
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -77,7 +77,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new ArrayList();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -86,7 +86,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<DynamicNode>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -95,7 +95,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new HashSet<DynamicNode>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -104,7 +104,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<string>();
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -117,7 +117,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new DynamicNode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -126,7 +126,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -135,7 +135,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -144,7 +144,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<string>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -153,7 +153,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new HashSet<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
     }
 
@@ -168,7 +168,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var value = newDocumentation("s");
         var values = new DynamicNode[] { value };
 
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(value.GetParent());
@@ -180,7 +180,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newDocumentation("s");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(value.GetParent());
@@ -192,7 +192,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newDocumentation("s");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(value.GetParent());
@@ -204,7 +204,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newDocumentation("s");
         var values = new List<DynamicNode>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(value.GetParent());
@@ -216,7 +216,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newDocumentation("s");
         var values = new HashSet<DynamicNode>() { value };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(value.GetParent());
@@ -228,7 +228,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newCoord("c");
         var values = new List<DynamicNode>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -238,7 +238,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newCoord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -248,7 +248,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newCoord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
     }
 
@@ -263,7 +263,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newDocumentation("sA");
         var valueB = newDocumentation("sB");
         var values = new DynamicNode[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());
@@ -277,7 +277,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newDocumentation("sA");
         var valueB = newDocumentation("sB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());
@@ -291,7 +291,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newDocumentation("sA");
         var valueB = newDocumentation("sB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());
@@ -305,7 +305,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newDocumentation("sA");
         var valueB = newDocumentation("sB");
         var values = new List<DynamicNode>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());
@@ -319,7 +319,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newDocumentation("sA");
         var valueB = newDocumentation("sB");
         var values = new HashSet<DynamicNode>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());
@@ -333,7 +333,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new List<DynamicNode>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());
@@ -347,7 +347,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());
@@ -361,7 +361,7 @@ public class SingleOptionalTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_documentation, values));
         Assert.IsNull(parent.Get(Geometry_documentation));
         Assert.IsNull(valueA.GetParent());

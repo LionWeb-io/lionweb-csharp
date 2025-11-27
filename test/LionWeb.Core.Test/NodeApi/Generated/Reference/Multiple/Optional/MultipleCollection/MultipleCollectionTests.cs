@@ -211,7 +211,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new List<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
         Assert.IsTrue(parent.Shapes.Count == 0);
     }
@@ -223,7 +223,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
         Assert.IsTrue(parent.Shapes.Count == 0);
     }
@@ -235,7 +235,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
         Assert.IsTrue(parent.Shapes.Count == 0);
     }

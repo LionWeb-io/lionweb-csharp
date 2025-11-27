@@ -26,42 +26,42 @@ public class NullTests
     public void Null()
     {
         var parent = new MaterialGroup("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddMaterials(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddMaterials(null));
     }
 
     [TestMethod]
     public void Reflective()
     {
         var parent = new MaterialGroup("cs");
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, null));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        Assert.ThrowsException<InvalidValueException>(() => new MaterialGroup("cs") { Materials = null });
+        Assert.ThrowsExactly<InvalidValueException>(() => new MaterialGroup("cs") { Materials = null });
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
         var parent = new MaterialGroup("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertMaterials(0, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertMaterials(0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
         var parent = new MaterialGroup("cs");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertMaterials(1, null));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertMaterials(1, null));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
         var parent = new MaterialGroup("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveMaterials(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveMaterials(null));
     }
 
     [TestMethod]

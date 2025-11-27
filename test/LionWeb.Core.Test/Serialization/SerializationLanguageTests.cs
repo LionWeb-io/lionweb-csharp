@@ -317,7 +317,7 @@ public class LanguageSerializationTests
             ]
         };
 
-        Assert.ThrowsException<DeserializerException>(() => ILanguageDeserializerExtensions.Deserialize(chunk));
+        Assert.ThrowsExactly<DeserializerException>(() => ILanguageDeserializerExtensions.Deserialize(chunk));
     }
 
     [TestMethod]

@@ -38,7 +38,7 @@ public class NullTests
         parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
         parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
         Assert.AreEqual(0, notifications);
     }
@@ -57,7 +57,7 @@ public class NullTests
         parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
         parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
         Assert.AreEqual(0, notifications);
     }

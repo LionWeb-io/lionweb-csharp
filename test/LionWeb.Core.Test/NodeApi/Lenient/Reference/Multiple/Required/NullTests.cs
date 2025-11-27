@@ -25,7 +25,7 @@ public class NullTests : LenientNodeTestsBase
     {
         var parent = newMaterialGroup("cs");
         parent.Set(MaterialGroup_materials, null);
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(MaterialGroup_materials) as IEnumerable<IReadableNode>).Count() == 0);
     }
 }

@@ -126,7 +126,7 @@ public class SerializationTests : SerializationTestsBase
     {
         var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
 
-        Assert.ThrowsException<SerializerException>(() =>
+        Assert.ThrowsExactly<SerializerException>(() =>
             new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk([materialGroup]));
     }
 
@@ -137,8 +137,8 @@ public class SerializationTests : SerializationTestsBase
         var a = new MaterialGroup("a") { DefaultShape = b };
         var b2 = new Circle("b");
 
-        Assert.ThrowsException<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b]).ToList());
-        Assert.ThrowsException<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b2]).ToList());
+        Assert.ThrowsExactly<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b]).ToList());
+        Assert.ThrowsExactly<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b2]).ToList());
     }
 
     [TestMethod]
@@ -157,7 +157,7 @@ public class SerializationTests : SerializationTestsBase
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        Assert.ThrowsException<SerializerException>(() =>
+        Assert.ThrowsExactly<SerializerException>(() =>
             new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk([a]));
     }
 
@@ -201,7 +201,7 @@ public class SerializationTests : SerializationTestsBase
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var serializedNodes = serializer.Serialize(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         Assert.AreEqual(2, serializedNodes.Count());
-        Assert.ThrowsException<AssertFailedException>(() => Assert.AreEqual(2, serializedNodes.Count()));
+        Assert.ThrowsExactly<AssertFailedException>(() => Assert.AreEqual(2, serializedNodes.Count()));
     }
 
     [TestMethod]

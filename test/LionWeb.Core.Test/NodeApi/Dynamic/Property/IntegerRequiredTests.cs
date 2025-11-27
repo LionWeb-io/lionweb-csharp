@@ -44,8 +44,8 @@ public class IntegerRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCircle("od");
         var value = 10L;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Circle_r, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     [TestMethod]
@@ -53,8 +53,8 @@ public class IntegerRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCircle("od");
         var value = "10";
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Circle_r, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     [TestMethod]
@@ -62,8 +62,8 @@ public class IntegerRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCircle("od");
         var value = true;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Circle_r, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     #endregion
@@ -75,16 +75,16 @@ public class IntegerRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCircle("od");
         object value = null;
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
         var parent = newCircle("od");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(Circle_r));
     }
 
     #endregion

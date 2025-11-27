@@ -138,7 +138,7 @@ public class TwowayTests : TwowayReplicatorTestsBase
         node.AddShapes([added]);
         var added2 = new Circle("added2") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
-        Assert.ThrowsException<DuplicateNodeIdException>(() => node.AddShapes([added2]));
+        Assert.ThrowsExactly<DuplicateNodeIdException>(() => node.AddShapes([added2]));
     }
 
     #endregion

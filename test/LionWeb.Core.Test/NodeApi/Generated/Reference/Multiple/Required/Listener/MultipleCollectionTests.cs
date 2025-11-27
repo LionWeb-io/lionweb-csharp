@@ -145,7 +145,7 @@ public class MultipleCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -164,7 +164,7 @@ public class MultipleCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
         Assert.AreEqual(0, notifications);
     }

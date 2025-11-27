@@ -78,9 +78,9 @@ public class NodeVariantsTests : LenientNodeTestsBase
         var valueA = new ReadOnlyLine("sA", null) {Name = "nameA", Uuid = "uuidA", Start = new Coord("startA"), End = new Coord("endA")};
         var valueB = new ReadOnlyLine("sB", null) {Name = "nameB", Uuid = "uuidB", Start = new Coord("startB"), End = new Coord("endB")};
         var values = new ArrayList { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(CompositeShape_parts, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(CompositeShape_parts, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(CompositeShape_parts));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(CompositeShape_parts));
     }
 }

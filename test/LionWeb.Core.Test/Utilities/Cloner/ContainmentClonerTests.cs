@@ -122,7 +122,7 @@ public class ContainmentClonerTests : ClonerTestsBase
         Assert.AreEqual(0, actualStart.Y);
         Assert.AreEqual(-3, actualStart.Z);
 
-        Assert.ThrowsException<UnsetFeatureException>(() => actualLine.End);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => actualLine.End);
     }
 
     [TestMethod]

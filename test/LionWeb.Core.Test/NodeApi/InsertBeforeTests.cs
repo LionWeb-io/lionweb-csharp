@@ -76,7 +76,7 @@ public class InsertBeforeTests
         var circle = new Circle("circ0");
         var line = new Line("line");
 
-        Assert.ThrowsException<TreeShapeException>(() => circle.InsertBefore(line));
+        Assert.ThrowsExactly<TreeShapeException>(() => circle.InsertBefore(line));
     }
 
     [TestMethod]
@@ -87,7 +87,7 @@ public class InsertBeforeTests
 
         var line = new Line("line");
 
-        Assert.ThrowsException<TreeShapeException>(() => coord.InsertBefore(line));
+        Assert.ThrowsExactly<TreeShapeException>(() => coord.InsertBefore(line));
     }
 
     [TestMethod]
@@ -103,7 +103,7 @@ public class InsertBeforeTests
             ]
         };
         var coord = new Coord("coord");
-        Assert.ThrowsException<InvalidValueException>(() => circle.InsertBefore(coord));
+        Assert.ThrowsExactly<InvalidValueException>(() => circle.InsertBefore(coord));
     }
 
     [TestMethod]
@@ -118,7 +118,7 @@ public class InsertBeforeTests
                 circle
             ]
         };
-        Assert.ThrowsException<InvalidValueException>(() => circle.InsertBefore(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => circle.InsertBefore(null));
     }
 
     [TestMethod]

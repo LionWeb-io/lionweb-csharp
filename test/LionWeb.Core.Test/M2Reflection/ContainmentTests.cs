@@ -48,7 +48,7 @@ public class ContainmentTests : M2ReflectionTestsBase
         Assert.AreEqual(cont.Optional, cont.Get(FeatureOptional));
         Assert.AreEqual(cont.Multiple, cont.Get(LinkMultiple));
         Assert.AreEqual(cont.Type, cont.Get(LinkType));
-        Assert.ThrowsException<UnknownFeatureException>(() => cont.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => cont.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -56,9 +56,9 @@ public class ContainmentTests : M2ReflectionTestsBase
     {
         cont.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", cont.Name);
-        Assert.ThrowsException<InvalidValueException>(() => cont.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => cont.Set(INamedName, null));
         Assert.AreEqual("Hello", cont.Name);
-        Assert.ThrowsException<InvalidValueException>(() => cont.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => cont.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -78,9 +78,9 @@ public class ContainmentTests : M2ReflectionTestsBase
         var containment = cont;
         containment.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", containment.Key);
-        Assert.ThrowsException<InvalidValueException>(() => containment.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => containment.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", containment.Key);
-        Assert.ThrowsException<InvalidValueException>(() => containment.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => containment.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -101,7 +101,7 @@ public class ContainmentTests : M2ReflectionTestsBase
         Assert.AreEqual(true, cont.Optional);
         cont.Set(FeatureOptional, false);
         Assert.AreEqual(false, cont.Optional);
-        Assert.ThrowsException<InvalidValueException>(() => cont.Set(FeatureOptional, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => cont.Set(FeatureOptional, null));
     }
 
     [TestMethod]
@@ -123,7 +123,7 @@ public class ContainmentTests : M2ReflectionTestsBase
         Assert.AreEqual(true, cont.Multiple);
         cont.Set(LinkMultiple, false);
         Assert.AreEqual(false, cont.Multiple);
-        Assert.ThrowsException<InvalidValueException>(() => cont.Set(LinkMultiple, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => cont.Set(LinkMultiple, null));
     }
 
     [TestMethod]
@@ -143,7 +143,7 @@ public class ContainmentTests : M2ReflectionTestsBase
     {
         cont.Set(LinkType, ann);
         Assert.AreEqual(ann, cont.Type);
-        Assert.ThrowsException<InvalidValueException>(() => cont.Set(LinkType, lang));
+        Assert.ThrowsExactly<InvalidValueException>(() => cont.Set(LinkType, lang));
         Assert.AreEqual(ann, cont.Type);
     }
 
@@ -162,6 +162,6 @@ public class ContainmentTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => cont.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => cont.Set(LanguageVersion, "asdf"));
     }
 }

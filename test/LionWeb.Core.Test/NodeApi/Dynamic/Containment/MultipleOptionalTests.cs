@@ -29,7 +29,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var line = newLine("myId");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Geometry_shapes, line));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Geometry_shapes, line));
         Assert.AreSame(null, line.GetParent());
         Assert.IsFalse((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(line));
     }
@@ -42,7 +42,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     public void Null_Reflective()
     {
         var parent = newGeometry("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Geometry_shapes, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Geometry_shapes, null));
     }
 
     #endregion
@@ -122,7 +122,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new DynamicNode[] { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -132,7 +132,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -142,7 +142,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -152,7 +152,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<INode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -162,7 +162,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new List<string>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -172,7 +172,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
     {
         var parent = newGeometry("g");
         var values = new HashSet<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -268,7 +268,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newCoord("c");
         var values = new List<DynamicNode>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -279,7 +279,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newCoord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -290,7 +290,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
         var parent = newGeometry("g");
         var value = newCoord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -404,7 +404,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new List<DynamicNode>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -416,7 +416,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }
@@ -428,7 +428,7 @@ public class MultipleOptionalTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(Geometry_shapes, values));
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Count() == 0);
     }

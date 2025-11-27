@@ -115,7 +115,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddAnnotations(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddAnnotations(values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
 
@@ -124,7 +124,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -134,7 +134,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertAnnotations(0, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertAnnotations(0, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
 
@@ -143,7 +143,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new INode[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveAnnotations(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveAnnotations(values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
 
@@ -152,7 +152,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -162,7 +162,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new List<INode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -172,7 +172,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new List<Shape>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -182,7 +182,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new List<Coord>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -192,7 +192,7 @@ public class CollectionTests
     {
         var parent = new Line("g");
         var values = new HashSet<INode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -380,7 +380,7 @@ public class CollectionTests
         var parent = new Line("g");
         var value = new Coord("c");
         var values = new List<Coord>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -391,7 +391,7 @@ public class CollectionTests
         var parent = new Line("g");
         var value = new Coord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -402,7 +402,7 @@ public class CollectionTests
         var parent = new Line("g");
         var value = new Coord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }

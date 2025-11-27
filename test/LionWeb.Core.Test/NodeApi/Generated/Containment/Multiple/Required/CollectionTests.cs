@@ -30,8 +30,8 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[0];
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddParts(values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddParts(values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -39,16 +39,16 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[0];
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
     public void EmptyArray_Constructor()
     {
         var values = new IShape[0];
-        Assert.ThrowsException<InvalidValueException>(() => new CompositeShape("cs") { Parts = values });
+        Assert.ThrowsExactly<InvalidValueException>(() => new CompositeShape("cs") { Parts = values });
     }
 
     [TestMethod]
@@ -56,8 +56,8 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[0];
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertParts(0, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertParts(0, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -65,8 +65,8 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[0];
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -74,9 +74,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new ArrayList();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -84,9 +84,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new List<IShape>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -94,9 +94,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new List<Shape>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -104,9 +104,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new HashSet<IShape>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -114,9 +114,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new List<Coord>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -126,7 +126,7 @@ public class CollectionTests
         var value = new Circle("myId");
         parent.AddParts([value]);
         var values = new List<Coord>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
         CollectionAssert.AreEqual(new List<IShape> { value }, parent.Parts.ToList());
     }
@@ -140,8 +140,8 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddParts(values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddParts(values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -149,16 +149,16 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[] { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
     public void NullArray_Constructor()
     {
         var values = new IShape[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => new CompositeShape("cs") { Parts = values });
+        Assert.ThrowsExactly<InvalidValueException>(() => new CompositeShape("cs") { Parts = values });
     }
 
     [TestMethod]
@@ -166,8 +166,8 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertParts(0, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertParts(0, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -175,8 +175,8 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new IShape[] { null };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -184,9 +184,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -194,9 +194,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new List<IShape>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -204,9 +204,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new List<Shape>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -214,9 +214,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new List<Coord>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -224,9 +224,9 @@ public class CollectionTests
     {
         var parent = new CompositeShape("cs");
         var values = new HashSet<IShape>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     #endregion
@@ -297,9 +297,9 @@ public class CollectionTests
         var parent = new CompositeShape("cs");
         var line = new Line("myId");
         var values = new IShape[] { line };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
     }
 
     [TestMethod]
@@ -308,7 +308,7 @@ public class CollectionTests
         var line = new Line("myId");
         var parent = new CompositeShape("cs") { Parts = [line] };
         var values = new IShape[] { line };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.AreSame(parent, line.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { line }, parent.Parts.ToList());
     }
@@ -417,9 +417,9 @@ public class CollectionTests
         var parent = new CompositeShape("cs");
         var value = new Coord("c");
         var values = new List<Coord>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -428,9 +428,9 @@ public class CollectionTests
         var parent = new CompositeShape("cs");
         var value = new Coord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -439,9 +439,9 @@ public class CollectionTests
         var parent = new CompositeShape("cs");
         var value = new Coord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     #endregion

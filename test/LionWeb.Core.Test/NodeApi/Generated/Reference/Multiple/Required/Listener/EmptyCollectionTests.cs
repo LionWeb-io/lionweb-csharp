@@ -35,7 +35,7 @@ public class EmptyCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.AddMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.AddMaterials(values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -51,7 +51,7 @@ public class EmptyCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() =>         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
+        Assert.ThrowsExactly<InvalidValueException>(() =>         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
         Assert.AreEqual(0, notifications);
     }
@@ -67,7 +67,7 @@ public class EmptyCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.InsertMaterials(0, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.InsertMaterials(0, values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -83,7 +83,7 @@ public class EmptyCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
         Assert.AreEqual(0, notifications);
     }
@@ -101,7 +101,7 @@ public class EmptyCollectionTests
         int notifications = 0;
         parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
 
         Assert.AreEqual(0, notifications);

@@ -319,7 +319,7 @@ public class HasherTests
     [TestMethod]
     public void ByteArrayHash_Short()
     {
-        Assert.ThrowsException<ArgumentException>(() => new ByteArrayHash("a", [1]));
+        Assert.ThrowsExactly<ArgumentException>(() => new ByteArrayHash("a", [1]));
     }
 
     [TestMethod]

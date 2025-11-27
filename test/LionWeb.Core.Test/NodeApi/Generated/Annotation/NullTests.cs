@@ -26,34 +26,34 @@ public class NullTests
     public void Null()
     {
         var parent = new Line("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddAnnotations(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddAnnotations(null));
     }
 
     [TestMethod]
     public void Reflective()
     {
         var parent = new Line("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, null));
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
         var parent = new Line("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertAnnotations(0, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertAnnotations(0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
         var parent = new Line("g");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, null));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, null));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
         var parent = new Line("g");
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveAnnotations(null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveAnnotations(null));
     }
 }

@@ -211,9 +211,9 @@ public class CollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new List<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -223,9 +223,9 @@ public class CollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -235,9 +235,9 @@ public class CollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
     }
 
     [TestMethod]
@@ -268,6 +268,6 @@ public class CollectionTests
     public void ResultUnmodifiable_Unset()
     {
         var parent = new CompositeShape("g");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(ShapesLanguage.Instance.CompositeShape_parts));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(ShapesLanguage.Instance.CompositeShape_parts));
     }
 }

@@ -29,11 +29,11 @@ public class RemoveTests
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new List<IShape> { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
     }
 
     [TestMethod]
@@ -43,11 +43,11 @@ public class RemoveTests
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new List<Shape> { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
     }
 
     [TestMethod]
@@ -57,11 +57,11 @@ public class RemoveTests
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new HashSet<IShape> { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
     }
 
     [TestMethod]
@@ -71,11 +71,11 @@ public class RemoveTests
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new SingleEnumerable<IShape> { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
     }
 
     [TestMethod]
@@ -85,11 +85,11 @@ public class RemoveTests
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
     }
 
     [TestMethod]
@@ -99,7 +99,7 @@ public class RemoveTests
         var valueB = new Line("sB");
         var parent = new CompositeShape("cs") { Parts = [valueA, valueB] };
         var values = new IShape[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(values));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Parts.ToList());

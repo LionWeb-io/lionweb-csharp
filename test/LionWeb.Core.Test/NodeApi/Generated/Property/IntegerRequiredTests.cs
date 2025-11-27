@@ -63,8 +63,8 @@ public class IntegerRequiredTests
     {
         var parent = new Circle("od");
         var value = 10L;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
     }
 
     [TestMethod]
@@ -72,8 +72,8 @@ public class IntegerRequiredTests
     {
         var parent = new Circle("od");
         var value = "10";
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
     }
 
     [TestMethod]
@@ -81,8 +81,8 @@ public class IntegerRequiredTests
     {
         var parent = new Circle("od");
         var value = true;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
     }
 
     [TestMethod]
@@ -109,8 +109,8 @@ public class IntegerRequiredTests
     {
         var parent = new Circle("od");
         object value = null;
-        Assert.ThrowsException<NullReferenceException>(() => parent.R = (int)value);
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<NullReferenceException>(() => parent.R = (int)value);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
     }
 
     [TestMethod]
@@ -118,8 +118,8 @@ public class IntegerRequiredTests
     {
         var parent = new Circle("od");
         object value = null;
-        Assert.ThrowsException<NullReferenceException>(() => parent.SetR((int)value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<NullReferenceException>(() => parent.SetR((int)value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
     }
 
     [TestMethod]
@@ -127,23 +127,23 @@ public class IntegerRequiredTests
     {
         var parent = new Circle("od");
         object value = null;
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
     }
 
     [TestMethod]
     public void Null_Get()
     {
         var parent = new Circle("od");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
         var parent = new Circle("od");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(ShapesLanguage.Instance.Circle_r));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(ShapesLanguage.Instance.Circle_r));
     }
 
     [TestMethod]
@@ -151,7 +151,7 @@ public class IntegerRequiredTests
     {
         var parent = new Circle("od");
         object value = null;
-        Assert.ThrowsException<NullReferenceException>(
+        Assert.ThrowsExactly<NullReferenceException>(
             () => new Circle("od") { R = (int)value });
     }
 

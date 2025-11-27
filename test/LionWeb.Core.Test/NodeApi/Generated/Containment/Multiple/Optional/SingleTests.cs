@@ -38,7 +38,7 @@ public class SingleTests
     {
         var parent = new Geometry("g");
         var line = new Line("myId");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Geometry_shapes, line));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Geometry_shapes, line));
         Assert.AreSame(null, line.GetParent());
         Assert.IsFalse(parent.Shapes.Contains(line));
     }
@@ -78,7 +78,7 @@ public class SingleTests
     {
         var parent = new Geometry("g");
         var line = new Line("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertShapes(-1, [line]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertShapes(-1, [line]));
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Shapes.Contains(line));
     }
@@ -88,7 +88,7 @@ public class SingleTests
     {
         var parent = new Geometry("g");
         var line = new Line("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertShapes(1, [line]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertShapes(1, [line]));
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Shapes.Contains(line));
     }

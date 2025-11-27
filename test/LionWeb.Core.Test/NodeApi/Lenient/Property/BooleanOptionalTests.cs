@@ -95,7 +95,7 @@ public class BooleanOptionalTests : LenientNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = new List<bool> { true, false };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Documentation_technical, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Documentation_technical, value));
         Assert.AreEqual(null, parent.Get(Documentation_technical));
     }
 

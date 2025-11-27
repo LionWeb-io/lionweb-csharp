@@ -211,9 +211,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new List<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Materials.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Count == 0);
     }
 
     [TestMethod]
@@ -223,9 +223,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Materials.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Count == 0);
     }
 
     [TestMethod]
@@ -235,9 +235,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Materials.Count == 0);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Count == 0);
     }
 
     [TestMethod]
@@ -268,6 +268,6 @@ public class MultipleCollectionTests
     public void ResultUnmodifiable_Unset()
     {
         var parent = new MaterialGroup("g");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(ShapesLanguage.Instance.MaterialGroup_materials));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(ShapesLanguage.Instance.MaterialGroup_materials));
     }
 }

@@ -127,7 +127,7 @@ public class NodeVariantsTests : LenientNodeTestsBase
             Name = "nameB", Uuid = "uuidB", Start = new Coord("startB"), End = new Coord("endB")
         };
         var values = new ArrayList { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         Assert.IsFalse((parent.Get(null) as IEnumerable<IReadableNode>).Any());

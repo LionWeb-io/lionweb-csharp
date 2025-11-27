@@ -52,7 +52,7 @@ public class AnnotationTests : M2ReflectionTestsBase
         Assert.AreEqual(ann.Extends, ann.Get(AnnotationExtends));
         CollectionAssert.AreEqual(ann.Implements.ToList(),
             (ann.Get(AnnotationImplements) as IReadOnlyList<Interface>).ToList());
-        Assert.ThrowsException<UnknownFeatureException>(() => ann.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => ann.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -60,9 +60,9 @@ public class AnnotationTests : M2ReflectionTestsBase
     {
         ann.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", ann.Name);
-        Assert.ThrowsException<InvalidValueException>(() => ann.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => ann.Set(INamedName, null));
         Assert.AreEqual("Hello", ann.Name);
-        Assert.ThrowsException<InvalidValueException>(() => ann.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => ann.Set(INamedName, 123));
         Assert.AreEqual("Hello", ann.Name);
     }
 
@@ -83,9 +83,9 @@ public class AnnotationTests : M2ReflectionTestsBase
         var annotation = ann;
         annotation.Set(IKeyedKey, "asdf");
         Assert.AreEqual("asdf", annotation.Key);
-        Assert.ThrowsException<InvalidValueException>(() => annotation.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => annotation.Set(IKeyedKey, null));
         Assert.AreEqual("asdf", annotation.Key);
-        Assert.ThrowsException<InvalidValueException>(() => annotation.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => annotation.Set(IKeyedKey, 123));
         Assert.AreEqual("asdf", annotation.Key);
     }
 
@@ -109,7 +109,7 @@ public class AnnotationTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { propA, refB }, ann.Features.ToList());
         ann.Set(ClassifierFeatures, Enumerable.Empty<Feature>());
         CollectionAssert.AreEqual(Enumerable.Empty<Feature>().ToList(), ann.Features.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => ann.Set(ClassifierFeatures, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => ann.Set(ClassifierFeatures, null));
     }
 
     [TestMethod]
@@ -130,7 +130,7 @@ public class AnnotationTests : M2ReflectionTestsBase
         Annotation tgt = new DynamicAnnotation("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
         ann.Set(AnnotationAnnotates, tgt);
         Assert.AreEqual(tgt, ann.Annotates);
-        Assert.ThrowsException<InvalidValueException>(() => ann.Set(AnnotationAnnotates, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => ann.Set(AnnotationAnnotates, null));
         Assert.AreEqual(tgt, ann.Annotates);
     }
 
@@ -154,7 +154,7 @@ public class AnnotationTests : M2ReflectionTestsBase
         Assert.AreEqual(sup, ann.Extends);
         ann.Set(AnnotationExtends, null);
         Assert.AreEqual(null, ann.Extends);
-        Assert.ThrowsException<InvalidValueException>(() => ann.Set(AnnotationExtends, lang));
+        Assert.ThrowsExactly<InvalidValueException>(() => ann.Set(AnnotationExtends, lang));
     }
 
     [TestMethod]
@@ -178,7 +178,7 @@ public class AnnotationTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { ifaceA, ifaceB }, ann.Implements.ToList());
         ann.Set(AnnotationImplements, Enumerable.Empty<Interface>());
         CollectionAssert.AreEqual(Enumerable.Empty<Interface>().ToList(), ann.Implements.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => ann.Set(AnnotationImplements, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => ann.Set(AnnotationImplements, null));
     }
 
     [TestMethod]
@@ -196,6 +196,6 @@ public class AnnotationTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => ann.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => ann.Set(LanguageVersion, "asdf"));
     }
 }

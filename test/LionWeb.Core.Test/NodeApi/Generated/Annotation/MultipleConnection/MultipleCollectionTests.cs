@@ -198,7 +198,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new List<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -210,7 +210,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -222,7 +222,7 @@ public class MultipleCollectionTests
         var valueA = new Coord("cA");
         var valueB = new Coord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -233,7 +233,7 @@ public class MultipleCollectionTests
         var parent = new Geometry("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
-        Assert.ThrowsException<InvalidValueException>(() => parent.AddAnnotations(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddAnnotations(values));
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));
     }
@@ -244,7 +244,7 @@ public class MultipleCollectionTests
         var parent = new Geometry("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, values));
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));
     }
@@ -255,7 +255,7 @@ public class MultipleCollectionTests
         var parent = new Geometry("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
-        Assert.ThrowsException<InvalidValueException>(() => parent.InsertAnnotations(0, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertAnnotations(0, values));
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));
     }

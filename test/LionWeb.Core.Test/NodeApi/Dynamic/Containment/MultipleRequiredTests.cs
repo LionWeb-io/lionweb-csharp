@@ -29,9 +29,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var line = newLine("myId");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(CompositeShape_parts, line));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(CompositeShape_parts, line));
         Assert.AreSame(null, line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Contains(line));
     }
 
@@ -43,7 +43,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     public void Null_Reflective()
     {
         var parent = newCompositeShape("cs");
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(CompositeShape_parts, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(CompositeShape_parts, null));
     }
 
     #endregion
@@ -55,9 +55,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new DynamicNode[0];
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -66,9 +66,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new ArrayList();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -77,9 +77,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new List<DynamicNode>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -88,9 +88,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new List<INode>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -99,9 +99,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new HashSet<DynamicNode>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -110,9 +110,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new List<string>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(
+        Assert.ThrowsExactly<UnsetFeatureException>(
             () => (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -123,7 +123,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
         var value = newCircle("myId");
         parent.Set(CompositeShape_parts, new List<DynamicNode> { value });
         var values = new List<DynamicNode>();
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
         CollectionAssert.AreEqual(new List<DynamicNode> { value },
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).ToList());
@@ -138,9 +138,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new DynamicNode[] { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -149,9 +149,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new ArrayList() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -160,9 +160,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new List<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -171,9 +171,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new List<INode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -182,9 +182,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new List<string>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -193,9 +193,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     {
         var parent = newCompositeShape("cs");
         var values = new HashSet<DynamicNode>() { null };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -290,9 +290,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
         var parent = newCompositeShape("cs");
         var value = "c";
         var values = new List<string>() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -302,9 +302,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
         var parent = newCompositeShape("cs");
         var value = newCoord("c");
         var values = new ArrayList() { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -314,9 +314,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
         var parent = newCompositeShape("cs");
         var value = newCoord("c");
         var values = new object[] { value };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -429,9 +429,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
         var valueA = "cA";
         var valueB = "cB";
         var values = new List<string>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -442,9 +442,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -455,9 +455,9 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
         var valueA = newCoord("cA");
         var valueB = newCoord("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(CompositeShape_parts, values));
-        Assert.ThrowsException<UnsetFeatureException>(() =>
+        Assert.ThrowsExactly<UnsetFeatureException>(() =>
             (parent.Get(CompositeShape_parts) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
@@ -477,7 +477,7 @@ public class MultipleRequiredTests : DynamicNodeTestsBase
     public void ResultUnmodifiable_Unset()
     {
         var parent = newCompositeShape("g");
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(CompositeShape_parts));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(CompositeShape_parts));
     }
 
     #endregion

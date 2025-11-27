@@ -53,7 +53,7 @@ public class StringOptionalTests : DynamicNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = true;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Documentation_text, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Documentation_text, value));
         Assert.AreEqual(null, parent.Get(Documentation_text));
     }
 
@@ -62,7 +62,7 @@ public class StringOptionalTests : DynamicNodeTestsBase
     {
         var parent = newDocumentation("od");
         var value = 10;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Documentation_text, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(Documentation_text, value));
         Assert.AreEqual(null, parent.Get(Documentation_text));
     }
 

@@ -34,7 +34,7 @@ public class CircularContainmentTests
 
         a.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestor<INode>(false));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestor<INode>(false));
     }
     
     [TestMethod]
@@ -44,7 +44,7 @@ public class CircularContainmentTests
 
         a.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestor<INode>(true));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestor<INode>(true));
     }
     
     [TestMethod]
@@ -56,7 +56,7 @@ public class CircularContainmentTests
         a.SetParent(b);
         b.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestor<INode>(false));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestor<INode>(false));
     }
     
     [TestMethod]
@@ -68,7 +68,7 @@ public class CircularContainmentTests
         a.SetParent(b);
         b.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestor<INode>(true));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestor<INode>(true));
     }
     
     [TestMethod]
@@ -82,7 +82,7 @@ public class CircularContainmentTests
         b.SetParent(a);
         c.SetParent(b);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestor<INode>(false));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestor<INode>(false));
     }
     
     [TestMethod]
@@ -96,7 +96,7 @@ public class CircularContainmentTests
         b.SetParent(a);
         c.SetParent(b);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestor<INode>(true));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestor<INode>(true));
     }
 
     #endregion
@@ -125,7 +125,7 @@ public class CircularContainmentTests
 
         a.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestors(false));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestors(false));
     }
     
     [TestMethod]
@@ -135,7 +135,7 @@ public class CircularContainmentTests
 
         a.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestors(true));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestors(true));
     }
     
     [TestMethod]
@@ -147,7 +147,7 @@ public class CircularContainmentTests
         a.SetParent(b);
         b.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestors(false));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestors(false));
     }
     
     [TestMethod]
@@ -159,7 +159,7 @@ public class CircularContainmentTests
         a.SetParent(b);
         b.SetParent(a);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestors(true));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestors(true));
     }
     
     [TestMethod]
@@ -173,7 +173,7 @@ public class CircularContainmentTests
         b.SetParent(a);
         c.SetParent(b);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestors(false));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestors(false));
     }
     
     [TestMethod]
@@ -187,7 +187,7 @@ public class CircularContainmentTests
         b.SetParent(a);
         c.SetParent(b);
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Ancestors(true));
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Ancestors(true));
     }
 
     #endregion
@@ -213,7 +213,7 @@ public class CircularContainmentTests
 
         a.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Children(false).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Children(false).ToList());
     }
     
     [TestMethod]
@@ -223,7 +223,7 @@ public class CircularContainmentTests
 
         a.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Children(true).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Children(true).ToList());
     }
     
     [TestMethod]
@@ -330,7 +330,7 @@ public class CircularContainmentTests
 
         a.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Descendants(false).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Descendants(false).ToList());
     }
     
     [TestMethod]
@@ -340,7 +340,7 @@ public class CircularContainmentTests
 
         a.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Descendants(true).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Descendants(true).ToList());
     }
     
     [TestMethod]
@@ -352,7 +352,7 @@ public class CircularContainmentTests
         a.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { b });
         b.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Descendants(false).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Descendants(false).ToList());
     }
     
     [TestMethod]
@@ -364,7 +364,7 @@ public class CircularContainmentTests
         a.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { b });
         b.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Descendants(true).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Descendants(true).ToList());
     }
     
     [TestMethod]
@@ -378,7 +378,7 @@ public class CircularContainmentTests
         b.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
         c.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Descendants(false).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Descendants(false).ToList());
     }
     
     [TestMethod]
@@ -392,7 +392,7 @@ public class CircularContainmentTests
         b.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
         c.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { b });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Descendants(false).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Descendants(false).ToList());
     }
     
     [TestMethod]
@@ -406,7 +406,7 @@ public class CircularContainmentTests
         b.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { a });
         c.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { b });
 
-        Assert.ThrowsException<TreeShapeException>(() => a.Descendants(true).ToList());
+        Assert.ThrowsExactly<TreeShapeException>(() => a.Descendants(true).ToList());
     }
 
     #endregion

@@ -38,7 +38,7 @@ public class PrimitiveTypeTests : M2ReflectionTestsBase
     {
         Assert.AreEqual(prim.Name, prim.Get(INamedName));
         Assert.AreEqual(prim.Key, prim.Get(IKeyedKey));
-        Assert.ThrowsException<UnknownFeatureException>(() => prim.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => prim.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -46,9 +46,9 @@ public class PrimitiveTypeTests : M2ReflectionTestsBase
     {
         prim.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", prim.Name);
-        Assert.ThrowsException<InvalidValueException>(() => prim.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => prim.Set(INamedName, null));
         Assert.AreEqual("Hello", prim.Name);
-        Assert.ThrowsException<InvalidValueException>(() => prim.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => prim.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -68,9 +68,9 @@ public class PrimitiveTypeTests : M2ReflectionTestsBase
         var primitive = prim;
         primitive.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", primitive.Key);
-        Assert.ThrowsException<InvalidValueException>(() => primitive.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => primitive.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", primitive.Key);
-        Assert.ThrowsException<InvalidValueException>(() => primitive.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => primitive.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -87,6 +87,6 @@ public class PrimitiveTypeTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => prim.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => prim.Set(LanguageVersion, "asdf"));
     }
 }

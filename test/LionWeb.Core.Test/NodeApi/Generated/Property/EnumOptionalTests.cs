@@ -72,7 +72,7 @@ public class EnumOptionalTests
     {
         var parent = new MaterialGroup("od");
         var value = true;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.MatterState);
     }
 
@@ -89,7 +89,7 @@ public class EnumOptionalTests
         
         var parent = new MaterialGroup("od");
         var value = TestEnum.a;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.MatterState);
     }
 
@@ -99,7 +99,7 @@ public class EnumOptionalTests
         
         var parent = new MaterialGroup("od");
         var value = TestEnum.solid;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.MatterState);
     }
 
@@ -109,7 +109,7 @@ public class EnumOptionalTests
         
         var parent = new MaterialGroup("od");
         var value = TestEnum.gas;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.MatterState);
     }
 
@@ -118,7 +118,7 @@ public class EnumOptionalTests
     {
         var parent = new MaterialGroup("od");
         var value = 10;
-        Assert.ThrowsException<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
         Assert.AreEqual(null, parent.MatterState);
     }
 

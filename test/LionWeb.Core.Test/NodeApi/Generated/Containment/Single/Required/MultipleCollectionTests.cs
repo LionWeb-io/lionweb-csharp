@@ -30,9 +30,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("sA");
         var valueB = new Coord("sB");
         var values = new Coord[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -44,9 +44,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("sA");
         var valueB = new Coord("sB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -58,9 +58,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("sA");
         var valueB = new Coord("sB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -72,9 +72,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("sA");
         var valueB = new Coord("sB");
         var values = new List<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -86,9 +86,9 @@ public class MultipleCollectionTests
         var valueA = new Coord("sA");
         var valueB = new Coord("sB");
         var values = new HashSet<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -100,9 +100,9 @@ public class MultipleCollectionTests
         var valueA = new Line("cA");
         var valueB = new Line("cB");
         var values = new List<Line>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -114,9 +114,9 @@ public class MultipleCollectionTests
         var valueA = new Line("cA");
         var valueB = new Line("cB");
         var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -128,9 +128,9 @@ public class MultipleCollectionTests
         var valueA = new Line("cA");
         var valueB = new Line("cB");
         var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
+        Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Offset);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }

@@ -72,7 +72,7 @@ public class BooleanOptionalTests
     {
         var parent = new Documentation("od");
         var value = "10";
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Documentation_technical, value));
         Assert.AreEqual(null, parent.Technical);
     }
@@ -82,7 +82,7 @@ public class BooleanOptionalTests
     {
         var parent = new Documentation("od");
         var value = 10;
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.Documentation_technical, value));
         Assert.AreEqual(null, parent.Technical);
     }

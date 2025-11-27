@@ -42,7 +42,7 @@ public class InterfaceTests : M2ReflectionTestsBase
             (iface.Get(ClassifierFeatures) as IReadOnlyList<Feature>).ToList());
         CollectionAssert.AreEqual(iface.Extends.ToList(),
             (iface.Get(InterfaceExtends) as IReadOnlyList<Interface>).ToList());
-        Assert.ThrowsException<UnknownFeatureException>(() => iface.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => iface.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -50,9 +50,9 @@ public class InterfaceTests : M2ReflectionTestsBase
     {
         iface.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", iface.Name);
-        Assert.ThrowsException<InvalidValueException>(() => iface.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => iface.Set(INamedName, null));
         Assert.AreEqual("Hello", iface.Name);
-        Assert.ThrowsException<InvalidValueException>(() => iface.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => iface.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -72,9 +72,9 @@ public class InterfaceTests : M2ReflectionTestsBase
         var ifac = iface;
         ifac.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", ifac.Key);
-        Assert.ThrowsException<InvalidValueException>(() => ifac.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => ifac.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", ifac.Key);
-        Assert.ThrowsException<InvalidValueException>(() => ifac.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => ifac.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -97,7 +97,7 @@ public class InterfaceTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { propA, refB }, iface.Features.ToList());
         iface.Set(ClassifierFeatures, Enumerable.Empty<Feature>());
         CollectionAssert.AreEqual(Enumerable.Empty<Feature>().ToList(), iface.Features.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => iface.Set(ClassifierFeatures, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => iface.Set(ClassifierFeatures, null));
     }
 
     [TestMethod]
@@ -121,7 +121,7 @@ public class InterfaceTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { ifaceA, ifaceB }, iface.Extends.ToList());
         iface.Set(InterfaceExtends, Enumerable.Empty<Interface>());
         CollectionAssert.AreEqual(Enumerable.Empty<Interface>().ToList(), iface.Extends.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => iface.Set(InterfaceExtends, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => iface.Set(InterfaceExtends, null));
     }
 
     [TestMethod]
@@ -139,6 +139,6 @@ public class InterfaceTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => iface.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => iface.Set(LanguageVersion, "asdf"));
     }
 }

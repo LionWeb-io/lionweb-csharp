@@ -37,10 +37,10 @@ public class SingleTests
     {
         var parent = new MaterialGroup("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<InvalidValueException>(() =>
+        Assert.ThrowsExactly<InvalidValueException>(() =>
             parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, line));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Materials.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Contains(line));
     }
 
     [TestMethod]
@@ -78,9 +78,9 @@ public class SingleTests
     {
         var parent = new MaterialGroup("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertMaterials(-1, [line]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertMaterials(-1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Materials.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Contains(line));
     }
 
     [TestMethod]
@@ -88,9 +88,9 @@ public class SingleTests
     {
         var parent = new MaterialGroup("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => parent.InsertMaterials(1, [line]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertMaterials(1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Materials.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Contains(line));
     }
 
     [TestMethod]
@@ -173,9 +173,9 @@ public class SingleTests
     {
         var parent = new MaterialGroup("cs");
         var line = new Line("myId");
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveMaterials([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveMaterials([line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsException<UnsetFeatureException>(() => parent.Materials.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Contains(line));
     }
 
     [TestMethod]
@@ -195,7 +195,7 @@ public class SingleTests
     {
         var line = new Line("myId");
         var parent = new MaterialGroup("cs") { Materials = [line] };
-        Assert.ThrowsException<InvalidValueException>(() => parent.RemoveMaterials([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveMaterials([line]));
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<IShape> { line }, parent.Materials.ToList());
     }

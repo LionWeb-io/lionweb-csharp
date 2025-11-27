@@ -40,7 +40,7 @@ public class StructuredDataTypeTests : M2ReflectionTestsBase
         Assert.AreEqual(sdt.Key, sdt.Get(IKeyedKey));
         CollectionAssert.AreEqual(sdt.Fields.ToList(),
             (sdt.Get(Fields) as IReadOnlyList<Field>).ToList());
-        Assert.ThrowsException<UnknownFeatureException>(() => sdt.Get(LanguageVersion));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => sdt.Get(LanguageVersion));
     }
 
     [TestMethod]
@@ -48,9 +48,9 @@ public class StructuredDataTypeTests : M2ReflectionTestsBase
     {
         sdt.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", sdt.Name);
-        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => sdt.Set(INamedName, null));
         Assert.AreEqual("Hello", sdt.Name);
-        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => sdt.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -69,9 +69,9 @@ public class StructuredDataTypeTests : M2ReflectionTestsBase
     {
         sdt.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", sdt.Key);
-        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => sdt.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", sdt.Key);
-        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => sdt.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -94,7 +94,7 @@ public class StructuredDataTypeTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { litA, litB }, sdt.Fields.ToList());
         sdt.Set(Fields, Enumerable.Empty<Field>());
         CollectionAssert.AreEqual(Enumerable.Empty<Feature>().ToList(), sdt.Fields.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(Fields, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => sdt.Set(Fields, null));
     }
 
     [TestMethod]
@@ -112,6 +112,6 @@ public class StructuredDataTypeTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => sdt.Set(LanguageVersion, "asdf"));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => sdt.Set(LanguageVersion, "asdf"));
     }
 }

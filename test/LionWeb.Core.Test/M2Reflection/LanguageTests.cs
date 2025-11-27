@@ -51,7 +51,7 @@ public class LanguageTests : M2ReflectionTestsBase
             (lang.Get(LanguageEntities) as IReadOnlyList<LanguageEntity>).ToList());
         CollectionAssert.AreEqual(lang.DependsOn.ToList(),
             (lang.Get(LanguageDependsOn) as IReadOnlyList<Language>).ToList());
-        Assert.ThrowsException<UnknownFeatureException>(() => lang.Get(AnnotationAnnotates));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => lang.Get(AnnotationAnnotates));
     }
 
     [TestMethod]
@@ -59,9 +59,9 @@ public class LanguageTests : M2ReflectionTestsBase
     {
         lang.Set(INamedName, "Hello");
         Assert.AreEqual("Hello", lang.Name);
-        Assert.ThrowsException<InvalidValueException>(() => lang.Set(INamedName, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => lang.Set(INamedName, null));
         Assert.AreEqual("Hello", lang.Name);
-        Assert.ThrowsException<InvalidValueException>(() => lang.Set(INamedName, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => lang.Set(INamedName, 123));
     }
 
     [TestMethod]
@@ -81,9 +81,9 @@ public class LanguageTests : M2ReflectionTestsBase
         var language = lang;
         language.Set(IKeyedKey, "Hello");
         Assert.AreEqual("Hello", language.Key);
-        Assert.ThrowsException<InvalidValueException>(() => language.Set(IKeyedKey, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => language.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", language.Key);
-        Assert.ThrowsException<InvalidValueException>(() => language.Set(IKeyedKey, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => language.Set(IKeyedKey, 123));
     }
 
     [TestMethod]
@@ -102,9 +102,9 @@ public class LanguageTests : M2ReflectionTestsBase
     {
         lang.Set(LanguageVersion, "453");
         Assert.AreEqual("453", lang.Version);
-        Assert.ThrowsException<InvalidValueException>(() => lang.Set(LanguageVersion, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => lang.Set(LanguageVersion, null));
         Assert.AreEqual("453", lang.Version);
-        Assert.ThrowsException<InvalidValueException>(() => lang.Set(LanguageVersion, 123));
+        Assert.ThrowsExactly<InvalidValueException>(() => lang.Set(LanguageVersion, 123));
     }
 
     [TestMethod]
@@ -127,7 +127,7 @@ public class LanguageTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<object> { conceptA, enumA }, lang.Entities.ToList());
         lang.Set(LanguageEntities, Enumerable.Empty<LanguageEntity>());
         CollectionAssert.AreEqual(Enumerable.Empty<LanguageEntity>().ToList(), lang.Entities.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => lang.Set(LanguageEntities, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => lang.Set(LanguageEntities, null));
     }
 
     [TestMethod]
@@ -168,7 +168,7 @@ public class LanguageTests : M2ReflectionTestsBase
         CollectionAssert.AreEqual(new List<Language> { langA, langB }, lang.DependsOn.ToList());
         lang.Set(LanguageDependsOn, Enumerable.Empty<Language>());
         CollectionAssert.AreEqual(Enumerable.Empty<Language>().ToList(), lang.DependsOn.ToList());
-        Assert.ThrowsException<InvalidValueException>(() => lang.Set(LanguageDependsOn, null));
+        Assert.ThrowsExactly<InvalidValueException>(() => lang.Set(LanguageDependsOn, null));
     }
 
     [TestMethod]
@@ -186,6 +186,6 @@ public class LanguageTests : M2ReflectionTestsBase
     [TestMethod]
     public void Set_Invalid()
     {
-        Assert.ThrowsException<UnknownFeatureException>(() => lang.Set(AnnotationExtends, null));
+        Assert.ThrowsExactly<UnknownFeatureException>(() => lang.Set(AnnotationExtends, null));
     }
 }
