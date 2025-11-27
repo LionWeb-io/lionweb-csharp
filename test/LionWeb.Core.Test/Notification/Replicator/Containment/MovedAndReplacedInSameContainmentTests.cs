@@ -130,12 +130,17 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
         var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
-        CreatePartitionReplicator(clonedPartition, notification);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
 
         replaced.ReplaceWith(replacement);
 
         Assert.AreEqual(5, clonedPartition.Shapes.Count);
         Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[1].GetId());
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
     }
 
     [TestMethod]

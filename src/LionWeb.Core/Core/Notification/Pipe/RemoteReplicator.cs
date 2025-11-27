@@ -196,6 +196,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             CheckMatchingNodeIdForDeletedNode(notification);
             notification.DeletedChild.DetachFromParent();
+            notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
         });
 
     private void OnRemoteChildReplaced(ChildReplacedNotification notification) =>
@@ -331,6 +332,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             CheckMatchingNodeIdForDeletedNode(notification);
 
             notification.DeletedAnnotation.DetachFromParent();
+            notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
         });
 
     private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>

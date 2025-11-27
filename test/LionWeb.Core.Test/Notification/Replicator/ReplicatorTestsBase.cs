@@ -47,9 +47,10 @@ public abstract class ReplicatorTestsBase: NotificationTestsBase
     /// partitionReplicator -> change applied on <paramref name="clonedPartition"/>
     /// </summary>
     /// <seealso cref="NotificationToNotificationMapper"/>
-    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
+    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition, SharedNodeMap? sharedNodeMap = null)
     {
-        var sharedNodeMap = new SharedNodeMap();
+        sharedNodeMap ??= new SharedNodeMap();
+        
         var notificationMapper = new NotificationMapper(sharedNodeMap);
         originalPartition.GetNotificationSender()!.ConnectTo(notificationMapper);
 

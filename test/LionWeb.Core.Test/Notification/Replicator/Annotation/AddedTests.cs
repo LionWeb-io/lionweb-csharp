@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Annotation;
 
+using Core.Notification;
 using Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
@@ -28,13 +29,20 @@ public class AddedTests : ReplicatorTestsBase
         var originalPartition = new Geometry("a");
         var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
 
         var added = new BillOfMaterials("added");
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(added.GetId()));
+
         originalPartition.AddAnnotations([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
         Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(added.GetId()));
     }
 
     [TestMethod]

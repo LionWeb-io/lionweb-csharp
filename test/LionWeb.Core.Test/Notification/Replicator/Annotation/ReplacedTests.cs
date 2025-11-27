@@ -37,11 +37,19 @@ public class ReplacedTests : ReplicatorTestsBase
 
         var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replacement.GetId()));
 
         replaced.ReplaceWith(replacement);
 
         AssertEquals([originalPartition], [clonedPartition]);
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
     }
 
     [TestMethod]
