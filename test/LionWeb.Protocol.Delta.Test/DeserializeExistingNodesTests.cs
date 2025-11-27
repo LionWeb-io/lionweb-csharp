@@ -288,7 +288,24 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         AssertEquals(clonedForest.Partitions, originalForest.Partitions);
     }
 
+    [TestMethod]
+    [Ignore("All nodes must have unique ids, not checked (yet) for partitions")]
+    public void AddExistingPartition()
+    {
+        var partition = new LinkTestConcept("partition");
+        
+        var originalForest = new Forest();
+        
+        originalForest.AddPartitions([partition]);
+        
+        CreateDeltaReplicator(originalForest);
+        
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
+        {
+            originalForest.AddPartitions([partition]);
+        });
+    }
     
-    //TODO: I can add tests with forest with replaced child
+    //TODO: add tests with forest for replaced child case
     
 }
