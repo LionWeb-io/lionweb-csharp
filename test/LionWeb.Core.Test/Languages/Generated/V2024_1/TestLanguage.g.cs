@@ -816,8 +816,16 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	}
 
     
-    private void AddContainment_1_nRaw(List<LinkTestConcept> nodes) =>
-        _containment_1_n.AddRange(SetSelfParent(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
+    private bool AddContainment_1_nRaw(List<LinkTestConcept> nodes)
+    {
+        if (nodes.Count == 0)
+            return false;
+        
+        _containment_1_n.AddRange(SetSelfParent(nodes,
+            TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
+        
+        return true;
+    }
 
     /// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Containment_1_n and nodes are empty</exception>
@@ -837,7 +845,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool InsertContainment_1_nRaw(int index, List<LinkTestConcept> nodes)
     {
-        if (!IsInRange(index, _containment_1_n))
+        if (nodes.Count == 0 || !IsInRange(index, _containment_1_n))
             return false;
 
         _containment_1_n.InsertRange(index,
@@ -856,7 +864,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
     
-    private void RemoveContainment_1_nRaw(List<LinkTestConcept> nodes) =>
+    private bool RemoveContainment_1_nRaw(List<LinkTestConcept> nodes) =>
         RemoveSelfParent(nodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
 
 	private ReferenceTarget? _reference_0_1 = null;
