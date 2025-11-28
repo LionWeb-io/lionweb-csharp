@@ -135,7 +135,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
     }
 
-    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> acceptableNewNodes)
+    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> replacedNodes)
     {
         HashSet<NodeId> newNodes = M1Extensions
             .Descendants(newNodeNotification.NewNode, true, true)
@@ -149,30 +149,15 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             return;
         }
 
-        var existingNodes = _sharedNodeMap.NodeIds.Intersect(newNodes).ToList();
+        var remainingNodes = _sharedNodeMap.NodeIds
+            .Intersect(newNodes)
+            .ExceptBy(replacedNodes, s => s)
+            .ToList();
 
-        switch (newNodeNotification)
+        if (remainingNodes.Count != 0)
         {
-            case PartitionAddedNotification partitionAddedNotification:
-                throw new InvalidNotificationException(partitionAddedNotification,
-                    $"Trying to add existing node(s) with ids: {string.Join(",", existingNodes)}");
-
-            case ChildAddedNotification childAddedNotification:
-                throw new InvalidNotificationException(childAddedNotification,
-                    $"Trying to add existing node(s) with ids: {string.Join(",", existingNodes)}");
-
-            case ChildReplacedNotification childReplacedNotification:
-                {
-                    var remainingNodes = existingNodes.ExceptBy(acceptableNewNodes, s => s).ToList();
-
-                    if (remainingNodes.Count != 0)
-                    {
-                        throw new InvalidNotificationException(childReplacedNotification,
-                            $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
-                    }
-
-                    break;
-                }
+            throw new InvalidNotificationException(newNodeNotification,
+                $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
         }
     }
     
