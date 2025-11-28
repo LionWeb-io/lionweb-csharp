@@ -120,7 +120,6 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
     }
     
     [TestMethod]
-    [Ignore("This test fails because child deletion in remote replicator uses DetachFromParent")]
     public void RemoveExistingChild_and_AddExistingChildAgain()
     {
         // Arrange
