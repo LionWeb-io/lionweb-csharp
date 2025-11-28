@@ -696,10 +696,17 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
     
-    private void AddContainment_0_nRaw(List<LinkTestConcept> nodes) =>
-        _containment_0_n.AddRange(SetSelfParent(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
+    private bool AddContainment_0_nRaw(List<LinkTestConcept> nodes)
+    {
+        if (nodes.Count == 0)
+            return false;
+        
+        _containment_0_n.AddRange(SetSelfParent(nodes,
+            TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
+        return true;
+    }
 
-	/// <remarks>Optional Multiple Containment</remarks>
+    /// <remarks>Optional Multiple Containment</remarks>
         public LinkTestConcept InsertContainment_0_n(int index, IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _containment_0_n);
@@ -716,7 +723,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool InsertContainment_0_nRaw(int index, List<LinkTestConcept> nodes)
     {
-        if (!IsInRange(index, _containment_0_n))
+        if (nodes.Count == 0 || !IsInRange(index, _containment_0_n))
             return false;
 
         _containment_0_n.InsertRange(index,
@@ -732,7 +739,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-    private void RemoveContainment_0_nRaw(List<LinkTestConcept> nodes) =>
+    private bool RemoveContainment_0_nRaw(List<LinkTestConcept> nodes) =>
         RemoveSelfParent(nodes, _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
 
     private LinkTestConcept? _containment_1 = null;
@@ -1352,9 +1359,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(feature))
 		{
-			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept v)
+			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept)
 			{
-				SetContainment_1Raw(v);
+				SetContainment_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)value);
 				return true;
 			}
 
