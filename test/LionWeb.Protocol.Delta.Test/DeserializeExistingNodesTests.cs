@@ -274,7 +274,7 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         Assert.IsNull(existingParent.Containment_0_1);
         
         // change has not replicated to the clone
-        Assert.ThrowsExactly<UnsetFeatureException>(() => ((LinkTestConcept)clonedForest.Partitions.ToList()[1]).Containment_1);
+        Assert.IsFalse(((LinkTestConcept)clonedForest.Partitions.ToList()[1]).TryGetContainment_1(out LinkTestConcept? _));
     }
 
     /// <summary>
