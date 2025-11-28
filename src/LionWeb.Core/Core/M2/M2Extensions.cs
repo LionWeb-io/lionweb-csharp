@@ -462,4 +462,31 @@ public static class M2Extensions
     /// <returns><c>true</c> if all entries of <paramref name="enumerable"/> are of type <typeparamref name="T"/>; <c>false</c> otherwise.</returns>
     public static bool AreAll<T>(IEnumerable enumerable) =>
         enumerable.Cast<object?>().All(o => o is T);
+
+    public static bool TryAsList<T>(object? value, out List<T> list)
+    {
+        if (value is List<T> listT)
+        {
+            list = listT;
+            return true;
+        }
+
+        list = value is IList l
+            ? list = new List<T>(l.Count)
+            : [];
+
+        if (value is not IEnumerable enumerable)
+            return false;
+
+        foreach (var entry in enumerable)
+        {
+            if (entry is not T e)
+            {
+                return false;
+            }
+            list.Add(e);
+        }
+
+        return true;
+    }
 }

@@ -126,9 +126,12 @@ public abstract partial class NodeBase
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is in out of range of <paramref name="storage"/>.</exception>
     protected void AssureInRange<T>(Index index, IList<T> storage)
     {
-        if ((uint)index > (uint)storage.Count)
+        if (!IsInRange(index, storage))
             throw new ArgumentOutOfRangeException(nameof(index), index, null);
     }
+
+    protected bool IsInRange<T>(Index index, IList<T> storage) =>
+        (uint)index <= (uint)storage.Count;
 
     /// <summary>
     /// Usually, we <i>can</i> insert nodes at the end of <param name="storage"></param>
@@ -412,6 +415,27 @@ public abstract partial class NodeBase
         }
     }
 
+    protected void RemoveAll(List<ReferenceTarget> targets, List<ReferenceTarget> storage)
+    {
+        foreach (var t in targets)
+        {
+            var index = storage.FindIndex(r =>
+            {
+                if (t.Target is not null)
+                    return Equals(t.Target, r.Target);
+                
+                if (t.TargetId is not null)
+                    return Equals(t.TargetId, r.TargetId);
+                
+                return Equals(t.ResolveInfo, r.ResolveInfo);
+            });
+            if (index < 0)
+                continue;
+
+            storage.RemoveAt(index);
+        }
+    }
+    
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
     protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
         ReferenceRemover<T>(Reference reference) where T : IReadableNode =>

@@ -26,7 +26,7 @@ using Utilities;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
 [DebuggerDisplay("{GetType().Name}[{GetId()}]")]
-public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
+public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReadableNode
 {
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
     protected virtual IBuiltInsLanguage _builtIns =>
@@ -84,6 +84,25 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// <inheritdoc />
     public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 
+    #region ReadableRaw
+
+    /// <inheritdoc/>
+    List<T> IReadableNodeRaw<T>.GetAnnotationsRaw() =>
+        _annotations;
+    
+    /// <inheritdoc/>
+    bool IReadableNodeRaw.TryGetRaw(Feature feature, out object? value) => 
+    TryGetRaw(feature, out value);
+
+    /// <inheritdoc cref="IReadableNodeRaw.TryGetRaw"/>
+    protected internal virtual bool TryGetRaw(Feature feature, out object? value)
+    {
+        value = null;
+        return false;
+    }
+
+    #endregion
+    
     #region References
 
     /// <summary>

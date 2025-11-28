@@ -71,4 +71,26 @@ class SpoofNode(string id) : IShape
         
     public string Uuid { get => null; set { } }
     public IShape SetUuid(string value, INotificationId? notificationId = null) => this;
+
+    List<IAnnotationInstance> IReadableNodeRaw.GetAnnotationsRaw() => [];
+
+    bool IReadableNodeRaw.TryGetRaw(Feature feature, out object? value)
+    {
+        value = null;
+        return false;
+    }
+
+    bool IWritableNodeRaw.SetRaw(Feature feature, object? value) => false;
+
+    void IWritableNodeRaw<INode>.AddAnnotationsRaw(List<INode> annotations) { }
+
+    void IWritableNodeRaw<INode>.InsertAnnotationsRaw(int index, List<INode> annotations) { }
+
+    bool IWritableNodeRaw<INode>.RemoveAnnotationsRaw(ISet<INode> annotations) => false;
+
+    bool IWritableNodeRaw<INode>.AddRaw(Link link, List<INode> nodes) => false;
+
+    bool IWritableNodeRaw<INode>.InsertRaw(Link link, int index, List<INode> nodes) => false;
+
+    bool IWritableNodeRaw<INode>.RemoveRaw(Link link, List<INode> nodes) => false;
 }

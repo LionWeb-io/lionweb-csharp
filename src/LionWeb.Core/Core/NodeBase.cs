@@ -66,9 +66,19 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
             startIndex: null, notificationId: notificationId);
         notification.CollectOldData();
-        _annotations.AddRange(SetSelfParent(safeAnnotations, null));
+        AddAnnotationsRaw(safeAnnotations);
         notification.Notify();
     }
+
+    void IWritableNodeRaw<INode>.AddAnnotationsRaw(List<INode> annotations) =>
+        AddAnnotationsRaw(annotations);
+
+    protected internal void AddAnnotationsRaw(List<INode> annotations)
+    {
+        AssureAnnotations(annotations);
+        _annotations.AddRange(SetSelfParent(annotations, null));
+    }
+
 
     /// <inheritdoc />
     public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations,
@@ -80,13 +90,31 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
             startIndex: index, notificationId: notificationId);
         notification.CollectOldData();
-        _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
+        InsertAnnotationsRaw(index, safeAnnotations);
         notification.Notify();
     }
+
+    void IWritableNodeRaw<INode>.InsertAnnotationsRaw(Index index, List<INode> annotations) =>
+        InsertAnnotationsRaw(index, annotations);
+    
+    protected internal void InsertAnnotationsRaw(Index index, List<INode> annotations)
+    {
+        AssureInRange(index, _annotations);
+        AssureAnnotations(annotations);
+        _annotations.InsertRange(index, SetSelfParent(annotations, null));
+    }
+
 
     /// <inheritdoc />
     public virtual bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
+
+
+    bool IWritableNodeRaw<INode>.RemoveAnnotationsRaw(ISet<INode> annotations) => 
+        RemoveAnnotationsRaw(annotations);
+
+    protected internal bool RemoveAnnotationsRaw(ISet<INode> annotations) =>
+        RemoveSelfParent(annotations?.ToList(), _annotations, null);
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() => [];
@@ -149,6 +177,14 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         return false;
     }
 
+    bool IWritableNodeRaw.SetRaw(Feature feature, object? value) => 
+        SetRaw(feature, value);
+
+    protected internal virtual bool SetRaw(Feature feature, object? value)
+    {
+        return false;
+    }
+
     /// <inheritdoc />
     public void Add(Link? link, IEnumerable<IReadableNode> nodes)
     {
@@ -169,6 +205,13 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
 
         return false;
     }
+
+
+    bool IWritableNodeRaw<INode>.AddRaw(Link link, List<INode> nodes) => 
+        AddRaw(link, nodes);
+
+    protected internal virtual bool AddRaw(Link link, List<INode> nodes) =>
+        false;
 
     /// <inheritdoc />
     public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes)
@@ -191,6 +234,12 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         return false;
     }
 
+    bool IWritableNodeRaw<INode>.InsertRaw(Link link, Index index, List<INode> nodes) =>
+        InsertRaw(link, index, nodes);
+
+    protected internal virtual bool InsertRaw(Link link, Index index, List<INode> nodes) =>
+        false;
+
     /// <inheritdoc />
     public void Remove(Link? link, IEnumerable<IReadableNode> nodes)
     {
@@ -211,6 +260,12 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
 
         return false;
     }
+
+    bool IWritableNodeRaw<INode>.RemoveRaw(Link link, List<INode> nodes) =>
+        RemoveRaw(link, nodes);
+
+    protected internal virtual bool RemoveRaw(Link link, List<INode> nodes) =>
+        false;
 
     /// <summary>
     /// Tries to retrieve the <see cref="IPartitionInstance.GetNotificationProducer"/> from this node's <see cref="Concept.Partition"/>.
