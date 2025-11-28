@@ -365,13 +365,17 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(AnnotationAddedNotification notification) =>
+    private void OnRemoteAnnotationAdded(AnnotationAddedNotification notification)
+    {
+        CheckIfNewNodeContainsExistingNodes(notification, []);
+        
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = (INotifiableNode)notification.Parent;
             var newAnnotation = (INode)notification.NewAnnotation;
             localParent.InsertAnnotations(notification.Index, [newAnnotation], notification.NotificationId);
         });
+    }
 
     private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>

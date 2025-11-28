@@ -404,6 +404,55 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
     
     #endregion
 
+    #region attempt to add an existing annotation
+
+    [TestMethod]
+    public void AddChildWithAnnotationContainingExistingNode()
+    {
+        // Arrange
+        var existingParentAnnotation = new TestAnnotation("existingParentAnnotation");
+        
+        var existingChildAnnotation = new TestAnnotation("existingChildAnnotation");
+        existingParentAnnotation.AddAnnotations([existingChildAnnotation]);
+        
+        var child0 = new LinkTestConcept("child0");
+        child0.AddAnnotations([existingParentAnnotation]);
+
+        var child1 = new LinkTestConcept("child1");
+        var originalPartition = new LinkTestConcept("originalPartition")
+        {
+            Containment_0_1 = child0,
+            Containment_1 = child1
+        };
+
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
+
+        var newParentAnnotation = new TestAnnotation("newAnnotation");
+        newParentAnnotation.AddAnnotations([existingChildAnnotation]);
+        
+        // Act
+        var addAnnotation = () =>
+        {
+            child1.AddAnnotations([newParentAnnotation]);
+        };
+        
+        // Assert
+        Assert.ThrowsExactly<InvalidNotificationException>(addAnnotation);
+        
+        // changes applied to original partition
+        Assert.HasCount(1,originalPartition.Containment_0_1.GetAnnotations());
+        Assert.AreEqual("existingParentAnnotation", originalPartition.Containment_0_1.GetAnnotations()[0].GetId());
+        Assert.HasCount(1, originalPartition.Containment_1.GetAnnotations());
+        Assert.HasCount(1, originalPartition.Containment_1.GetAnnotations()[0].GetAnnotations());
+        Assert.AreEqual("existingChildAnnotation", originalPartition.Containment_1.GetAnnotations()[0].GetAnnotations()[0].GetId());
+        
+        // change has not replicated to the clone
+        Assert.HasCount(1,clonedPartition.Containment_0_1!.GetAnnotations());
+        Assert.IsEmpty(clonedPartition.Containment_1.GetAnnotations());
+    }
+
+    #endregion
+    
     [TestMethod]
     [Ignore("All nodes must have unique ids, not checked (yet) for partitions")]
     public void AddExistingPartition()
@@ -426,7 +475,4 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         // Assert 
         Assert.ThrowsExactly<InvalidNotificationException>(addPartition);
     }
-    
-
-    
 }
