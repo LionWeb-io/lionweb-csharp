@@ -248,8 +248,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             CheckMatchingNodeIdForDeletedNode(notification);
-            // TODO: DetachFromParent() does not update sharedNodeMap 
-            notification.DeletedChild.DetachFromParent(); 
+            notification.DeletedChild.DetachFromParent();
+            notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
         });
 
     private void OnRemoteChildReplaced(ChildReplacedNotification notification)
@@ -394,6 +394,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             CheckMatchingNodeIdForDeletedNode(notification);
 
             notification.DeletedAnnotation.DetachFromParent();
+            notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
         });
 
     private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>
@@ -403,7 +404,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
 
             CheckMatchingNodeIdForReplacedNode(notification);
-
+            
             replacedAnnotation.ReplaceWith(newAnnotation);
         });
 
@@ -421,9 +422,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedAnnotation = (INode)notification.MovedAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-
+            
             CheckMatchingNodeIdForReplacedNode(notification);
-
+            
             replacedAnnotation.ReplaceWith(movedAnnotation);
         });
 
@@ -441,9 +442,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var movedAnnotation = (INode)notification.MovedAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-
+            
             CheckMatchingNodeIdForReplacedNode(notification);
-
+            
             replacedAnnotation.ReplaceWith(movedAnnotation);
         });
 
@@ -586,7 +587,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 $"at index {notification.NewIndex}");
         }
     }
-
+    
     private void CheckMatchingNodeIdForDeletedNode(AnnotationDeletedNotification notification)
     {
         var localParent = notification.Parent;
@@ -601,7 +602,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 $"at index {notification.Index}");
         }
     }
-
+    
     private void CheckMatchingNodeIdForReplacedNode(AnnotationMovedAndReplacedInSameParentNotification notification)
     {
         var localParent = notification.Parent;
@@ -616,7 +617,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 $"at index {notification.NewIndex}");
         }
     }
-
+    
     private void CheckMatchingNodeIdForReplacedNode(AnnotationReplacedNotification notification)
     {
         var localParent = notification.Parent;
@@ -763,7 +764,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     {
         var replacedChildId = notification.ReplacedChild.GetId();
         var localParent = notification.Parent;
-
+        
         if (!notification.Containment.Multiple)
         {
             return;

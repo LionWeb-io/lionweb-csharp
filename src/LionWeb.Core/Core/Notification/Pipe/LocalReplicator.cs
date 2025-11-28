@@ -57,20 +57,40 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
             case PartitionDeletedNotification partitionDeleted:
                 OnLocalPartitionDeleted(partitionDeleted);
                 break;
+
             case ChildAddedNotification e:
                 OnLocalChildAdded(e);
                 break;
             case ChildDeletedNotification e:
                 OnLocalChildDeleted(e);
                 break;
+            case ChildReplacedNotification e:
+                OnLocalChildReplaced(e);
+                break;
+            case ChildMovedAndReplacedFromOtherContainmentNotification e:
+                OnLocalChildMovedAndReplacedFromOtherContainment(e);
+                break;
+            case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e:
+                OnLocalChildMovedAndReplacedFromOtherContainmentInSameParent(e);
+                break;
+            case ChildMovedAndReplacedInSameContainmentNotification e:
+                OnLocalChildMovedAndReplacedInSameContainment(e);
+                break;
+
             case AnnotationAddedNotification e:
                 OnLocalAnnotationAdded(e);
                 break;
             case AnnotationDeletedNotification e:
                 OnLocalAnnotationDeleted(e);
                 break;
-            case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e:
-                OnLocalChildMovedAndReplacedFromOtherContainmentInSameParentNotification(e);
+            case AnnotationReplacedNotification e:
+                OnLocalAnnotationReplaced(e);
+                break;
+            case AnnotationMovedAndReplacedFromOtherParentNotification e:
+                OnLocalAnnotationMovedAndReplacedFromOtherParent(e);
+                break;
+            case AnnotationMovedAndReplacedInSameParentNotification e:
+                OnLocalAnnotationMovedAndReplacedInSameParent(e);
                 break;
         }
 
@@ -95,11 +115,35 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
 
     #region Partition
 
+    #region Containment
+
     private void OnLocalChildAdded(ChildAddedNotification childAdded) =>
         _sharedNodeMap.RegisterNode(childAdded.NewChild);
 
     private void OnLocalChildDeleted(ChildDeletedNotification childDeleted) =>
         _sharedNodeMap.UnregisterNode(childDeleted.DeletedChild);
+
+    private void OnLocalChildReplaced(ChildReplacedNotification childReplaced)
+    {
+        _sharedNodeMap.UnregisterNode(childReplaced.ReplacedChild);
+        _sharedNodeMap.RegisterNode(childReplaced.NewChild);
+    }
+
+    private void OnLocalChildMovedAndReplacedFromOtherContainment(
+        ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplaced) =>
+        _sharedNodeMap.UnregisterNode(childMovedAndReplaced.ReplacedChild);
+
+    private void OnLocalChildMovedAndReplacedFromOtherContainmentInSameParent(
+        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
+        _sharedNodeMap.UnregisterNode(notification.ReplacedChild);
+
+    private void OnLocalChildMovedAndReplacedInSameContainment(
+        ChildMovedAndReplacedInSameContainmentNotification childMovedAndReplaced) =>
+        _sharedNodeMap.UnregisterNode(childMovedAndReplaced.ReplacedChild);
+
+    #endregion
+
+    #region Annotation
 
     private void OnLocalAnnotationAdded(AnnotationAddedNotification annotationAdded) =>
         _sharedNodeMap.RegisterNode(annotationAdded.NewAnnotation);
@@ -107,9 +151,21 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
     private void OnLocalAnnotationDeleted(AnnotationDeletedNotification annotationDeleted) =>
         _sharedNodeMap.UnregisterNode(annotationDeleted.DeletedAnnotation);
 
-    private void OnLocalChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
-        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
-        _sharedNodeMap.UnregisterNode(notification.ReplacedChild);
-    
+    private void OnLocalAnnotationReplaced(AnnotationReplacedNotification annotationReplaced)
+    {
+        _sharedNodeMap.UnregisterNode(annotationReplaced.ReplacedAnnotation);
+        _sharedNodeMap.RegisterNode(annotationReplaced.NewAnnotation);
+    }
+
+    private void OnLocalAnnotationMovedAndReplacedFromOtherParent(
+        AnnotationMovedAndReplacedFromOtherParentNotification annotationMovedAndReplaced) =>
+        _sharedNodeMap.UnregisterNode(annotationMovedAndReplaced.ReplacedAnnotation);
+
+    private void OnLocalAnnotationMovedAndReplacedInSameParent(
+        AnnotationMovedAndReplacedInSameParentNotification annotationMovedAndReplaced) =>
+        _sharedNodeMap.UnregisterNode(annotationMovedAndReplaced.ReplacedAnnotation);
+
+    #endregion
+
     #endregion
 }

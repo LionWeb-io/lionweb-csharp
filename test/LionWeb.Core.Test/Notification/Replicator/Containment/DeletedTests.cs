@@ -31,11 +31,17 @@ public class DeletedTests : ReplicatorTestsBase
         var originalPartition = new Geometry("a") { Shapes = [deleted] };
         var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonedPartition, originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
+
+        Assert.IsTrue(sharedNodeMap.ContainsKey(deleted.GetId()));
 
         originalPartition.RemoveShapes([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
+
+        Assert.IsFalse(sharedNodeMap.ContainsKey(deleted.GetId()));
     }
 
     [TestMethod]
