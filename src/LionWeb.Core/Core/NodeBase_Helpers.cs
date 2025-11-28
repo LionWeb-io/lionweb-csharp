@@ -187,11 +187,14 @@ public abstract partial class NodeBase
         AssureNotNullMembers(annotations, null);
         foreach (var a in annotations)
         {
-            if (a.GetClassifier() is not Annotation ann || !ann.CanAnnotate(GetClassifier()))
+            if (!CanAnnotate(a))
                 throw new InvalidValueException(null, a);
         }
     }
 
+    protected bool CanAnnotate(INode? candidate) =>
+        candidate?.GetClassifier() is Annotation ann && ann.CanAnnotate(GetClassifier());
+    
     /// <summary>
     /// Unsets <paramref name="child">child's</paramref> parent, if applicable. 
     /// Does <i>not</i> update parent's containments.

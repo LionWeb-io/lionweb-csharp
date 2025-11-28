@@ -41,17 +41,17 @@ public interface IWritableNodeRaw<T> : IWritableNode<T>, IWritableNodeRaw where 
     void IWritableNodeRaw.AddAnnotationsRaw(List<IAnnotationInstance> annotations) =>
         AddAnnotationsRaw(annotations);
     
-    protected internal void AddAnnotationsRaw(List<T> annotations);
+    protected internal bool AddAnnotationsRaw(List<T> annotations);
     
     void IWritableNodeRaw.InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotations) =>
         InsertAnnotationsRaw(index, annotations);
 
-    protected internal void InsertAnnotationsRaw(Index index, List<T> annotations);
+    protected internal bool InsertAnnotationsRaw(Index index, List<T> annotations);
 
     bool IWritableNodeRaw.RemoveAnnotationsRaw(ISet<IAnnotationInstance> annotations) =>
         RemoveAnnotationsRaw(annotations);
     
-    protected internal bool RemoveAnnotationsRaw(ISet<T> annotations);
+    protected internal bool RemoveAnnotationsRaw(HashSet<INode> annotations);
     
     bool IWritableNodeRaw.AddRaw(Link link, List<IReadableNode> nodes) =>
         AddRaw(link, nodes);

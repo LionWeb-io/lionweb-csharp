@@ -70,15 +70,17 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         notification.Notify();
     }
 
-    void IWritableNodeRaw<INode>.AddAnnotationsRaw(List<INode> annotations) =>
+    bool IWritableNodeRaw<INode>.AddAnnotationsRaw(List<INode> annotations) =>
         AddAnnotationsRaw(annotations);
 
-    protected internal void AddAnnotationsRaw(List<INode> annotations)
+    protected internal bool AddAnnotationsRaw(List<INode> annotations)
     {
-        AssureAnnotations(annotations);
-        _annotations.AddRange(SetSelfParent(annotations, null));
-    }
+        if (annotations.Count == 0 || annotations.Any(a => !CanAnnotate(a)))
+            return false;
 
+        _annotations.AddRange(SetSelfParent(annotations, null));
+        return true;
+    }
 
     /// <inheritdoc />
     public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations,
@@ -94,14 +96,17 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         notification.Notify();
     }
 
-    void IWritableNodeRaw<INode>.InsertAnnotationsRaw(Index index, List<INode> annotations) =>
+    bool IWritableNodeRaw<INode>.InsertAnnotationsRaw(Index index, List<INode> annotations) =>
         InsertAnnotationsRaw(index, annotations);
     
-    protected internal void InsertAnnotationsRaw(Index index, List<INode> annotations)
+    protected internal bool InsertAnnotationsRaw(Index index, List<INode> annotations)
     {
-        AssureInRange(index, _annotations);
+        if(annotations.Count == 0 || !IsInRange(index, _annotations) || annotations.Any(a => !CanAnnotate(a)))
+            return false;
+        
         AssureAnnotations(annotations);
         _annotations.InsertRange(index, SetSelfParent(annotations, null));
+        return true;
     }
 
 
@@ -110,11 +115,16 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
 
 
-    bool IWritableNodeRaw<INode>.RemoveAnnotationsRaw(ISet<INode> annotations) => 
+    bool IWritableNodeRaw<INode>.RemoveAnnotationsRaw(HashSet<INode> annotations) => 
         RemoveAnnotationsRaw(annotations);
 
-    protected internal bool RemoveAnnotationsRaw(ISet<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null);
+    protected internal bool RemoveAnnotationsRaw(HashSet<INode> annotations)
+    {
+        if (annotations.Count == 0 || annotations.Any(a => !CanAnnotate(a)))
+            return false;
+
+        return RemoveSelfParent(annotations.ToList(), _annotations, null);
+    }
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() => [];
