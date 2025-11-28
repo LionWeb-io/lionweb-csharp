@@ -386,16 +386,25 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
         });
 
-    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>
+    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification)
+    {
+        HashSet<NodeId> replacedNodes = M1Extensions
+            .Descendants(notification.ReplacedAnnotation, true, true)
+            .Select(node => node.GetId())
+            .ToHashSet();
+        
+        CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
+        
         SuppressNotificationForwarding(notification, () =>
         {
             var newAnnotation = (INode)notification.NewAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
 
             CheckMatchingNodeIdForReplacedNode(notification);
-            
+
             replacedAnnotation.ReplaceWith(newAnnotation);
         });
+    }
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>

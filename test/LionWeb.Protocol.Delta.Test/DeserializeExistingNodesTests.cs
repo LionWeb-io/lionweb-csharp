@@ -404,10 +404,10 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
     
     #endregion
 
-    #region attempt to add an existing annotation
+    #region attempt to add/replace an existing annotation
 
     [TestMethod]
-    public void AddChildWithAnnotationContainingExistingNode()
+    public void AddNewAnnotationAnnotatedWithExistingAnnotation()
     {
         // Arrange
         var existingParentAnnotation = new TestAnnotation("existingParentAnnotation");
@@ -451,6 +451,36 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         Assert.IsEmpty(clonedPartition.Containment_1.GetAnnotations());
     }
 
+    
+    [TestMethod]
+    public void ReplaceAnnotationWithAnnotationContainingExistingAnnotation()
+    {
+        // Arrange
+        var existingParentAnnotation = new TestAnnotation("existingParentAnnotation");
+        
+        var existingChildAnnotation = new TestAnnotation("existingChildAnnotation");
+        existingParentAnnotation.AddAnnotations([existingChildAnnotation]);
+        
+        var child = new LinkTestConcept("child");
+        child.AddAnnotations([existingParentAnnotation]);
+        
+        var originalPartition = new LinkTestConcept("originalPartition")
+        {
+            Containment_0_1 = child
+        };
+        
+        var newParentAnnotation = new TestAnnotation("newAnnotation");
+        newParentAnnotation.AddAnnotations([existingChildAnnotation]);
+        
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
+        
+        // Act
+        child.GetAnnotations()[0].ReplaceWith(newParentAnnotation);
+        
+        // Assert
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
     #endregion
     
     [TestMethod]
