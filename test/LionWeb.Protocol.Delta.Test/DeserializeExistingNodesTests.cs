@@ -24,6 +24,8 @@ using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 [TestClass]
 public class DeserializeExistingNodesTests: DeltaTestsBase
 {
+    #region attempt to add an existing child
+
     /// <summary>
     /// According to spec, all descendants in an added node MUST be new (i.e. not present in the model).
     /// This test case is legal in api but results in delta error because the existingChild is attempted
@@ -159,76 +161,6 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
     }
     
     /// <summary>
-    /// Model is valid after replacement
-    /// </summary>
-    [TestMethod]
-    public void ReplacedChildWithReplacementContainingChildOfReplacedNode()
-    {
-        // Arrange
-        var existingChild = new LinkTestConcept("existingChild");
-        
-        var replaced = new LinkTestConcept("replaced")
-        {
-            Containment_0_1 = existingChild 
-        };
-        
-        var originalPartition = new LinkTestConcept("originalPartition")
-        {
-            Containment_0_1 = replaced
-        };
-        
-        var clonedPartition = CreateDeltaReplicator(originalPartition);
-
-        var replacement = new LinkTestConcept("replacement")
-        {
-            Containment_0_1 = existingChild
-        };
-        
-        // Act
-        replaced.ReplaceWith(replacement);
-        
-        // Assert
-        AssertEquals([originalPartition], [clonedPartition]);
-    }
-    
-    
-    /// <summary>
-    /// Model is valid after replacement
-    /// </summary>
-    [TestMethod]
-    public void ReplacedChildWithReplacementContainingChildOfReplacedNode_with_PartitionAdded()
-    {
-        // Arrange
-        var existingChild = new LinkTestConcept("existingChild");
-        
-        var replaced = new LinkTestConcept("replaced")
-        {
-            Containment_0_1 = existingChild 
-        };
-        
-        var originalPartition = new LinkTestConcept("originalPartition")
-        {
-            Containment_0_1 = replaced
-        };
-        
-        var originalForest = new Forest();
-        
-        var clonedForest = CreateDeltaReplicator(originalForest);
-
-        var replacement = new LinkTestConcept("replacement")
-        {
-            Containment_0_1 = existingChild
-        };
-        
-        // Act
-        originalForest.AddPartitions([originalPartition]);
-        replaced.ReplaceWith(replacement);
-        
-        // Assert
-        AssertEquals(originalForest.Partitions, clonedForest.Partitions);
-    }
-
-    /// <summary>
     /// existingChild is part of another partition in the same forest.
     /// Therefore, it is considered as a known node (not a new node).
     /// </summary>
@@ -315,6 +247,162 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         // Assert
         AssertEquals(clonedForest.Partitions, originalForest.Partitions);
     }
+    
+    #endregion
+    
+    #region attempt to replace an existing child   
+    
+    /// <summary>
+    /// Model is valid after replacement
+    /// </summary>
+    [TestMethod]
+    public void ReplacedChildWithReplacementContainingChildOfReplacedNode()
+    {
+        // Arrange
+        var existingChild = new LinkTestConcept("existingChild");
+        
+        var replaced = new LinkTestConcept("replaced")
+        {
+            Containment_0_1 = existingChild 
+        };
+        
+        var originalPartition = new LinkTestConcept("originalPartition")
+        {
+            Containment_0_1 = replaced
+        };
+        
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
+
+        var replacement = new LinkTestConcept("replacement")
+        {
+            Containment_0_1 = existingChild
+        };
+        
+        // Act
+        replaced.ReplaceWith(replacement);
+        
+        // Assert
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    
+    /// <summary>
+    /// Model is valid after replacement
+    /// </summary>
+    [TestMethod]
+    public void ReplacedChildWithReplacementContainingChildOfReplacedNode_with_PartitionAdded()
+    {
+        // Arrange
+        var existingChild = new LinkTestConcept("existingChild");
+        
+        var replaced = new LinkTestConcept("replaced")
+        {
+            Containment_0_1 = existingChild 
+        };
+        
+        var originalPartition = new LinkTestConcept("originalPartition")
+        {
+            Containment_0_1 = replaced
+        };
+        
+        var originalForest = new Forest();
+        
+        var clonedForest = CreateDeltaReplicator(originalForest);
+
+        var replacement = new LinkTestConcept("replacement")
+        {
+            Containment_0_1 = existingChild
+        };
+        
+        // Act
+        originalForest.AddPartitions([originalPartition]);
+        replaced.ReplaceWith(replacement);
+        
+        // Assert
+        AssertEquals(originalForest.Partitions, clonedForest.Partitions);
+    }
+    
+    
+    /// <summary>
+    /// existingChild is part of another partition in the same forest.
+    /// Model is valid after replacement.
+    /// </summary>
+    [TestMethod]
+    public void ReplacedChildWithReplacementContainingChildOfReplacedNode_FromOtherPartition()
+    {
+        // Arrange
+        var existingChild = new LinkTestConcept("existingChild");
+        
+        var replaced = new LinkTestConcept("replaced")
+        {
+            Containment_0_1 = existingChild 
+        };
+        
+        var otherPartition = new LinkTestConcept("originalPartition")
+        {
+            Containment_0_1 = replaced
+        };
+        
+        var changedPartition = new LinkTestConcept("changedPartition");
+        
+        var originalForest = new Forest();
+        originalForest.AddPartitions([otherPartition, changedPartition]);
+        
+        var clonedForest = CreateDeltaReplicator(originalForest);
+
+        var replacement = new LinkTestConcept("replacement")
+        {
+            Containment_0_1 = existingChild
+        };
+        
+        // Act
+        replaced.ReplaceWith(replacement);
+        
+        // Assert
+        AssertEquals(originalForest.Partitions, clonedForest.Partitions);
+    }
+    
+    /// <summary>
+    /// existingChild is part of another (free floating) partition which is not in the same forest.
+    /// Model is valid after replacement.
+    /// </summary>
+    [TestMethod]
+    public void ReplacedChildWithReplacementContainingChildOfReplacedNode_FromFreeFloatingPartition()
+    {
+        // Arrange
+        var existingChild = new LinkTestConcept("existingChild");
+        
+        var replaced = new LinkTestConcept("replaced")
+        {
+            Containment_0_1 = existingChild 
+        };
+        
+        var otherPartition = new LinkTestConcept("originalPartition")
+        {
+            Containment_0_1 = replaced
+        };
+        
+        var changedPartition = new LinkTestConcept("changedPartition");
+        
+        var originalForest = new Forest();
+        originalForest.AddPartitions([changedPartition]);
+        
+        var clonedForest = CreateDeltaReplicator(originalForest);
+
+        var replacement = new LinkTestConcept("replacement")
+        {
+            Containment_0_1 = existingChild
+        };
+        
+        // Act
+        replaced.ReplaceWith(replacement);
+        
+        // Assert
+        AssertEquals(originalForest.Partitions, clonedForest.Partitions);
+    }
+    
+    
+    #endregion
 
     [TestMethod]
     [Ignore("All nodes must have unique ids, not checked (yet) for partitions")]
@@ -339,6 +427,6 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         Assert.ThrowsExactly<InvalidNotificationException>(addPartition);
     }
     
-    //TODO: add tests with forest for replaced child case
+
     
 }
