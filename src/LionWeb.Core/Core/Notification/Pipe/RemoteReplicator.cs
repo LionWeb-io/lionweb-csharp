@@ -134,13 +134,16 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
     }
+    
+    private HashSet<NodeId> CollectNodeIdsOfAllDescendantsOf(IReadableNode node) =>
+        M1Extensions
+            .Descendants(node, true, true)
+            .Select(n => n.GetId())
+            .ToHashSet();
 
     private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> replacedNodes)
     {
-        HashSet<NodeId> newNodes = M1Extensions
-            .Descendants(newNodeNotification.NewNode, true, true)
-            .Select(node => node.GetId())
-            .ToHashSet();
+        HashSet<NodeId> newNodes = CollectNodeIdsOfAllDescendantsOf(node: newNodeNotification.NewNode);
 
         var hasIntersection = _sharedNodeMap.NodeIds.ToHashSet().Overlaps(newNodes);
 
@@ -239,10 +242,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     private void OnRemoteChildReplaced(ChildReplacedNotification notification)
     {
-        HashSet<NodeId> replacedNodes = M1Extensions
-            .Descendants(notification.ReplacedChild, true, true)
-            .Select(node => node.GetId())
-            .ToHashSet();
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: notification.ReplacedChild);
         
         CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
         
@@ -388,10 +388,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification)
     {
-        HashSet<NodeId> replacedNodes = M1Extensions
-            .Descendants(notification.ReplacedAnnotation, true, true)
-            .Select(node => node.GetId())
-            .ToHashSet();
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: notification.ReplacedAnnotation);
         
         CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
         
