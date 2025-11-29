@@ -57,14 +57,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         // Act
         // This emits a ChildAddedNotification, "replacement" is a new node but its child "existingChild" is not.
         // That's what makes the ChildAddedNotification "invalid".
-        var applyReplacement = () =>
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
             originalPartition.Containment_1 = replacement;
-        };
+        });
         
         // Assert
-        Assert.ThrowsExactly<InvalidNotificationException>(applyReplacement);
-        
         // changes applied to original partition
         // (node api maintains tree shape: moves existingChild from Containment_0_1 to Containment_1)
         Assert.AreSame(replacement, originalPartition.Containment_1);
@@ -99,17 +97,14 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         {
             Containment_0_1 = existingChild
         };
-        
+
         // Act
         originalForest.AddPartitions([originalPartition]);
         
-        var applyReplacement = () =>
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
             originalPartition.Containment_1 = replacement;
-        };
-        
-        // Assert
-        Assert.ThrowsExactly<InvalidNotificationException>(applyReplacement);
+        });
         
         // Assert
         // changes applied to original partition
@@ -193,14 +188,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         };
 
         // Act
-        var applyReplacement = () =>
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
             changedPartition.Containment_1 = replacement;
-        };
+        });
         
         // Assert
-        Assert.ThrowsExactly<InvalidNotificationException>(applyReplacement);
-        
         // changes applied to original partition
         Assert.AreSame(replacement, changedPartition.Containment_1);
         Assert.IsNull(existingParent.Containment_0_1);
@@ -431,14 +424,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         newParentAnnotation.AddAnnotations([existingChildAnnotation]);
         
         // Act
-        var addAnnotation = () =>
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
             child1.AddAnnotations([newParentAnnotation]);
-        };
+        });
         
         // Assert
-        Assert.ThrowsExactly<InvalidNotificationException>(addAnnotation);
-        
         // changes applied to original partition
         Assert.HasCount(1,originalPartition.Containment_0_1.GetAnnotations());
         Assert.AreEqual("existingParentAnnotation", originalPartition.Containment_0_1.GetAnnotations()[0].GetId());
@@ -496,13 +487,10 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         
         CreateDeltaReplicator(originalForest);
 
-        // Act
-        var addPartition = () =>
+        // Act & Assert 
+        Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
             originalForest.AddPartitions([partition]);
-        };
-        
-        // Assert 
-        Assert.ThrowsExactly<InvalidNotificationException>(addPartition);
+        });
     }
 }
