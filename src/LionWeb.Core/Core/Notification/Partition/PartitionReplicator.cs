@@ -28,7 +28,7 @@ public static class PartitionReplicator
     {
         var internalSender = sender ?? localPartition.GetId();
         var filter = new IdFilteringNotificationFilter(internalSender);
-        var remoteReplicator = new RemoteReplicator(null, filter, internalSender);
+        var remoteReplicator = new RemoteReplicator(null, filter, sharedNodeMap, internalSender);
         var localReplicator = new LocalReplicator(null, sharedNodeMap, internalSender);
 
         var result = new MultipartNotificationHandler([remoteReplicator, filter],

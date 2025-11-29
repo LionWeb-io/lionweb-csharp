@@ -61,6 +61,10 @@ public class SharedNodeMap : IDisposable
     public IEnumerable<IReadableNode> Values
         => _map.Values;
 
+    /// Retrieves all node ids.
+    public IEnumerable<NodeId> NodeIds
+        => _map.Keys;
+
     /// Checks whether <paramref name="nodeId"/> has been mapped.
     public bool ContainsKey(NodeId nodeId)
         => _map.ContainsKey(nodeId);
