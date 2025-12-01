@@ -58,7 +58,8 @@ public class DeltaCommandToDeltaEventMapper
             DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, a.DeletedTarget, a.DeletedResolveInfo, OriginCommands(a), []),
             ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, a.OldTarget, a.OldResolveInfo, OriginCommands(a), []),
             AddPartition a => new PartitionAdded(a.NewPartition, /*TODO*/ null, OriginCommands(a), []),
-            DeletePartition a => new PartitionDeleted(a.DeletedPartition, /*TODO*/[], OriginCommands(a), [])
+            DeletePartition a => new PartitionDeleted(a.DeletedPartition, /*TODO*/[], OriginCommands(a), []),
+            _ => throw new ArgumentException($"{nameof(DeltaCommandToDeltaEventMapper)} does not support {deltaCommand.GetType().Name}!")
         };
 
     private NodeId GetParent(NodeId childId)
