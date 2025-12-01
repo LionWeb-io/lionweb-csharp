@@ -70,7 +70,7 @@ public class DeltaEventToNotificationMapper
             ReferenceAdded a => OnReferenceAdded(a),
             ReferenceDeleted a => OnReferenceDeleted(a),
             ReferenceChanged a => OnReferenceChanged(a),
-            _ => throw new NotImplementedException(deltaEvent.GetType().Name)
+            _ => throw new ArgumentException($"{nameof(DeltaEventToNotificationMapper)} does not support {deltaEvent.GetType().Name}!")
         };
 
     #region Partitions

@@ -70,7 +70,7 @@ public class DeltaCommandToNotificationMapper
             AddReference a => OnAddReference(a),
             DeleteReference a => OnDeleteReference(a),
             ChangeReference a => OnChangeReference(a),
-            _ => throw new NotImplementedException(command.GetType().Name)
+            _ => throw new ArgumentException($"{nameof(DeltaCommandToNotificationMapper)} does not support {command.GetType().Name}!")
         };
 
     #region Partitions
