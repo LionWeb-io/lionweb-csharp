@@ -473,7 +473,63 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 		return false;
 	}
 
-	/// <inheritdoc/>
+    protected internal override bool TryGetPropertyRaw(Feature property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1.EqualsIdentity(property))
+        {
+            value = _booleanValue_0_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_1.EqualsIdentity(property))
+        {
+            value = _booleanValue_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1.EqualsIdentity(property))
+        {
+            value = _enumValue_0_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1.EqualsIdentity(property))
+        {
+            value = _enumValue_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_0_1.EqualsIdentity(property))
+        {
+            value = _integerValue_0_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1.EqualsIdentity(property))
+        {
+            value = _integerValue_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1.EqualsIdentity(property))
+        {
+            value = _stringValue_0_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_1.EqualsIdentity(property))
+        {
+            value = _stringValue_1;
+            return true;
+        }
+
+        return false;
+    }
+    
+    /// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
 		if (base.SetInternal(feature, value, notificationId))
@@ -569,7 +625,87 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 		return false;
 	}
 
-	/// <inheritdoc/>
+    protected internal override bool SetPropertyRaw(Feature property, object? value)
+	{
+		if (base.SetPropertyRaw(property, value))
+			return true;
+        
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1.EqualsIdentity(property))
+		{
+			if (value is null or bool)
+			{
+				_booleanValue_0_1 = (bool?)value;
+				return true;
+			}
+		}
+
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_1.EqualsIdentity(property))
+		{
+            if (value is null or bool)
+			{
+				_booleanValue_1 = (bool?)value;
+				return true;
+			}
+		}
+
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1.EqualsIdentity(property))
+		{
+			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration)
+			{
+				_enumValue_0_1 = (LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration?)value;
+				return true;
+			}
+		}
+
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1.EqualsIdentity(property))
+		{
+            if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration)
+            {
+                _enumValue_1 = (LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration?)value;
+				return true;
+			}
+		}
+
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_0_1.EqualsIdentity(property))
+		{
+			if (value is null or int)
+			{
+				_integerValue_0_1 = (int?)value;
+				return true;
+			}
+		}
+
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1.EqualsIdentity(property))
+		{
+            if (value is null or int)
+            {
+                _integerValue_1 = (int?)value;
+				return true;
+			}
+		}
+
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1.EqualsIdentity(property))
+		{
+			if (value is null or string)
+			{
+				_stringValue_0_1 = (string?)value;
+				return true;
+			}
+		}
+
+		if (TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_1.EqualsIdentity(property))
+		{
+            if (value is null or string)
+            {
+                _stringValue_1 = (string?)value;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+    /// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
@@ -885,13 +1021,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNullableInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
 		emitter.CollectOldData();
-		SetReference_0_1Raw(value);
+		_reference_0_1 = value;
 		emitter.Notify();
 		return this;
 	}
-
-    private void SetReference_0_1Raw(ReferenceTarget? value) =>
-        _reference_0_1 = value;
 
     /// <remarks>Optional Single Reference</remarks>
         public LinkTestConcept SetReference_0_1(LinkTestConcept? value, INotificationId? notificationId = null)
@@ -992,13 +1125,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNotNullInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
 		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1, notificationId);
 		emitter.CollectOldData();
-		SetReference_1Raw(value);
+		_reference_1 = value;
 		emitter.Notify();
 		return this;
 	}
-
-    private void SetReference_1Raw(ReferenceTarget? value) =>
-        _reference_1 = value;
 
     /// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -1427,13 +1557,13 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(reference))
 		{
-				SetReference_0_1Raw(target);
+				_reference_0_1 = target;
 				return true;
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1.EqualsIdentity(reference))
 		{
-				SetReference_1Raw(target);
+				_reference_1 = target;
 				return true;
 		}
 
