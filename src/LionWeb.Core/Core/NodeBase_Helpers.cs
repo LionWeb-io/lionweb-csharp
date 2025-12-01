@@ -424,6 +424,9 @@ public abstract partial class NodeBase
 
     protected bool RemoveAll(List<ReferenceTarget> targets, List<ReferenceTarget> storage)
     {
+        if (targets is null || storage is null)
+            return false;
+        
         bool result = false;
         
         foreach (var t in targets)

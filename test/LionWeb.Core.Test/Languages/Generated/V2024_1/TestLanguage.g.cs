@@ -929,7 +929,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool AddReference_0_nRaw(List<ReferenceTarget> targets)
     {
-        if (targets.Count == 0)
+        if (targets is null || targets.Count == 0 || targets.Any(t => t is null))
             return false;
         
         _reference_0_n.AddRange(targets);
@@ -952,7 +952,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool InsertReference_0_nRaw(int index, List<ReferenceTarget> targets)
     {
-        if (targets.Count == 0 || !IsInRange(index, _reference_0_n))
+        if (targets is null || targets.Count == 0 || !IsInRange(index, _reference_0_n) || targets.Any(t => t is null))
             return false;
 
         _reference_0_n.InsertRange(index, targets);
@@ -1039,7 +1039,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool AddReference_1_nRaw(List<ReferenceTarget> targets)
     {
-        if (targets.Count == 0)
+        if (targets is null || targets.Count == 0 || targets.Any(t => t is null))
             return false;
         
         _reference_1_n.AddRange(targets);
@@ -1065,7 +1065,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool InsertReference_1_nRaw(int index, List<ReferenceTarget> targets)
     {
-        if (targets.Count == 0 || !IsInRange(index, _reference_1_n))
+        if (targets is null || targets.Count == 0 || !IsInRange(index, _reference_1_n) || targets.Any(t => t is null))
             return false;
 
         _reference_1_n.InsertRange(index, targets);
