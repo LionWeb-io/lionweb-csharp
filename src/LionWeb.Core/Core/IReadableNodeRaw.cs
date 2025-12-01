@@ -23,14 +23,12 @@ public interface IReadableNodeRaw : IReadableNode
 {
     protected internal List<IAnnotationInstance> GetAnnotationsRaw();
     
-    protected internal bool TryGetRaw(Feature feature, out object? value);
+    protected internal bool TryGetPropertyRaw(Feature property, out object? value);
+    protected internal bool TryGetContainmentRaw(Feature containment, out IWritableNode? node);
+    protected internal bool TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes);
+    protected internal bool TryGetReferenceRaw(Feature reference, out IReferenceTarget? target);
+    protected internal bool TryGetReferencesRaw(Feature reference, out IEnumerable<IReferenceTarget> targets);
 }
 
-public interface IReadableNodeRaw<T> : IReadableNode<T>, IReadableNodeRaw where T : IReadableNode
-{
-    List<IAnnotationInstance> IReadableNodeRaw.GetAnnotationsRaw() => 
-        GetAnnotationsRaw().Cast<IAnnotationInstance>().ToList();
-
-    protected internal new List<T> GetAnnotationsRaw();
-}
+public interface IReadableNodeRaw<out T> : IReadableNode<T>, IReadableNodeRaw where T : IReadableNode;
 

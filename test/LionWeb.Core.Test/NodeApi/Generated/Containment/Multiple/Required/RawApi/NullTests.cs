@@ -26,27 +26,27 @@ public class NullTests
     public void Null()
     {
         var parent = new LinkTestConcept("cs");
-        Assert.IsFalse(parent.AddRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null));
+        Assert.IsFalse(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null));
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
         var parent = new LinkTestConcept("cs");
-        Assert.IsFalse(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, null));
+        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
         var parent = new LinkTestConcept("cs");
-        Assert.IsFalse(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 1, [null]));
+        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 1, [null]));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
         var parent = new LinkTestConcept("cs");
-        Assert.IsFalse(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null));
     }
 }

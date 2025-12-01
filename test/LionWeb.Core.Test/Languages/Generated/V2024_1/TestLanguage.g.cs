@@ -927,8 +927,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-    private void AddReference_0_nRaw(List<ReferenceTarget> targets) =>
+    private bool AddReference_0_nRaw(List<ReferenceTarget> targets)
+    {
+        if (targets.Count == 0)
+            return false;
+        
         _reference_0_n.AddRange(targets);
+        return true;
+    }
 
     /// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept InsertReference_0_n(int index, IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
@@ -946,7 +952,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool InsertReference_0_nRaw(int index, List<ReferenceTarget> targets)
     {
-        if (!IsInRange(index, _reference_0_n))
+        if (targets.Count == 0 || !IsInRange(index, _reference_0_n))
             return false;
 
         _reference_0_n.InsertRange(index, targets);
@@ -963,7 +969,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-    private void RemoveReference_0_nRaw(List<ReferenceTarget> targets) =>
+    private bool RemoveReference_0_nRaw(List<ReferenceTarget> targets) =>
         RemoveAll(targets, _reference_0_n);
 
     private ReferenceTarget? _reference_1 = null;
@@ -1031,8 +1037,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-    private void AddReference_1_nRaw(List<ReferenceTarget> targets) =>
+    private bool AddReference_1_nRaw(List<ReferenceTarget> targets)
+    {
+        if (targets.Count == 0)
+            return false;
+        
         _reference_1_n.AddRange(targets);
+        return true;
+    }
 
     /// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Reference_1_n and nodes are empty</exception>
@@ -1053,7 +1065,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
     private bool InsertReference_1_nRaw(int index, List<ReferenceTarget> targets)
     {
-        if (!IsInRange(index, _reference_1_n))
+        if (targets.Count == 0 || !IsInRange(index, _reference_1_n))
             return false;
 
         _reference_1_n.InsertRange(index, targets);
@@ -1072,7 +1084,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return this;
 	}
 
-    private void RemoveReference_1_nRaw(List<ReferenceTarget> targets) =>
+    private bool RemoveReference_1_nRaw(List<ReferenceTarget> targets) =>
         RemoveAll(targets, _reference_1_n);
 
 	public LinkTestConcept(string id) : base(id)
@@ -1147,68 +1159,100 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 		return false;
 	}
-    
-    protected internal override bool TryGetRaw(Feature feature, out object? value)
+
+    protected internal override bool TryGetPropertyRaw(Feature property, out object? value)
     {
-        if (base.TryGetRaw(feature, out value))
+        if (base.TryGetPropertyRaw(property, out value))
             return true;
-        if (_builtIns.INamed_name.EqualsIdentity(feature))
+        
+        if (_builtIns.INamed_name.EqualsIdentity(property))
         {
             value = _name;
             return true;
         }
+        
+        return false;
+    }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1.EqualsIdentity(feature))
+    protected internal override bool TryGetContainmentRaw(Feature containment, out IWritableNode? node)
+    {
+        if (base.TryGetContainmentRaw(containment, out node))
+            return true;
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1.EqualsIdentity(containment))
         {
-            value = _containment_0_1;
+            node = _containment_0_1;
             return true;
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(containment))
         {
-            value = _containment_0_n;
-            return true;
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(feature))
-        {
-            value = _containment_1;
-            return true;
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature))
-        {
-            value = _containment_1_n;
-            return true;
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(feature))
-        {
-            value = _reference_0_1;
-            return true;
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(feature))
-        {
-            value = _reference_0_n;
-            return true;
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1.EqualsIdentity(feature))
-        {
-            value = _reference_1;
-            return true;
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(feature))
-        {
-            value = _reference_1_n;
+            node = _containment_1;
             return true;
         }
 
         return false;
     }
 
+    protected internal override bool TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(containment))
+        {
+            nodes = _containment_0_n;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(containment))
+        {
+            nodes = _containment_1_n;
+            return true;
+        }
+
+        return false;
+    }
+
+    protected internal override bool TryGetReferenceRaw(Feature reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(reference))
+        {
+            target = _reference_0_1;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1.EqualsIdentity(reference))
+        {
+            target = _reference_1;
+            return true;
+        }
+
+        return false;
+    }
+
+    protected internal override bool TryGetReferencesRaw(Feature reference, out IEnumerable<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(reference))
+        {
+            targets = _reference_0_n;
+            return true;
+        }
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(reference))
+        {
+            targets = _reference_1_n;
+            return true;
+        }
+
+        return false;
+    }
 
     /// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
@@ -1333,12 +1377,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return false;
 	}
 
-    protected internal override bool SetRaw(Feature feature, object? value)
+    protected internal override bool SetPropertyRaw(Feature property, object? value)
     {
-		if (base.SetRaw(feature, value))
+		if (base.SetPropertyRaw(property, value))
 			return true;
         
-		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		if (_builtIns.INamed_name.EqualsIdentity(property))
 		{
 			if (value is null or string)
 			{
@@ -1347,80 +1391,50 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 			}
 		}
 
-		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1.EqualsIdentity(feature))
+		return false;
+    }
+
+    protected internal override bool SetContainmentRaw(Feature containment, IWritableNode? node)
+    {
+		if (base.SetContainmentRaw(containment, node))
+			return true;
+        
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1.EqualsIdentity(containment))
 		{
-			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept)
+			if (node is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept)
 			{
-				SetContainment_0_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)value);
+				SetContainment_0_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)node);
 				return true;
 			}
 		}
 
-		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature))
+		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(containment))
 		{
-            if (M2Extensions.TryAsList<LinkTestConcept>(value, out var list))
-            {
-                SetContainment_0_nRaw(list);
-                return true;
-            }
-		}
-
-		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(feature))
-		{
-			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept)
+			if (node is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept)
 			{
-				SetContainment_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)value);
-				return true;
-			}
-
-			throw new InvalidValueException(feature, value);
-		}
-
-		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature))
-		{
-            if (M2Extensions.TryAsList<LinkTestConcept>(value, out var list))
-            {
-                SetContainment_1_nRaw(list);
-                return true;
-            }
-		}
-
-		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(feature))
-		{
-			if (value is null or ReferenceTarget)
-			{
-				SetReference_0_1Raw((ReferenceTarget?)value);
+				SetContainment_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)node);
 				return true;
 			}
 		}
 
-		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(feature))
+		return false;
+    }
+
+    protected internal override bool SetReferenceRaw(Feature reference, ReferenceTarget? target)
+    {
+		if (base.SetReferenceRaw(reference, target))
+			return true;
+
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(reference))
 		{
-            if (M2Extensions.TryAsList<ReferenceTarget>(value, out var list))
-            {
-                SetReference_0_nRaw(list);
-                return true;
-            }
+				SetReference_0_1Raw(target);
+				return true;
 		}
 
-		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1.EqualsIdentity(feature))
+		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1.EqualsIdentity(reference))
 		{
-			if (value is ReferenceTarget target)
-			{
 				SetReference_1Raw(target);
 				return true;
-			}
-
-			throw new InvalidValueException(feature, value);
-		}
-
-		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(feature))
-		{
-            if (M2Extensions.TryAsList<ReferenceTarget>(value, out var list))
-            {
-                SetReference_1_nRaw(list);
-                return true;
-            }
 		}
 
 		return false;
@@ -1483,45 +1497,43 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return false;
 	}
 
-    protected internal override bool AddRaw(Link link, List<INode> value)
+    protected internal override bool AddContainmentsRaw(Feature containment, List<IWritableNode> nodes)
     {
-        if (base.AddRaw(link, value))
+        if (base.AddContainmentsRaw(containment, nodes))
             return true;
         
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(containment))
         {
-            if (M2Extensions.TryAsList<LinkTestConcept>(value, out var list))
+            if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
             {
-                AddContainment_0_nRaw(list);
-                return true;
+                return AddContainment_0_nRaw(list);
             }
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(containment))
         {
-            if (M2Extensions.TryAsList<LinkTestConcept>(value, out var list))
+            if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
             {
-                AddContainment_1_nRaw(list);
-                return true;
+                return AddContainment_1_nRaw(list);
             }
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(link))
+        return false;
+    }
+
+    protected internal override bool AddReferencesRaw(Feature reference, List<ReferenceTarget> targets)
+    {
+        if (base.AddReferencesRaw(reference, targets))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(reference))
         {
-            if (M2Extensions.TryAsList<ReferenceTarget>(value, out var list))
-            {
-                AddReference_0_nRaw(list);
-                return true;
-            }
+                return AddReference_0_nRaw(targets);
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(reference))
         {
-            if (M2Extensions.TryAsList<ReferenceTarget>(value, out var list))
-            {
-                AddReference_1_nRaw(list);
-                return true;
-            }
+                return AddReference_1_nRaw(targets);
         }
 
         return false;
@@ -1559,12 +1571,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return false;
 	}
 
-    protected internal override bool InsertRaw(Link link, int index, List<INode> nodes)
+    protected internal override bool InsertContainmentsRaw(Feature containment, int index, List<IWritableNode> nodes)
     {
-        if (base.InsertRaw(link, index, nodes))
+        if (base.InsertContainmentsRaw(containment, index, nodes))
             return true;
         
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(containment))
         {
             if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
             {
@@ -1572,7 +1584,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
             }
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(containment))
         {
             if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
             {
@@ -1580,7 +1592,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
             }
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(containment))
         {
             if (M2Extensions.TryAsList<ReferenceTarget>(nodes, out var list))
             {
@@ -1588,12 +1600,30 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
             }
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(containment))
         {
             if (M2Extensions.TryAsList<ReferenceTarget>(nodes, out var list))
             {
-                return InsertReference_0_nRaw(index, list);
+                return InsertReference_1_nRaw(index, list);
             }
+        }
+
+        return false;
+    }
+
+    protected internal override bool InsertReferencesRaw(Feature reference, int index, List<ReferenceTarget> targets)
+    {
+        if (base.InsertReferencesRaw(reference, index, targets))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(reference))
+        {
+                return InsertReference_0_nRaw(index, targets);
+        }
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(reference))
+        {
+                return InsertReference_1_nRaw(index, targets);
         }
 
         return false;
@@ -1631,49 +1661,47 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		return false;
 	}
 
-    protected internal override bool RemoveRaw(Link link, List<INode> nodes)
+    protected internal override bool RemoveContainmentsRaw(Feature containment, List<IWritableNode> nodes)
     {
-        if (base.RemoveRaw(link, nodes))
+        if (base.RemoveContainmentsRaw(containment, nodes))
             return true;
         
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(containment))
         {
             if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
             {
-                RemoveContainment_0_nRaw(list);
-                return true;
+                return RemoveContainment_0_nRaw(list);
             }
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(link))
+        if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(containment))
         {
             if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
             {
-                RemoveContainment_1_nRaw(list);
-                return true;
-            }
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(link))
-        {
-            if (M2Extensions.TryAsList<ReferenceTarget>(nodes, out var list))
-            {
-                RemoveReference_0_nRaw(list);
-                return true;
-            }
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(link))
-        {
-            if (M2Extensions.TryAsList<ReferenceTarget>(nodes, out var list))
-            {
-                RemoveReference_1_nRaw(list);
-                return true;
+                return RemoveContainment_1_nRaw(list);
             }
         }
 
         return false;
         
+    }
+
+    protected internal override bool RemoveReferencesRaw(Feature reference, List<ReferenceTarget> targets)
+    {
+        if (base.RemoveReferencesRaw(reference, targets))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(reference))
+        {
+                return RemoveReference_0_nRaw(targets);
+        }
+
+        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(reference))
+        {
+                return RemoveReference_1_nRaw(targets);
+        }
+
+        return false;
     }
     
 

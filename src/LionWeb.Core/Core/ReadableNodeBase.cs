@@ -87,20 +87,64 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     #region ReadableRaw
 
     /// <inheritdoc/>
-    List<T> IReadableNodeRaw<T>.GetAnnotationsRaw() =>
-        _annotations;
+    public List<IAnnotationInstance> GetAnnotationsRaw() =>
+        _annotations.Cast<IAnnotationInstance>().ToList();
     
     /// <inheritdoc/>
-    bool IReadableNodeRaw.TryGetRaw(Feature feature, out object? value) => 
-    TryGetRaw(feature, out value);
+    bool IReadableNodeRaw.TryGetPropertyRaw(Feature property, out object? value) => 
+    TryGetPropertyRaw(property, out value);
 
-    /// <inheritdoc cref="IReadableNodeRaw.TryGetRaw"/>
-    protected internal virtual bool TryGetRaw(Feature feature, out object? value)
+    /// <inheritdoc cref="IReadableNodeRaw.TryGetPropertyRaw"/>
+    protected internal virtual bool TryGetPropertyRaw(Feature property, out object? value)
     {
         value = null;
         return false;
     }
 
+    /// <inheritdoc/>
+    bool IReadableNodeRaw.TryGetContainmentRaw(Feature containment, out IWritableNode? node) => 
+    TryGetContainmentRaw(containment, out node);
+
+    /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentRaw"/>
+    protected internal virtual bool TryGetContainmentRaw(Feature containment, out IWritableNode? node)
+    {
+        node = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    bool IReadableNodeRaw.TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes) =>
+        TryGetContainmentsRaw(containment, out nodes);
+
+    /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentsRaw"/>
+    protected internal virtual bool TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes)
+    {
+        nodes = [];
+        return false;
+    }
+    
+    /// <inheritdoc/>
+    bool IReadableNodeRaw.TryGetReferenceRaw(Feature reference, out IReferenceTarget? target) => 
+    TryGetReferenceRaw(reference, out target);
+
+    /// <inheritdoc cref="IReadableNodeRaw.TryGetReferenceRaw"/>
+    protected internal virtual bool TryGetReferenceRaw(Feature reference, out IReferenceTarget? target)
+    {
+        target = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    bool IReadableNodeRaw.TryGetReferencesRaw(Feature reference, out IEnumerable<IReferenceTarget> targets) =>
+        TryGetReferencesRaw(reference, out targets);
+
+    /// <inheritdoc cref="IReadableNodeRaw.TryGetReferencesRaw"/>
+    protected internal virtual bool TryGetReferencesRaw(Feature reference, out IEnumerable<IReferenceTarget> targets)
+    {
+        targets = [];
+        return false;
+    }
+    
     #endregion
     
     #region References

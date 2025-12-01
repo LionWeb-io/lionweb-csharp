@@ -30,9 +30,7 @@ public interface IAnnotationInstance : IReadableNode
 }
 
 /// <inheritdoc cref="IAnnotationInstance" />
-public interface IAnnotationInstance<out T> : IReadableNode<T>, IAnnotationInstance where T : IReadableNode
-{
-}
+public interface IAnnotationInstance<out T> : IReadableNode<T>, IAnnotationInstance where T : IReadableNode;
 
 /// Base implementation of <see cref="IAnnotationInstance{T}"/>.
 public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INode>

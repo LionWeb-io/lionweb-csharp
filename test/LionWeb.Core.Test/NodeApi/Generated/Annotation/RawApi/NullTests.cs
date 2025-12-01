@@ -33,7 +33,7 @@ public class NullTests
     public void Null_Reflective()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsFalse(parent.SetRaw(null, null));
+        Assert.IsFalse(parent.SetContainmentRaw(null, null));
     }
 
     [TestMethod]

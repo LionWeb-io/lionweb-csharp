@@ -28,7 +28,7 @@ public class CollectionTests
     public void EmptyList()
     {
         var parent = new LinkTestConcept("g");
-        var values = new List<INode>();
+        var values = new List<IAnnotationInstance>();
         Assert.IsFalse(parent.AddAnnotationsRaw(values));
         Assert.IsEmpty(parent.GetAnnotations());
     }
@@ -38,7 +38,7 @@ public class CollectionTests
     public void Insert_EmptyList()
     {
         var parent = new LinkTestConcept("g");
-        var values = new List<INode>();
+        var values = new List<IAnnotationInstance>();
         Assert.IsFalse(parent.InsertAnnotationsRaw(0, values));
         Assert.IsEmpty(parent.GetAnnotations());
     }
@@ -47,7 +47,7 @@ public class CollectionTests
     public void Remove_EmptyList()
     {
         var parent = new LinkTestConcept("g");
-        var values = new HashSet<INode>();
+        var values = new HashSet<IAnnotationInstance>();
         Assert.IsFalse(parent.RemoveAnnotationsRaw(values));
         Assert.IsEmpty(parent.GetAnnotations());
     }
@@ -60,7 +60,7 @@ public class CollectionTests
     public void NullList()
     {
         var parent = new LinkTestConcept("g");
-        var values = new List<INode> { null };
+        var values = new List<IAnnotationInstance> { null };
         Assert.IsFalse(parent.AddAnnotationsRaw(values));
         Assert.IsEmpty(parent.GetAnnotations());
     }
@@ -70,7 +70,7 @@ public class CollectionTests
     public void Insert_NullList()
     {
         var parent = new LinkTestConcept("g");
-        var values = new List<INode> { null };
+        var values = new List<IAnnotationInstance> { null };
         Assert.IsFalse(parent.InsertAnnotationsRaw(0, values));
         Assert.IsEmpty(parent.GetAnnotations());
     }
@@ -79,7 +79,7 @@ public class CollectionTests
     public void Remove_NullList()
     {
         var parent = new LinkTestConcept("g");
-        var values = new HashSet<INode> { null };
+        var values = new HashSet<IAnnotationInstance> { null };
         Assert.IsFalse(parent.RemoveAnnotationsRaw(values));
         Assert.IsEmpty(parent.GetAnnotations());
     }
@@ -93,7 +93,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var value = new TestAnnotation("s");
-        var values = new List<INode> { value };
+        var values = new List<IAnnotationInstance> { value };
         Assert.IsTrue(parent.AddAnnotationsRaw(values));
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(value));
@@ -104,7 +104,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var value = new TestAnnotation("s");
-        var values = new List<INode> { value };
+        var values = new List<IAnnotationInstance> { value };
         Assert.IsTrue(parent.InsertAnnotationsRaw(0, values));
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(value));
@@ -117,7 +117,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var annotation = new TestAnnotation("myId");
-        var values = new HashSet<INode> { annotation };
+        var values = new HashSet<IAnnotationInstance> { annotation };
         Assert.IsFalse(parent.RemoveAnnotationsRaw(values));
         Assert.IsNull(annotation.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
@@ -129,10 +129,10 @@ public class CollectionTests
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
         Assert.IsTrue(parent.AddAnnotationsRaw([annotation]));
-        var values = new HashSet<INode> { annotation };
+        var values = new HashSet<IAnnotationInstance> { annotation };
         Assert.IsTrue(parent.RemoveAnnotationsRaw(values));
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IAnnotationInstance> { }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -142,11 +142,11 @@ public class CollectionTests
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
         Assert.IsTrue(parent.AddAnnotationsRaw([annotation, otherAnnotation]));
-        var values = new HashSet<INode> { annotation };
+        var values = new HashSet<IAnnotationInstance> { annotation };
         Assert.IsTrue(parent.RemoveAnnotationsRaw(values));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IAnnotationInstance> { otherAnnotation }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -156,11 +156,11 @@ public class CollectionTests
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
         Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotation, annotation]));
-        var values = new HashSet<INode> { annotation };
+        var values = new HashSet<IAnnotationInstance> { annotation };
         Assert.IsTrue(parent.RemoveAnnotationsRaw(values));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IAnnotationInstance> { otherAnnotation }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -171,12 +171,12 @@ public class CollectionTests
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
         Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotationA, annotation, otherAnnotationB]));
-        var values = new HashSet<INode> { annotation };
+        var values = new HashSet<IAnnotationInstance> { annotation };
         Assert.IsTrue(parent.RemoveAnnotationsRaw(values));
         Assert.AreSame(parent, otherAnnotationA.GetParent());
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotationA, otherAnnotationB },
+        CollectionAssert.AreEqual(new List<IAnnotationInstance> { otherAnnotationA, otherAnnotationB },
             parent.GetAnnotations().ToList());
     }
 

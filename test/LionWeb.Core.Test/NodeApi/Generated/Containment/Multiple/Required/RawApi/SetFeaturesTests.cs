@@ -26,7 +26,7 @@ public class SetFeaturesTests
     public void ContainmentMultipleRequired_Init()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
         Assert.IsEmpty((List<LinkTestConcept>)result);
     }
@@ -36,8 +36,8 @@ public class SetFeaturesTests
     {
         var parent = new LinkTestConcept("g");
         var child = new LinkTestConcept("myId");
-        parent.AddRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [child]);
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [child]);
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
         CollectionAssert.AreEqual(new List<INode> { child }, (List<LinkTestConcept>)result);
     }
@@ -47,9 +47,9 @@ public class SetFeaturesTests
     {
         var parent = new LinkTestConcept("g");
         var child = new LinkTestConcept("myId");
-        parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0,
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0,
             [child]);
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
         CollectionAssert.AreEqual(new List<INode> { child }, (List<LinkTestConcept>)result);
     }
@@ -59,11 +59,10 @@ public class SetFeaturesTests
     {
         var parent = new LinkTestConcept("g");
         var child = new LinkTestConcept("myId");
-        parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n,
-            new List<INode> { child });
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, child));
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
-        CollectionAssert.AreEqual(new List<INode> { child }, (List<LinkTestConcept>)result);
+        Assert.IsEmpty((List<LinkTestConcept>)result);
     }
 
     [TestMethod]
@@ -71,9 +70,9 @@ public class SetFeaturesTests
     {
         var parent = new LinkTestConcept("g");
         var value = new LinkTestConcept("myId");
-        parent.AddRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [value]);
-        parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [value]);
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [value]);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [value]);
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
         Assert.IsEmpty((List<LinkTestConcept>)result);
     }
@@ -84,9 +83,9 @@ public class SetFeaturesTests
         var parent = new LinkTestConcept("g");
         var valueA = new LinkTestConcept("myA");
         var valueB = new LinkTestConcept("myB");
-        parent.AddRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [valueA, valueB]);
-        parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [valueA]);
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [valueA, valueB]);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [valueA]);
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
         CollectionAssert.AreEqual(new List<INode> { valueB }, (List<LinkTestConcept>)result);
     }
@@ -97,11 +96,11 @@ public class SetFeaturesTests
     {
         var parent = new LinkTestConcept("g");
         var value = new LinkTestConcept("myId");
-        parent.AddRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [value]);
-        parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode>());
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [value]));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null));
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
-        Assert.IsEmpty((List<LinkTestConcept>)result);
+        CollectionAssert.AreEqual(new List<INode> { value }, (List<LinkTestConcept>)result);
     }
 
     [TestMethod]
@@ -109,11 +108,11 @@ public class SetFeaturesTests
     {
         var parent = new LinkTestConcept("g");
         var valueA = new LinkTestConcept("myA");
-        parent.AddRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [valueA]);
+        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, [valueA]));
         var valueB = new LinkTestConcept("myB");
-        parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { valueB });
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, valueB));
+        Assert.IsTrue(parent.TryGetContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, out var result));
         Assert.IsInstanceOfType<List<LinkTestConcept>>(result);
-        CollectionAssert.AreEqual(new List<INode> { valueB }, (List<LinkTestConcept>)result);
+        CollectionAssert.AreEqual(new List<INode> { valueA }, (List<LinkTestConcept>)result);
     }
 }

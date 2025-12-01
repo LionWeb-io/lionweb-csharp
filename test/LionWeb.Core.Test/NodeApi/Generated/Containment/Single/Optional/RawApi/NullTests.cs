@@ -26,7 +26,7 @@ public class NullTests
     public void Reflective()
     {
         var parent = new LinkTestConcept("g");
-        parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, null);
+        parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, null);
         Assert.IsNull(parent.Containment_0_1);
     }
 
@@ -34,7 +34,7 @@ public class NullTests
     public void Reset()
     {
         var parent = new LinkTestConcept("od") {Containment_0_1 = new LinkTestConcept("child")};
-        Assert.IsTrue(parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, null));
+        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, null));
         Assert.IsNull(parent.Containment_0_1);
     }
 
@@ -42,7 +42,7 @@ public class NullTests
     public void TryGet()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var o));
+        Assert.IsTrue(parent.TryGetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var o));
         Assert.IsNull(o);
     }
 }

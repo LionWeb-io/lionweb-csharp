@@ -181,15 +181,19 @@ public abstract partial class NodeBase
     /// contains any non-<see cref="Annotation"/> instance,
     /// or contains any annotation that cannot annotate <c>this</c> node's <see cref="IReadableNode.GetClassifier">classifier</see>.
     /// </exception>
-    protected void AssureAnnotations([NotNull] IList<INode>? annotations)
+    protected List<IAnnotationInstance> AssureAnnotations([NotNull] IList<INode>? annotations)
     {
         AssureNotNull(annotations, null);
         AssureNotNullMembers(annotations, null);
+        var result = new List<IAnnotationInstance>(annotations.Count);
         foreach (var a in annotations)
         {
             if (!CanAnnotate(a))
                 throw new InvalidValueException(null, a);
+            result.Add((IAnnotationInstance)a);
         }
+        
+        return result;
     }
 
     protected bool CanAnnotate(INode? candidate) =>
@@ -418,8 +422,10 @@ public abstract partial class NodeBase
         }
     }
 
-    protected void RemoveAll(List<ReferenceTarget> targets, List<ReferenceTarget> storage)
+    protected bool RemoveAll(List<ReferenceTarget> targets, List<ReferenceTarget> storage)
     {
+        bool result = false;
+        
         foreach (var t in targets)
         {
             var index = storage.FindIndex(r =>
@@ -435,8 +441,11 @@ public abstract partial class NodeBase
             if (index < 0)
                 continue;
 
+            result = true;
             storage.RemoveAt(index);
         }
+        
+        return result;
     }
     
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.

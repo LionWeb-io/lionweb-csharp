@@ -26,7 +26,7 @@ public class SetFeaturesTests
     public void ContainmentSingleOptional_Init()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var result));
+        Assert.IsTrue(parent.TryGetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var result));
         Assert.IsNull(result);
     }
 
@@ -35,8 +35,8 @@ public class SetFeaturesTests
     {
         var parent = new LinkTestConcept("g");
         var doc = new LinkTestConcept("myId");
-        Assert.IsTrue(parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, doc));
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var result));
+        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, doc));
+        Assert.IsTrue(parent.TryGetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var result));
         Assert.AreSame(doc, result);
     }
 
@@ -46,8 +46,8 @@ public class SetFeaturesTests
         var parent = new LinkTestConcept("g");
         var doc = new LinkTestConcept("myId");
         parent.Containment_0_1 = doc;
-        Assert.IsTrue(parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, null));
-        Assert.IsTrue(parent.TryGetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var result));
+        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, null));
+        Assert.IsTrue(parent.TryGetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, out var result));
         Assert.IsNull(result);
     }
     
@@ -57,7 +57,7 @@ public class SetFeaturesTests
         var oldDoc = new LinkTestConcept("old");
         var parent = new LinkTestConcept("g") { Containment_0_1 = oldDoc };
         var doc = new LinkTestConcept("myId");
-        Assert.IsTrue(parent.SetRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, doc));
+        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, doc));
         Assert.IsNull(oldDoc.GetParent());
         Assert.AreSame(parent, doc.GetParent());
         Assert.AreSame(doc, parent.Containment_0_1);

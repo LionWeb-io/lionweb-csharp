@@ -74,23 +74,57 @@ class SpoofNode(string id) : IShape
 
     List<IAnnotationInstance> IReadableNodeRaw.GetAnnotationsRaw() => [];
 
-    bool IReadableNodeRaw.TryGetRaw(Feature feature, out object? value)
+    bool IReadableNodeRaw.TryGetPropertyRaw(Feature property, out object? value)
     {
         value = null;
         return false;
     }
 
-    bool IWritableNodeRaw.SetRaw(Feature feature, object? value) => false;
+    bool IReadableNodeRaw.TryGetContainmentRaw(Feature containment, out IWritableNode? node)
+    {
+        node = null;
+        return false;
+    }
 
-    bool IWritableNodeRaw<INode>.AddAnnotationsRaw(List<INode> annotations) => false;
+    bool IReadableNodeRaw.TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes)
+    {
+        nodes = [];
+        return false;
+    }
 
-    bool IWritableNodeRaw<INode>.InsertAnnotationsRaw(Index index, List<INode> annotations) => false;
+    bool IReadableNodeRaw.TryGetReferenceRaw(Feature reference, out IReferenceTarget? target)
+    {
+        target = null;
+        return false;
+    }
 
-    bool IWritableNodeRaw<INode>.RemoveAnnotationsRaw(HashSet<INode> annotations) => false;
+    bool IReadableNodeRaw.TryGetReferencesRaw(Feature reference, out IEnumerable<IReferenceTarget> targets)
+    {
+        targets = [];
+        return false;
+    }
 
-    bool IWritableNodeRaw<INode>.AddRaw(Link link, List<INode> nodes) => false;
+    bool IWritableNodeRaw.AddAnnotationsRaw(List<IAnnotationInstance> annotationInstances) => false;
 
-    bool IWritableNodeRaw<INode>.InsertRaw(Link link, int index, List<INode> nodes) => false;
+    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotationInstances) => false;
 
-    bool IWritableNodeRaw<INode>.RemoveRaw(Link link, List<INode> nodes) => false;
+    bool IWritableNodeRaw.RemoveAnnotationsRaw(HashSet<IAnnotationInstance> annotationInstances) => false;
+
+    bool IWritableNodeRaw.SetPropertyRaw(Feature property, object? value) => false;
+
+    bool IWritableNodeRaw.SetContainmentRaw(Feature containment, IWritableNode? node) => false;
+
+    bool IWritableNodeRaw.AddContainmentsRaw(Feature containment, List<IWritableNode> nodes) => false;
+
+    bool IWritableNodeRaw.InsertContainmentsRaw(Feature containment, Index index, List<IWritableNode> nodes) => false;
+
+    bool IWritableNodeRaw.RemoveContainmentsRaw(Feature containment, List<IWritableNode> nodes) => false;
+
+    bool IWritableNodeRaw.SetReferenceRaw(Feature reference, ReferenceTarget? targets) => false;
+
+    bool IWritableNodeRaw.AddReferencesRaw(Feature reference, List<ReferenceTarget> targets) => false;
+
+    bool IWritableNodeRaw.InsertReferencesRaw(Feature reference, Index index, List<ReferenceTarget> targets) => false;
+
+    bool IWritableNodeRaw.RemoveReferencesRaw(Feature reference, List<ReferenceTarget> targets) => false;
 }

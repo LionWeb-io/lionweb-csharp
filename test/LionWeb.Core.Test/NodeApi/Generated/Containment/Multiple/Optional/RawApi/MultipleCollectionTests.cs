@@ -30,11 +30,11 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { valueA, valueB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -43,11 +43,11 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { valueA, valueB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -57,12 +57,12 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle] };
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { valueA, valueB, circle }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB, circle }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -72,12 +72,12 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle] };
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, values));
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circle, valueA, valueB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circle, valueA, valueB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -88,13 +88,13 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, circleB] };
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { valueA, valueB, circleA, circleB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB, circleA, circleB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -105,13 +105,13 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, circleB] };
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, values));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circleA, valueA, valueB, circleB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circleA, valueA, valueB, circleB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -122,13 +122,13 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, circleB] };
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, values));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circleA, circleB, valueA, valueB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circleA, circleB, valueA, valueB }, parent.Containment_0_n.ToList());
     }
 
     #endregion
@@ -141,8 +141,8 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode>() { valueA, valueB };
-        Assert.IsFalse(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode>() { valueA, valueB };
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(valueA));
@@ -155,8 +155,8 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsFalse(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(valueA));
@@ -171,13 +171,13 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsFalse(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circleA, circleB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circleA, circleB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -187,12 +187,12 @@ public class MultipleCollectionTests
         var circleB = new LinkTestConcept("cB");
         var parent = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
         var valueA = new LinkTestConcept("sA");
-        var values = new List<INode> { valueA, circleA };
-        Assert.IsTrue(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, circleA };
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(circleA.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circleB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circleB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -201,11 +201,11 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [valueA, valueB] };
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -215,12 +215,12 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [valueA, valueB, circle] };
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circle }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circle }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -230,12 +230,12 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle, valueA, valueB] };
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circle }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circle }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -246,13 +246,13 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, valueA, valueB, circleB] };
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circleA, circleB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circleA, circleB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
@@ -263,13 +263,13 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [valueA, circleA, valueB, circleB] };
-        var values = new List<INode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode> { valueA, valueB };
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { circleA, circleB }, parent.Containment_0_n.ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { circleA, circleB }, parent.Containment_0_n.ToList());
     }
 
     #endregion
@@ -281,8 +281,8 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
-        var values = new List<INode>() { valueA, valueB };
-        Assert.IsTrue(parent.AddRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        var values = new List<IWritableNode>() { valueA, valueB };
+        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(valueA));
         Assert.AreSame(parent, valueB.GetParent());

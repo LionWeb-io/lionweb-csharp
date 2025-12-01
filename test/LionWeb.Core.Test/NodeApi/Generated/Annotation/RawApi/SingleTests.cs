@@ -38,7 +38,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var annotation = new TestAnnotation("myId");
-        Assert.IsFalse(parent.SetRaw(null, new List<IAnnotationInstance>{annotation}));
+        Assert.IsFalse(parent.AddContainmentsRaw(null, [annotation]));
         Assert.IsNull(annotation.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
         Assert.DoesNotContain(annotation, ((IReadableNodeRaw)parent).GetAnnotationsRaw());

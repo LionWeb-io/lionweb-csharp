@@ -19,52 +19,48 @@ namespace LionWeb.Core;
 
 using M3;
 
-public interface IWritableNodeRaw : IWritableNode, IReadableNodeRaw
+public interface IWritableNodeRaw : IReadableNodeRaw, IWritableNode
 {
-    protected internal void AddAnnotationsRaw(List<IAnnotationInstance> annotations);
+    #region Annotation
+
+    protected internal bool AddAnnotationsRaw(List<IAnnotationInstance> annotations);
     
-    protected internal void InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotations);
+    protected internal bool InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotations);
 
-    protected internal bool RemoveAnnotationsRaw(ISet<IAnnotationInstance> annotations);
-    
-    protected internal bool SetRaw(Feature feature, object? value);
+    protected internal bool RemoveAnnotationsRaw(HashSet<IAnnotationInstance> annotations);
 
-    protected internal bool AddRaw(Link link, List<IReadableNode> nodes);
+    #endregion
 
-    protected internal bool InsertRaw(Link link, Index index, List<IReadableNode> nodes);
+    #region Property
 
-    protected internal bool RemoveRaw(Link link, List<IReadableNode> nodes);
+    protected internal bool SetPropertyRaw(Feature property, object? value);
+
+    #endregion
+
+
+    #region Containment
+
+    protected internal bool SetContainmentRaw(Feature containment, IWritableNode? node);
+
+    protected internal bool AddContainmentsRaw(Feature containment, List<IWritableNode> nodes);
+
+    protected internal bool InsertContainmentsRaw(Feature containment, Index index, List<IWritableNode> nodes);
+
+    protected internal bool RemoveContainmentsRaw(Feature containment, List<IWritableNode> nodes);
+
+    #endregion
+
+    #region Reference
+
+    protected internal bool SetReferenceRaw(Feature reference, ReferenceTarget? target);
+
+    protected internal bool AddReferencesRaw(Feature reference, List<ReferenceTarget> targets);
+
+    protected internal bool InsertReferencesRaw(Feature reference, Index index, List<ReferenceTarget> targets);
+
+    protected internal bool RemoveReferencesRaw(Feature reference, List<ReferenceTarget> targets);
+
+    #endregion
 }
 
-public interface IWritableNodeRaw<T> : IWritableNode<T>, IWritableNodeRaw where T : class, IWritableNode
-{
-    void IWritableNodeRaw.AddAnnotationsRaw(List<IAnnotationInstance> annotations) =>
-        AddAnnotationsRaw(annotations);
-    
-    protected internal bool AddAnnotationsRaw(List<T> annotations);
-    
-    void IWritableNodeRaw.InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotations) =>
-        InsertAnnotationsRaw(index, annotations);
-
-    protected internal bool InsertAnnotationsRaw(Index index, List<T> annotations);
-
-    bool IWritableNodeRaw.RemoveAnnotationsRaw(ISet<IAnnotationInstance> annotations) =>
-        RemoveAnnotationsRaw(annotations);
-    
-    protected internal bool RemoveAnnotationsRaw(HashSet<INode> annotations);
-    
-    bool IWritableNodeRaw.AddRaw(Link link, List<IReadableNode> nodes) =>
-        AddRaw(link, nodes);
-    
-    protected internal bool AddRaw(Link link, List<T> nodes);
-
-    bool IWritableNodeRaw.InsertRaw(Link link, Index index, List<IReadableNode> nodes) =>
-        InsertRaw(link, index, nodes);
-    
-    protected internal bool InsertRaw(Link link, Index index, List<T> nodes);
-
-    bool IWritableNodeRaw.RemoveRaw(Link link, List<IReadableNode> nodes) =>
-        RemoveRaw(link, nodes);
-    
-    protected internal bool RemoveRaw(Link link, List<T> nodes);
-}
+public interface IWritableNodeRaw<T> : IWritableNodeRaw, IWritableNode<T> where T : class, IWritableNode;
