@@ -36,13 +36,17 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     protected readonly IdFilteringNotificationFilter Filter;
 
+    private readonly SharedNodeMap _sharedNodeMap;
+
     public RemoteReplicator(
         IForest? localForest,
         IdFilteringNotificationFilter filter,
+        SharedNodeMap sharedNodeMap,
         object? sender) : base(sender)
     {
         _localForest = localForest;
         Filter = filter;
+        _sharedNodeMap = sharedNodeMap;
     }
 
     /// <inheritdoc />
@@ -130,15 +134,48 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
     }
+    
+    private HashSet<NodeId> CollectNodeIdsOfAllDescendantsOf(IReadableNode node) =>
+        M1Extensions
+            .Descendants(node, true, true)
+            .Select(n => n.GetId())
+            .ToHashSet();
 
+    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> replacedNodes)
+    {
+        HashSet<NodeId> newNodes = CollectNodeIdsOfAllDescendantsOf(node: newNodeNotification.NewNode);
+
+        var hasIntersection = _sharedNodeMap.NodeIds.ToHashSet().Overlaps(newNodes);
+
+        if (!hasIntersection)
+        {
+            return;
+        }
+
+        var remainingNodes = _sharedNodeMap.NodeIds
+            .Intersect(newNodes)
+            .ExceptBy(replacedNodes, s => s)
+            .ToList();
+
+        if (remainingNodes.Count != 0)
+        {
+            throw new InvalidNotificationException(newNodeNotification,
+                $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
+        }
+    }
+    
     #region Partitions
 
-    private void OnRemoteNewPartition(PartitionAddedNotification notification) =>
+    private void OnRemoteNewPartition(PartitionAddedNotification notification)
+    {
+        CheckIfNewNodeContainsExistingNodes(notification, []);
+   
         SuppressNotificationForwarding(notification, () =>
         {
             var newPartition = notification.NewPartition;
             _localForest?.AddPartitions([newPartition], notification.NotificationId);
         });
+    }
 
     private void OnRemotePartitionDeleted(PartitionDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
@@ -178,7 +215,10 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Children
 
-    private void OnRemoteChildAdded(ChildAddedNotification notification) =>
+    private void OnRemoteChildAdded(ChildAddedNotification notification)
+    {
+        CheckIfNewNodeContainsExistingNodes(notification, []);
+        
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = (INode)notification.Parent;
@@ -190,6 +230,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
             localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
+    }
 
     private void OnRemoteChildDeleted(ChildDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
@@ -199,7 +240,12 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
         });
 
-    private void OnRemoteChildReplaced(ChildReplacedNotification notification) =>
+    private void OnRemoteChildReplaced(ChildReplacedNotification notification)
+    {
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: notification.ReplacedChild);
+        
+        CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
+        
         SuppressNotificationForwarding(notification, () =>
         {
             var newChild = (INode)notification.NewChild;
@@ -209,6 +255,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
             replacedChild.ReplaceWith(newChild);
         });
+    }
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
@@ -318,13 +365,17 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(AnnotationAddedNotification notification) =>
+    private void OnRemoteAnnotationAdded(AnnotationAddedNotification notification)
+    {
+        CheckIfNewNodeContainsExistingNodes(notification, []);
+        
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = (INotifiableNode)notification.Parent;
             var newAnnotation = (INode)notification.NewAnnotation;
             localParent.InsertAnnotations(notification.Index, [newAnnotation], notification.NotificationId);
         });
+    }
 
     private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
@@ -335,16 +386,22 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
         });
 
-    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>
+    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification)
+    {
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: notification.ReplacedAnnotation);
+        
+        CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
+        
         SuppressNotificationForwarding(notification, () =>
         {
             var newAnnotation = (INode)notification.NewAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
 
             CheckMatchingNodeIdForReplacedNode(notification);
-            
+
             replacedAnnotation.ReplaceWith(newAnnotation);
         });
+    }
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
@@ -458,7 +515,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 targets.Insert(notification.NewIndex, target);
                 newValue = targets;
             }
-        } else
+        }
+        else
         {
             newValue = new List<IReadableNode>() { target };
         }
@@ -480,7 +538,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                     targets.Insert(index, target);
                     newValue = targets;
                 }
-            } else
+            }
+            else
             {
                 newValue = new List<IReadableNode>() { target };
             }
@@ -500,12 +559,15 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         try
         {
             action();
-        } finally
+        }
+        finally
         {
             Filter.UnregisterNotificationId(notificationId);
         }
     }
-    
+
+    #region CheckMatchingNodeIdForReplacedNode
+
     private void CheckMatchingNodeIdForReplacedNode(AnnotationMovedAndReplacedFromOtherParentNotification notification)
     {
         var localParent = notification.NewParent;
@@ -584,7 +646,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                         $"in containment {notification.Containment} at index {notification.Index}");
                 }
             }
-        } else
+        }
+        else
         {
             var existingChild = localParent.Get(notification.Containment);
             if (existingChild is IReadableNode node && deletedNode != node.GetId())
@@ -614,7 +677,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                         $"in containment {notification.Containment} at index {notification.Index}");
                 }
             }
-        } else
+        }
+        else
         {
             var existingChild = localParent.Get(notification.Containment);
             if (existingChild is IReadableNode node && replacedChildId != node.GetId())
@@ -644,7 +708,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                         $"in containment {notification.NewContainment} at index {notification.NewIndex}");
                 }
             }
-        } else
+        }
+        else
         {
             var existingChild = localParent.Get(notification.NewContainment);
             if (existingChild is IReadableNode node && replacedChildId != node.GetId())
@@ -674,7 +739,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                         $"in containment {notification.NewContainment} at index {notification.NewIndex}");
                 }
             }
-        } else
+        }
+        else
         {
             var existingChild = localParent.Get(notification.NewContainment);
             if (existingChild is IReadableNode node && replacedChildId != node.GetId())
@@ -714,4 +780,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 $"in containment {notification.Containment} at index {notification.NewIndex}");
         }
     }
+
+    #endregion
+
 }

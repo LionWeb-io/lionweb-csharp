@@ -335,7 +335,7 @@ public record AnnotationAddedNotification(
     public override NodeId ContextNodeId => Parent.GetId();
 
     /// <inheritdoc />
-    public IReadableNode NewNode => NewNode;
+    public IReadableNode NewNode => NewAnnotation;
 }
 
 /// <param name="DeletedAnnotation"></param>
