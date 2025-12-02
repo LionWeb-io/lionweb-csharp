@@ -70,7 +70,7 @@ public class DeltaCommandToNotificationMapper
             AddReference a => OnAddReference(a),
             DeleteReference a => OnDeleteReference(a),
             ChangeReference a => OnChangeReference(a),
-            _ => throw new NotImplementedException(command.GetType().Name)
+            _ => throw new ArgumentException($"{nameof(DeltaCommandToNotificationMapper)} does not support {command.GetType().Name}!")
         };
 
     #region Partitions
@@ -350,13 +350,15 @@ public class DeltaCommandToNotificationMapper
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
         var oldParent = (IWritableNode)movedAnnotation.GetParent();
+        var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
+        
         var newParent = ToNode(moveAnnotationCommand.NewParent);
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
             moveAnnotationCommand.NewIndex,
             movedAnnotation,
             oldParent,
-            0, // TODO FIXME
+            oldIndex,
             ToNotificationId(moveAnnotationCommand)
         );
     }
@@ -366,11 +368,13 @@ public class DeltaCommandToNotificationMapper
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
         var parent = (IWritableNode)movedAnnotation.GetParent();
+        var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
+        
         return new AnnotationMovedInSameParentNotification(
             moveAnnotationCommand.NewIndex,
             movedAnnotation,
             parent,
-            0, // TODO FIXME
+            oldIndex,
             ToNotificationId(moveAnnotationCommand)
         );
     }
@@ -441,12 +445,13 @@ public class DeltaCommandToNotificationMapper
     {
         if (_sharedNodeMap.TryGetValue(nodeId, out var node))
         {
-            if (node is IWritableNode w) return w;
-            throw new NotImplementedException($"node: {node}");
+            if (node is IWritableNode w)
+                return w;
+
+            throw new UnsupportedNodeTypeException(node, nameof(node));
         }
 
-        // TODO change to correct exception 
-        throw new NotImplementedException($"nodeId: {nodeId}");
+        throw new InvalidOperationException($"Unknown node with id: {nodeId}");
     }
 
     private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
@@ -463,10 +468,13 @@ public class DeltaCommandToNotificationMapper
     private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-        if (nodes is [IWritableNode w])
-            return w;
 
-        // TODO change to correct exception 
-        throw new NotImplementedException();
+        var node = nodes.FirstOrDefault();
+        if (node is not IWritableNode w)
+        {
+            throw new UnsupportedNodeTypeException(node, nameof(node));
+        }
+
+        return w;
     }
 }
