@@ -455,7 +455,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             if (result is T w)
                 return w;
 
-            throw new InvalidCastException($"Can not cast {result.GetType().Name} to {typeof(T).Name}");
+            throw new UnsupportedNodeTypeException(result, nameof(result));
         }
 
         throw new InvalidOperationException($"Unknown node with id: {nodeId}");

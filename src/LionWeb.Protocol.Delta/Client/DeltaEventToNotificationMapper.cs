@@ -440,9 +440,14 @@ public class DeltaEventToNotificationMapper
     private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-        if (nodes is [IWritableNode w])
-            return w;
+        
+        var node = nodes.FirstOrDefault();
+        if (node is not IWritableNode w)
+        {
+            throw new UnsupportedNodeTypeException(node, nameof(node));
+        }
 
-        throw new InvalidCastException($"Can not cast nodes in {nodes.GetType().Name} to {nameof(IWritableNode)}");
+        return w;
+
     }
 }

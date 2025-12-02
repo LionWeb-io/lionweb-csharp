@@ -445,10 +445,10 @@ public class DeltaCommandToNotificationMapper
     {
         if (_sharedNodeMap.TryGetValue(nodeId, out var node))
         {
-            if (node is IWritableNode w) 
+            if (node is IWritableNode w)
                 return w;
-           
-            throw new InvalidCastException($"Can not cast {node.GetType().Name} to {nameof(IWritableNode)}");
+
+            throw new UnsupportedNodeTypeException(node, nameof(node));
         }
 
         throw new InvalidOperationException($"Unknown node with id: {nodeId}");
@@ -468,9 +468,13 @@ public class DeltaCommandToNotificationMapper
     private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-        if (nodes is [IWritableNode w])
-            return w;
- 
-        throw new InvalidCastException($"Can not cast nodes in {nodes.GetType().Name} to {nameof(IWritableNode)}");
+
+        var node = nodes.FirstOrDefault();
+        if (node is not IWritableNode w)
+        {
+            throw new UnsupportedNodeTypeException(node, nameof(node));
+        }
+
+        return w;
     }
 }
