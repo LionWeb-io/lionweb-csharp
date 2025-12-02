@@ -33,7 +33,7 @@ public interface IForest
 
     /// Tries to find partition with <see cref="IReadableNode.GetId">node id</see> <paramref name="nodeId"/>.
     bool TryGetPartition(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition);
-    
+
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
     void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
@@ -44,11 +44,18 @@ public interface IForest
     INotificationSender? GetNotificationSender();
 
     /// <c>this</c> forest's notification producer, if any.
-    protected IForestNotificationProducer? GetNotificationProducer();
+    protected internal IForestNotificationProducer? GetNotificationProducer();
+}
+
+public interface IForestRaw : IForest
+{
+    protected internal bool TryGetPartitionRaw(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition);
+    protected internal bool AddPartitionRaw(IPartitionInstance partition);
+    protected internal bool RemovePartitionRaw(IPartitionInstance partition);
 }
 
 /// <inheritdoc />
-public class Forest : IForest
+public class Forest : IForestRaw
 {
     private readonly HashSet<IPartitionInstance> _partitions;
     private readonly IForestNotificationProducer _notificationProducer;
@@ -74,17 +81,31 @@ public class Forest : IForest
         return partition is not null;
     }
 
+    bool IForestRaw.TryGetPartitionRaw(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition) =>
+        TryGetPartition(nodeId, out partition);
+
     /// <inheritdoc />
     public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null)
     {
         foreach (var partition in partitions)
         {
-            if (!_partitions.Add(partition))
+            if (!AddPartitionRaw(partition))
                 continue;
 
             ProducePartitionAddedNotification(notificationId, partition);
-            ConnectToPartition(partition);
         }
+    }
+
+    bool IForestRaw.AddPartitionRaw(IPartitionInstance partition) =>
+        AddPartitionRaw(partition);
+
+    protected internal bool AddPartitionRaw(IPartitionInstance partition)
+    {
+        if (!_partitions.Add(partition))
+            return false;
+
+        ConnectToPartition(partition);
+        return true;
     }
 
     private void ProducePartitionAddedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
@@ -104,13 +125,25 @@ public class Forest : IForest
     {
         foreach (var partition in partitions)
         {
-            if (!_partitions.Remove(partition))
+            if (!RemovePartitionRaw(partition))
                 continue;
 
             ProducePartitionDeletedNotification(notificationId, partition);
-            UnsubscribeFromPartition(partition);
         }
     }
+
+    bool IForestRaw.RemovePartitionRaw(IPartitionInstance partition) =>
+        RemovePartitionRaw(partition);
+
+    protected internal bool RemovePartitionRaw(IPartitionInstance partition)
+    {
+        if (!_partitions.Remove(partition))
+            return false;
+
+        UnsubscribeFromPartition(partition);
+        return true;
+    }
+
 
     private void ProducePartitionDeletedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
         GetNotificationProducer()?.ProduceNotification(new PartitionDeletedNotification(partition,
