@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -29,12 +29,12 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
     [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]
     public void Backward()
     {
-        var replacement = new Line("replacement");
-        var replaced = new Circle("replaced");
+        var replacement = new LinkTestConcept("replacement");
+        var replaced = new LinkTestConcept("replaced");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [new Circle("child"), replaced, replacement]
+            Contents =  [new LinkTestConcept("child"), replaced, replacement]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -53,32 +53,32 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Forward_ProducesNotification()
     {
-        var moved = new Circle("moved");
-        var replaced = new Line("replaced");
-        var originalPartition = new Geometry("a") { Shapes = [moved, replaced] };
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var originalPartition = new TestPartition("a") { Contents =  [moved, replaced] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
-        Assert.AreEqual(1, clonedPartition.Shapes.Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Contents.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[0].GetId());
     }
 
     [TestMethod]
     [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]
     public void Forward()
     {
-        var replacement = new Line("replacement");
-        var replaced = new Circle("replaced");
+        var replacement = new LinkTestConcept("replacement");
+        var replaced = new LinkTestConcept("replaced");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [new Circle("child"), replacement, replaced]
+            Contents =  [new LinkTestConcept("child"), replacement, replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -97,37 +97,37 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void BackwardP_ProducesNotification()
     {
-        var moved = new Circle("moved");
-        var replaced = new Line("replaced");
-        var originalPartition = new Geometry("a") { Shapes = [replaced, moved] };
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var originalPartition = new TestPartition("a") { Contents =  [replaced, moved] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 0;
         var oldIndex = 1;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
-        Assert.AreEqual(1, clonedPartition.Shapes.Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Contents.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[0].GetId());
     }
 
     [TestMethod]
     public void Backward_MoreThanThreeChildren_ProducesNotification()
     {
-        var replacement = new Line("E");
-        var replaced = new Circle("B");
+        var replacement = new LinkTestConcept("E");
+        var replaced = new LinkTestConcept("B");
 
-        var originalPartition = new Geometry("container")
+        var originalPartition = new TestPartition("container")
         {
-            Shapes = [new Circle("A"), replaced, new Circle("C"), new Circle("D"), replacement, new Circle("F")]
+            Contents =  [new LinkTestConcept("A"), replaced, new LinkTestConcept("C"), new LinkTestConcept("D"), replacement, new LinkTestConcept("F")]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 1;
         var oldIndex = 4;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         var sharedNodeMap = new SharedNodeMap();
@@ -136,8 +136,8 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
 
         replaced.ReplaceWith(replacement);
 
-        Assert.AreEqual(5, clonedPartition.Shapes.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[1].GetId());
+        Assert.AreEqual(5, clonedPartition.Contents.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[1].GetId());
 
         Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
         Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
@@ -146,40 +146,40 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Forward_MoreThanThreeChildren_ProducesNotification()
     {
-        var replacement = new Line("E");
-        var replaced = new Circle("B");
+        var replacement = new LinkTestConcept("E");
+        var replaced = new LinkTestConcept("B");
 
-        var originalPartition = new Geometry("container")
+        var originalPartition = new TestPartition("container")
         {
-            Shapes = [new Circle("A"), replacement, new Circle("C"), new Circle("D"), replaced, new Circle("F")]
+            Contents =  [new LinkTestConcept("A"), replacement, new LinkTestConcept("C"), new LinkTestConcept("D"), replaced, new LinkTestConcept("F")]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 4;
         var oldIndex = 1;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
         replaced.ReplaceWith(replacement);
 
-        Assert.AreEqual(5, clonedPartition.Shapes.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[^2].GetId());
+        Assert.AreEqual(5, clonedPartition.Contents.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[^2].GetId());
     }
 
     [TestMethod]
     public void Not_matching_node_ids()
     {
-        var moved = new Circle("moved");
-        var replaced = new Line("replaced");
-        var nodeWithAnotherId = new Line("node-with-another-id");
-        var originalPartition = new Geometry("a") { Shapes = [moved, replaced, nodeWithAnotherId] };
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
+        var originalPartition = new TestPartition("a") { Contents =  [moved, replaced, nodeWithAnotherId] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
             nodeWithAnotherId, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

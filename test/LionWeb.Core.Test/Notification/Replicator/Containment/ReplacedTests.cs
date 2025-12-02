@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -28,20 +28,21 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
-        var replaced = new Documentation("replaced") { Text = "a" };
-        var originalPartition = new Geometry("a")
+        var replaced = new LinkTestConcept("replaced") { Name = "a" };
+        var originalParent = new LinkTestConcept("a")
         {
-            Documentation = replaced
+            Containment_0_1 = replaced
         };
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
         
         CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
 
-        var added = new Documentation("added")
+        var added = new LinkTestConcept("added")
         {
-            Text = "added"
+            Name = "added"
         };
 
         Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
@@ -50,7 +51,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.Documentation = added;
+        originalParent.Containment_0_1 = added;
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
@@ -63,12 +64,12 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Deep()
     {
-        var originalPartition = new Geometry("a");
-        var bof = new BillOfMaterials("bof")
+        var originalPartition = new TestPartition("a");
+        var bof = new LinkTestConcept("bof")
         {
-            DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid }
+            Containment_1 = new LinkTestConcept("mg") { Name = "liquid" }
         };
-        originalPartition.AddAnnotations([bof]);
+        originalPartition.AddContents([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -77,7 +78,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
+        bof.Containment_1 = new LinkTestConcept("replaced") { Name = "gas" };
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
@@ -88,12 +89,12 @@ public class ReplacedTests : ReplicatorTestsBase
     [Ignore("Should emit ChildReplacedNotification")]
     public void Multiple_Only()
     {
-        var replaced = new Circle("replaced");
-        var replacement = new Line("replacement");
+        var replaced = new LinkTestConcept("replaced");
+        var replacement = new LinkTestConcept("replacement");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [replaced]
+            Contents =  [replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -112,11 +113,11 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only_ProducesNotification()
     {
-        var replaced = new Circle("replaced");
+        var replaced = new LinkTestConcept("replaced");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [replaced]
+            Contents =  [replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -124,18 +125,18 @@ public class ReplacedTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
 
-        var replacement = new Line("replacement");
+        var replacement = new LinkTestConcept("replacement");
 
         Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
         Assert.IsFalse(sharedNodeMap.ContainsKey(replacement.GetId()));
         
         var childReplacedNotification = new ChildReplacedNotification(replacement, replaced, originalPartition, 
-            ShapesLanguage.Instance.Geometry_shapes, 0, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_contents, 0, new NumericNotificationId("childReplacedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
-        Assert.AreEqual(1, clonedPartition.Shapes.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Contents.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[0].GetId());
 
         Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
         Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
@@ -145,12 +146,12 @@ public class ReplacedTests : ReplicatorTestsBase
     [Ignore("Should emit ChildReplacedNotification")]
     public void Multiple_First()
     {
-        var replaced = new Circle("replaced");
-        var replacement = new Line("replacement");
+        var replaced = new LinkTestConcept("replaced");
+        var replacement = new LinkTestConcept("replacement");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [replaced, new Circle("child")]
+            Contents =  [replaced, new LinkTestConcept("child")]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -177,34 +178,34 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_First_ProducesNotification()
     {
-        var replaced = new Circle("replaced");
-        var replacement = new Line("replacement");
+        var replaced = new LinkTestConcept("replaced");
+        var replacement = new LinkTestConcept("replacement");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [replaced, new Circle("child")]
+            Contents =  [replaced, new LinkTestConcept("child")]
         };
         var clonedPartition = ClonePartition(originalPartition);
         
         var childReplacedNotification = new ChildReplacedNotification(replacement, replaced, originalPartition, 
-            ShapesLanguage.Instance.Geometry_shapes, 0, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_contents, 0, new NumericNotificationId("childReplacedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
-        Assert.AreEqual(2, clonedPartition.Shapes.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[0].GetId());
+        Assert.AreEqual(2, clonedPartition.Contents.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[0].GetId());
     }
 
     [TestMethod]
     [Ignore("Should emit ChildReplacedNotification")]
     public void Multiple_Last()
     {
-        var replaced = new Circle("replaced");
-        var replacement = new Line("replacement");
+        var replaced = new LinkTestConcept("replaced");
+        var replacement = new LinkTestConcept("replacement");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [new Circle("child"), replaced]
+            Contents =  [new LinkTestConcept("child"), replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -223,40 +224,40 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Last_ProducesNotification()
     {
-        var replaced = new Circle("replaced");
-        var replacement = new Line("replacement");
+        var replaced = new LinkTestConcept("replaced");
+        var replacement = new LinkTestConcept("replacement");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [new Circle("child"), replaced]
+            Contents =  [new LinkTestConcept("child"), replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
         var childReplacedNotification = new ChildReplacedNotification(replacement, replaced, originalPartition, 
-            ShapesLanguage.Instance.Geometry_shapes, 1, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_contents, 1, new NumericNotificationId("childReplacedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
-        Assert.AreEqual(2, clonedPartition.Shapes.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Shapes[^1].GetId());
+        Assert.AreEqual(2, clonedPartition.Contents.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[^1].GetId());
     }
 
     [TestMethod]
     public void Multiple_not_matching_node_ids()
     {
-        var replaced = new Circle("replaced");
-        var replacement = new Line("replacement");
-        var nodeWithAnotherId = new Circle("node-with-another-id");
+        var replaced = new LinkTestConcept("replaced");
+        var replacement = new LinkTestConcept("replacement");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
         
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [new Circle("child"), replaced, nodeWithAnotherId]
+            Contents =  [new LinkTestConcept("child"), replaced, nodeWithAnotherId]
         };
         
         var clonedPartition = ClonePartition(originalPartition);
         
         var notification = new ChildReplacedNotification(replacement, nodeWithAnotherId, originalPartition, 
-            ShapesLanguage.Instance.Geometry_shapes, 1, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_contents, 1, new NumericNotificationId("childReplacedNotification", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
@@ -267,22 +268,23 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single_not_matching_node_ids()
     {
-        var replaced = new Documentation("replaced") { Text = "replaced" };
-        var originalPartition = new Geometry("a")
+        var replaced = new LinkTestConcept("replaced") { Name = "replaced" };
+        var originalParent = new LinkTestConcept("a")
         {
-            Documentation = replaced
+            Containment_0_1 = replaced
         };
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
-        var added = new Documentation("added") { Text = "added" };
-        var nodeWithAnotherId = new Documentation("node-with-another-id") { Text = "another node" };
+        var added = new LinkTestConcept("added") { Name = "added" };
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id") { Name = "another node" };
 
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(added);
         sharedNodeMap.RegisterNode(nodeWithAnotherId);
 
-        var notification = new ChildReplacedNotification(added, nodeWithAnotherId, originalPartition, ShapesLanguage.Instance.Geometry_documentation, 
+        var notification = new ChildReplacedNotification(added, nodeWithAnotherId, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
             0, new NumericNotificationId("childReplacedNotification", 0));
 
         AssertUniqueNodeIds(originalPartition, added, nodeWithAnotherId);
@@ -300,19 +302,19 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Floating_node_replaces_existing_node()
     {
-        var replaced = new Circle("replaced")
+        var replaced = new LinkTestConcept("replaced")
         {
-            Center = new Coord("cc") { X = 2 }
+            Containment_0_1 = new LinkTestConcept("cc") { Name = "2" }
         };
 
-        var replacement = new Line("replacement")
+        var replacement = new LinkTestConcept("replacement")
         {
-            Start = new Coord("sc") { X = 1 }
+            Containment_1 = new LinkTestConcept("sc") { Name = "1" }
         };
 
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [new Circle("child"), replaced]
+            Contents =  [new LinkTestConcept("child"), replaced]
         };
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -322,7 +324,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        replaced.Center = replacement.Start;
+        replaced.Containment_0_1 = replacement.Containment_1;
 
         AssertUniqueNodeIds(originalPartition, replacement);
         Assert.AreEqual(1, notificationObserver.Count);
@@ -337,19 +339,19 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Nodes_are_in_same_partition()
     {
-        var replaced = new Circle("replaced")
+        var replaced = new LinkTestConcept("replaced")
         {
-            Center = new Coord("cc") { X = 2 }
+            Containment_0_1 = new LinkTestConcept("cc") { Name = "2" }
         };
 
-        var replacement = new Line("replacement")
+        var replacement = new LinkTestConcept("replacement")
         {
-            Start = new Coord("sc") { X = 1 }
+            Containment_1 = new LinkTestConcept("sc") { Name = "1" }
         };
 
-        var originalPartition = new Geometry("a")
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [replacement, replaced]
+            Contents =  [replacement, replaced]
         };
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -359,7 +361,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        replaced.Center = replacement.Start;
+        replaced.Containment_0_1 = replacement.Containment_1;
 
         AssertUniqueNodeIds(originalPartition);
         Assert.AreEqual(1, notificationObserver.Count);
@@ -375,24 +377,24 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Origin_partition_is_not_in_any_forest()
     {
-        var replaced = new Circle("replaced")
+        var replaced = new LinkTestConcept("replaced")
         {
-            Center = new Coord("cc") { X = 2 }
+            Containment_0_1 = new LinkTestConcept("cc") { Name = "2" }
         };
         
-        var destinationPartition = new Geometry("a")
+        var destinationPartition = new TestPartition("a")
         {
-            Shapes = [replaced]
+            Contents =  [replaced]
         };
         
-        var replacement = new Line("replacement")
+        var replacement = new LinkTestConcept("replacement")
         {
-            Start = new Coord("sc") { X = 1 }
+            Containment_1 = new LinkTestConcept("sc") { Name = "1" }
         };
         
-        var originPartition = new Geometry("b")
+        var originPartition = new TestPartition("b")
         {
-            Shapes = [replacement]
+            Contents =  [replacement]
         };
         
         var originalForest = new Forest();
@@ -401,7 +403,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         destinationPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        replaced.Center = replacement.Start;
+        replaced.Containment_0_1 = replacement.Containment_1;
 
         AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
@@ -416,24 +418,24 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Origin_partition_is_in_different_forest()
     {
-        var replaced = new Circle("replaced")
+        var replaced = new LinkTestConcept("replaced")
         {
-            Center = new Coord("cc") { X = 2 }
+            Containment_0_1 = new LinkTestConcept("cc") { Name = "2" }
         };
         
-        var destinationPartition = new Geometry("a")
+        var destinationPartition = new TestPartition("a")
         {
-            Shapes = [replaced]
+            Contents =  [replaced]
         };
         
-        var replacement = new Line("replacement")
+        var replacement = new LinkTestConcept("replacement")
         {
-            Start = new Coord("sc") { X = 1 }
+            Containment_1 = new LinkTestConcept("sc") { Name = "1" }
         };
         
-        var originPartition = new Geometry("b")
+        var originPartition = new TestPartition("b")
         {
-            Shapes = [replacement]
+            Contents =  [replacement]
         };
 
         var otherForest = new Forest();
@@ -445,7 +447,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         destinationPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        replaced.Center = replacement.Start;
+        replaced.Containment_0_1 = replacement.Containment_1;
 
         AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);

@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -28,12 +28,13 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
-        var moved = new Documentation("moved");
-        var replaced = new Documentation("replaced");
-        var originalPartition = new Geometry("a")
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var originalParent = new LinkTestConcept("a")
         {
-            Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
+            Containment_0_1 = replaced, Containment_0_n = [new LinkTestConcept("l") { Containment_1 = moved }]
         };
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
@@ -46,7 +47,7 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.Documentation = moved;
+        originalParent.Containment_0_1 = moved;
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
@@ -60,12 +61,13 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Single_ReplaceWith()
     {
-        var moved = new Documentation("moved");
-        var replaced = new Documentation("replaced");
-        var originalPartition = new Geometry("a")
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var originalParent = new LinkTestConcept("a")
         {
-            Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
+            Containment_0_1 = replaced, Containment_0_n = [new LinkTestConcept("l") { Containment_1 = moved }]
         };
+        var originalPartition = new TestPartition("Partition") { Contents = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -85,10 +87,10 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
     [Ignore("Should emit ChildMovedAndReplacedFromOtherContainmentNotification")]
     public void Multiple()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var replaced = new Circle("replaced");
-        var originalPartition = new Geometry("a") { Shapes = [origin, replaced] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var replaced = new LinkTestConcept("replaced");
+        var originalPartition = new TestPartition("a") { Contents = [origin, replaced] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -106,41 +108,41 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_ProducesNotification()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var replaced = new Circle("replaced");
-        var originalPartition = new Geometry("a") { Shapes = [origin, replaced] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var replaced = new LinkTestConcept("replaced");
+        var originalPartition = new TestPartition("a") { Contents = [origin, replaced] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
-            newIndex, moved, origin, ShapesLanguage.Instance.CompositeShape_parts, oldIndex, replaced, new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
+        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
+            newIndex, moved, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, oldIndex, replaced, new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
         
         CreatePartitionReplicator(clonedPartition, notification);
 
-        Assert.AreEqual(2, clonedPartition.Shapes.Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[^1].GetId());
+        Assert.AreEqual(2, clonedPartition.Contents.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[^1].GetId());
     }
 
     [TestMethod]
     public void Multiple_not_matching_node_ids()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var replaced = new Circle("replaced");
-        var nodeWithAnotherId = new Circle("node-with-another-id");
-        var originalPartition = new Geometry("a") { Shapes = [origin, replaced, nodeWithAnotherId] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var replaced = new LinkTestConcept("replaced");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
+        var originalPartition = new TestPartition("a") { Contents = [origin, replaced, nodeWithAnotherId] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, ShapesLanguage.Instance.Geometry_shapes,
-            newIndex, moved, origin, ShapesLanguage.Instance.CompositeShape_parts, oldIndex, nodeWithAnotherId,
+        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_contents,
+            newIndex, moved, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, oldIndex, nodeWithAnotherId,
             new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
@@ -152,29 +154,30 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Single_not_matching_node_ids()
     {
-        var moved = new Documentation("moved");
-        var replaced = new Documentation("replaced");
-        var line = new Line("l")
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var line = new LinkTestConcept("l")
         {
-            ShapeDocs = moved
+            Containment_0_1 = moved
         };
-        var originalPartition = new Geometry("a")
+        var originalParent = new LinkTestConcept("a")
         {
-            Documentation = replaced, 
-            Shapes = [line]
+            Containment_1 = replaced, 
+            Containment_0_n = [line]
         };
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var nodeWithAnotherId = new Circle("node-with-another-id");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(nodeWithAnotherId);
 
         var newIndex = 0;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, ShapesLanguage.Instance.Geometry_documentation,
-            newIndex, moved, line, ShapesLanguage.Instance.Geometry_shapes, oldIndex, nodeWithAnotherId,
+        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_contents,
+            newIndex, moved, line, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, oldIndex, nodeWithAnotherId,
             new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

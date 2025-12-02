@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class TwowayTests : TwowayReplicatorTestsBase
@@ -27,118 +27,120 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildAdded_Multiple_Only()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
 
-        var clone = new Geometry("a");
+        var clone = new TestPartition("a");
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
-        var added = new Circle("added");
-        node.AddShapes([added]);
-        var added2 = new Circle("added2");
-        clone.AddShapes([added2]);
+        var added = new LinkTestConcept("added");
+        node.AddContents([added]);
+        var added2 = new LinkTestConcept("added2");
+        clone.AddContents([added2]);
 
         AssertEquals([node], [clone]);
-        Assert.AreNotSame(added, clone.Shapes[0]);
-        Assert.AreNotSame(added2, node.Shapes[1]);
+        Assert.AreNotSame(added, clone.Contents[0]);
+        Assert.AreNotSame(added2, node.Contents[1]);
     }
 
     [TestMethod]
     public void ChildAdded_Multiple_First()
     {
-        var node = new Geometry("a") { Shapes = [new Line("l")] };
+        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l")] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        var added = new Circle("added");
-        node.InsertShapes(0, [added]);
-        var added2 = new Circle("added2");
-        clone.InsertShapes(1, [added2]);
+        var added = new LinkTestConcept("added");
+        node.InsertContents(0, [added]);
+        var added2 = new LinkTestConcept("added2");
+        clone.InsertContents(1, [added2]);
 
         AssertEquals([node], [clone]);
-        Assert.AreNotSame(added, clone.Shapes[0]);
-        Assert.AreNotSame(added2, node.Shapes[2]);
+        Assert.AreNotSame(added, clone.Contents[0]);
+        Assert.AreNotSame(added2, node.Contents[2]);
     }
 
     [TestMethod]
     public void ChildAdded_Multiple_Last()
     {
-        var node = new Geometry("a") { Shapes = [new Line("l")] };
+        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l")] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        var added = new Circle("added");
-        node.InsertShapes(1, [added]);
-        var added2 = new Circle("added2");
-        clone.InsertShapes(0, [added2]);
+        var added = new LinkTestConcept("added");
+        node.InsertContents(1, [added]);
+        var added2 = new LinkTestConcept("added2");
+        clone.InsertContents(0, [added2]);
 
         AssertEquals([node], [clone]);
-        Assert.AreNotSame(added, clone.Shapes[2]);
-        Assert.AreNotSame(added2, node.Shapes[0]);
+        Assert.AreNotSame(added, clone.Contents[2]);
+        Assert.AreNotSame(added2, node.Contents[0]);
     }
 
     [TestMethod]
     [Ignore("issue with replaceWith")]
     public void ChildAdded_Single()
     {
-        var node = new Geometry("a");
+        var node = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [node] };
 
-        var clone = new Geometry("a");
+        var clone = new LinkTestConcept("a");
+        var clonePartition = new TestPartition("partition") { Contents = [clone] };
 
-        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
+        var (replicator, cloneReplicator) = CreateReplicators(originalPartition, clonePartition);
 
 
-        var added = new Documentation("added");
-        node.Documentation = added;
-        var added2 = new Documentation("added2");
-        clone.Documentation = added2;
+        var added = new LinkTestConcept("added");
+        node.Containment_0_1 = added;
+        var added2 = new LinkTestConcept("added2");
+        clone.Containment_0_1 = added2;
 
         AssertEquals([node], [clone]);
-        Assert.AreNotSame(added, clone.Documentation);
-        Assert.AreNotSame(added2, node.Documentation);
+        Assert.AreNotSame(added, clone.Containment_0_1);
+        Assert.AreNotSame(added2, node.Containment_0_1);
     }
 
     [TestMethod]
     public void ChildAdded_Deep()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
 
-        var clone = new Geometry("a");
+        var clone = new TestPartition("a");
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
-        node.AddShapes([added]);
-        var added2 = new Circle("added2") { Center = new Coord("coord2") { X = 11, Y = 12, Z = 13 } };
-        clone.AddShapes([added2]);
+        var added = new LinkTestConcept("added") { Containment_1 = new LinkTestConcept("coord") { Name = "1" } };
+        node.AddContents([added]);
+        var added2 = new LinkTestConcept("added2") { Containment_1 = new LinkTestConcept("coord2") { Name = "11" } };
+        clone.AddContents([added2]);
 
         AssertEquals([node], [clone]);
-        Assert.AreNotSame(added, clone.Shapes[0]);
-        Assert.AreNotSame(added2, node.Shapes[1]);
+        Assert.AreNotSame(added, clone.Contents[0]);
+        Assert.AreNotSame(added2, node.Contents[1]);
     }
 
     [TestMethod]
     public void ChildAdded_Deep_DuplicateNodeId()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
 
-        var clone = new Geometry("a");
+        var clone = new TestPartition("a");
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
-        node.AddShapes([added]);
-        var added2 = new Circle("added2") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
+        var added = new LinkTestConcept("added") { Containment_1 = new LinkTestConcept("coord") { Name = "1" } };
+        node.AddContents([added]);
+        var added2 = new LinkTestConcept("added2") { Containment_1 = new LinkTestConcept("coord") { Name = "1" } };
 
-        Assert.ThrowsExactly<DuplicateNodeIdException>(() => node.AddShapes([added2]));
+        Assert.ThrowsExactly<DuplicateNodeIdException>(() => node.AddContents([added2]));
     }
 
     #endregion
@@ -148,15 +150,15 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildDeleted_Multiple_Only()
     {
-        var deleted = new Circle("deleted");
-        var node = new Geometry("a") { Shapes = [deleted] };
+        var deleted = new LinkTestConcept("deleted");
+        var node = new TestPartition("a") { Contents =  [deleted] };
 
-        var clone = new Geometry("a") { Shapes = [new Circle("deleted")] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("deleted")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        node.RemoveShapes([deleted]);
+        node.RemoveContents([deleted]);
 
         AssertEquals([node], [clone]);
     }
@@ -164,15 +166,15 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildDeleted_Multiple_First()
     {
-        var deleted = new Circle("deleted");
-        var node = new Geometry("a") { Shapes = [deleted, new Line("l")] };
+        var deleted = new LinkTestConcept("deleted");
+        var node = new TestPartition("a") { Contents =  [deleted, new LinkTestConcept("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Circle("deleted"), new Line("l")] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("deleted"), new LinkTestConcept("l")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        node.RemoveShapes([deleted]);
+        node.RemoveContents([deleted]);
 
         AssertEquals([node], [clone]);
     }
@@ -180,15 +182,15 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildDeleted_Multiple_Last()
     {
-        var deleted = new Circle("deleted");
-        var node = new Geometry("a") { Shapes = [new Line("l"), deleted] };
+        var deleted = new LinkTestConcept("deleted");
+        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l"), deleted] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("deleted")] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l"), new LinkTestConcept("deleted")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        node.RemoveShapes([deleted]);
+        node.RemoveContents([deleted]);
 
         AssertEquals([node], [clone]);
     }
@@ -196,15 +198,17 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildDeleted_Single()
     {
-        var deleted = new Documentation("deleted");
-        var node = new Geometry("a") { Documentation = deleted };
+        var deleted = new LinkTestConcept("deleted");
+        var node = new LinkTestConcept("a") { Containment_0_1 = deleted };
+        var originalPartition = new TestPartition("partition") { Contents = [node] };
 
-        var clone = new Geometry("a") { Documentation = new Documentation("deleted") };
+        var clone = new LinkTestConcept("a") { Containment_0_1 = new LinkTestConcept("deleted") };
+        var clonePartition = new TestPartition("partition") { Contents = [clone] };
 
-        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
+        var (replicator, cloneReplicator) = CreateReplicators(originalPartition, clonePartition);
 
 
-        node.Documentation = null;
+        node.Containment_0_1 = null;
 
         AssertEquals([node], [clone]);
     }
@@ -217,15 +221,17 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [Ignore("issue with replaceWith")]
     public void ChildReplaced_Single()
     {
-        var node = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
+        var node = new LinkTestConcept("a") { Containment_0_1 = new LinkTestConcept("replaced") { Name = "a" } };
+        var originalPartition = new TestPartition("partition") { Contents = [node] };
 
-        var clone = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
+        var clone = new LinkTestConcept("a") { Containment_0_1 = new LinkTestConcept("replaced") { Name = "a" } };
+        var clonePartition = new TestPartition("partition") { Contents = [clone] };
 
-        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
+        var (replicator, cloneReplicator) = CreateReplicators(originalPartition, clonePartition);
 
 
-        var added = new Documentation("added") { Text = "added" };
-        node.Documentation = added;
+        var added = new LinkTestConcept("added") { Name = "added" };
+        node.Containment_0_1 = added;
 
         AssertEquals([node], [clone]);
     }
@@ -234,22 +240,22 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [Ignore("issue with replaceWith")]
     public void ChildReplaced_Deep()
     {
-        var node = new Geometry("a");
-        var bof = new BillOfMaterials("bof")
+        var node = new TestPartition("a");
+        var bof = new LinkTestConcept("bof")
         {
-            DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid }
+            Containment_1 = new LinkTestConcept("mg") { Name = "liquid" }
         };
-        node.AddAnnotations([bof]);
+        node.AddContents([bof]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([
-            new BillOfMaterials("bof") { DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid } }
+        var clone = new TestPartition("a");
+        clone.AddContents([
+            new LinkTestConcept("bof") { Containment_1 = new LinkTestConcept("mg") { Name = "liquid" } }
         ]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
+        bof.Containment_1 = new LinkTestConcept("replaced") { Name = "gas" };
 
         AssertEquals([node], [clone]);
     }
@@ -261,16 +267,16 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainment_Multiple()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var node = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var node = new TestPartition("a") { Contents =  [origin] };
 
-        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("origin") { Containment_1_n = [new LinkTestConcept("moved")] }] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        node.AddShapes([moved]);
+        node.AddContents([moved]);
 
         AssertEquals([node], [clone]);
     }
@@ -278,15 +284,15 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainment_Single()
     {
-        var moved = new Documentation("moved");
-        var node = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+        var moved = new LinkTestConcept("moved");
+        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_1 = moved }, new LinkTestConcept("b")] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_1 = new LinkTestConcept("moved") }, new LinkTestConcept("b")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        node.Documentation = moved;
+        node.Contents[1].Containment_0_1 = moved;
 
         AssertEquals([node], [clone]);
     }
@@ -298,16 +304,16 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainmentInSameParent_Multiple()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var node = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var node = new TestPartition("a") { Contents =  [origin] };
 
-        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("origin") { Containment_1_n = [new LinkTestConcept("moved")] }] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        origin.AddDisabledParts([moved]);
+        origin.AddContainment_0_n([moved]);
 
         AssertEquals([node], [clone]);
     }
@@ -315,16 +321,16 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainmentInSameParent_Single()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var node = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var node = new TestPartition("a") { Contents =  [origin] };
 
-        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("origin") { Containment_1_n = [new LinkTestConcept("moved")] }] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        origin.EvilPart = moved;
+        origin.Containment_0_1 = moved;
 
         AssertEquals([node], [clone]);
     }
@@ -336,15 +342,15 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildMovedInSameContainment_Forward()
     {
-        var moved = new Circle("moved");
-        var node = new Geometry("a") { Shapes = [moved, new Line("l")] };
+        var moved = new LinkTestConcept("moved");
+        var node = new TestPartition("a") { Contents =  [moved, new LinkTestConcept("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Circle("moved"), new Line("l")] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("moved"), new LinkTestConcept("l")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        node.AddShapes([moved]);
+        node.AddContents([moved]);
 
         AssertEquals([node], [clone]);
     }
@@ -352,15 +358,15 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ChildMovedInSameContainment_Backward()
     {
-        var moved = new Circle("moved");
-        var node = new Geometry("a") { Shapes = [new Line("l"), moved] };
+        var moved = new LinkTestConcept("moved");
+        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l"), moved] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("moved")] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l"), new LinkTestConcept("moved")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        node.InsertShapes(0, [moved]);
+        node.InsertContents(0, [moved]);
 
         AssertEquals([node], [clone]);
     }

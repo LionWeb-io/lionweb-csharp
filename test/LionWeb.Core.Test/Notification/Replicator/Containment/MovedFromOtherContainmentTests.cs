@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -27,14 +27,14 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
+        var originalPartition = new TestPartition("a") { Contents =  [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.AddShapes([moved]);
+        originalPartition.AddContents([moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -42,16 +42,17 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
-        var moved = new Documentation("moved");
-        var originalPartition = new Geometry("a")
+        var moved = new LinkTestConcept("moved");
+        var parent = new LinkTestConcept("parent");
+        var originalPartition = new TestPartition("a")
         {
-            Shapes = [new Line("l") { ShapeDocs = moved }]
+            Contents =  [new LinkTestConcept("l") { Containment_1 = moved }, parent]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.Documentation = moved;
+        parent.Containment_1 = moved;
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -59,24 +60,24 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Partitions_are_in_same_forest()
     {
-        var replaced = new Circle("replaced")
+        var replaced = new LinkTestConcept("replaced")
         {
-            Center = new Coord("cc") { X = 2 }
+            Containment_0_1 = new LinkTestConcept("cc") { Name = "2" }
         };
         
-        var destinationPartition = new Geometry("a")
+        var destinationPartition = new TestPartition("a")
         {
-            Shapes = [replaced]
+            Contents =  [replaced]
         };
         
-        var replacement = new Line("replacement")
+        var replacement = new LinkTestConcept("replacement")
         {
-            Start = new Coord("sc") { X = 1 }
+            Containment_1 = new LinkTestConcept("sc") { Name = "1" }
         };
         
-        var originPartition = new Geometry("b")
+        var originPartition = new TestPartition("b")
         {
-            Shapes = [replacement]
+            Contents =  [replacement]
         };
         
         var originalForest = new Forest();
@@ -89,7 +90,7 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         destinationPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        replaced.Center = replacement.Start;
+        replaced.Containment_0_1 = replacement.Containment_1;
 
         AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
