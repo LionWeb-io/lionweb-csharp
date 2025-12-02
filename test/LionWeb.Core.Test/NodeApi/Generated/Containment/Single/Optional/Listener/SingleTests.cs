@@ -22,7 +22,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
 [TestClass]
-public class SingleTests
+public class SingleTests: NotificationTestsBase
 {
     [TestMethod]
     public void Single()

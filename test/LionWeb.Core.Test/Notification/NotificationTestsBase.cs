@@ -54,6 +54,16 @@ public abstract class NotificationTestsBase
             }
         }
     }
+
+    protected class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
+    {
+        public int Count => Notifications.Count;
+
+        public List<INotification> Notifications { get; } = [];
+
+        public void Receive(INotificationSender correspondingSender, INotification notification) =>
+            Notifications.Add(notification);
+    }
 }
 
 /// <summary>
@@ -64,15 +74,6 @@ internal class NotificationForwarder() : NotificationPipeBase(null), INotificati
     public void ProduceNotification(INotification notification) => Send(notification);
 }
 
-public class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
-{
-    public int Count => Notifications.Count;
-
-    public List<INotification> Notifications { get; } = [];
-
-    public void Receive(INotificationSender correspondingSender, INotification notification) =>
-        Notifications.Add(notification);
-}
 
 [Obsolete("Will be removed after tests are refactored with proper ConnectTo() calls")]
 public static class NotificationExtensions

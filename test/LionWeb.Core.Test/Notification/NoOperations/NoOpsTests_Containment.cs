@@ -20,7 +20,7 @@ namespace LionWeb.Core.Test.Notification.NoOperationsTests;
 using Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
-public class NoOpsTests_Containment
+public class NoOpsTests_Containment: NotificationTestsBase
 {
     [TestMethod]
     public void ChildReplaced_Single_sets_the_same_node()

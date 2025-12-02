@@ -22,7 +22,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
 [TestClass]
-public class EmptyCollectionTests
+public class EmptyCollectionTests: NotificationTestsBase
 {
     [TestMethod]
     public void EmptyArray()
@@ -93,7 +93,11 @@ public class EmptyCollectionTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
+        var childDeletedNotification = (ChildDeletedNotification)notificationObserver.Notifications[0];
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildDeletedNotification>(notificationObserver.Notifications[0]);
+        Assert.AreSame(parent, childDeletedNotification.Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, childDeletedNotification.Containment);
+        Assert.AreEqual(0, childDeletedNotification.Index);
+        Assert.AreSame(circle, childDeletedNotification.DeletedChild);
     }
 }
