@@ -370,7 +370,12 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteReferenceAdded(ReferenceAddedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = MoveReference((IWritableNodeRaw)n.Parent, n.Reference, n.Index, n.NewTarget);
+            IWritableNodeRaw localNewParent = (IWritableNodeRaw)n.Parent;
+            var success = n.Reference.Multiple switch
+            {
+                true => localNewParent.InsertReferencesRaw(n.Reference, n.Index, [(ReferenceTarget)n.NewTarget]),
+                false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.NewTarget)
+            };
             ProduceNotification(n, success);
         });
 
@@ -398,19 +403,14 @@ public class RemoteReplicatorRaw : RemoteReplicator
 
     private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification n)
     {
-        var success = MoveReference((IWritableNodeRaw)n.Parent, n.Reference, n.NewIndex, n.Target);
-        ProduceNotification(n, success);
-    }
-
-    private static bool MoveReference(IWritableNodeRaw localNewParent, Reference newReference, Index newIndex,
-        IReferenceTarget movedTarget)
-    {
-        bool success = newReference.Multiple switch
+        IWritableNodeRaw localNewParent = (IWritableNodeRaw)n.Parent;
+        var success = n.Reference.Multiple switch
         {
-            true => localNewParent.InsertReferencesRaw(newReference, newIndex, [(ReferenceTarget)movedTarget]),
-            false => localNewParent.SetReferenceRaw(newReference, (ReferenceTarget?)movedTarget)
+            true => localNewParent.RemoveReferencesRaw(n.Reference, [(ReferenceTarget)n.Target])
+                && localNewParent.InsertReferencesRaw(n.Reference, n.NewIndex, [(ReferenceTarget)n.Target]),
+            false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.Target)
         };
-        return success;
+        ProduceNotification(n, success);
     }
 
     private static bool ReplaceReference(IWritableNodeRaw localParent, IReferenceTarget replacedTarget,
@@ -422,7 +422,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
             true => localParent.RemoveReferencesRaw(reference, [(ReferenceTarget)replacedTarget])
                     && localParent.InsertReferencesRaw(reference, index, [(ReferenceTarget)newTarget]),
 
-            false => localParent.SetReferenceRaw(reference, (ReferenceTarget?)replacedTarget)
+            false => localParent.SetReferenceRaw(reference, (ReferenceTarget?)newTarget)
         };
         return success;
     }

@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Reference;
 
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class DeletedTests : ReplicatorTestsBase
@@ -25,15 +25,15 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only()
     {
-        var line = new Line("line");
-        var bof = new BillOfMaterials("bof") { Materials = [line] };
-        var originalPartition = new Geometry("a") { Shapes = [line] };
-        originalPartition.AddAnnotations([bof]);
+        var line = new LinkTestConcept("line");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [line] };
+        var originalPartition = new TestPartition("a") { Contents =  [line] };
+        originalPartition.AddContents([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        bof.RemoveMaterials([line]);
+        bof.RemoveReference_0_n([line]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -41,16 +41,16 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_First()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var bof = new BillOfMaterials("bof") { Materials = [line, circle] };
-        var originalPartition = new Geometry("a") { Shapes = [line, circle] };
-        originalPartition.AddAnnotations([bof]);
+        var circle = new LinkTestConcept("circle");
+        var line = new LinkTestConcept("line");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [line, circle] };
+        var originalPartition = new TestPartition("a") { Contents =  [line, circle] };
+        originalPartition.AddContents([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        bof.RemoveMaterials([line]);
+        bof.RemoveReference_0_n([line]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -58,16 +58,16 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Last()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var bof = new BillOfMaterials("bof") { Materials = [circle, line] };
-        var originalPartition = new Geometry("a") { Shapes = [line, circle] };
-        originalPartition.AddAnnotations([bof]);
+        var circle = new LinkTestConcept("circle");
+        var line = new LinkTestConcept("line");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle, line] };
+        var originalPartition = new TestPartition("a") { Contents =  [line, circle] };
+        originalPartition.AddContents([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        bof.RemoveMaterials([line]);
+        bof.RemoveReference_0_n([line]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -75,14 +75,14 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
-        var circle = new Circle("circle");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle] };
+        var circle = new LinkTestConcept("circle");
+        var od = new LinkTestConcept("od") { Reference_0_1 = circle };
+        var originalPartition = new TestPartition("a") { Contents =  [od, circle] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        od.AltSource = null;
+        od.Reference_0_1 = null;
 
         AssertEquals([originalPartition], [clonedPartition]);
     }

@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Reference;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class TargetTests : ReplicatorTestsBase
@@ -27,9 +27,9 @@ public class TargetTests : ReplicatorTestsBase
     [TestMethod]
     public void ReferenceAdded_referencetarget_refers_to_cloned_node()
     {
-        var circle = new Circle("circle");
-        var od = new OffsetDuplicate("od");
-        var originalPartition = new Geometry("a") { Shapes = [od, circle] };
+        var circle = new LinkTestConcept("circle");
+        var od = new LinkTestConcept("od");
+        var originalPartition = new TestPartition("a") { Contents =  [od, circle] };
 
         var clonedPartition = ClonePartition(originalPartition);
         var sharedNodeMap = new SharedNodeMap();
@@ -38,7 +38,7 @@ public class TargetTests : ReplicatorTestsBase
         var notificationMapper = new NotificationToNotificationMapper(sharedNodeMap);
 
         var referenceAddedNotification = new ReferenceAddedNotification(originalPartition,
-            ShapesLanguage.Instance.OffsetDuplicate_source, 0,
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_1, 0,
             ReferenceTarget.FromNode(circle), new NumericNotificationId("refAddedNotification", 0));
 
         var notification = notificationMapper.Map(referenceAddedNotification);
@@ -49,17 +49,17 @@ public class TargetTests : ReplicatorTestsBase
     [TestMethod]
     public void ReferenceChanged_referencetarget_refers_to_cloned_node()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
+        var circle = new LinkTestConcept("circle");
+        var line = new LinkTestConcept("line");
+        var od = new LinkTestConcept("od") { Reference_1 = circle };
+        var originalPartition = new TestPartition("a") { Contents =  [od, circle, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(clonedPartition);
 
         var notificationMapper = new NotificationToNotificationMapper(sharedNodeMap);
-        var referenceChangedNotification = new ReferenceChangedNotification(originalPartition, ShapesLanguage.Instance.OffsetDuplicate_altSource, 0,
+        var referenceChangedNotification = new ReferenceChangedNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_1, 0,
             ReferenceTarget.FromNode(line), ReferenceTarget.FromNode(circle), new NumericNotificationId("refChangedNotification", 0));
 
         var notification = notificationMapper.Map(referenceChangedNotification);
@@ -71,16 +71,16 @@ public class TargetTests : ReplicatorTestsBase
     [TestMethod]
     public void ReferenceDeleted_referencetarget_refers_to_cloned_node()
     {
-        var circle = new Circle("circle");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle] };
+        var circle = new LinkTestConcept("circle");
+        var od = new LinkTestConcept("od") { Reference_1 = circle };
+        var originalPartition = new TestPartition("a") { Contents =  [od, circle] };
 
         var clonedPartition = ClonePartition(originalPartition);
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(clonedPartition);
 
         var notificationMapper = new NotificationToNotificationMapper(sharedNodeMap);
-        var referenceDeletedNotification = new ReferenceDeletedNotification(originalPartition, ShapesLanguage.Instance.OffsetDuplicate_altSource, 0,
+        var referenceDeletedNotification = new ReferenceDeletedNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_1, 0,
             ReferenceTarget.FromNode(circle),
             new NumericNotificationId("refChangedNotification", 0));
 
