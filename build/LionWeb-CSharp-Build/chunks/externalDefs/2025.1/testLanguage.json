@@ -56,7 +56,8 @@
             "SecondTestEnumeration",
             "DataTypeTestConcept",
             "LinkTestConcept",
-            "TestAnnotation"
+            "TestAnnotation",
+            "TestPartition"
           ]
         }
       ],
@@ -361,7 +362,7 @@
             "version": "2025.1",
             "key": "Concept-partition"
           },
-          "value": "true"
+          "value": "false"
         },
         {
           "property": {
@@ -858,7 +859,7 @@
             "version": "2025.1",
             "key": "Concept-partition"
           },
-          "value": "true"
+          "value": "false"
         },
         {
           "property": {
@@ -1446,8 +1447,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Node",
-              "reference": "LionCore-builtins-Node"
+              "resolveInfo": "LionWeb.LionCore_builtins.Node",
+              "reference": null
             }
           ]
         },
@@ -1470,6 +1471,206 @@
       ],
       "annotations": [],
       "parent": "TestLanguage"
+    },
+    {
+      "id": "TestPartition",
+      "classifier": {
+        "language": "LionCore-M3",
+        "version": "2025.1",
+        "key": "Concept"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2025.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": "TestPartition"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "IKeyed-key"
+          },
+          "value": "TestPartition"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Concept-abstract"
+          },
+          "value": "false"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Concept-partition"
+          },
+          "value": "true"
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Classifier-features"
+          },
+          "children": [
+            "TestPartition-dataType",
+            "TestPartition-contents"
+          ]
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Concept-extends"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Concept-implements"
+          },
+          "targets": [
+            {
+              "resolveInfo": "LionWeb.LionCore_builtins.INamed",
+              "reference": null
+            }
+          ]
+        }
+      ],
+      "annotations": [],
+      "parent": "TestLanguage"
+    },
+    {
+      "id": "TestPartition-dataType",
+      "classifier": {
+        "language": "LionCore-M3",
+        "version": "2023.1",
+        "key": "Containment"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": "dataType"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2023.1",
+            "key": "IKeyed-key"
+          },
+          "value": "TestPartition-dataType"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2023.1",
+            "key": "Feature-optional"
+          },
+          "value": "true"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2023.1",
+            "key": "Link-multiple"
+          },
+          "value": "false"
+        }
+      ],
+      "containments": [],
+      "references": [
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2023.1",
+            "key": "Link-type"
+          },
+          "targets": [
+            {
+              "resolveInfo": "DataTypeTestConcept",
+              "reference": "DataTypeTestConcept"
+            }
+          ]
+        }
+      ],
+      "annotations": [],
+      "parent": "TestPartition"
+    },
+    {
+      "id": "TestPartition-contents",
+      "classifier": {
+        "language": "LionCore-M3",
+        "version": "2025.1",
+        "key": "Containment"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2025.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": "contents"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "IKeyed-key"
+          },
+          "value": "TestPartition-contents"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Feature-optional"
+          },
+          "value": "true"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Link-multiple"
+          },
+          "value": "true"
+        }
+      ],
+      "containments": [],
+      "references": [
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2025.1",
+            "key": "Link-type"
+          },
+          "targets": [
+            {
+              "resolveInfo": "LinkTestConcept",
+              "reference": "LinkTestConcept"
+            }
+          ]
+        }
+      ],
+      "annotations": [],
+      "parent": "TestPartition"
     }
   ]
 }
