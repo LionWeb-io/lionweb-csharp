@@ -350,13 +350,15 @@ public class DeltaCommandToNotificationMapper
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
         var oldParent = (IWritableNode)movedAnnotation.GetParent();
+        var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
+        
         var newParent = ToNode(moveAnnotationCommand.NewParent);
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
             moveAnnotationCommand.NewIndex,
             movedAnnotation,
             oldParent,
-            0, // TODO FIXME
+            oldIndex,
             ToNotificationId(moveAnnotationCommand)
         );
     }
@@ -366,11 +368,13 @@ public class DeltaCommandToNotificationMapper
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
         var parent = (IWritableNode)movedAnnotation.GetParent();
+        var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
+        
         return new AnnotationMovedInSameParentNotification(
             moveAnnotationCommand.NewIndex,
             movedAnnotation,
             parent,
-            0, // TODO FIXME
+            oldIndex,
             ToNotificationId(moveAnnotationCommand)
         );
     }
