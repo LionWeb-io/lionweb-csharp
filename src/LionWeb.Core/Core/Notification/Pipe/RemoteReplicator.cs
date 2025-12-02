@@ -46,7 +46,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     }
 
     /// <inheritdoc />
-    public void Receive(INotificationSender correspondingSender, INotification notification)
+    public virtual void Receive(INotificationSender correspondingSender, INotification notification)
     {
         Debug.WriteLine($"processing notification {notification.NotificationId}");
         switch (notification)

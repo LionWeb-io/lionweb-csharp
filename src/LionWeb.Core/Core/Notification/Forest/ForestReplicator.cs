@@ -74,7 +74,7 @@ public static class ForestReplicator
             localForest,
             sharedNodeMap,
             sender,
-            (filter, s) => new RemoteReplicator(localForest, filter, s)
+            (filter, s) => new RemoteReplicatorRaw((IForestRaw?)localForest, filter, s)
         );
 
         var result = new MultipartNotificationHandler(parts,

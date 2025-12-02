@@ -29,7 +29,7 @@ using System.Diagnostics;
 /// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public class RemoteReplicatorRaw : NotificationPipeBase, INotificationHandler
+public class RemoteReplicatorRaw : RemoteReplicator
 {
     private readonly IForestRaw? _localForest;
 
@@ -38,14 +38,14 @@ public class RemoteReplicatorRaw : NotificationPipeBase, INotificationHandler
     public RemoteReplicatorRaw(
         IForestRaw? localForest,
         IdFilteringNotificationFilter filter,
-        object? sender) : base(sender)
+        object? sender) : base(localForest, filter, sender)
     {
         _localForest = localForest;
         Filter = filter;
     }
 
     /// <inheritdoc />
-    public void Receive(INotificationSender correspondingSender, INotification notification)
+    public override void Receive(INotificationSender correspondingSender, INotification notification)
     {
         Debug.WriteLine($"processing notification {notification.NotificationId}");
         switch (notification)
