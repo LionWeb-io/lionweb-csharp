@@ -117,7 +117,7 @@ public class ForestTests : ReplicatorTestsBase
 
         originalForest.AddPartitions([destinationPartition]);
         // Node "moved" is unknown in the cloned forest
-        Assert.ThrowsExactly<NotImplementedException>(() => destinationPartition.AddShapes([moved]));
+        Assert.ThrowsExactly<InvalidOperationException>(() => destinationPartition.AddShapes([moved]));
     }
 
     [TestMethod]

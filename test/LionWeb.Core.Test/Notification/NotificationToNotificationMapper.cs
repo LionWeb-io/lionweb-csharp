@@ -450,11 +450,15 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private T LookUpNode<T>(T node) where T : IReadableNode
     {
         var nodeId = node.GetId();
-        if (sharedNodeMap.TryGetValue(nodeId, out var result) && result is T w)
-            return w;
+        if (sharedNodeMap.TryGetValue(nodeId, out var result))
+        {
+            if (result is T w)
+                return w;
 
-        // TODO change to correct exception (UnknownNodeIdException ?)
-        throw new NotImplementedException($"Unknown node with id: {nodeId}");
+            throw new InvalidCastException($"Can not cast {result.GetType().Name} to {typeof(T).Name}");
+        }
+
+        throw new InvalidOperationException($"Unknown node with id: {nodeId}");
     }
 
     private ReferenceTarget LookUpNode(IReferenceTarget target)
@@ -463,8 +467,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         if (sharedNodeMap.TryGetValue(nodeId, out var result))
             return new ReferenceTarget(target.ResolveInfo, target.TargetId, result);
 
-        // TODO change to correct exception (UnknownNodeIdException ?)
-        throw new NotImplementedException($"Unknown target node with id: {nodeId}");
+        throw new InvalidOperationException($"Unknown target node with id: {nodeId}");
     }
 
     private T CloneNode<T>(T node) where T : IReadableNode => (T)SameIdCloner.Clone((INode)node);

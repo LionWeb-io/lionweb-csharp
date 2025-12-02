@@ -443,7 +443,6 @@ public class DeltaEventToNotificationMapper
         if (nodes is [IWritableNode w])
             return w;
 
-        // TODO change to correct exception 
-        throw new NotImplementedException();
+        throw new InvalidCastException($"Can not cast nodes in {nodes.GetType().Name} to {nameof(IWritableNode)}");
     }
 }
