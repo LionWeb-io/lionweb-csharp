@@ -324,12 +324,13 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     {
         var newParent = LookUpNode(notification.NewParent);
         var movedAnnotation = LookUpNode(notification.MovedAnnotation);
+        var oldParent = LookUpNode(notification.OldParent);
 
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
             notification.NewIndex,
             movedAnnotation,
-            notification.OldParent,
+            oldParent,
             notification.OldIndex,
             notification.NotificationId
         );
