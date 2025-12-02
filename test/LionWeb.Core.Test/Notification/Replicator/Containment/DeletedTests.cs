@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class DeletedTests : ReplicatorTestsBase
@@ -27,8 +27,8 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only()
     {
-        var deleted = new Circle("deleted");
-        var originalPartition = new Geometry("a") { Shapes = [deleted] };
+        var deleted = new LinkTestConcept("deleted");
+        var originalPartition = new TestPartition("a") { Contents = [deleted] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
@@ -37,7 +37,7 @@ public class DeletedTests : ReplicatorTestsBase
 
         Assert.IsTrue(sharedNodeMap.ContainsKey(deleted.GetId()));
 
-        originalPartition.RemoveShapes([deleted]);
+        originalPartition.RemoveContents([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
 
@@ -47,13 +47,13 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_First()
     {
-        var deleted = new Circle("deleted");
-        var originalPartition = new Geometry("a") { Shapes = [deleted, new Line("l")] };
+        var deleted = new LinkTestConcept("deleted");
+        var originalPartition = new TestPartition("a") { Contents = [deleted, new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.RemoveShapes([deleted]);
+        originalPartition.RemoveContents([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -61,13 +61,13 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Last()
     {
-        var deleted = new Circle("deleted");
-        var originalPartition = new Geometry("a") { Shapes = [new Line("l"), deleted] };
+        var deleted = new LinkTestConcept("deleted");
+        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("l"), deleted] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.RemoveShapes([deleted]);
+        originalPartition.RemoveContents([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -75,13 +75,14 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
-        var deleted = new Documentation("deleted");
-        var originalPartition = new Geometry("a") { Documentation = deleted };
+        var deleted = new LinkTestConcept("deleted");
+        var parent = new LinkTestConcept("parent") { Containment_0_1 = deleted };
+        var originalPartition = new TestPartition("a") { Contents = [parent]};
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.Documentation = null;
+        parent.Containment_0_1 = null;
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -89,13 +90,13 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_not_matching_node_id()
     {
-        var deleted = new Circle("deleted");
-        var nodeWithAnotherId = new Circle("node-with-another-id");
-        var originalPartition = new Geometry("a") { Shapes = [deleted, nodeWithAnotherId, new Line("l")] };
+        var deleted = new LinkTestConcept("deleted");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
+        var originalPartition = new TestPartition("a") { Contents = [deleted, nodeWithAnotherId, new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var notification = new ChildDeletedNotification(nodeWithAnotherId, originalPartition,
-            ShapesLanguage.Instance.Geometry_shapes, 0, new NumericNotificationId("childDeletedNotificationMultiple", 0));
+            TestLanguageLanguage.Instance.TestPartition_contents, 0, new NumericNotificationId("childDeletedNotificationMultiple", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
@@ -111,17 +112,17 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_required_containment()
     {
-        var deleted = new Circle("deleted");
-        var origin = new CompositeShape("origin") { Parts = [deleted] };
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var deleted = new LinkTestConcept("deleted");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [deleted] };
+        var originalPartition = new TestPartition("a") { Contents = [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
-        var notification = new ChildDeletedNotification(deleted, origin, ShapesLanguage.Instance.CompositeShape_parts, 0,
+        var notification = new ChildDeletedNotification(deleted, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0,
             new NumericNotificationId("childDeletedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
-        Assert.ThrowsExactly<UnsetFeatureException>(() => ((CompositeShape)clonedPartition.Shapes[0]).Parts);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => clonedPartition.Contents[0].Containment_1_n);
     }
 
     /// <summary>
@@ -131,18 +132,18 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single_required_containment()
     {
-        var deleted = new Coord("deleted");
-        var origin = new Circle("c") { Center = deleted };
+        var deleted = new LinkTestConcept("deleted");
+        var origin = new LinkTestConcept("c") { Containment_1 = deleted };
 
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var originalPartition = new TestPartition("a") { Contents = [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
-        var notification = new ChildDeletedNotification(deleted, origin, ShapesLanguage.Instance.Circle_center, 0,
+        var notification = new ChildDeletedNotification(deleted, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1, 0,
             new NumericNotificationId("childDeletedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
-        Assert.ThrowsExactly<UnsetFeatureException>(() => ((Circle)clonedPartition.Shapes[0]).Center);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => clonedPartition.Contents[0].Containment_1);
     }
 
     /// <summary>
@@ -152,10 +153,10 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single_uses_detach_from_parent()
     {
-        var deleted = new Coord("deleted");
-        var origin = new Circle("c") { Center = deleted };
+        var deleted = new LinkTestConcept("deleted");
+        var origin = new LinkTestConcept("c") { Containment_1 = deleted };
 
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var originalPartition = new TestPartition("a") { Contents = [origin] };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
@@ -168,19 +169,20 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single_not_matching_node_id()
     {
-        var deleted = new Documentation("deleted");
-        var nodeWithAnotherId = new Documentation("node-with-another-id");
-        var originalPartition = new Geometry("a")
+        var deleted = new LinkTestConcept("deleted");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
+        var originalParent = new LinkTestConcept("parent")
         {
-            Documentation = deleted
+            Containment_0_1 = deleted
         };
+        var originalPartition = new TestPartition("a") { Contents = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(nodeWithAnotherId);
 
-        var notification = new ChildDeletedNotification(nodeWithAnotherId, originalPartition,
-            ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("childDeletedNotificationSingle", 0));
+        var notification = new ChildDeletedNotification(nodeWithAnotherId, originalParent,
+            TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, 0, new NumericNotificationId("childDeletedNotificationSingle", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {

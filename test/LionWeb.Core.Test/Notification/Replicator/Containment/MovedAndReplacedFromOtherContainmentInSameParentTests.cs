@@ -19,8 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
-using Languages.Generated.V2025_1.TestLanguage;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -29,13 +28,13 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
     [TestMethod]
     public void Single()
     {
-        var replaced = new Coord("replaced");
-        var moved = new Coord("moved");
-        var line = new Line("l")
+        var replaced = new LinkTestConcept("replaced");
+        var moved = new LinkTestConcept("moved");
+        var line = new LinkTestConcept("l")
         {
-            Start = moved, End = replaced
+            Containment_1 = moved, Containment_0_1 = replaced
         };
-        var originalPartition = new Geometry("a") { Shapes = [line] };
+        var originalPartition = new TestPartition("a") { Contents = [line] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var notificationObserver = new NotificationObserver();
@@ -48,7 +47,7 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
         Assert.IsTrue(sharedNodeMap.ContainsKey(replaced.GetId()));
         Assert.IsTrue(sharedNodeMap.ContainsKey(moved.GetId()));
 
-        line.End = line.Start;
+        line.Containment_0_1 = line.Containment_1;
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(notificationObserver.Notifications[0]);
@@ -62,11 +61,11 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
     [TestMethod]
     public void Single_ReplaceWith()
     {
-        var line = new Line("l")
+        var line = new LinkTestConcept("l")
         {
-            Start = new Coord("moved"), End = new Coord("replaced")
+            Containment_1 = new LinkTestConcept("moved"), Containment_0_1 = new LinkTestConcept("replaced")
         };
-        var originalPartition = new Geometry("a") { Shapes = [line] };
+        var originalPartition = new TestPartition("a") { Contents = [line] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -74,7 +73,7 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        line.End.ReplaceWith(line.Start);
+        line.Containment_0_1.ReplaceWith(line.Containment_1);
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(notificationObserver.Notifications[0]);
@@ -85,23 +84,23 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
     [TestMethod]
     public void Single_not_matching_node_ids()
     {
-        var moved = new Coord("moved");
-        var replaced = new Coord("replaced");
-        var line = new Line("l")
+        var moved = new LinkTestConcept("moved");
+        var replaced = new LinkTestConcept("replaced");
+        var line = new LinkTestConcept("l")
         {
-            Start = moved, 
-            End = replaced
+            Containment_1 = moved, 
+            Containment_0_1 = replaced
         };
         
-        var originalPartition = new Geometry("a") { Shapes = [line] };
+        var originalPartition = new TestPartition("a") { Contents = [line] };
         var clonedPartition = ClonePartition(originalPartition);
 
-        var nodeWithAnotherId = new Coord("node-with-another-id");
+        var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(nodeWithAnotherId);
 
-        var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(ShapesLanguage.Instance.Geometry_shapes, 0, 
-            moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 0, nodeWithAnotherId, 
+        var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(TestLanguageLanguage.Instance.TestPartition_contents, 0, 
+            moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 0, nodeWithAnotherId, 
             new NumericNotificationId("childMovedAndReplacedFromOtherContainmentInSameParentNotification", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

@@ -285,7 +285,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
             true => localParent.RemoveContainmentsRaw(containment, [replacedChild])
                     && localParent.InsertContainmentsRaw(containment, index, [newChild]),
 
-            false => localParent.SetContainmentRaw(containment, replacedChild)
+            false => localParent.SetContainmentRaw(containment, newChild)
         };
         return success;
     }
