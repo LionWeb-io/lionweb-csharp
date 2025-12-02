@@ -775,9 +775,16 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return this;
 	}
 
-    private void SetNameRaw(string? value) => _name = value;
+    private bool SetNameRaw(string? value)
+    {
+        if (value == _name)
+            return false;
+        
+        _name = value;
+        return true;
+    }
 
-	private LinkTestConcept? _containment_0_1 = null;
+    private LinkTestConcept? _containment_0_1 = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-containment_0_1")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
@@ -877,8 +884,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
         _containment_0_n.InsertRange(index,
             SetSelfParent(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
-        return true;
 
+        return true;
     }
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -1524,8 +1531,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		{
 			if (value is null or string)
 			{
-				SetNameRaw((string?)value);
-				return true;
+				return SetNameRaw((string?)value);
 			}
 		}
 
@@ -1730,22 +1736,6 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
             }
         }
 
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(containment))
-        {
-            if (M2Extensions.TryAsList<ReferenceTarget>(nodes, out var list))
-            {
-                return InsertReference_0_nRaw(index, list);
-            }
-        }
-
-        if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(containment))
-        {
-            if (M2Extensions.TryAsList<ReferenceTarget>(nodes, out var list))
-            {
-                return InsertReference_1_nRaw(index, list);
-            }
-        }
-
         return false;
     }
 
@@ -1821,7 +1811,6 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         }
 
         return false;
-        
     }
 
     protected internal override bool RemoveReferencesRaw(Feature reference, List<ReferenceTarget> targets)
@@ -1933,10 +1922,19 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		AssureNotNull(value, _builtIns.INamed_name);
 		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
 		emitter.CollectOldData();
-		_name = value;
+        SetNameRaw(value);
 		emitter.Notify();
 		return this;
 	}
+
+    private bool SetNameRaw(string? value)
+    {
+        if (value == _name)
+            return false;
+        
+        _name = value;
+        return true;
+    }
 
 	private readonly List<LinkTestConcept> _contents = [];
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -1963,14 +1961,24 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		{
 			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, [safeNode], _contents, null, notificationId);
 			emitter.CollectOldData();
-			_contents.AddRange(SetSelfParent([safeNode], TestLanguageLanguage.Instance.TestPartition_contents));
+            AddContentsRaw([safeNode]);
 			emitter.Notify();
 		}
 
 		return this;
 	}
 
-	/// <remarks>Optional Multiple Containment</remarks>
+    private bool AddContentsRaw(List<LinkTestConcept> nodes)
+    {
+        if (nodes.Count == 0)
+            return false;
+        
+        _contents.AddRange(SetSelfParent(nodes,
+            TestLanguageLanguage.Instance.TestPartition_contents));
+        return true;
+    }
+
+    /// <remarks>Optional Multiple Containment</remarks>
         public TestPartition InsertContents(int index, IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _contents);
@@ -1980,11 +1988,22 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents);
 		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, safeNodes, _contents, index, notificationId);
 		emitter.CollectOldData();
-		_contents.InsertRange(index, SetSelfParent(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents));
+        InsertContentsRaw(index, safeNodes);
 		emitter.Notify();
 		return this;
 	}
 
+    private bool InsertContentsRaw(int index, List<LinkTestConcept> nodes)
+    {
+        if (nodes.Count == 0 || !IsInRange(index, _contents))
+            return false;
+
+        _contents.InsertRange(index,
+            SetSelfParent(nodes, TestLanguageLanguage.Instance.TestPartition_contents));
+
+        return true;
+    }
+    
 	/// <remarks>Optional Multiple Containment</remarks>
         public TestPartition RemoveContents(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
@@ -1992,6 +2011,9 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return this;
 	}
 
+    private bool RemoveContentsRaw(List<LinkTestConcept> nodes) =>
+        RemoveSelfParent(nodes, _contents, TestLanguageLanguage.Instance.TestPartition_contents);
+    
 	private DataTypeTestConcept? _dataType = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "TestPartition-dataType")]
@@ -2010,14 +2032,19 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	{
 		ContainmentSingleNotificationEmitter<DataTypeTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_dataType, this, value, _dataType, notificationId);
 		emitter.CollectOldData();
-		SetParentNull(_dataType);
-		AttachChild(value);
-		_dataType = value;
+		SetDataTypeRaw(value);
 		emitter.Notify();
 		return this;
 	}
 
-	public TestPartition(string id) : base(id)
+    private void SetDataTypeRaw(DataTypeTestConcept? value)
+    {
+        SetParentNull(_dataType);
+        AttachChild(value);
+        _dataType = value;
+    }
+
+    public TestPartition(string id) : base(id)
 	{
 		_notificationProducer = new PartitionNotificationProducer(this);
 	}
@@ -2053,6 +2080,48 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
 		return false;
 	}
+
+    protected internal override bool TryGetPropertyRaw(Feature property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_builtIns.INamed_name.EqualsIdentity(property))
+        {
+            value = _name;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    protected internal override bool TryGetContainmentRaw(Feature containment, out IWritableNode? node)
+    {
+        if (base.TryGetContainmentRaw(containment, out node))
+            return true;
+
+        if (TestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(containment))
+        {
+            node = _dataType;
+            return true;
+        }
+
+        return false;
+    }
+
+    protected internal override bool TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+
+        if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(containment))
+        {
+            nodes = _contents;
+            return true;
+        }
+
+        return false;
+    }
 
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
@@ -2095,6 +2164,39 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return false;
 	}
 
+    protected internal override bool SetPropertyRaw(Feature property, object? value)
+    {
+        if (base.SetPropertyRaw(property, value))
+            return true;
+        
+        if (_builtIns.INamed_name.EqualsIdentity(property))
+        {
+            if (value is null or string)
+            {
+                return SetNameRaw((string?)value);
+            }
+        }
+
+        return false;
+    }
+
+    protected internal override bool SetContainmentRaw(Feature containment, IWritableNode? node)
+    {
+        if (base.SetContainmentRaw(containment, node))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(containment))
+        {
+            if (node is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept)
+            {
+                SetDataTypeRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept?)node);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
@@ -2122,6 +2224,22 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return false;
 	}
 
+    protected internal override bool AddContainmentsRaw(Feature containment, List<IWritableNode> nodes)
+    {
+        if (base.AddContainmentsRaw(containment, nodes))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(containment))
+        {
+            if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
+            {
+                return AddContentsRaw(list);
+            }
+        }
+
+        return false;
+    }
+
 	/// <inheritdoc/>
         protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> value)
 	{
@@ -2136,7 +2254,23 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return false;
 	}
 
-	/// <inheritdoc/>
+    protected internal override bool InsertContainmentsRaw(Feature containment, int index, List<IWritableNode> nodes)
+    {
+        if (base.InsertContainmentsRaw(containment, index, nodes))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(containment))
+        {
+            if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
+            {
+                return InsertContentsRaw(index, list);
+            }
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
         protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> value)
 	{
 		if (base.RemoveInternal(link, value))
@@ -2149,6 +2283,22 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
 		return false;
 	}
+
+    protected internal override bool RemoveContainmentsRaw(Feature containment, List<IWritableNode> nodes)
+    {
+        if (base.RemoveContainmentsRaw(containment, nodes))
+            return true;
+        
+        if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(containment))
+        {
+            if (M2Extensions.TryAsList<LinkTestConcept>(nodes, out var list))
+            {
+                return RemoveContentsRaw(list);
+            }
+        }
+
+        return false;
+    }
 
 	/// <inheritdoc/>
         protected override bool DetachChild(INode child)
