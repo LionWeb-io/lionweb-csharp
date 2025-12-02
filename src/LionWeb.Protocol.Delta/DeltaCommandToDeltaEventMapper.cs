@@ -24,6 +24,10 @@ using Core.Serialization;
 using Message.Command;
 using Message.Event;
 
+/// <summary>
+/// This class is used only in tests, will be moved to tests.
+/// </summary>
+[Obsolete("Not useful in production, will be removed.")]
 public class DeltaCommandToDeltaEventMapper
 {
     private readonly SharedNodeMap _sharedNodeMap;
