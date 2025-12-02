@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Property;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class TwowayTests : TwowayReplicatorTestsBase 
@@ -25,11 +25,11 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void PropertyAdded()
     {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
+        var circle = new LinkTestConcept("c");
+        var node = new TestPartition("a") { Contents =  [circle] };
 
-        var cloneCircle = new Circle("c");
-        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+        var cloneCircle = new LinkTestConcept("c");
+        var clone = new TestPartition("a") { Contents =  [cloneCircle] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -42,16 +42,16 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void PropertyChanged()
     {
-        var docs = new Documentation("c") { Text = "Hello" };
-        var node = new Geometry("a") { Documentation = docs };
+        var docs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
+        var node = new TestPartition("a") { DataType = docs };
 
-        var cloneDocs = new Documentation("c") { Text = "Hello" };
-        var clone = new Geometry("a") { Documentation = cloneDocs };
+        var cloneDocs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
+        var clone = new TestPartition("a") { DataType = cloneDocs };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
-        docs.Text = "Bye";
-        cloneDocs.Text = null;
+        docs.StringValue_0_1 = "Bye";
+        cloneDocs.StringValue_0_1 = null;
 
         AssertEquals([node], [clone]);
     }
@@ -59,16 +59,16 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void PropertyDeleted()
     {
-        var docs = new Documentation("c") { Text = "Hello" };
-        var node = new Geometry("a") { Documentation = docs };
+        var docs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
+        var node = new TestPartition("a") { DataType = docs };
 
-        var cloneDocs = new Documentation("c") { Text = "Hello" };
-        var clone = new Geometry("a") { Documentation = cloneDocs };
+        var cloneDocs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
+        var clone = new TestPartition("a") { DataType = cloneDocs };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
-        docs.Text = null;
-        cloneDocs.Text = "Bye";
+        docs.StringValue_0_1 = null;
+        cloneDocs.StringValue_0_1 = "Bye";
 
         AssertEquals([node], [clone]);
     }

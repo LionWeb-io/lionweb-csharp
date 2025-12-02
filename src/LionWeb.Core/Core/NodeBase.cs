@@ -185,7 +185,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     bool IWritableNodeRaw.SetPropertyRaw(Feature property, object? value) => 
-        SetPropertyRaw(property, property);
+        SetPropertyRaw(property, value);
 
     protected internal virtual bool SetPropertyRaw(Feature property, object? value) =>
         false;

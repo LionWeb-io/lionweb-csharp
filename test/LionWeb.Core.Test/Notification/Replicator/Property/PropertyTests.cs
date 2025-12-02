@@ -1,8 +1,8 @@
 ﻿namespace LionWeb.Core.Test.Notification.Replicator;
 
+using Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Notification;
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
 public class PropertyTests : ReplicatorTestsBase
@@ -10,8 +10,8 @@ public class PropertyTests : ReplicatorTestsBase
     [TestMethod]
     public void PropertyAdded()
     {
-        var circle = new Circle("c");
-        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var circle = new LinkTestConcept("c");
+        var originalPartition = new TestPartition("a") { Contents =  [circle] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -24,8 +24,8 @@ public class PropertyTests : ReplicatorTestsBase
     [TestMethod]
     public void PropertyChanged()
     {
-        var circle = new Circle("c") { Name = "Hello" };
-        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var circle = new LinkTestConcept("c") { Name = "Hello" };
+        var originalPartition = new TestPartition("a") { Contents =  [circle] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -38,13 +38,13 @@ public class PropertyTests : ReplicatorTestsBase
     [TestMethod]
     public void PropertyDeleted()
     {
-        var docs = new Documentation("c") { Text = "Hello" };
-        var originalPartition = new Geometry("a") { Documentation = docs };
+        var docs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
+        var originalPartition = new TestPartition("a") { DataType = docs };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        docs.Text = null;
+        docs.StringValue_0_1 = null;
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -61,22 +61,18 @@ public class PropertyTests : ReplicatorTestsBase
     public void PropertyDeleted_required_single_containment()
     {
         const int x = 1;
-        var coord = new Coord("coord")
+        var coord = new DataTypeTestConcept("coord")
         {
-            X = x, Y = 2, Z = 3
+            IntegerValue_1 = x
         };
-        var circle = new Circle("circle")
+        var originalPartition = new TestPartition("a")
         {
-            Center = coord
-        };
-        var originalPartition = new Geometry("a")
-        {
-            Shapes = [circle]
+            DataType =  coord
         };
         
         var clonedPartition = ClonePartition(originalPartition);
 
-        var notification = new PropertyDeletedNotification(coord, ShapesLanguage.Instance.Coord_x, x, 
+        var notification = new PropertyDeletedNotification(coord, TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, x, 
             new NumericNotificationId("propertyDeletedNotification", 0));
 
         Assert.ThrowsExactly<InvalidValueException>(() =>
