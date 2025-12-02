@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator;
 
+using Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using NotificationId = string;
 
 [TestClass]
@@ -31,11 +31,11 @@ public class MultiPartitionTests : ReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainment_Multiple_SamePartition()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var node = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var node = new TestPartition("a") { Contents =  [origin] };
 
-        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("origin") { Containment_1_n = [new LinkTestConcept("moved")] }] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -45,7 +45,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.AddShapes([moved]);
+        node.AddContents([moved]);
 
         AssertEquals([node], [clone]);
         Assert.IsFalse(deletions.Any());
@@ -60,13 +60,13 @@ public class MultiPartitionTests : ReplicatorTestsBase
         // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var originPartition = new Geometry("g") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var originPartition = new TestPartition("g") { Contents =  [origin] };
 
-        var node = new Geometry("a") { Shapes = [] };
+        var node = new TestPartition("a") { Contents =  [] };
 
-        var clone = new Geometry("a") { Shapes = [] };
+        var clone = new TestPartition("a") { Contents =  [] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -77,7 +77,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.AddShapes([moved]);
+        node.AddContents([moved]);
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -93,13 +93,13 @@ public class MultiPartitionTests : ReplicatorTestsBase
         // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.
 
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var originPartition = new Geometry("g") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var originPartition = new TestPartition("g") { Contents =  [origin] };
 
-        var node = new Geometry("a") { Shapes = [] };
+        var node = new TestPartition("a") { Contents =  [] };
 
-        var clone = new Geometry("a") { Shapes = [] };
+        var clone = new TestPartition("a") { Contents =  [] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -110,7 +110,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.InsertShapes(0, [moved]);
+        node.InsertContents(0, [moved]);
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -121,10 +121,10 @@ public class MultiPartitionTests : ReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainment_Single_SamePartition()
     {
-        var moved = new Documentation("moved");
-        var node = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+        var moved = new LinkTestConcept("moved");
+        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_1 = moved }, new LinkTestConcept("ll")] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
+        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_1 = new LinkTestConcept("moved") }, new LinkTestConcept("ll")] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -134,7 +134,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.Documentation = moved;
+        node.Contents[1].Containment_0_1 = moved;
 
         AssertEquals([node], [clone]);
         Assert.IsFalse(deletions.Any());
@@ -149,12 +149,12 @@ public class MultiPartitionTests : ReplicatorTestsBase
         // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
-        var moved = new Documentation("moved");
-        var originPartition = new Geometry("g") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+        var moved = new LinkTestConcept("moved");
+        var originPartition = new TestPartition("g") { Contents =  [new LinkTestConcept("l") { Containment_1 = moved }] };
 
-        var node = new Geometry("a") { };
+        var node = new TestPartition("a") {Contents = [new LinkTestConcept("b")]};
 
-        var clone = new Geometry("a") { };
+        var clone = new TestPartition("a") {Contents = [new LinkTestConcept("b")] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -165,7 +165,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.Documentation = moved;
+        node.Contents[0].Containment_0_1 = moved;
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -184,14 +184,14 @@ public class MultiPartitionTests : ReplicatorTestsBase
     [TestMethod]
     public void AnnotationMovedFromOtherParent_Multiple_SamePartition()
     {
-        var moved = new BillOfMaterials("moved");
-        var origin = new CompositeShape("origin");
+        var moved = new TestAnnotation("moved");
+        var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var node = new Geometry("a") { Shapes = [origin] };
+        var node = new TestPartition("a") { Contents =  [origin] };
 
-        var cloneOrigin = new CompositeShape("origin");
-        cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
-        var clone = new Geometry("a") { Shapes = [cloneOrigin] };
+        var cloneOrigin = new LinkTestConcept("origin");
+        cloneOrigin.AddAnnotations([new TestAnnotation("moved")]);
+        var clone = new TestPartition("a") { Contents =  [cloneOrigin] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -217,14 +217,14 @@ public class MultiPartitionTests : ReplicatorTestsBase
         // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
-        var moved = new BillOfMaterials("moved");
-        var origin = new CompositeShape("origin");
+        var moved = new TestAnnotation("moved");
+        var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var originPartition = new Geometry("g") { Shapes = [origin] };
+        var originPartition = new TestPartition("g") { Contents =  [origin] };
 
-        var node = new Geometry("a") { };
+        var node = new TestPartition("a") { };
 
-        var clone = new Geometry("a") { };
+        var clone = new TestPartition("a") { };
 
         CreatePartitionReplicator(clone, node);
 
@@ -252,14 +252,14 @@ public class MultiPartitionTests : ReplicatorTestsBase
         // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
-        var moved = new BillOfMaterials("moved");
-        var origin = new CompositeShape("origin");
+        var moved = new TestAnnotation("moved");
+        var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var originPartition = new Geometry("g") { Shapes = [origin] };
+        var originPartition = new TestPartition("g") { Contents =  [origin] };
 
-        var node = new Geometry("a") { };
+        var node = new TestPartition("a") { };
 
-        var clone = new Geometry("a") { };
+        var clone = new TestPartition("a") { };
 
         CreatePartitionReplicator(clone, node);
 

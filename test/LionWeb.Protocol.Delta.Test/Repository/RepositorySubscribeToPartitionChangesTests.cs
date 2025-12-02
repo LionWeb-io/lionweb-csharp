@@ -17,7 +17,7 @@
 
 namespace LionWeb.Protocol.Delta.Test.Repository;
 
-using Core.Test.Languages.Generated.V2023_1.TestLanguage;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SubscribeToPartitionContentsTests : RepositoryTestNoExceptionsBase

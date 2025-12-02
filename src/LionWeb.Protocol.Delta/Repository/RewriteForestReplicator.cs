@@ -59,7 +59,7 @@ internal class RewriteRemoteReplicator(
     IdFilteringNotificationFilter filter,
     IdReplacingNotificationFilter replacingFilter,
     object? sender
-) : RemoteReplicator(localForest, filter, sender)
+) : RemoteReplicatorRaw((IForestRaw?)localForest, filter, sender)
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(null);
 
