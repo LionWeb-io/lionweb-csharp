@@ -117,16 +117,17 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
         var moved = new LinkTestConcept("moved");
         var replaced = new LinkTestConcept("replaced");
         var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
-        var originalPartition = new LinkTestConcept("a")
+        var originalParent = new LinkTestConcept("a")
         {
             Containment_0_n = [moved],
             Containment_1_n = [replaced, nodeWithAnotherId]
         };
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
         var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 
-            0, moved, originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, nodeWithAnotherId, 
+            0, moved, originalParent, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, nodeWithAnotherId, 
             new NumericNotificationId("childMovedAndReplacedFromOtherContainmentInSameParentNotification", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

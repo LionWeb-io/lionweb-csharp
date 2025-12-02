@@ -29,7 +29,7 @@ public class SubscribeToPartitionContentsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        var part = new LinkTestConcept("part");
+        var part = new TestPartition("part");
         _aForest.AddPartitions([part]);
 
         Assert.HasCount(0, _bForest.Partitions);
@@ -42,7 +42,7 @@ public class SubscribeToPartitionContentsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        var part = new LinkTestConcept("part");
+        var part = new TestPartition("part");
 
         _aForest.AddPartitions([part]);
 
@@ -60,14 +60,14 @@ public class SubscribeToPartitionContentsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        var aPart = new LinkTestConcept("part");
+        var aPart = new TestPartition("part");
         _aForest.AddPartitions([aPart]);
 
         var actual = await _bClient.SubscribeToPartitionContents("part");
         await _aClient.UnsubscribeFromPartitionContents("part");
 
         Assert.HasCount(1, _bForest.Partitions);
-        var bPart = (LinkTestConcept)_bForest.Partitions.First();
+        var bPart = (TestPartition)_bForest.Partitions.First();
         bPart.Name = "my name";
 
         Assert.IsFalse(aPart.TryGetName(out _));

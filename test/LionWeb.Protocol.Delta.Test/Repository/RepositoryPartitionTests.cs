@@ -44,7 +44,7 @@ public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        _aForest.AddPartitions([new Geometry("partitionA"), new LinkTestConcept("partitionB")]);
+        _aForest.AddPartitions([new Geometry("partitionA"), new TestPartition("partitionB")]);
         await _bClient.SubscribeToPartitionContents("partitionA");
         await _bClient.SubscribeToPartitionContents("partitionB");
         WaitForReceived(2);
@@ -64,12 +64,12 @@ public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
         _aForest.AddPartitions([new Geometry("geo")]);
         WaitForReceived(1);
         
-        var bLink = new LinkTestConcept("link");
+        var bLink = new TestPartition("link");
         _bForest.AddPartitions([bLink]);
         await _aClient.SubscribeToPartitionContents("link");
         WaitForReceived(1);
 
-        var aLink = (LinkTestConcept)_aForest.Partitions.Last();
+        var aLink = (TestPartition)_aForest.Partitions.Last();
         _aForest.RemovePartitions([aLink]);
         WaitForReceived(1);
 

@@ -45,7 +45,7 @@ public class PartitionTests
     public void Parent_Parent()
     {
         var node = new LinkTestConcept("p");
-        var partition = new LinkTestConcept("parent") { Containment_0_1 = node };
+        var partition = new TestPartition("parent") { Contents = [node] };
 
         Assert.AreSame(partition, node.GetPartition());
     }
@@ -73,7 +73,7 @@ public class PartitionTests
     {
         var node = new LinkTestConcept("p");
         var partition =
-            new LinkTestConcept("parent") { Containment_0_1 = new LinkTestConcept("middle") { Containment_1 = node } };
+            new TestPartition("parent") { Contents = [new LinkTestConcept("middle") { Containment_1 = node }] };
 
         Assert.AreSame(partition, node.GetPartition());
     }

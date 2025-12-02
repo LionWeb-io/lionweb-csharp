@@ -37,13 +37,14 @@ public class UnresolvedReferenceSerializationTests
             Reference_0_1 = new LinkTestConcept("ref0"),
             Reference_0_n = [new LinkTestConcept("ref0"), new LinkTestConcept("refN1")]
         };
+        var inputPartition = new TestPartition("partition") { Contents = [input] };
 
         var serializer = new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
             .Build();
 
         var stream = new MemoryStream();
-        JsonUtils.WriteNodesToStream(stream, serializer, [input]);
+        JsonUtils.WriteNodesToStream(stream, serializer, [inputPartition, input]);
 
         var unresolvedReferencesManager = new UnresolvedReferencesManager();
         
@@ -58,12 +59,13 @@ public class UnresolvedReferenceSerializationTests
 
         Assert.HasCount(1, nodes);
 
-        var deserialized = nodes.OfType<LinkTestConcept>().Single();
+        var deserializedPartition = nodes.OfType<TestPartition>().Single();
+        var deserialized = (LinkTestConcept)deserializedPartition.Contents.Single();
 
         Assert.Throws<UnresolvedReferenceException>(() => deserialized.Reference_0_1);
         Assert.Throws<UnresolvedReferenceException>(() => deserialized.Reference_0_n);
 
-        deserialized.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
+        deserializedPartition.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
 
         var newRef0 = new LinkTestConcept("ref0");
         deserialized.Containment_0_1 = newRef0;
@@ -84,13 +86,14 @@ public class UnresolvedReferenceSerializationTests
             Reference_0_1 = new NullableReferencesTestLang.LinkTestConcept("ref0"),
             Reference_0_n = [new NullableReferencesTestLang.LinkTestConcept("ref0"), new NullableReferencesTestLang.LinkTestConcept("refN1")]
         };
+        var inputPartition = new NullableReferencesTestLang.TestPartition("partition") { Contents = [input] };
 
         var serializer = new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
             .Build();
 
         var stream = new MemoryStream();
-        JsonUtils.WriteNodesToStream(stream, serializer, [input]);
+        JsonUtils.WriteNodesToStream(stream, serializer, [inputPartition, input]);
 
         var unresolvedReferencesManager = new UnresolvedReferencesManager();
         
@@ -105,7 +108,8 @@ public class UnresolvedReferenceSerializationTests
 
         Assert.HasCount(1, nodes);
 
-        var deserialized = nodes.OfType<NullableReferencesTestLang.LinkTestConcept>().Single();
+        var deserializedPartition = nodes.OfType<NullableReferencesTestLang.TestPartition>().Single();
+        var deserialized = (NullableReferencesTestLang.LinkTestConcept)deserializedPartition.Contents.Single();
 
         Assert.IsNull(deserialized.Reference_0_1);
         foreach (var target in deserialized.Reference_0_n)
@@ -113,7 +117,7 @@ public class UnresolvedReferenceSerializationTests
             Assert.IsNull(target);
         }
 
-        deserialized.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
+        deserializedPartition.GetNotificationSender()!.ConnectTo(unresolvedReferencesManager);
 
         var newRef0 = new NullableReferencesTestLang.LinkTestConcept("ref0");
         deserialized.Containment_0_1 = newRef0;

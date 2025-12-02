@@ -79,9 +79,10 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         
         var containment01 = new LinkTestConcept("cont");
-        var part0 = new LinkTestConcept("partition")
+        var part0 = new TestPartition("partition")
         {
-            Name = "my partition", Containment_0_1 = containment01, Reference_0_1 = containment01
+            Name = "my partition", 
+            Contents = [containment01]
         };
         part0.AddAnnotations([new TestAnnotation("ann")]);
         _aForest.AddPartitions([part0]);
@@ -89,12 +90,11 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
 
         var partitions = await _aClient.ListPartitions();
         Assert.HasCount(1, partitions);
-        var actual = (LinkTestConcept)partitions[0];
+        var actual = (TestPartition)partitions[0];
 
         Assert.AreEqual(part0.GetId(), actual.GetId());
         Assert.AreEqual(part0.GetConcept(), actual.GetConcept());
         Assert.AreEqual(part0.Name, actual.Name);
-        Assert.IsNull(actual.Containment_0_1);
-        Assert.IsNull(actual.Reference_0_1);
+        Assert.IsEmpty(actual.Contents);
     }
 }

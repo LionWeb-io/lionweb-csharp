@@ -45,7 +45,7 @@ public class RepositoryGetAvailableIdsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
 
         var usedNodeId = "repoProvidedId-6";
-        _aForest.AddPartitions([new LinkTestConcept(usedNodeId)]);
+        _aForest.AddPartitions([new TestPartition(usedNodeId)]);
 
         var availableIdsResponse = await _aClient.GetAvailableIds(11);
 

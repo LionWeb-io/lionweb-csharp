@@ -27,7 +27,7 @@ public class RepositorySignOnTests : RepositoryTestsBase
     [Timeout(6000)]
     public void NoSignOn()
     {
-        _aForest.AddPartitions([new LinkTestConcept("part")]);
+        _aForest.AddPartitions([new TestPartition("part")]);
 
         Assert.AreEqual(0, _aClient.MessageCount);
         Assert.HasCount(0, _bForest.Partitions);
@@ -42,7 +42,7 @@ public class RepositorySignOnTests : RepositoryTestsBase
     {
         _aClient.ParticipationId = "xxx";
 
-        _aForest.AddPartitions([new LinkTestConcept("part")]);
+        _aForest.AddPartitions([new TestPartition("part")]);
         _aClient.WaitForReceived(1);
 
         Assert.AreEqual(1, _aClient.MessageCount);
@@ -90,22 +90,22 @@ public class RepositorySignOnTests : RepositoryTestsBase
         
         var participationId = _aClient.ParticipationId;
 
-        _aForest.AddPartitions([new LinkTestConcept("part")]);
+        _aForest.AddPartitions([new TestPartition("part")]);
         WaitForReceived(1);
         
         await _aClient.SignOff();
 
-        var onlyA = new LinkTestConcept("onlyA");
+        var onlyA = new TestPartition("onlyA");
         _aForest.AddPartitions([onlyA]);
         _aForest.RemovePartitions([onlyA]);
         
         Assert.HasCount(2, _aClient.Exceptions);
         
-        _bForest.AddPartitions([new LinkTestConcept("onlyB")]);
+        _bForest.AddPartitions([new TestPartition("onlyB")]);
         _bClient.WaitForReceived(1);
         
         await _aClient.Reconnect(participationId);
-        _aForest.AddPartitions([new LinkTestConcept("p2")]);
+        _aForest.AddPartitions([new TestPartition("p2")]);
         WaitForReceived(1);
         
         Assert.HasCount(2, _aForest.Partitions);
@@ -124,8 +124,8 @@ public class RepositorySignOnTests : RepositoryTestsBase
         
         var participationId = _aClient.ParticipationId;
 
-        _aForest.AddPartitions([new LinkTestConcept("part0")]);
-        _aForest.AddPartitions([new LinkTestConcept("part1")]);
+        _aForest.AddPartitions([new TestPartition("part0")]);
+        _aForest.AddPartitions([new TestPartition("part1")]);
         _aClient.WaitForReceived(2);
         
         await _aClient.SignOff();
