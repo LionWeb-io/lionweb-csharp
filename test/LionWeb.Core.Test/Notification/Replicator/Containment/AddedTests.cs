@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class AddedTests : ReplicatorTestsBase
@@ -26,21 +26,21 @@ public class AddedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only()
     {
-        var originalPartition = new Geometry("a");
+        var originalPartition = new TestPartition("a");
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
         
         CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
 
-        var added = new Circle("added");
+        var added = new LinkTestConcept("added");
         
         Assert.IsFalse(sharedNodeMap.ContainsKey(added.GetId()));
 
-        originalPartition.AddShapes([added]);
+        originalPartition.AddContents([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0]);
         
         Assert.IsTrue(sharedNodeMap.ContainsKey(added.GetId()));
     }
@@ -48,126 +48,127 @@ public class AddedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_adds_one_node_using_generic_api()
     {
-        var originalPartition = new Geometry("a");
+        var originalPartition = new TestPartition("a");
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new Circle("added");
-        originalPartition.Add(ShapesLanguage.Instance.Geometry_shapes, [added]);
+        var added = new LinkTestConcept("added");
+        originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_contents, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0]);
     }
 
     [TestMethod]
     public void Multiple_adds_multiple_nodes_using_generic_api()
     {
-        var originalPartition = new Geometry("a");
+        var originalPartition = new TestPartition("a");
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added1 = new Circle("added1");
-        var added2 = new Circle("added2");
-        originalPartition.Add(ShapesLanguage.Instance.Geometry_shapes, [added1, added2]);
+        var added1 = new LinkTestConcept("added1");
+        var added2 = new LinkTestConcept("added2");
+        originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_contents, [added1, added2]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added2, clonedPartition.Shapes[0]);
+        Assert.AreNotSame(added2, clonedPartition.Contents[0]);
     }
 
     [TestMethod]
     public void Multiple_sets_one_node_using_set()
     {
-        var originalPartition = new Geometry("a");
+        var originalPartition = new TestPartition("a");
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new Circle("added");
-        var values = new IShape[] { added };
+        var added = new LinkTestConcept("added");
+        var values = new LinkTestConcept[] { added };
 
-        originalPartition.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_contents, values);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0]);
     }
 
     [TestMethod]
     public void Multiple_sets_multiple_nodes_using_set()
     {
-        var originalPartition = new Geometry("a");
+        var originalPartition = new TestPartition("a");
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added1 = new Circle("added1");
-        var added2 = new Circle("added2");
-        var values = new IShape[] { added1, added2 };
+        var added1 = new LinkTestConcept("added1");
+        var added2 = new LinkTestConcept("added2");
+        var values = new LinkTestConcept[] { added1, added2 };
 
-        originalPartition.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_contents, values);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added2, clonedPartition.Shapes[0]);
+        Assert.AreNotSame(added2, clonedPartition.Contents[0]);
     }
 
     [TestMethod]
     public void Multiple_First()
     {
-        var originalPartition = new Geometry("a") { Shapes = [new Line("l")] };
+        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new Circle("added");
-        originalPartition.InsertShapes(0, [added]);
+        var added = new LinkTestConcept("added");
+        originalPartition.InsertContents(0, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0]);
     }
 
     [TestMethod]
     public void Multiple_Last()
     {
-        var originalPartition = new Geometry("a") { Shapes = [new Line("l")] };
+        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new Circle("added");
-        originalPartition.InsertShapes(1, [added]);
+        var added = new LinkTestConcept("added");
+        originalPartition.InsertContents(1, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Shapes[1]);
+        Assert.AreNotSame(added, clonedPartition.Contents[1]);
     }
 
     [TestMethod]
     public void Single()
     {
-        var originalPartition = new Geometry("a");
+        var parent = new LinkTestConcept("parent");
+        var originalPartition = new TestPartition("a") {Contents = [parent]};
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new Documentation("added");
-        originalPartition.Documentation = added;
+        var added = new LinkTestConcept("added");
+        parent.Containment_0_1 = added;
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Documentation);
+        Assert.AreNotSame(added, clonedPartition.Contents[0].Containment_0_1);
     }
 
     [TestMethod]
     public void Deep()
     {
-        var originalPartition = new Geometry("a");
+        var originalPartition = new TestPartition("a");
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
-        originalPartition.AddShapes([added]);
+        var added = new LinkTestConcept("added") { Containment_1 = new LinkTestConcept("coord") { Name = "1" } };
+        originalPartition.AddContents([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0]);
     }
 }
