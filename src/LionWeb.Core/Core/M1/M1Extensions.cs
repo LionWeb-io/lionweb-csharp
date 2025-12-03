@@ -39,15 +39,10 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert before a node with no parent");
 
         Containment containment = parent.GetContainmentOf(self)!;
-        if (!containment.Multiple)
+        if (!parent.TryGetContainmentsRaw(containment, out var nodes))
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var value = parent.Get(containment);
-        if (value is not IEnumerable)
-            // should not happen
-            throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
-
-        var siblings = containment.AsNodes<INode>(value).ToList();
+        var siblings = nodes.ToList();
         var index = siblings.IndexOf(self);
         if (index < 0)
             // should not happen
@@ -79,15 +74,10 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert after a node with no parent");
 
         Containment containment = parent.GetContainmentOf(self)!;
-        if (!containment.Multiple)
-            throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
+        if (!parent.TryGetContainmentsRaw(containment, out var nodes))
+            throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var value = parent.Get(containment);
-        if (value is not IEnumerable)
-            // should not happen
-            throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
-
-        var siblings = containment.AsNodes<INode>(value).ToList();
+        var siblings = nodes.ToList();
         var index = siblings.IndexOf(self);
         if (index < 0)
             // should not happen
@@ -402,15 +392,10 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot get siblings of a node with no parent");
 
         Containment containment = parent.GetContainmentOf(self)!;
-        if (!containment.Multiple)
-            throw new TreeShapeException(self, "A single containment does not have siblings");
+        if (!parent.TryGetContainmentsRaw(containment, out var nodes))
+            throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
-            // should not happen
-            throw new TreeShapeException(self, "A single containment does not have siblings");
-
-        return [..containment.AsNodes<INode>(enumerable)];
+        return nodes.Cast<INode>().ToList();
     }
 
     private static Index GetIndexOf<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
