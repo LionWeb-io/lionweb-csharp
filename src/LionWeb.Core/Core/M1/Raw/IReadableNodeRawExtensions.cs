@@ -22,7 +22,7 @@ using M3;
 public static class IReadableNodeRawExtensions
 {
     /// <inheritdoc cref="IReadableNodeRaw.GetAnnotationsRaw"/>
-    public static List<IAnnotationInstance> GetAnnotationsRaw(this IReadableNodeRaw self) =>
+    public static IReadOnlyList<IAnnotationInstance> GetAnnotationsRaw(this IReadableNodeRaw self) =>
         self.GetAnnotationsRaw();
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetPropertyRaw"/>
@@ -35,7 +35,7 @@ public static class IReadableNodeRawExtensions
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentsRaw"/>
     public static bool TryGetContainmentsRaw(this IReadableNodeRaw self, Feature containment,
-        out IEnumerable<IWritableNode> nodes) => self.TryGetContainmentsRaw(containment, out nodes);
+        out IReadOnlyList<IWritableNode> nodes) => self.TryGetContainmentsRaw(containment, out nodes);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetReferenceRaw"/>
     public static bool TryGetReferenceRaw(this IReadableNodeRaw self, Feature reference, out IReferenceTarget? target) =>
@@ -43,5 +43,5 @@ public static class IReadableNodeRawExtensions
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetReferencesRaw"/>
     public static bool TryGetReferencesRaw(this IReadableNodeRaw self, Feature reference,
-        out IEnumerable<IReferenceTarget> targets) => self.TryGetReferencesRaw(reference, out targets);
+        out IReadOnlyList<IReferenceTarget> targets) => self.TryGetReferencesRaw(reference, out targets);
 }

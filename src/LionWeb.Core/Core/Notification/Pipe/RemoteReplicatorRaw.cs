@@ -507,7 +507,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
         switch (containment.Multiple)
         {
             case true when localParent.TryGetContainmentsRaw(containment, out var nodes):
-                CheckMatchingNodeId(messagePrefix, notification, candidate, nodes.ToList(), index, messageSuffix);
+                CheckMatchingNodeId(messagePrefix, notification, candidate, nodes, index, messageSuffix);
                 break;
 
             case false

@@ -104,7 +104,7 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
                     // should not happen
                     throw new TreeShapeException(self, "Node not contained in its parent");
 
-                oldIndex = oldNodes.ToList().IndexOf(replacement);
+                oldIndex = oldNodes.IndexOf(replacement);
                 if (oldIndex < 0)
                     // should not happen
                     throw new TreeShapeException(self, "Node not contained in its parent");
@@ -212,11 +212,10 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
 
     private Index ReplaceMultipleContainment()
     {
-        if (!_parent.TryGetContainmentsRaw(_containment, out var children))
+        if (!_parent.TryGetContainmentsRaw(_containment, out var nodes))
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
 
-        var nodes = children.ToList();
         var index = nodes.IndexOf(self);
         if (index < 0)
             // should not happen

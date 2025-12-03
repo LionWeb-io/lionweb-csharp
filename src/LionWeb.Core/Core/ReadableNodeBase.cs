@@ -87,8 +87,8 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     #region ReadableRaw
 
     /// <inheritdoc/>
-    public List<IAnnotationInstance> GetAnnotationsRaw() =>
-        _annotations.Cast<IAnnotationInstance>().ToList();
+    public IReadOnlyList<IAnnotationInstance> GetAnnotationsRaw() =>
+        _annotations.Cast<IAnnotationInstance>().ToImmutableList();
     
     /// <inheritdoc/>
     bool IReadableNodeRaw.TryGetPropertyRaw(Feature property, out object? value) => 
@@ -113,11 +113,11 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     }
 
     /// <inheritdoc />
-    bool IReadableNodeRaw.TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes) =>
+    bool IReadableNodeRaw.TryGetContainmentsRaw(Feature containment, out IReadOnlyList<IWritableNode> nodes) =>
         TryGetContainmentsRaw(containment, out nodes);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentsRaw"/>
-    protected internal virtual bool TryGetContainmentsRaw(Feature containment, out IEnumerable<IWritableNode> nodes)
+    protected internal virtual bool TryGetContainmentsRaw(Feature containment, out IReadOnlyList<IWritableNode> nodes)
     {
         nodes = [];
         return false;
@@ -135,11 +135,11 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     }
 
     /// <inheritdoc />
-    bool IReadableNodeRaw.TryGetReferencesRaw(Feature reference, out IEnumerable<IReferenceTarget> targets) =>
+    bool IReadableNodeRaw.TryGetReferencesRaw(Feature reference, out IReadOnlyList<IReferenceTarget> targets) =>
         TryGetReferencesRaw(reference, out targets);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetReferencesRaw"/>
-    protected internal virtual bool TryGetReferencesRaw(Feature reference, out IEnumerable<IReferenceTarget> targets)
+    protected internal virtual bool TryGetReferencesRaw(Feature reference, out IReadOnlyList<IReferenceTarget> targets)
     {
         targets = [];
         return false;

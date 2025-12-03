@@ -88,7 +88,7 @@ public class SingleTests
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
-        CollectionAssert.AreEqual(new List<INode> { annotation, otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { annotation, otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public class SingleTests
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotation, annotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { otherAnnotation, annotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -118,7 +118,7 @@ public class SingleTests
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
-        CollectionAssert.AreEqual(new List<INode> { annotation, otherAnnotationA, otherAnnotationB }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { annotation, otherAnnotationA, otherAnnotationB }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -134,7 +134,7 @@ public class SingleTests
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotationA, annotation, otherAnnotationB }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { otherAnnotationA, annotation, otherAnnotationB }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -150,7 +150,7 @@ public class SingleTests
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotationA, otherAnnotationB, annotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { otherAnnotationA, otherAnnotationB, annotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     #endregion
@@ -177,7 +177,7 @@ public class SingleTests
         Assert.IsFalse(parent.RemoveAnnotationsRaw([annotation]));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -188,7 +188,7 @@ public class SingleTests
         Assert.IsTrue(parent.AddAnnotationsRaw([annotation]));
         Assert.IsTrue(parent.RemoveAnnotationsRaw([annotation]));
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -201,7 +201,7 @@ public class SingleTests
         Assert.IsTrue(parent.RemoveAnnotationsRaw([annotation]));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -214,7 +214,7 @@ public class SingleTests
         Assert.IsTrue(parent.RemoveAnnotationsRaw([annotation]));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     [TestMethod]
@@ -229,7 +229,7 @@ public class SingleTests
         Assert.AreSame(parent, otherAnnotationA.GetParent());
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.IsNull(annotation.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { otherAnnotationA, otherAnnotationB }, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
+        CollectionAssert.AreEqual(new List<INode> { otherAnnotationA, otherAnnotationB }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
 
     #endregion
