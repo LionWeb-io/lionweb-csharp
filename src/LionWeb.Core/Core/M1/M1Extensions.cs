@@ -57,7 +57,7 @@ public static class M1Extensions
             if (predecessorIndex < index)
                 index--;
         }
-        
+
         parent.Insert(containment, index, [newPredecessor]);
     }
 
@@ -133,78 +133,9 @@ public static class M1Extensions
         return list.Skip(skipCount);
     }
 
-    /// <summary>
-    /// Replaces <paramref name="self"/> in its parent with <paramref name="replacement"/>.
-    ///
-    /// Does <i>not</i> change references to <paramref name="self"/>.
-    /// </summary>
-    /// <param name="self">Base node, must have a parent.</param>
-    /// <param name="replacement">Node that will replace <paramref name="self"/> in <paramref name="self"/>'s parent.</param>
-    /// <typeparam name="T">Type of <paramref name="replacement"/>.</typeparam>
-    /// <returns><paramref name="replacement"/></returns>
-    /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
-    public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
-    {
-        if (ReferenceEquals(self, replacement))
-            return replacement;
-
-        INode? parent = self.GetParent();
-        if (parent == null)
-            throw new TreeShapeException(self, "Cannot replace a node with no parent");
-
-        if (replacement is null)
-            throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
-
-        Containment? containment = parent.GetContainmentOf(self);
-
-        if (containment == null)
-        {
-            var index = parent.GetAnnotations().ToList().IndexOf(self);
-            if (index < 0)
-                // should not happen
-                throw new TreeShapeException(self, "Node not contained in its parent");
-            parent.InsertAnnotations(index, [replacement]);
-            parent.RemoveAnnotations([self]);
-            return replacement;
-        }
-
-        if (containment.Multiple)
-        {
-            var value = parent.Get(containment);
-            if (value is not IEnumerable)
-                // should not happen
-                throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
-
-            var nodes = M2Extensions.AsNodes<INode>(value, containment).ToList();
-            var index = nodes.IndexOf(self);
-            if (index < 0)
-                // should not happen
-                throw new TreeShapeException(self, "Node not contained in its parent");
-
-            var replacementParent = replacement.GetParent();
-            var replacementContainment = replacementParent?.GetContainmentOf(replacement);
-
-            if (containment.Equals(replacementContainment))
-            {
-                var replacementIndex = nodes.IndexOf(replacement);
-                nodes.Insert(index, replacement);
-                nodes.RemoveAt(index + 1);
-                nodes.RemoveAt(index < replacementIndex ? nodes.LastIndexOf(replacement) : nodes.IndexOf(replacement));
-            } else
-            {
-                nodes.Insert(index, replacement);
-                nodes.Remove(self);
-            }
-
-            parent.Insert(containment, index, [replacement]);
-            parent.Remove(containment, [self]);
-        } else
-        {
-            parent.Set(containment, replacement);
-        }
-
-        return replacement;
-    }
+    /// <inheritdoc cref="NodeReplacer{T}" />
+    public static T ReplaceWith<T>(this INode self, T replacement) where T : INode =>
+        new NodeReplacer<T>(self, replacement).Replace();
 
     #region Descendants
 
