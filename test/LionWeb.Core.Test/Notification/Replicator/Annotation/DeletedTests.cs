@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Annotation;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class DeletedTests : ReplicatorTestsBase
@@ -27,9 +27,10 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only()
     {
-        var deleted = new BillOfMaterials("deleted");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([deleted]);
+        var deleted = new TestAnnotation("deleted");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        originalParent.AddAnnotations([deleted]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -39,7 +40,7 @@ public class DeletedTests : ReplicatorTestsBase
 
         Assert.IsTrue(sharedNodeMap.ContainsKey(deleted.GetId()));
 
-        originalPartition.RemoveAnnotations([deleted]);
+        originalParent.RemoveAnnotations([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
 
@@ -49,14 +50,15 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_First()
     {
-        var deleted = new BillOfMaterials("deleted");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([deleted, new BillOfMaterials("bof")]);
+        var deleted = new TestAnnotation("deleted");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        originalParent.AddAnnotations([deleted, new TestAnnotation("bof")]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.RemoveAnnotations([deleted]);
+        originalParent.RemoveAnnotations([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -64,14 +66,15 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Last()
     {
-        var deleted = new BillOfMaterials("deleted");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), deleted]);
+        var deleted = new TestAnnotation("deleted");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("bof"), deleted]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.RemoveAnnotations([deleted]);
+        originalParent.RemoveAnnotations([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -79,14 +82,15 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_not_matching_node_ids()
     {
-        var deleted = new BillOfMaterials("deleted");
-        var nodeWithAnotherId = new BillOfMaterials("node-with-another-id");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), deleted, nodeWithAnotherId]);
+        var deleted = new TestAnnotation("deleted");
+        var nodeWithAnotherId = new TestAnnotation("node-with-another-id");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("bof"), deleted, nodeWithAnotherId]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
-        var notification = new AnnotationDeletedNotification(nodeWithAnotherId, originalPartition, 1,
+        var notification = new AnnotationDeletedNotification(nodeWithAnotherId, originalParent, 1,
             new NumericNotificationId("annotationDeletedNotification", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
@@ -102,9 +106,9 @@ public class DeletedTests : ReplicatorTestsBase
     [TestMethod]
     public void uses_detach_from_parent()
     {
-        var deleted = new BillOfMaterials("deleted");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), deleted]);
+        var deleted = new TestAnnotation("deleted");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([new TestAnnotation("bof"), deleted]);
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);

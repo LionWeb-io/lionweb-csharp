@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Annotation;
 
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class MovedFromOtherParentTests : ReplicatorTestsBase
@@ -25,10 +25,10 @@ public class MovedFromOtherParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple()
     {
-        var moved = new BillOfMaterials("moved");
-        var origin = new CompositeShape("origin");
+        var moved = new TestAnnotation("moved");
+        var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var originalPartition = new TestPartition("a") { Contents = [origin] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);

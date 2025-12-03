@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.Notification.Replicator.Annotation;
 
 using Core.Notification;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class AddedTests : ReplicatorTestsBase
@@ -26,21 +26,22 @@ public class AddedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only()
     {
-        var originalPartition = new Geometry("a");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
         
         CreatePartitionReplicator(clonedPartition, originalPartition, sharedNodeMap);
 
-        var added = new BillOfMaterials("added");
+        var added = new TestAnnotation("added");
 
         Assert.IsFalse(sharedNodeMap.ContainsKey(added.GetId()));
 
-        originalPartition.AddAnnotations([added]);
+        originalParent.AddAnnotations([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[0]);
 
         Assert.IsTrue(sharedNodeMap.ContainsKey(added.GetId()));
     }
@@ -48,47 +49,50 @@ public class AddedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_First()
     {
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof")]);
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("bof")]);
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new BillOfMaterials("added");
-        originalPartition.InsertAnnotations(0, [added]);
+        var added = new TestAnnotation("added");
+        originalParent.InsertAnnotations(0, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[0]);
     }
 
     [TestMethod]
     public void Multiple_Last()
     {
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof")]);
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("bof")]);
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new BillOfMaterials("added");
-        originalPartition.InsertAnnotations(1, [added]);
+        var added = new TestAnnotation("added");
+        originalParent.InsertAnnotations(1, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[1]);
+        Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[1]);
     }
 
     [TestMethod]
+    [Ignore("Not possible with TestLanguage")]
     public void Deep()
     {
-        var originalPartition = new Geometry("a");
+        var originalPartition = new TestPartition("a");
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var added = new BillOfMaterials("added") { AltGroups = [new MaterialGroup("mg") { MatterState = MatterState.gas }] };
-        originalPartition.AddAnnotations([added]);
+        // var added = new TestAnnotation("added") { AltGroups = [new MaterialGroup("mg") { MatterState = MatterState.gas }] };
+        // originalPartition.AddAnnotations([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
+        // Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[0]);
     }
 }
