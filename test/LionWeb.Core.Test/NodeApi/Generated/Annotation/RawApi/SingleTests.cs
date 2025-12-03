@@ -27,7 +27,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var annotation = new TestAnnotation("myId");
-        Assert.IsTrue(parent.AddAnnotationsRaw([annotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(annotation));
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
         Assert.Contains(annotation, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
@@ -51,7 +51,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var annotation = new TestAnnotation("myId");
-        Assert.IsTrue(parent.InsertAnnotationsRaw(0, [annotation]));
+        Assert.IsTrue(parent.InsertAnnotationsRaw(0, annotation));
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
         Assert.Contains(annotation, ((IReadableNodeRaw)parent).GetAnnotationsRaw());
@@ -62,7 +62,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var annotation = new TestAnnotation("myId");
-        Assert.IsFalse(parent.InsertAnnotationsRaw( -1, [annotation]));
+        Assert.IsFalse(parent.InsertAnnotationsRaw( -1, annotation));
         Assert.IsNull(annotation.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
@@ -72,7 +72,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var annotation = new TestAnnotation("myId");
-        Assert.IsFalse(parent.InsertAnnotationsRaw(1, [annotation]));
+        Assert.IsFalse(parent.InsertAnnotationsRaw(1, annotation));
         Assert.IsNull(annotation.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
@@ -82,9 +82,9 @@ public class SingleTests
     {
         var otherAnnotation = new TestAnnotation("cId");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotation));
         var annotation = new TestAnnotation("myId");
-        Assert.IsTrue(parent.InsertAnnotationsRaw(0, [annotation]));
+        Assert.IsTrue(parent.InsertAnnotationsRaw(0, annotation));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
@@ -96,9 +96,9 @@ public class SingleTests
     {
         var otherAnnotation = new TestAnnotation("cId");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotation));
         var annotation = new TestAnnotation("myId");
-        Assert.IsTrue(parent.InsertAnnotationsRaw(1, [annotation]));
+        Assert.IsTrue(parent.InsertAnnotationsRaw(1, annotation));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
@@ -111,9 +111,10 @@ public class SingleTests
         var otherAnnotationA = new TestAnnotation("cIdA");
         var otherAnnotationB = new TestAnnotation("cIdB");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotationA, otherAnnotationB]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationA));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationB));
         var annotation = new TestAnnotation("myId");
-        Assert.IsTrue(parent.InsertAnnotationsRaw(0, [annotation]));
+        Assert.IsTrue(parent.InsertAnnotationsRaw(0, annotation));
         Assert.AreSame(parent, otherAnnotationA.GetParent());
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
@@ -127,9 +128,10 @@ public class SingleTests
         var otherAnnotationA = new TestAnnotation("cIdA");
         var otherAnnotationB = new TestAnnotation("cIdB");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotationA, otherAnnotationB]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationA));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationB));
         var annotation = new TestAnnotation("myId");
-        Assert.IsTrue(parent.InsertAnnotationsRaw(1, [annotation]));
+        Assert.IsTrue(parent.InsertAnnotationsRaw(1, annotation));
         Assert.AreSame(parent, otherAnnotationA.GetParent());
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
@@ -143,9 +145,10 @@ public class SingleTests
         var otherAnnotationA = new TestAnnotation("cIdA");
         var otherAnnotationB = new TestAnnotation("cIdB");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotationA, otherAnnotationB]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationA));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationB));
         var annotation = new TestAnnotation("myId");
-        Assert.IsTrue(parent.InsertAnnotationsRaw(2, [annotation]));
+        Assert.IsTrue(parent.InsertAnnotationsRaw(2, annotation));
         Assert.AreSame(parent, otherAnnotationA.GetParent());
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.AreSame(parent, annotation.GetParent());
@@ -162,7 +165,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var annotation = new TestAnnotation("myId");
-        Assert.IsFalse(parent.RemoveAnnotationsRaw([annotation]));
+        Assert.IsFalse(parent.RemoveAnnotationsRaw(annotation));
         Assert.IsNull(annotation.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
@@ -172,9 +175,9 @@ public class SingleTests
     {
         var otherAnnotation = new TestAnnotation("myC");
         var parent = new LinkTestConcept("cs");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotation));
         var annotation = new TestAnnotation("myId");
-        Assert.IsFalse(parent.RemoveAnnotationsRaw([annotation]));
+        Assert.IsFalse(parent.RemoveAnnotationsRaw(annotation));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
         CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
@@ -185,8 +188,8 @@ public class SingleTests
     {
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([annotation]));
-        Assert.IsTrue(parent.RemoveAnnotationsRaw([annotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(annotation));
+        Assert.IsTrue(parent.RemoveAnnotationsRaw(annotation));
         Assert.IsNull(annotation.GetParent());
         CollectionAssert.AreEqual(new List<INode> { }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
     }
@@ -197,8 +200,9 @@ public class SingleTests
         var otherAnnotation = new TestAnnotation("cId");
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([annotation, otherAnnotation]));
-        Assert.IsTrue(parent.RemoveAnnotationsRaw([annotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(annotation));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotation));
+        Assert.IsTrue(parent.RemoveAnnotationsRaw(annotation));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
         CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
@@ -210,8 +214,9 @@ public class SingleTests
         var otherAnnotation = new TestAnnotation("cId");
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotation, annotation]));
-        Assert.IsTrue(parent.RemoveAnnotationsRaw([annotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotation));
+        Assert.IsTrue(parent.AddAnnotationsRaw(annotation));
+        Assert.IsTrue(parent.RemoveAnnotationsRaw(annotation));
         Assert.AreSame(parent, otherAnnotation.GetParent());
         Assert.IsNull(annotation.GetParent());
         CollectionAssert.AreEqual(new List<INode> { otherAnnotation }, ((IReadableNodeRaw)parent).GetAnnotationsRaw().ToList());
@@ -224,8 +229,10 @@ public class SingleTests
         var otherAnnotationB = new TestAnnotation("cIdB");
         var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        Assert.IsTrue(parent.AddAnnotationsRaw([otherAnnotationA, annotation, otherAnnotationB]));
-        Assert.IsTrue(parent.RemoveAnnotationsRaw([annotation]));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationA));
+        Assert.IsTrue(parent.AddAnnotationsRaw(annotation));
+        Assert.IsTrue(parent.AddAnnotationsRaw(otherAnnotationB));
+        Assert.IsTrue(parent.RemoveAnnotationsRaw(annotation));
         Assert.AreSame(parent, otherAnnotationA.GetParent());
         Assert.AreSame(parent, otherAnnotationB.GetParent());
         Assert.IsNull(annotation.GetParent());

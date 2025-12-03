@@ -65,19 +65,25 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
             startIndex: null, notificationId: notificationId);
         notification.CollectOldData();
-        AddAnnotationsRaw(safeAnnotations);
+        foreach (var safeAnnotation in safeAnnotations)
+        {
+            AddAnnotationsRaw(safeAnnotation);
+        }
         notification.Notify();
     }
 
-    bool IWritableNodeRaw.AddAnnotationsRaw(List<IAnnotationInstance> annotations) =>
-        AddAnnotationsRaw(annotations);
+    bool IWritableNodeRaw.AddAnnotationsRaw(IAnnotationInstance annotation) =>
+        AddAnnotationsRaw(annotation);
 
-    protected internal bool AddAnnotationsRaw(List<IAnnotationInstance> annotations)
+    protected internal bool AddAnnotationsRaw(IAnnotationInstance annotation)
     {
-        if (annotations is null || annotations.Count == 0 || annotations.Any(a => a is null || !a.GetAnnotation().CanAnnotate(GetClassifier())))
+        if (annotation is null || !annotation.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
 
-        _annotations.AddRange(SetSelfParent(annotations, null).Cast<INode>());
+        var node = (INode) annotation;
+        AttachChild(node);
+
+        _annotations.Add(node);
         return true;
     }
 
@@ -87,22 +93,28 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = AssureAnnotations(annotations?.ToList());
-        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
-            startIndex: index, notificationId: notificationId);
-        notification.CollectOldData();
-        InsertAnnotationsRaw(index, safeAnnotations);
-        notification.Notify();
+        foreach (var safeAnnotation in safeAnnotations)
+        {
+            AnnotationAddMultipleNotificationEmitter notification = new(this, [safeAnnotation], _annotations,
+                startIndex: index, notificationId: notificationId);
+            notification.CollectOldData();
+            InsertAnnotationsRaw(index++, safeAnnotation);
+            notification.Notify();
+        }
     }
 
-    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotations) =>
-        InsertAnnotationsRaw(index, annotations);
+    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IAnnotationInstance annotation) =>
+        InsertAnnotationsRaw(index, annotation);
     
-    protected internal bool InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotations)
+    protected internal bool InsertAnnotationsRaw(Index index, IAnnotationInstance annotation)
     {
-        if(annotations is null || annotations.Count == 0 || !IsInRange(index, _annotations) || annotations.Any(a => a is null || !a.GetAnnotation().CanAnnotate(GetClassifier())))
+        if(annotation is null || !IsInRange(index, _annotations) || !annotation.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
         
-        _annotations.InsertRange(index, SetSelfParent(annotations, null).Cast<INode>());
+        var node = (INode) annotation;
+        AttachChild(node);
+
+        _annotations.Insert(index, node);
         return true;
     }
 
@@ -112,15 +124,15 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
 
 
-    bool IWritableNodeRaw.RemoveAnnotationsRaw(HashSet<IAnnotationInstance> annotations) => 
-        RemoveAnnotationsRaw(annotations);
+    bool IWritableNodeRaw.RemoveAnnotationsRaw(IAnnotationInstance annotation) => 
+        RemoveAnnotationsRaw(annotation);
 
-    protected internal bool RemoveAnnotationsRaw(HashSet<IAnnotationInstance> annotations)
+    protected internal bool RemoveAnnotationsRaw(IAnnotationInstance annotation)
     {
-        if (annotations is null || annotations.Count == 0 || annotations.Any(a => a is null || !a.GetAnnotation().CanAnnotate(GetClassifier())))
+        if (annotation is null || !annotation.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
 
-        return RemoveSelfParent(annotations.Cast<INode>().ToList(), _annotations, null);
+        return RemoveSelfParent((INode)annotation, _annotations, null);
     }
 
     /// <inheritdoc />

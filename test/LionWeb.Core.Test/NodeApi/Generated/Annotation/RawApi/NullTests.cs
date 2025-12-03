@@ -26,7 +26,7 @@ public class NullTests
     public void Null()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsFalse(parent.AddAnnotationsRaw([null]));
+        Assert.IsFalse(parent.AddAnnotationsRaw(null));
     }
 
     [TestMethod]
@@ -40,20 +40,20 @@ public class NullTests
     public void Null_Insert_Empty()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsFalse(parent.InsertAnnotationsRaw(0, [null]));
+        Assert.IsFalse(parent.InsertAnnotationsRaw(0, null));
     }
 
     [TestMethod]
     public void Null_Insert_Empty_OutOfBounds()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsFalse(parent.InsertAnnotationsRaw(1, [null]));
+        Assert.IsFalse(parent.InsertAnnotationsRaw(1, null));
     }
 
     [TestMethod]
     public void Null_Remove_Empty()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsFalse(parent.RemoveAnnotationsRaw([null]));
+        Assert.IsFalse(parent.RemoveAnnotationsRaw(null));
     }
 }

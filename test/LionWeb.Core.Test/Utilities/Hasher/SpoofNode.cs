@@ -104,11 +104,11 @@ class SpoofNode(string id) : IShape
         return false;
     }
 
-    bool IWritableNodeRaw.AddAnnotationsRaw(List<IAnnotationInstance> annotationInstances) => false;
+    bool IWritableNodeRaw.AddAnnotationsRaw(IAnnotationInstance annotationInstances) => false;
 
-    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotationInstances) => false;
+    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IAnnotationInstance annotationInstances) => false;
 
-    bool IWritableNodeRaw.RemoveAnnotationsRaw(HashSet<IAnnotationInstance> annotationInstances) => false;
+    bool IWritableNodeRaw.RemoveAnnotationsRaw(IAnnotationInstance annotationInstances) => false;
 
     bool IWritableNodeRaw.SetPropertyRaw(Feature property, object? value) => false;
 

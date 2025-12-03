@@ -162,8 +162,8 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
     private void ReplaceAnnotation(Index index, IAnnotationInstance replaceAnnotation,
         IAnnotationInstance selfAnnotation)
     {
-        if (!_parent.InsertAnnotationsRaw(index, [replaceAnnotation])
-            || !_parent.RemoveAnnotationsRaw([selfAnnotation]))
+        if (!_parent.InsertAnnotationsRaw(index, replaceAnnotation)
+            || !_parent.RemoveAnnotationsRaw(selfAnnotation))
         {
             throw new InvalidValueException(null, replacement);
         }

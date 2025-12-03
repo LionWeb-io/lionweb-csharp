@@ -23,11 +23,11 @@ public interface IWritableNodeRaw : IReadableNodeRaw, IWritableNode
 {
     #region Annotation
 
-    protected internal bool AddAnnotationsRaw(List<IAnnotationInstance> annotations);
+    protected internal bool AddAnnotationsRaw(IAnnotationInstance annotation);
     
-    protected internal bool InsertAnnotationsRaw(Index index, List<IAnnotationInstance> annotations);
+    protected internal bool InsertAnnotationsRaw(Index index, IAnnotationInstance annotation);
 
-    protected internal bool RemoveAnnotationsRaw(HashSet<IAnnotationInstance> annotations);
+    protected internal bool RemoveAnnotationsRaw(IAnnotationInstance annotation);
 
     #endregion
 
