@@ -40,7 +40,7 @@ public class NullTests
     public void Insert_Empty_OutOfBounds()
     {
         var parent = new LinkTestConcept("cs");
-        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 1, [null]));
+        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 1, null));
     }
 
     [TestMethod]

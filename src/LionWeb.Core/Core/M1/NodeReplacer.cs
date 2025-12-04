@@ -221,8 +221,8 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
 
-        if (!_parent.InsertContainmentsRaw(_containment, index, [replacement])
-            || !_parent.RemoveContainmentsRaw(_containment, [self]))
+        if (!_parent.InsertContainmentsRaw(_containment, index, replacement)
+            || !_parent.RemoveContainmentsRaw(_containment, self))
         {
             throw new InvalidValueException(_containment, replacement);
         }

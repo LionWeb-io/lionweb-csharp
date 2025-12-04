@@ -54,18 +54,18 @@ public static class IWritableNodeRawExtensions
         self.SetContainmentRaw(containment, node);
 
     /// <inheritdoc cref="IWritableNodeRaw.AddContainmentsRaw"/>
-    public static bool AddContainmentsRaw(this IWritableNodeRaw self, Feature containment, List<IWritableNode> nodes) =>
-        self.AddContainmentsRaw(containment, nodes);
+    public static bool AddContainmentsRaw(this IWritableNodeRaw self, Feature containment, IWritableNode node) =>
+        self.AddContainmentsRaw(containment, node);
 
     /// <inheritdoc cref="IWritableNodeRaw.InsertContainmentsRaw"/>
     public static bool InsertContainmentsRaw(this IWritableNodeRaw self, Feature containment, Index index,
-        List<IWritableNode> nodes) =>
-        self.InsertContainmentsRaw(containment, index, nodes);
+        IWritableNode node) =>
+        self.InsertContainmentsRaw(containment, index, node);
 
     /// <inheritdoc cref="IWritableNodeRaw.RemoveContainmentsRaw"/>
     public static bool RemoveContainmentsRaw(this IWritableNodeRaw self, Feature containment,
-        List<IWritableNode> nodes) =>
-        self.RemoveContainmentsRaw(containment, nodes);
+        IWritableNode node) =>
+        self.RemoveContainmentsRaw(containment, node);
 
     #endregion
 
@@ -76,18 +76,18 @@ public static class IWritableNodeRawExtensions
         self.SetReferenceRaw(reference, target);
 
     /// <inheritdoc cref="IWritableNodeRaw.AddReferencesRaw"/>
-    public static bool AddReferencesRaw(this IWritableNodeRaw self, Feature reference, List<ReferenceTarget> targets) =>
-        self.AddReferencesRaw(reference, targets);
+    public static bool AddReferencesRaw(this IWritableNodeRaw self, Feature reference, ReferenceTarget target) =>
+        self.AddReferencesRaw(reference, target);
 
     /// <inheritdoc cref="IWritableNodeRaw.InsertReferencesRaw"/>
     public static bool InsertReferencesRaw(this IWritableNodeRaw self, Feature reference, Index index,
-        List<ReferenceTarget> targets) =>
-        self.InsertReferencesRaw(reference, index, targets);
+        ReferenceTarget target) =>
+        self.InsertReferencesRaw(reference, index, target);
 
     /// <inheritdoc cref="IWritableNodeRaw.RemoveReferencesRaw"/>
     public static bool RemoveReferencesRaw(this IWritableNodeRaw self, Feature reference,
-        List<ReferenceTarget> targets) =>
-        self.RemoveReferencesRaw(reference, targets);
+        ReferenceTarget target) =>
+        self.RemoveReferencesRaw(reference, target);
 
     #endregion
 }

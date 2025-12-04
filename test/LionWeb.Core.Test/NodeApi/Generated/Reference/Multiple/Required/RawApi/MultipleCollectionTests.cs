@@ -31,7 +31,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values[0]));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values[1]));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Reference_1_n.ToList());
@@ -44,7 +45,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values[0]));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values[1]));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Reference_1_n.ToList());
@@ -58,7 +60,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values[0]));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values[1]));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
@@ -73,7 +76,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values[0]));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 2, values[1]));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
@@ -89,7 +93,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values[0]));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values[1]));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -106,7 +111,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, values[0]));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 2, values[1]));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -123,7 +129,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 2, values));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 2, values[0]));
+        Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 3, values[1]));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -142,7 +149,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
@@ -158,7 +166,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -174,7 +183,8 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("cs") { Reference_1_n = [circleA, circleB] };
         var valueA = new LinkTestConcept("sA");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(circleA) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(circleA.GetParent());
@@ -188,7 +198,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Reference_1_n = [valueA, valueB] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
@@ -203,7 +214,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Reference_1_n = [valueA, valueB, circle] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
@@ -218,7 +230,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Reference_1_n = [circle, valueA, valueB] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
@@ -234,7 +247,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Reference_1_n = [circleA, valueA, valueB, circleB] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -251,7 +265,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Reference_1_n = [valueA, circleA, valueB, circleB] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -268,7 +283,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB) };
-        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
+        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[1]));
         Assert.IsNull(valueA.GetParent());
         Assert.IsTrue(parent.Reference_1_n.Contains(valueA));
         Assert.IsNull(valueB.GetParent());

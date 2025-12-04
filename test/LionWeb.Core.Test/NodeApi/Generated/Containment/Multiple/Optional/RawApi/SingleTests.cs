@@ -29,7 +29,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("line");
-        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]);
+        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line);
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(line));
     }
@@ -40,7 +40,8 @@ public class SingleTests
         var parent = new LinkTestConcept("g");
         var line1 = new LinkTestConcept("line1");
         var line2 = new LinkTestConcept("line2");
-        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line1, line2]);
+        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line1);
+        parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line2);
         Assert.AreEqual(2, parent.Containment_0_n.Count);
         Assert.AreSame(parent, line1.GetParent());
         Assert.AreSame(parent, line2.GetParent());
@@ -57,7 +58,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var line1 = new LinkTestConcept("line1");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line1]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line1);
         Assert.AreEqual(1, parent.Containment_0_n.Count);
         Assert.AreSame(parent, line1.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(line1));
@@ -70,7 +71,8 @@ public class SingleTests
         var parent = new LinkTestConcept("g");
         var line1 = new LinkTestConcept("line1");
         var line2 = new LinkTestConcept("line2");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line1, line2]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line1);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, line2);
         Assert.AreEqual(2, parent.Containment_0_n.Count);
         Assert.AreSame(parent, line1.GetParent());
         Assert.AreSame(parent, line2.GetParent());
@@ -83,7 +85,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line);
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(line));
     }
@@ -93,7 +95,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
-        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, -1, [line]));
+        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, -1, line));
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(line));
     }
@@ -103,7 +105,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
-        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, [line]));
+        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, line));
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(line));
     }
@@ -114,7 +116,7 @@ public class SingleTests
         var circle = new LinkTestConcept("cId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle] };
         var line = new LinkTestConcept("myId");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line);
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(line));
@@ -127,7 +129,7 @@ public class SingleTests
         var circle = new LinkTestConcept("cId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle] };
         var line = new LinkTestConcept("myId");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, [line]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, line);
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(line));
@@ -141,7 +143,7 @@ public class SingleTests
         var circleB = new LinkTestConcept("cIdB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, circleB] };
         var line = new LinkTestConcept("myId");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, line.GetParent());
@@ -156,7 +158,7 @@ public class SingleTests
         var circleB = new LinkTestConcept("cIdB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, circleB] };
         var line = new LinkTestConcept("myId");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, [line]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, line);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, line.GetParent());
@@ -171,7 +173,7 @@ public class SingleTests
         var circleB = new LinkTestConcept("cIdB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, circleB] };
         var line = new LinkTestConcept("myId");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, [line]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, line);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, line.GetParent());
@@ -188,8 +190,8 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line]);
-        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line);
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(line));
     }
@@ -200,9 +202,10 @@ public class SingleTests
         var parent = new LinkTestConcept("g");
         var line1 = new LinkTestConcept("line1");
         var line2 = new LinkTestConcept("line2");
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line1]);
-        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, [line2]);
-        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line1, line2]);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line1);
+        parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, line2);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line1);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line2);
         Assert.IsEmpty(parent.Containment_0_n);
         Assert.IsNull(line1.GetParent());
         Assert.IsNull(line2.GetParent());
@@ -215,7 +218,7 @@ public class SingleTests
     {
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
-        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line));
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(line));
     }
@@ -226,7 +229,7 @@ public class SingleTests
         var circle = new LinkTestConcept("myC");
         var parent = new LinkTestConcept("cs") { Containment_0_n = [circle] };
         var line = new LinkTestConcept("myId");
-        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_0_n.ToList());
@@ -237,7 +240,7 @@ public class SingleTests
     {
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [line] };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line));
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { }, parent.Containment_0_n.ToList());
     }
@@ -248,7 +251,7 @@ public class SingleTests
         var circle = new LinkTestConcept("cId");
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [line, circle] };
-        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_0_n.ToList());
@@ -260,7 +263,7 @@ public class SingleTests
         var circle = new LinkTestConcept("cId");
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle, line] };
-        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_0_n.ToList());
@@ -273,7 +276,7 @@ public class SingleTests
         var circleB = new LinkTestConcept("cIdB");
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, line, circleB] };
-        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, [line]);
+        parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(line.GetParent());

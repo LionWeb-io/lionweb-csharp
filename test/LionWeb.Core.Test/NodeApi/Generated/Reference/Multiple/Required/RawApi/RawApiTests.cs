@@ -30,7 +30,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
         Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.Reference_1_n.Contains(line));
     }
@@ -43,7 +43,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
         Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.Reference_1_n.Contains(line));
     }
@@ -54,7 +54,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
         Assert.IsFalse(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, -1,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
         Assert.IsEmpty(result);
@@ -66,7 +66,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
         Assert.IsFalse(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
         Assert.IsEmpty(result);
@@ -79,7 +79,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g") { Reference_1_n = [circle] };
         var line = new LinkTestConcept("myId");
         Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.Reference_1_n.Contains(line));
@@ -93,7 +93,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g") { Reference_1_n = [circle] };
         var line = new LinkTestConcept("myId");
         Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.Reference_1_n.Contains(line));
@@ -108,7 +108,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g") { Reference_1_n = [circleA, circleB] };
         var line = new LinkTestConcept("myId");
         Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
@@ -124,7 +124,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g") { Reference_1_n = [circleA, circleB] };
         var line = new LinkTestConcept("myId");
         Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
@@ -140,7 +140,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g") { Reference_1_n = [circleA, circleB] };
         var line = new LinkTestConcept("myId");
         Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 2,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
@@ -158,7 +158,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
         Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
         Assert.IsEmpty(result);
@@ -171,7 +171,7 @@ public class RawApiTests
         var parent = new LinkTestConcept("cs") { Reference_1_n = [circle] };
         var line = new LinkTestConcept("myId");
         Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<INode> { circle }, parent.Reference_1_n.ToList());
@@ -183,7 +183,7 @@ public class RawApiTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [line] };
         Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(line.GetParent());
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
         Assert.IsEmpty(result);
@@ -196,7 +196,7 @@ public class RawApiTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [line, circle] };
         Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<INode> { circle }, parent.Reference_1_n.ToList());
@@ -209,7 +209,7 @@ public class RawApiTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [circle, line] };
         Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<INode> { circle }, parent.Reference_1_n.ToList());
@@ -223,7 +223,7 @@ public class RawApiTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [circleA, line, circleB] };
         Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(line)]));
+            ReferenceTarget.FromNode(line)));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
@@ -240,7 +240,7 @@ public class RawApiTests
     public void Null()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [null]));
+        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, null));
     }
 
     [TestMethod]
@@ -254,7 +254,7 @@ public class RawApiTests
     public void Null_Insert_Empty_OutOfBounds()
     {
         var parent = new LinkTestConcept("g");
-        Assert.IsFalse(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, [null]));
+        Assert.IsFalse(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, null));
     }
 
     [TestMethod]

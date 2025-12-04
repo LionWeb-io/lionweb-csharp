@@ -200,7 +200,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
 
             bool success = n.Containment.Multiple switch
             {
-                true => localParent.RemoveContainmentsRaw(n.Containment, [n.DeletedChild]),
+                true => localParent.RemoveContainmentsRaw(n.Containment, n.DeletedChild),
                 false => localParent.SetContainmentRaw(n.Containment, null)
             };
 
@@ -271,7 +271,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     {
         bool success = newContainment.Multiple switch
         {
-            true => localNewParent.InsertContainmentsRaw(newContainment, newIndex, [movedChild]),
+            true => localNewParent.InsertContainmentsRaw(newContainment, newIndex, movedChild),
             false => localNewParent.SetContainmentRaw(newContainment, movedChild)
         };
         return success;
@@ -282,8 +282,8 @@ public class RemoteReplicatorRaw : RemoteReplicator
     {
         bool success = containment.Multiple switch
         {
-            true => localParent.RemoveContainmentsRaw(containment, [replacedChild])
-                    && localParent.InsertContainmentsRaw(containment, index, [newChild]),
+            true => localParent.RemoveContainmentsRaw(containment, replacedChild)
+                    && localParent.InsertContainmentsRaw(containment, index, newChild),
 
             false => localParent.SetContainmentRaw(containment, newChild)
         };
@@ -373,7 +373,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
             IWritableNodeRaw localNewParent = (IWritableNodeRaw)n.Parent;
             var success = n.Reference.Multiple switch
             {
-                true => localNewParent.InsertReferencesRaw(n.Reference, n.Index, [(ReferenceTarget)n.NewTarget]),
+                true => localNewParent.InsertReferencesRaw(n.Reference, n.Index, (ReferenceTarget)n.NewTarget),
                 false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.NewTarget)
             };
             ProduceNotification(n, success);
@@ -387,7 +387,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
 
             bool success = n.Reference.Multiple switch
             {
-                true => localParent.RemoveReferencesRaw(n.Reference, [(ReferenceTarget)n.DeletedTarget]),
+                true => localParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.DeletedTarget),
                 false => localParent.SetReferenceRaw(n.Reference, null)
             };
 
@@ -406,8 +406,8 @@ public class RemoteReplicatorRaw : RemoteReplicator
         IWritableNodeRaw localNewParent = (IWritableNodeRaw)n.Parent;
         var success = n.Reference.Multiple switch
         {
-            true => localNewParent.RemoveReferencesRaw(n.Reference, [(ReferenceTarget)n.Target])
-                && localNewParent.InsertReferencesRaw(n.Reference, n.NewIndex, [(ReferenceTarget)n.Target]),
+            true => localNewParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.Target)
+                && localNewParent.InsertReferencesRaw(n.Reference, n.NewIndex, (ReferenceTarget)n.Target),
             false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.Target)
         };
         ProduceNotification(n, success);
@@ -419,8 +419,8 @@ public class RemoteReplicatorRaw : RemoteReplicator
     {
         bool success = reference.Multiple switch
         {
-            true => localParent.RemoveReferencesRaw(reference, [(ReferenceTarget)replacedTarget])
-                    && localParent.InsertReferencesRaw(reference, index, [(ReferenceTarget)newTarget]),
+            true => localParent.RemoveReferencesRaw(reference, (ReferenceTarget)replacedTarget)
+                    && localParent.InsertReferencesRaw(reference, index, (ReferenceTarget)newTarget),
 
             false => localParent.SetReferenceRaw(reference, (ReferenceTarget?)newTarget)
         };

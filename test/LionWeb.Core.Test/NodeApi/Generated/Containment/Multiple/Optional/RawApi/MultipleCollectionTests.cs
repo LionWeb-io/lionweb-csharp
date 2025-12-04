@@ -31,7 +31,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, valueA));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, valueB));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
         CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB }, parent.Containment_0_n.ToList());
@@ -44,7 +45,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, valueA));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, valueB));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
         CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB }, parent.Containment_0_n.ToList());
@@ -58,7 +60,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, valueA));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, valueB));
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
@@ -73,7 +76,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, valueA));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, valueB));
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
@@ -89,7 +93,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, valueA));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, valueB));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
@@ -106,7 +111,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 1, valueA));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, valueB));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
@@ -123,7 +129,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 2, valueA));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 3, valueB));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
@@ -142,7 +149,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode>() { valueA, valueB };
-        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(valueA));
@@ -156,7 +164,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(valueA));
@@ -172,7 +181,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -188,7 +198,8 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
         var valueA = new LinkTestConcept("sA");
         var values = new List<IWritableNode> { valueA, circleA };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, circleA));
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(circleA.GetParent());
@@ -202,7 +213,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [valueA, valueB] };
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
         CollectionAssert.AreEqual(new List<IWritableNode> { }, parent.Containment_0_n.ToList());
@@ -216,7 +228,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [valueA, valueB, circle] };
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
@@ -231,7 +244,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle, valueA, valueB] };
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
@@ -247,7 +261,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, valueA, valueB, circleB] };
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -264,7 +279,8 @@ public class MultipleCollectionTests
         var valueB = new LinkTestConcept("sB");
         var parent = new LinkTestConcept("g") { Containment_0_n = [valueA, circleA, valueB, circleB] };
         var values = new List<IWritableNode> { valueA, valueB };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
@@ -282,7 +298,8 @@ public class MultipleCollectionTests
         var valueA = new LinkTestConcept("sA");
         var valueB = new LinkTestConcept("sB");
         var values = new List<IWritableNode>() { valueA, valueB };
-        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueA));
+        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, valueB));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(valueA));
         Assert.AreSame(parent, valueB.GetParent());

@@ -29,7 +29,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<ReferenceTarget>();
-        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, values));
+        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, null));
     }
 
     #endregion
@@ -41,7 +41,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<ReferenceTarget>{null};
-        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, values));
+        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, null));
     }
 
     #endregion
@@ -54,7 +54,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("g");
         var value = new LinkTestConcept("s");
         var values = new List<ReferenceTarget>{ReferenceTarget.FromNode(value)};
-        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, values));
+        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, null));
         Assert.IsNull(parent.Reference_0_1);
         Assert.IsNull(value.GetParent());
     }

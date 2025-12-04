@@ -29,7 +29,7 @@ public class SetFeaturesTests
         var parent = new LinkTestConcept("g");
         var other = new LinkTestConcept("myId");
         var target = ReferenceTarget.FromNode(other);
-        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [target]));
+        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, target));
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
             out var result));
         CollectionAssert.AreEqual(new List<ReferenceTarget> { target }, (ICollection?)result);
@@ -42,7 +42,7 @@ public class SetFeaturesTests
         var other = new LinkTestConcept("myId");
         var target = ReferenceTarget.FromNode(other);
         Assert.IsTrue(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0,
-            [target]));
+            target));
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
             out var result));
         CollectionAssert.AreEqual(new List<ReferenceTarget> { target }, (ICollection?)result);
@@ -66,9 +66,9 @@ public class SetFeaturesTests
         var parent = new LinkTestConcept("g");
         var other = new LinkTestConcept("myId");
         var target = ReferenceTarget.FromNode(other);
-        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [target]));
+        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, target));
         Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [target]));
+            target));
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
             out var result));
         Assert.IsEmpty(result);
@@ -80,9 +80,9 @@ public class SetFeaturesTests
         var parent = new LinkTestConcept("g");
         var other = new LinkTestConcept("myId");
         var target = ReferenceTarget.FromNode(other);
-        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [target]));
+        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, target));
         Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(other)]));
+            ReferenceTarget.FromNode(other)));
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
             out var result));
         Assert.IsEmpty(result);
@@ -95,9 +95,11 @@ public class SetFeaturesTests
         var valueA = new LinkTestConcept("myA");
         var valueB = new LinkTestConcept("myB");
         parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(valueA), ReferenceTarget.FromNode(valueB)]);
+            ReferenceTarget.FromNode(valueA));
+        parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
+            ReferenceTarget.FromNode(valueB));
         parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
-            [ReferenceTarget.FromNode(valueA)]);
+            ReferenceTarget.FromNode(valueA));
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
             out var result));
         CollectionAssert.AreEqual(new List<ReferenceTarget> { ReferenceTarget.FromNode(valueB) },

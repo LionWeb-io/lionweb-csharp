@@ -22,44 +22,6 @@ using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 [TestClass]
 public class CollectionTests
 {
-    #region EmptyCollection
-
-    [TestMethod]
-    public void EmptyArray()
-    {
-        var parent = new LinkTestConcept("g");
-        var values = new List<ReferenceTarget>();
-        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
-        Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
-        Assert.IsEmpty(result);
-    }
-
-    [TestMethod]
-    public void Insert_EmptyArray()
-    {
-        var parent = new LinkTestConcept("g");
-        var values = new List<ReferenceTarget>();
-        Assert.IsFalse(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0,
-            values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
-        Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
-        Assert.IsEmpty(result);
-    }
-
-    [TestMethod]
-    public void Remove_EmptyArray()
-    {
-        var parent = new LinkTestConcept("g");
-        var values = new List<ReferenceTarget>();
-        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
-        Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
-        Assert.IsEmpty(result);
-    }
-
-    #endregion
-
     #region NullCollection
 
     [TestMethod]
@@ -67,7 +29,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<ReferenceTarget> { null };
-        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsFalse(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
         Assert.IsEmpty(result);
@@ -78,7 +40,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<ReferenceTarget> { null };
-        Assert.IsFalse(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values));
+        Assert.IsFalse(parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
         Assert.IsEmpty(result);
@@ -89,7 +51,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<ReferenceTarget> { null };
-        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
         Assert.IsEmpty(result);
@@ -105,7 +67,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("g");
         var value = new LinkTestConcept("s");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(value) };
-        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.AddReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
         Assert.IsNull(value.GetParent());
         Assert.IsTrue(parent.Reference_1_n.Contains(value));
     }
@@ -117,7 +79,7 @@ public class CollectionTests
         var value = new LinkTestConcept("s");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(value) };
         Assert.IsTrue(
-            parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values));
+            parent.InsertReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, values[0]));
         Assert.IsNull(value.GetParent());
         Assert.IsTrue(parent.Reference_1_n.Contains(value));
     }
@@ -130,7 +92,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(line) };
-        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsFalse(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
         Assert.IsNull(line.GetParent());
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
@@ -143,7 +105,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [line] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(line) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
         Assert.IsNull(line.GetParent());
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n);
         Assert.IsTrue(parent.TryGetReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, out var result));
@@ -157,7 +119,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [line, circle] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(line) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_1_n.ToList());
@@ -170,7 +132,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [circle, line] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(line) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_1_n.ToList());
@@ -184,7 +146,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Reference_1_n = [circleA, line, circleB] };
         var values = new List<ReferenceTarget> { ReferenceTarget.FromNode(line) };
-        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
+        Assert.IsTrue(parent.RemoveReferencesRaw(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values[0]));
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());

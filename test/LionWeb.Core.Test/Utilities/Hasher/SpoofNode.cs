@@ -114,17 +114,17 @@ class SpoofNode(string id) : IShape
 
     bool IWritableNodeRaw.SetContainmentRaw(Feature containment, IWritableNode? node) => false;
 
-    bool IWritableNodeRaw.AddContainmentsRaw(Feature containment, List<IWritableNode> nodes) => false;
+    bool IWritableNodeRaw.AddContainmentsRaw(Feature containment, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.InsertContainmentsRaw(Feature containment, Index index, List<IWritableNode> nodes) => false;
+    bool IWritableNodeRaw.InsertContainmentsRaw(Feature containment, Index index, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.RemoveContainmentsRaw(Feature containment, List<IWritableNode> nodes) => false;
+    bool IWritableNodeRaw.RemoveContainmentsRaw(Feature containment, IWritableNode node) => false;
 
     bool IWritableNodeRaw.SetReferenceRaw(Feature reference, ReferenceTarget? targets) => false;
 
-    bool IWritableNodeRaw.AddReferencesRaw(Feature reference, List<ReferenceTarget> targets) => false;
+    bool IWritableNodeRaw.AddReferencesRaw(Feature reference, ReferenceTarget target) => false;
 
-    bool IWritableNodeRaw.InsertReferencesRaw(Feature reference, Index index, List<ReferenceTarget> targets) => false;
+    bool IWritableNodeRaw.InsertReferencesRaw(Feature reference, Index index, ReferenceTarget target) => false;
 
-    bool IWritableNodeRaw.RemoveReferencesRaw(Feature reference, List<ReferenceTarget> targets) => false;
+    bool IWritableNodeRaw.RemoveReferencesRaw(Feature reference, ReferenceTarget target) => false;
 }

@@ -22,37 +22,6 @@ using Languages.Generated.V2024_1.TestLanguage;
 [TestClass]
 public class CollectionTests
 {
-    #region EmptyCollection
-
-    [TestMethod]
-    public void EmptyList()
-    {
-        var parent = new LinkTestConcept("g");
-        var values = new List<IWritableNode>();
-        Assert.IsFalse(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
-        Assert.IsEmpty(parent.Containment_0_n);
-    }
-
-    [TestMethod]
-    public void Insert_EmptyList()
-    {
-        var parent = new LinkTestConcept("g");
-        var values = new List<IWritableNode>();
-        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
-        Assert.IsTrue(parent.Containment_0_n.Count == 0);
-    }
-
-    [TestMethod]
-    public void Remove_EmptyList()
-    {
-        var parent = new LinkTestConcept("g");
-        var values = new List<IWritableNode>();
-        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
-        Assert.IsTrue(parent.Containment_0_n.Count == 0);
-    }
-
-    #endregion
-
     #region NullCollection
 
     [TestMethod]
@@ -60,7 +29,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<IWritableNode> { null };
-        Assert.IsFalse(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsFalse(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, null));
         Assert.IsEmpty(parent.Containment_0_n);
     }
 
@@ -70,7 +39,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<IWritableNode> { null };
-        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        Assert.IsFalse(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, null));
         Assert.IsEmpty(parent.Containment_0_n);
     }
 
@@ -79,7 +48,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("g");
         var values = new List<IWritableNode> { null };
-        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, null));
         Assert.IsEmpty(parent.Containment_0_n);
     }
 
@@ -93,7 +62,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("g");
         var value = new LinkTestConcept("s");
         var values = new List<IWritableNode> { value };
-        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.AddContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, value));
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(value));
     }
@@ -105,7 +74,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("g");
         var value = new LinkTestConcept("s");
         var values = new List<IWritableNode> { value };
-        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, values));
+        Assert.IsTrue(parent.InsertContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, 0, value));
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.Containment_0_n.Contains(value));
     }
@@ -118,7 +87,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("g");
         var line = new LinkTestConcept("myId");
         var values = new List<IWritableNode> { line };
-        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsFalse(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line));
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Containment_0_n.Contains(line));
     }
@@ -129,7 +98,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [line] };
         var values = new List<IWritableNode> { line };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line));
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<IWritableNode> { }, parent.Containment_0_n.ToList());
     }
@@ -141,7 +110,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [line, circle] };
         var values = new List<IWritableNode> { line };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line));
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<IWritableNode> { circle }, parent.Containment_0_n.ToList());
@@ -154,7 +123,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circle, line] };
         var values = new List<IWritableNode> { line };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line));
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
         CollectionAssert.AreEqual(new List<IWritableNode> { circle }, parent.Containment_0_n.ToList());
@@ -168,7 +137,7 @@ public class CollectionTests
         var line = new LinkTestConcept("myId");
         var parent = new LinkTestConcept("g") { Containment_0_n = [circleA, line, circleB] };
         var values = new List<IWritableNode> { line };
-        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, values));
+        Assert.IsTrue(parent.RemoveContainmentsRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, line));
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(line.GetParent());
