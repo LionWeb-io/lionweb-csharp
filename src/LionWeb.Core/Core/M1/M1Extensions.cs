@@ -133,7 +133,7 @@ public static class M1Extensions
 
     /// <inheritdoc cref="NodeReplacer{T}" />
     public static T ReplaceWith<T>(this INode self, T replacement) where T : INode =>
-        new NodeReplacer<T>(self, replacement).Replace();
+        new NotifyingNodeReplacer<T>(self, replacement).Replace();
 
     #region Descendants
 
