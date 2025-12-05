@@ -1353,7 +1353,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         return false;
     }
 
-    protected internal override bool TryGetContainmentRaw(Containment containment, out IWritableNode? node)
+    protected internal override bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
     {
         if (base.TryGetContainmentRaw(containment, out node))
             return true;
@@ -1374,7 +1374,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     }
 
     protected internal override bool TryGetContainmentsRaw(Containment containment,
-        out IReadOnlyList<IWritableNode> nodes)
+        out IReadOnlyList<IReadableNode> nodes)
     {
         if (base.TryGetContainmentsRaw(containment, out nodes))
             return true;
@@ -2213,7 +2213,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         return false;
     }
     
-    protected internal override bool TryGetContainmentRaw(Containment containment, out IWritableNode? node)
+    protected internal override bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
     {
         if (base.TryGetContainmentRaw(containment, out node))
             return true;
@@ -2227,8 +2227,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         return false;
     }
 
-    protected internal override bool TryGetContainmentsRaw(Containment containment,
-        out IReadOnlyList<IWritableNode> nodes)
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
     {
         if (base.TryGetContainmentsRaw(containment, out nodes))
             return true;

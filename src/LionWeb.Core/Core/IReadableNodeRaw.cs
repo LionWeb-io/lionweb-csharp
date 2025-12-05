@@ -69,8 +69,8 @@ public interface IReadableNodeRaw : IReadableNode
     }
 
     protected internal bool TryGetPropertyRaw(Property property, out object? value);
-    protected internal bool TryGetContainmentRaw(Containment containment, out IWritableNode? node);
-    protected internal bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IWritableNode> nodes);
+    protected internal bool TryGetContainmentRaw(Containment containment, out IReadableNode? node);
+    protected internal bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes);
     protected internal bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target);
     protected internal bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets);
 }

@@ -102,22 +102,22 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     }
 
     /// <inheritdoc/>
-    bool IReadableNodeRaw.TryGetContainmentRaw(Containment containment, out IWritableNode? node) => 
+    bool IReadableNodeRaw.TryGetContainmentRaw(Containment containment, out IReadableNode? node) => 
     TryGetContainmentRaw(containment, out node);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentRaw"/>
-    protected internal virtual bool TryGetContainmentRaw(Containment containment, out IWritableNode? node)
+    protected internal virtual bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
     {
         node = null;
         return false;
     }
 
     /// <inheritdoc />
-    bool IReadableNodeRaw.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IWritableNode> nodes) =>
+    bool IReadableNodeRaw.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes) =>
         TryGetContainmentsRaw(containment, out nodes);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentsRaw"/>
-    protected internal virtual bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IWritableNode> nodes)
+    protected internal virtual bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
     {
         nodes = [];
         return false;

@@ -80,13 +80,13 @@ class SpoofNode(string id) : IShape
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetContainmentRaw(Containment containment, out IWritableNode? node)
+    bool IReadableNodeRaw.TryGetContainmentRaw(Containment containment, out IReadableNode? node)
     {
         node = null;
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IWritableNode> nodes)
+    bool IReadableNodeRaw.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
     {
         nodes = [];
         return false;
