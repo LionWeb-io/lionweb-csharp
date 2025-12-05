@@ -22,7 +22,52 @@ using M3;
 public interface IReadableNodeRaw : IReadableNode
 {
     protected internal IReadOnlyList<IAnnotationInstance> GetAnnotationsRaw();
-    
+
+    protected internal bool TryGetRaw(Feature feature, out object? value)
+    {
+        switch (feature)
+        {
+            case Property:
+                return TryGetPropertyRaw(feature, out value);
+            case Containment { Multiple: false }:
+                if (TryGetContainmentRaw(feature, out var c))
+                {
+                    value = c;
+                    return true;
+                }
+                value = null;
+                return false;
+
+            case Reference { Multiple: false }:
+                if (TryGetReferenceRaw(feature, out var r))
+                {
+                    value = r;
+                    return true;
+                }
+                value = null;
+                return false;
+            case Containment { Multiple: true }:
+                if (TryGetContainmentsRaw(feature, out var cs))
+                {
+                    value = cs;
+                    return true;
+                }
+                value = null;
+                return false;
+            case Reference { Multiple: true }:
+                if (TryGetReferencesRaw(feature, out var rs))
+                {
+                    value = rs;
+                    return true;
+                }
+                value = null;
+                return false;
+            default:
+                value = null;
+                return false;
+        }
+    }
+
     protected internal bool TryGetPropertyRaw(Feature property, out object? value);
     protected internal bool TryGetContainmentRaw(Feature containment, out IWritableNode? node);
     protected internal bool TryGetContainmentsRaw(Feature containment, out IReadOnlyList<IWritableNode> nodes);

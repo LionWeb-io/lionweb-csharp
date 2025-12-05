@@ -126,18 +126,23 @@ public class Serializer : ISerializer
     {
         Classifier classifier = ExtractClassifier(node);
 
+        var nodeRaw = (IReadableNodeRaw)node;
         var featureValues = node
             .CollectAllSetFeatures()
-            .ToDictionary(f => f, feature => node.TryGet(feature, out var r) ? r : null);
+            .ToDictionary(f => f, feature => nodeRaw.TryGetRaw(feature, out var r) ? r : null);
 
         Dictionary<Feature, object?> properties = CollectProperties(featureValues);
-        RemoveFromFeatureValues(properties);
+        RemoveFromFeatureValues(properties.Keys);
 
-        Dictionary<Feature, object?> containments = CollectContainments(node, featureValues);
-        RemoveFromFeatureValues(containments);
+        Dictionary<Feature, IReadOnlyList<IWritableNode>?> containmentsMultiple = CollectContainmentsMultiple(node, featureValues);
+        RemoveFromFeatureValues(containmentsMultiple.Keys);
+        Dictionary<Feature, IReadableNode?> containmentsSingle = CollectContainmentsSingle(node, featureValues);
+        RemoveFromFeatureValues(containmentsSingle.Keys);
 
-        Dictionary<Feature, object?> references = CollectReferences(featureValues);
-        RemoveFromFeatureValues(references);
+        Dictionary<Feature, IReadOnlyList<ReferenceTarget>?> referencesMultiple = CollectReferencesMultiple(featureValues);
+        RemoveFromFeatureValues(referencesMultiple.Keys);
+        Dictionary<Feature, ReferenceTarget?> referencesSingle = CollectReferencesSingle(featureValues);
+        RemoveFromFeatureValues(referencesSingle.Keys);
 
         Debug.Assert(featureValues.Count == 0, $"remaining features: {featureValues}");
 
@@ -150,20 +155,22 @@ public class Serializer : ISerializer
             Properties = properties.Select(pair => SerializeProperty(node, pair.Key, pair.Value))
                 .Concat(CollectUnsetProperties(node, allFeatures, properties))
                 .ToArray(),
-            Containments = containments.Select(SerializeContainment)
-                .Concat(CollectUnsetContainments(allFeatures, containments))
+            Containments = containmentsSingle.Select(p => SerializeContainment(p.Value is not null ? [p.Value] : [], p.Key))
+                .Concat(containmentsMultiple.Select(p => SerializeContainment(p.Value ?? [], p.Key)))
+                .Concat(CollectUnsetContainments(allFeatures, containmentsSingle.Keys.Concat(containmentsMultiple.Keys)))
                 .ToArray(),
-            References = references.Select(SerializeReference)
-                .Concat(CollectUnsetReferences(allFeatures, references))
+            References = referencesSingle.Select(p => SerializeReference(p.Value is not null ? [p.Value] : [], p.Key))
+                .Concat(referencesMultiple.Select(p => SerializeReference(p.Value ?? [], p.Key)))
+                .Concat(CollectUnsetReferences(allFeatures, referencesSingle.Keys.Concat(referencesMultiple.Keys)))
                 .ToArray(),
             Annotations = node.GetAnnotations().Select(SerializeAnnotationTarget)
                 .ToArray(),
             Parent = node.GetParent()?.GetId()
         };
 
-        void RemoveFromFeatureValues(Dictionary<Feature, object?> dictionary)
+        void RemoveFromFeatureValues(IEnumerable<Feature> keys)
         {
-            foreach (var key in dictionary.Keys)
+            foreach (var key in keys)
             {
                 featureValues.Remove(key);
             }
@@ -217,26 +224,23 @@ public class Serializer : ISerializer
 
     #region Containments
 
-    private Dictionary<Feature, object?> CollectContainments(IReadableNode node,
+    private Dictionary<Feature, IReadableNode?> CollectContainmentsSingle(IReadableNode node,
         Dictionary<Feature, object?> featureValues)
     {
         var containments = featureValues
-            .Where(pair =>
-            {
-                (Feature feature, var value) = pair;
-                return feature is Containment
-                       || feature is Property && (
-                           (value is IReadableNode n && ReferenceEquals(n.GetParent(), node))
-                           || (value is IEnumerable e &&
-                               e.Cast<IReadableNode>().All(c => ReferenceEquals(c.GetParent(), node)))
-                       );
-            })
-            .ToDictionary();
+            .Where(pair => pair.Value is IReadableNode || pair is { Key: Containment, Value: null })
+            .ToDictionary(p => p.Key, p => (IReadableNode?)p.Value);
         return containments;
     }
 
-    private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
-        SerializeContainment(AsNodes(pair), pair.Key);
+    private Dictionary<Feature, IReadOnlyList<IWritableNode>?> CollectContainmentsMultiple(IReadableNode node,
+        Dictionary<Feature, object?> featureValues)
+    {
+        var containments = featureValues
+            .Where(pair => pair.Value is IReadOnlyList<IWritableNode>)
+            .ToDictionary(p => p.Key, p => (IReadOnlyList<IWritableNode>?)p.Value);
+        return containments;
+    }
 
     private SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment)
     {
@@ -248,12 +252,12 @@ public class Serializer : ISerializer
     }
 
     private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> containments)
+        IEnumerable<Feature> containmentKeys)
     {
         if (SerializeEmptyFeatures)
             return allFeatures
                 .OfType<Containment>()
-                .Except(containments.Keys, new FeatureComparer())
+                .Except(containmentKeys, new FeatureComparer())
                 .Select<Feature, SerializedContainment>(c => SerializeContainment([], c));
 
         return [];
@@ -263,55 +267,57 @@ public class Serializer : ISerializer
 
     #region References
 
-    private Dictionary<Feature, object?> CollectReferences(Dictionary<Feature, object?> featureValues)
+    private Dictionary<Feature, ReferenceTarget?> CollectReferencesSingle(Dictionary<Feature, object?> featureValues)
     {
         var references = featureValues
-            .Where(pair => pair.Key is Reference
-                           || pair.Value is IReadableNode
-                           || (pair.Value is IEnumerable e && M2Extensions.AreAll<IReadableNode>(e))
-            )
-            .ToDictionary();
+            .Where(pair => pair.Value is ReferenceTarget || pair is { Key: Reference, Value: null })
+            .ToDictionary(p => p.Key, p => (ReferenceTarget?)p.Value);
         return references;
     }
 
-    private SerializedReference SerializeReference(KeyValuePair<Feature, object?> pair) =>
-        SerializeReference(AsNodes(pair), pair.Key);
+    private Dictionary<Feature, IReadOnlyList<ReferenceTarget>?> CollectReferencesMultiple(Dictionary<Feature, object?> featureValues)
+    {
+        var references = featureValues
+            .Where(pair => pair.Value is IReadOnlyList<ReferenceTarget>)
+            .ToDictionary(p => p.Key, p => (IReadOnlyList<ReferenceTarget>?)p.Value);
+        return references;
+    }
 
-    private SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference)
+    private SerializedReference SerializeReference(IEnumerable<ReferenceTarget> targets, Feature reference)
     {
         RegisterUsedLanguage(reference.GetLanguage());
         return new SerializedReference
         {
             Reference = reference.ToMetaPointer(),
-            Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget!).ToArray()
+            Targets = targets.Select(SerializeReferenceTarget).ToArray()
         };
     }
 
-    private SerializedReferenceTarget SerializeReferenceTarget(IReadableNode target)
+    private SerializedReferenceTarget SerializeReferenceTarget(ReferenceTarget target)
     {
-        if (target is not IKeyed k)
-            return new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() };
+        if (target.Target is not IKeyed k)
+            return new SerializedReferenceTarget { Reference = target.TargetId, ResolveInfo = target.ResolveInfo };
 
         var hostingLanguage = M1Extensions
             .Ancestors(k, true)
             .OfType<Language>()
             .FirstOrDefault();
 
-        var referenceTarget = PersistLionCoreReferenceTargetIds ? target.GetId() : null;
+        var referenceTarget = PersistLionCoreReferenceTargetIds ? target.TargetId : null;
 
         return hostingLanguage?.Key switch
         {
             ILionCoreLanguage.LanguageKey => new SerializedReferenceTarget
             {
                 Reference = referenceTarget,
-                ResolveInfo = ConcatResolveInfo(target, ILionCoreLanguage.ResolveInfoPrefix),
+                ResolveInfo = ConcatResolveInfo(target.Target, ILionCoreLanguage.ResolveInfoPrefix),
             },
             IBuiltInsLanguage.LanguageKey => new SerializedReferenceTarget
             {
                 Reference = referenceTarget,
-                ResolveInfo = ConcatResolveInfo(target, IBuiltInsLanguage.ResolveInfoPrefix),
+                ResolveInfo = ConcatResolveInfo(target.Target, IBuiltInsLanguage.ResolveInfoPrefix),
             },
-            _ => new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() }
+            _ => new SerializedReferenceTarget { Reference = target.TargetId, ResolveInfo = target.Target.GetNodeName() }
         };
     }
 
@@ -323,12 +329,12 @@ public class Serializer : ISerializer
         } + ((IKeyed)target).Name;
 
     private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> references)
+        IEnumerable<Feature> referenceKeys)
     {
         if (SerializeEmptyFeatures)
             return allFeatures
                 .OfType<Reference>()
-                .Except(references.Keys, new FeatureComparer())
+                .Except(referenceKeys, new FeatureComparer())
                 .Select<Feature, SerializedReference>(c => SerializeReference([], c));
 
         return [];
