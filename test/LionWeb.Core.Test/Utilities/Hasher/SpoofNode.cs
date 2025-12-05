@@ -72,7 +72,7 @@ class SpoofNode(string id) : IShape
     public string Uuid { get => null; set { } }
     public IShape SetUuid(string value, INotificationId? notificationId = null) => this;
 
-    IReadOnlyList<IAnnotationInstance> IReadableNodeRaw.GetAnnotationsRaw() => [];
+    IReadOnlyList<IReadableNode> IReadableNodeRaw.GetAnnotationsRaw() => [];
 
     bool IReadableNodeRaw.TryGetPropertyRaw(Property property, out object? value)
     {
@@ -104,11 +104,11 @@ class SpoofNode(string id) : IShape
         return false;
     }
 
-    bool IWritableNodeRaw.AddAnnotationsRaw(IAnnotationInstance annotationInstances) => false;
+    bool IWritableNodeRaw.AddAnnotationsRaw(IWritableNode annotationInstances) => false;
 
-    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IAnnotationInstance annotationInstances) => false;
+    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IWritableNode annotationInstances) => false;
 
-    bool IWritableNodeRaw.RemoveAnnotationsRaw(IAnnotationInstance annotationInstances) => false;
+    bool IWritableNodeRaw.RemoveAnnotationsRaw(IWritableNode annotationInstances) => false;
 
     public bool SetRaw(Feature feature, object? value) => false;
 

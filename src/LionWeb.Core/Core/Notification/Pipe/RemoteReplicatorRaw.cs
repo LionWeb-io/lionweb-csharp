@@ -297,7 +297,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteAnnotationAdded(AnnotationAddedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ((IWritableNodeRaw)n.Parent).InsertAnnotationsRaw(n.Index, (IAnnotationInstance)n.NewAnnotation);
+            var success = ((IWritableNodeRaw)n.Parent).InsertAnnotationsRaw(n.Index, n.NewAnnotation);
             ProduceNotification(n, success);
         });
 
@@ -306,7 +306,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
         {
             CheckMatchingNodeId("Deleted annotation", n, n.DeletedAnnotation, n.Parent.GetAnnotations(), n.Index);
             
-            var success = ((IWritableNodeRaw)n.Parent).RemoveAnnotationsRaw((IAnnotationInstance)n.DeletedAnnotation);
+            var success = ((IWritableNodeRaw)n.Parent).RemoveAnnotationsRaw(n.DeletedAnnotation);
             ProduceNotification(n, success);
         });
 
@@ -317,8 +317,8 @@ public class RemoteReplicatorRaw : RemoteReplicator
                 n.Parent.GetAnnotations(), n.Index);
 
             var localParent = (IWritableNodeRaw)n.Parent;
-            var success = localParent.RemoveAnnotationsRaw((IAnnotationInstance)n.ReplacedAnnotation)
-                          && localParent.InsertAnnotationsRaw(n.Index, (IAnnotationInstance)n.NewAnnotation);
+            var success = localParent.RemoveAnnotationsRaw(n.ReplacedAnnotation)
+                          && localParent.InsertAnnotationsRaw(n.Index, n.NewAnnotation);
 
             ProduceNotification(n, success);
         });
@@ -326,7 +326,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ((IWritableNodeRaw)n.NewParent).InsertAnnotationsRaw(n.NewIndex, (IAnnotationInstance)n.MovedAnnotation);
+            var success = ((IWritableNodeRaw)n.NewParent).InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
             ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
         });
 
@@ -337,8 +337,8 @@ public class RemoteReplicatorRaw : RemoteReplicator
             CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation, n.NewParent.GetAnnotations(), n.NewIndex);
 
             var localNewParent = (IWritableNodeRaw)n.NewParent;
-            var success = localNewParent.RemoveAnnotationsRaw((IAnnotationInstance)n.ReplacedAnnotation)
-                          && localNewParent.InsertAnnotationsRaw(n.NewIndex, (IAnnotationInstance)n.MovedAnnotation);
+            var success = localNewParent.RemoveAnnotationsRaw(n.ReplacedAnnotation)
+                          && localNewParent.InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
 
             ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
         });
@@ -346,7 +346,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ((IWritableNodeRaw)n.Parent).InsertAnnotationsRaw(n.NewIndex, (IAnnotationInstance)n.MovedAnnotation);
+            var success = ((IWritableNodeRaw)n.Parent).InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
             ProduceNotification(n, success);
         });
 
@@ -357,8 +357,8 @@ public class RemoteReplicatorRaw : RemoteReplicator
             CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation, n.Parent.GetAnnotations(), n.NewIndex);
 
             var localParent = (IWritableNodeRaw)n.Parent;
-            var success = localParent.RemoveAnnotationsRaw((IAnnotationInstance)n.ReplacedAnnotation)
-                          && localParent.InsertAnnotationsRaw(n.NewIndex, (IAnnotationInstance)n.MovedAnnotation);
+            var success = localParent.RemoveAnnotationsRaw(n.ReplacedAnnotation)
+                          && localParent.InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
 
             ProduceNotification(n, success);
         });

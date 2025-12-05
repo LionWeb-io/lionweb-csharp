@@ -74,12 +74,12 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
 
     private void ReplaceAnnotation()
     {
-        var index = CheckAnnotation(out IAnnotationInstance selfAnnotation, out IAnnotationInstance replaceAnnotation);
+        var index = CheckAnnotation();
 
-        ReplaceAnnotation(index, replaceAnnotation, selfAnnotation);
+        ReplaceAnnotation(index);
     }
 
-    private Index CheckAnnotation(out IAnnotationInstance selfAnnotation, out IAnnotationInstance replaceAnnotation)
+    private Index CheckAnnotation()
     {
         if (self is not IAnnotationInstance ann || replacement is not IAnnotationInstance replAnn)
             throw new InvalidValueException(null, replacement);
@@ -89,16 +89,13 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
 
-        selfAnnotation = ann;
-        replaceAnnotation = replAnn;
         return _index;
     }
 
-    private void ReplaceAnnotation(Index index, IAnnotationInstance replaceAnnotation,
-        IAnnotationInstance selfAnnotation)
+    private void ReplaceAnnotation(Index index)
     {
-        if (!_parent.InsertAnnotationsRaw(index, replaceAnnotation)
-            || !_parent.RemoveAnnotationsRaw(selfAnnotation))
+        if (!_parent.InsertAnnotationsRaw(index, replacement)
+            || !_parent.RemoveAnnotationsRaw(self))
         {
             throw new InvalidValueException(null, replacement);
         }

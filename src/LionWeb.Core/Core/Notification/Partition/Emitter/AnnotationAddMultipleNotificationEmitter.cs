@@ -39,7 +39,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
     }
 
     public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
-        List<IAnnotationInstance>? addedValues,
+        List<IWritableNode>? addedValues,
         List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues, notificationId)
     {
         _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);

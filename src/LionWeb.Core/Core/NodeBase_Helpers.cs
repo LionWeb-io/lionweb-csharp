@@ -181,16 +181,16 @@ public abstract partial class NodeBase
     /// contains any non-<see cref="Annotation"/> instance,
     /// or contains any annotation that cannot annotate <c>this</c> node's <see cref="IReadableNode.GetClassifier">classifier</see>.
     /// </exception>
-    protected List<IAnnotationInstance> AssureAnnotations([NotNull] IList<INode>? annotations)
+    protected List<IWritableNode> AssureAnnotations([NotNull] IList<INode>? annotations)
     {
         AssureNotNull(annotations, null);
         AssureNotNullMembers(annotations, null);
-        var result = new List<IAnnotationInstance>(annotations.Count);
+        var result = new List<IWritableNode>(annotations.Count);
         foreach (var a in annotations)
         {
             if (!CanAnnotate(a))
                 throw new InvalidValueException(null, a);
-            result.Add((IAnnotationInstance)a);
+            result.Add(a);
         }
         
         return result;

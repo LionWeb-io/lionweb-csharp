@@ -73,12 +73,12 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         notification.Notify();
     }
 
-    bool IWritableNodeRaw.AddAnnotationsRaw(IAnnotationInstance annotation) =>
+    bool IWritableNodeRaw.AddAnnotationsRaw(IWritableNode annotation) =>
         AddAnnotationsRaw(annotation);
 
-    protected internal bool AddAnnotationsRaw(IAnnotationInstance annotation)
+    protected internal bool AddAnnotationsRaw(IWritableNode annotation)
     {
-        if (annotation is null || !annotation.GetAnnotation().CanAnnotate(GetClassifier()))
+        if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
 
         var node = (INode)annotation;
@@ -104,13 +104,12 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IAnnotationInstance annotation) =>
+    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IWritableNode annotation) =>
         InsertAnnotationsRaw(index, annotation);
 
-    protected internal bool InsertAnnotationsRaw(Index index, IAnnotationInstance annotation)
+    protected internal bool InsertAnnotationsRaw(Index index, IWritableNode annotation)
     {
-        if (annotation is null || !IsInRange(index, _annotations) ||
-            !annotation.GetAnnotation().CanAnnotate(GetClassifier()))
+        if (!IsInRange(index, _annotations) || annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
 
         var node = (INode)annotation;
@@ -126,12 +125,12 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
 
 
-    bool IWritableNodeRaw.RemoveAnnotationsRaw(IAnnotationInstance annotation) =>
+    bool IWritableNodeRaw.RemoveAnnotationsRaw(IWritableNode annotation) =>
         RemoveAnnotationsRaw(annotation);
 
-    protected internal bool RemoveAnnotationsRaw(IAnnotationInstance annotation)
+    protected internal bool RemoveAnnotationsRaw(IWritableNode annotation)
     {
-        if (annotation is null || !annotation.GetAnnotation().CanAnnotate(GetClassifier()))
+        if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
 
         return RemoveSelfParent((INode)annotation, _annotations, null);

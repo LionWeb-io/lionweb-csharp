@@ -21,8 +21,15 @@ using M3;
 
 public interface IReadableNodeRaw : IReadableNode
 {
-    protected internal IReadOnlyList<IAnnotationInstance> GetAnnotationsRaw();
+    /// <remarks>
+    /// <i>Should</i> return <c>List{<see cref="IAnnotationInstance"/>}</c>,
+    /// but for broken models we want to allow invalid annotation instances.
+    /// </remarks>
+    protected internal IReadOnlyList<IReadableNode> GetAnnotationsRaw();
 
+    /// <remarks>
+    /// For broken models, we might allow invalid values for a feature (e.g. a string for a containment).
+    /// </remarks>
     protected internal virtual bool TryGetRaw(Feature feature, out object? value)
     {
         switch (feature)

@@ -23,14 +23,29 @@ public interface IWritableNodeRaw : IReadableNodeRaw, IWritableNode
 {
     #region Annotation
 
-    protected internal bool AddAnnotationsRaw(IAnnotationInstance annotation);
+    /// <remarks>
+    /// <i>Should</i> take an <see cref="IAnnotationInstance"/>,
+    /// but for broken models we want to allow invalid annotation instances.
+    /// </remarks>
+    protected internal bool AddAnnotationsRaw(IWritableNode annotation);
     
-    protected internal bool InsertAnnotationsRaw(Index index, IAnnotationInstance annotation);
+    /// <remarks>
+    /// <i>Should</i> take an <see cref="IAnnotationInstance"/>,
+    /// but for broken models we want to allow invalid annotation instances.
+    /// </remarks>
+    protected internal bool InsertAnnotationsRaw(Index index, IWritableNode annotation);
 
-    protected internal bool RemoveAnnotationsRaw(IAnnotationInstance annotation);
+    /// <remarks>
+    /// <i>Should</i> take an <see cref="IAnnotationInstance"/>,
+    /// but for broken models we want to allow invalid annotation instances.
+    /// </remarks>
+    protected internal bool RemoveAnnotationsRaw(IWritableNode annotation);
 
     #endregion
 
+    /// <remarks>
+    /// For broken models, we might allow invalid values for a feature (e.g. a string for a containment).
+    /// </remarks>
     protected internal bool SetRaw(Feature feature, object? value);
     
     #region Property

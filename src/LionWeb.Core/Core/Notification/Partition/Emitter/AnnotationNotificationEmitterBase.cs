@@ -34,9 +34,9 @@ public abstract class AnnotationNotificationEmitterBase : PartitionNotificationE
         NewValues = newValues?.ToDictionary<INode, INode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
     }
 
-    protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<IAnnotationInstance>? newValues, INotificationId? notificationId = null) : base(destinationParent, notificationId)
+    protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<IWritableNode>? newValues, INotificationId? notificationId = null) : base(destinationParent, notificationId)
     {
-        NewValues = newValues?.ToDictionary<IAnnotationInstance, INode, OldAnnotationInfo?>(k => (INode)k, _ => null) ?? [];
+        NewValues = newValues?.ToDictionary<IWritableNode, INode, OldAnnotationInfo?>(k => (INode)k, _ => null) ?? [];
     }
 
     /// <inheritdoc />

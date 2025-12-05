@@ -89,7 +89,7 @@ public partial class Deserializer
 
         foreach (var annotation in annotations)
         {
-            node.AddAnnotationsRaw((IAnnotationInstance)annotation);
+            node.AddAnnotationsRaw(annotation);
         }
     }
 

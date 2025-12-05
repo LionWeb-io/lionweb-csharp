@@ -31,12 +31,12 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.InsertAnnotationsRaw(0, values[0]);
         parent.InsertAnnotationsRaw(1, values[1]);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { valueA, valueB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -45,12 +45,12 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.InsertAnnotationsRaw(0, values[0]);
         parent.InsertAnnotationsRaw(1, values[1]);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { valueA, valueB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -61,13 +61,13 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(ann);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.InsertAnnotationsRaw(0, values[0]);
         parent.InsertAnnotationsRaw(1, values[1]);
         Assert.AreSame(parent, ann.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { valueA, valueB, ann }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB, ann }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -78,13 +78,13 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(ann);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.InsertAnnotationsRaw(1, values[0]);
         parent.InsertAnnotationsRaw(2, values[1]);
         Assert.AreSame(parent, ann.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { ann, valueA, valueB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { ann, valueA, valueB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -97,14 +97,14 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(docB);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.InsertAnnotationsRaw(0, values[0]);
         parent.InsertAnnotationsRaw(1, values[1]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { valueA, valueB, docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { valueA, valueB, docA, docB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -117,14 +117,14 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(docB);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.InsertAnnotationsRaw(1, values[0]);
         parent.InsertAnnotationsRaw(2, values[1]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { docA, valueA, valueB, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { docA, valueA, valueB, docB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -137,14 +137,14 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(docB);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.InsertAnnotationsRaw(2, values[0]);
         parent.InsertAnnotationsRaw(3, values[1]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { docA, docB, valueA, valueB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { docA, docB, valueA, valueB }, parent.GetAnnotations().ToList());
     }
 
     #endregion
@@ -157,7 +157,7 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance>() { valueA, valueB };
+        var values = new List<IWritableNode>() { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.IsNull(valueA.GetParent());
@@ -172,7 +172,7 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.IsNull(valueA.GetParent());
@@ -191,14 +191,14 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(docB);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { docA, docB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -210,13 +210,13 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(docA);
         parent.AddAnnotationsRaw(docB);
         var valueA = new TestAnnotation("sA");
-        var values = new List<IAnnotationInstance> { valueA, docA };
+        var values = new List<IWritableNode> { valueA, docA };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.AreSame(parent, docB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(docA.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { docB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -227,12 +227,12 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         parent.AddAnnotationsRaw(valueA);
         parent.AddAnnotationsRaw(valueB);
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -245,13 +245,13 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(valueA);
         parent.AddAnnotationsRaw(valueB);
         parent.AddAnnotationsRaw(doc);
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { doc }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { doc }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -264,13 +264,13 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(doc);
         parent.AddAnnotationsRaw(valueA);
         parent.AddAnnotationsRaw(valueB);
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { doc }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { doc }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -285,14 +285,14 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(valueA);
         parent.AddAnnotationsRaw(valueB);
         parent.AddAnnotationsRaw(docB);
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { docA, docB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -307,14 +307,14 @@ public class MultipleCollectionTests
         parent.AddAnnotationsRaw(docA);
         parent.AddAnnotationsRaw(valueB);
         parent.AddAnnotationsRaw(docB);
-        var values = new List<IAnnotationInstance> { valueA, valueB };
+        var values = new List<IWritableNode> { valueA, valueB };
         parent.RemoveAnnotationsRaw(values[0]);
         parent.RemoveAnnotationsRaw(values[1]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IAnnotationInstance> { docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<IWritableNode> { docA, docB }, parent.GetAnnotations().ToList());
     }
 
     #endregion
@@ -325,7 +325,7 @@ public class MultipleCollectionTests
         var parent = new LinkTestConcept("g");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
-        var values = new List<IAnnotationInstance>() { valueA, valueB };
+        var values = new List<IWritableNode>() { valueA, valueB };
         Assert.IsTrue(parent.AddAnnotationsRaw(values[0]));
         Assert.IsTrue(parent.AddAnnotationsRaw(values[1]));
         Assert.AreSame(parent, valueA.GetParent());
@@ -340,7 +340,7 @@ public class MultipleCollectionTests
     {
         var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
-        var values = new List<IAnnotationInstance>() { value };
+        var values = new List<IWritableNode>() { value };
         Assert.IsFalse(parent.AddAnnotationsRaw(values[0]));
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));
@@ -351,7 +351,7 @@ public class MultipleCollectionTests
     {
         var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
-        var values = new List<IAnnotationInstance>() { value };
+        var values = new List<IWritableNode>() { value };
         Assert.IsFalse(parent.InsertAnnotationsRaw(0, values[0]));
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));
@@ -362,7 +362,7 @@ public class MultipleCollectionTests
     {
         var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
-        var values = new List<IAnnotationInstance>() { value };
+        var values = new List<IWritableNode>() { value };
         Assert.IsFalse(parent.RemoveAnnotationsRaw(values[0]));
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));

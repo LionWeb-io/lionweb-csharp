@@ -19,29 +19,35 @@ namespace LionWeb.Core.M1.Raw;
 
 using M3;
 
+/// <inheritdoc cref="IReadableNodeRaw"/>
 public static class IReadableNodeRawExtensions
 {
     /// <inheritdoc cref="IReadableNodeRaw.GetAnnotationsRaw"/>
-    public static IReadOnlyList<IAnnotationInstance> GetAnnotationsRaw(this IReadableNodeRaw self) =>
+    public static IReadOnlyList<IReadableNode> GetAnnotationsRaw(this IReadableNodeRaw self) =>
         self.GetAnnotationsRaw();
 
+    /// <inheritdoc cref="IReadableNodeRaw.TryGetRaw"/>
+    public static bool TryGetRaw(this IReadableNodeRaw self, Feature feature, out object? value) =>
+        self.TryGetRaw(feature, out value);
+
     /// <inheritdoc cref="IReadableNodeRaw.TryGetPropertyRaw"/>
-    public static bool TryGetPropertyRaw(this IReadableNodeRaw self, Feature property, out object? value) =>
+    public static bool TryGetPropertyRaw(this IReadableNodeRaw self, Property property, out object? value) =>
         self.TryGetPropertyRaw(property, out value);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentRaw"/>
-    public static bool TryGetContainmentRaw(this IReadableNodeRaw self, Feature containment, out IWritableNode? node) =>
+    public static bool TryGetContainmentRaw(this IReadableNodeRaw self, Containment containment, out IReadableNode? node) =>
         self.TryGetContainmentRaw(containment, out node);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentsRaw"/>
-    public static bool TryGetContainmentsRaw(this IReadableNodeRaw self, Feature containment,
-        out IReadOnlyList<IWritableNode> nodes) => self.TryGetContainmentsRaw(containment, out nodes);
+    public static bool TryGetContainmentsRaw(this IReadableNodeRaw self, Containment containment,
+        out IReadOnlyList<IReadableNode> nodes) =>
+        self.TryGetContainmentsRaw(containment, out nodes);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetReferenceRaw"/>
-    public static bool TryGetReferenceRaw(this IReadableNodeRaw self, Feature reference, out IReferenceTarget? target) =>
+    public static bool TryGetReferenceRaw(this IReadableNodeRaw self, Reference reference, out IReferenceTarget? target) =>
         self.TryGetReferenceRaw(reference, out target);
 
     /// <inheritdoc cref="IReadableNodeRaw.TryGetReferencesRaw"/>
-    public static bool TryGetReferencesRaw(this IReadableNodeRaw self, Feature reference,
+    public static bool TryGetReferencesRaw(this IReadableNodeRaw self, Reference reference,
         out IReadOnlyList<IReferenceTarget> targets) => self.TryGetReferencesRaw(reference, out targets);
 }
