@@ -30,7 +30,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("od");
         var values = new LinkTestConcept[0];
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     [TestMethod]
@@ -38,7 +38,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("od");
         var values = new ArrayList();
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     [TestMethod]
@@ -46,7 +46,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("od");
         var values = new List<INode>();
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     #endregion
@@ -58,7 +58,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("od");
         var values = new LinkTestConcept[] { null };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     [TestMethod]
@@ -66,7 +66,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("od");
         var values = new ArrayList() { null };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     [TestMethod]
@@ -74,7 +74,7 @@ public class CollectionTests
     {
         var parent = new LinkTestConcept("od");
         var values = new List<INode>() { null };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     #endregion
@@ -88,7 +88,7 @@ public class CollectionTests
         var value = new LinkTestConcept("s");
         var values = new LinkTestConcept[] { value };
 
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(value.GetParent());
     }
@@ -99,7 +99,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("od");
         var value = new LinkTestConcept("s");
         var values = new object[] { value };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(value.GetParent());
     }
@@ -110,7 +110,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("od");
         var value = new LinkTestConcept("s");
         var values = new ArrayList() { value };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(value.GetParent());
     }
@@ -121,7 +121,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("od");
         var value = new LinkTestConcept("s");
         var values = new List<INode>() { value };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(value.GetParent());
     }
@@ -132,7 +132,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("od");
         var value = new LinkTestConcept("c");
         var values = new ArrayList() { value };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     [TestMethod]
@@ -141,7 +141,7 @@ public class CollectionTests
         var parent = new LinkTestConcept("od");
         var value = new LinkTestConcept("c");
         var values = new object[] { value };
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
     }
 
     #endregion

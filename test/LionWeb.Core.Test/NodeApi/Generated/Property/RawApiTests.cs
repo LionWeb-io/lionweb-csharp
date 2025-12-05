@@ -87,8 +87,8 @@ public class RawApiTests
     public void Integer_Optional_Unset_Reflective()
     {
         var parent = new DataTypeTestConcept("od") { IntegerValue_1 = 10 };
-        Assert.IsTrue(parent.SetPropertyRaw(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_0_1, null));
-        Assert.IsTrue(parent.TryGetPropertyRaw(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_0_1, out var result));
+        Assert.IsTrue(parent.SetPropertyRaw(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, null));
+        Assert.IsTrue(parent.TryGetPropertyRaw(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, out var result));
         Assert.IsNull(result);
     }
 
@@ -204,7 +204,7 @@ public class RawApiTests
     [TestMethod]
     public void Enum_Required_Unset_Reflective()
     {
-        var parent = new DataTypeTestConcept("od") { EnumValue_0_1 = TestEnumeration.literal2 };
+        var parent = new DataTypeTestConcept("od") { EnumValue_1 = TestEnumeration.literal2 };
         Assert.IsTrue(parent.SetPropertyRaw(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1, null));
         Assert.IsTrue(parent.TryGetPropertyRaw(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1, out var result));
         Assert.IsNull(result);

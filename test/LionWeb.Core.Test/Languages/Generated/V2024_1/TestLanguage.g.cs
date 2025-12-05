@@ -246,11 +246,21 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 	{
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, this, value, _booleanValue_0_1);
 		emitter.CollectOldData();
-		_booleanValue_0_1 = value;
-		emitter.Notify();
+		if (SetBooleanValue_0_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
 
+    private bool SetBooleanValue_0_1Raw(bool? value)
+    {
+        if (value == _booleanValue_0_1)
+            return false;
+        
+        _booleanValue_0_1 = value;
+        return true;
+    }
+
+    
 	private bool? _booleanValue_1 = null;
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If BooleanValue_1 has not been set</exception>
@@ -270,10 +280,19 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 	{
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_1, this, value, _booleanValue_1);
 		emitter.CollectOldData();
-		_booleanValue_1 = value;
-		emitter.Notify();
+		if (SetBooleanValue_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetBooleanValue_1Raw(bool? value)
+    {
+        if (value == _booleanValue_1)
+            return false;
+        
+        _booleanValue_1 = value;
+        return true;
+    }
 
 	private TestEnumeration? _enumValue_0_1 = null;
 	/// <remarks>Optional Property</remarks>
@@ -293,10 +312,19 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 	{
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, this, value, _enumValue_0_1);
 		emitter.CollectOldData();
-		_enumValue_0_1 = value;
-		emitter.Notify();
+		if (SetEnumValue_0_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetEnumValue_0_1Raw(TestEnumeration? value)
+    {
+        if (value == _enumValue_0_1)
+            return false;
+        
+        _enumValue_0_1 = value;
+        return true;
+    }
 
 	private TestEnumeration? _enumValue_1 = null;
 	/// <remarks>Required Property</remarks>
@@ -321,10 +349,19 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		AssureNotNull(value, TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1);
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1, this, value, _enumValue_1);
 		emitter.CollectOldData();
-		_enumValue_1 = value;
-		emitter.Notify();
+		if (SetEnumValue_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetEnumValue_1Raw(TestEnumeration? value)
+    {
+        if (value == _enumValue_1)
+            return false;
+        
+        _enumValue_1 = value;
+        return true;
+    }
 
 	private int? _integerValue_0_1 = null;
 	/// <remarks>Optional Property</remarks>
@@ -344,10 +381,19 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 	{
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_0_1, this, value, _integerValue_0_1);
 		emitter.CollectOldData();
-		_integerValue_0_1 = value;
-		emitter.Notify();
+		if (SetIntegerValue_0_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetIntegerValue_0_1Raw(int? value)
+    {
+        if (value == _integerValue_0_1)
+            return false;
+        
+        _integerValue_0_1 = value;
+        return true;
+    }
 
 	private int? _integerValue_1 = null;
 	/// <remarks>Required Property</remarks>
@@ -368,10 +414,19 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 	{
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, this, value, _integerValue_1);
 		emitter.CollectOldData();
-		_integerValue_1 = value;
-		emitter.Notify();
+		if(SetIntegerValue_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetIntegerValue_1Raw(int? value)
+    {
+        if (value == _integerValue_1)
+            return false;
+        
+        _integerValue_1 = value;
+        return true;
+    }
 
 	private string? _stringValue_0_1 = null;
 	/// <remarks>Optional Property</remarks>
@@ -391,10 +446,19 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 	{
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, this, value, _stringValue_0_1);
 		emitter.CollectOldData();
-		_stringValue_0_1 = value;
-		emitter.Notify();
+        if (SetStringValue_0_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetStringValue_0_1Raw(string? value)
+    {
+        if (value == _stringValue_0_1)
+            return false;
+        
+        _stringValue_0_1 = value;
+        return true;
+    }
 
 	private string? _stringValue_1 = null;
 	/// <remarks>Required Property</remarks>
@@ -419,10 +483,19 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		AssureNotNull(value, TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_1);
 		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_1, this, value, _stringValue_1);
 		emitter.CollectOldData();
-		_stringValue_1 = value;
-		emitter.Notify();
+		if (SetStringValue_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetStringValue_1Raw(string? value)
+    {
+        if (value == _stringValue_1)
+            return false;
+        
+        _stringValue_1 = value;
+        return true;
+    }
 
 	public DataTypeTestConcept(string id) : base(id)
 	{
@@ -647,8 +720,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
 			if (value is null or bool)
 			{
-				_booleanValue_0_1 = (bool?)value;
-				return true;
+				return SetBooleanValue_0_1Raw((bool?)value);
 			}
 		}
 
@@ -656,8 +728,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
             if (value is null or bool)
 			{
-				_booleanValue_1 = (bool?)value;
-				return true;
+				return SetBooleanValue_1Raw((bool?)value);
 			}
 		}
 
@@ -665,8 +736,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration)
 			{
-				_enumValue_0_1 = (LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration?)value;
-				return true;
+				return SetEnumValue_0_1Raw((TestEnumeration?)value);
 			}
 		}
 
@@ -674,8 +744,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
             if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration)
             {
-                _enumValue_1 = (LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.TestEnumeration?)value;
-				return true;
+                return SetEnumValue_1Raw((TestEnumeration?)value);
 			}
 		}
 
@@ -683,8 +752,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
 			if (value is null or int)
 			{
-				_integerValue_0_1 = (int?)value;
-				return true;
+				return SetIntegerValue_0_1Raw((int?)value);
 			}
 		}
 
@@ -692,8 +760,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
             if (value is null or int)
             {
-                _integerValue_1 = (int?)value;
-				return true;
+                return SetIntegerValue_1Raw((int?)value);
 			}
 		}
 
@@ -701,8 +768,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
 			if (value is null or string)
 			{
-				_stringValue_0_1 = (string?)value;
-				return true;
+				return SetStringValue_0_1Raw((string?)value);
 			}
 		}
 
@@ -710,8 +776,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		{
             if (value is null or string)
             {
-                _stringValue_1 = (string?)value;
-				return true;
+                return SetStringValue_1Raw((string?)value);
 			}
 		}
 
@@ -770,8 +835,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		AssureNotNull(value, _builtIns.INamed_name);
 		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		SetNameRaw(value);
-		emitter.Notify();
+		if (SetNameRaw(value));
+		    emitter.Notify();
 		return this;
 	}
 
@@ -802,17 +867,22 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	{
 		ContainmentSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, this, value, _containment_0_1);
 		emitter.CollectOldData();
-		SetContainment_0_1Raw(value);
-        emitter.Notify();
+		if (SetContainment_0_1Raw(value))
+            emitter.Notify();
 		return this;
 	}
 
-    private void SetContainment_0_1Raw(LinkTestConcept? value)
+    private bool SetContainment_0_1Raw(LinkTestConcept? value)
     {
+        if (_containment_0_1 == value)
+            return false;
+        
 		SetParentNull(_containment_0_1);
 		AttachChild(value);
 		_containment_0_1 = value;
-	}
+
+        return true;
+    }
 
 	private readonly List<LinkTestConcept> _containment_0_n = [];
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -827,10 +897,15 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return containment_0_n.Count != 0;
 	}
 
-    private void SetContainment_0_nRaw(List<LinkTestConcept> nodes)
+    private bool SetContainment_0_nRaw(List<LinkTestConcept> nodes)
     {
+        if (_containment_0_n.SequenceEqual(nodes))
+            return false;
+        
         RemoveSelfParent(_containment_0_n.ToList(), _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
         _containment_0_n.AddRange(SetSelfParent(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
+
+        return true;
     }
 
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -845,8 +920,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		{
 			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, [safeNode], _containment_0_n, null);
 			emitter.CollectOldData();
-            AddContainment_0_nRaw(safeNode);
-			emitter.Notify();
+            if (AddContainment_0_nRaw(safeNode))
+			    emitter.Notify();
 		}
 
 		return this;
@@ -854,7 +929,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     
     private bool AddContainment_0_nRaw(LinkTestConcept? node)
     {
-        if (node is null)
+        if (node is null || _containment_0_n.Count != 0 && _containment_0_n[^1] == node)
             return false;
         
         AttachChild(node);
@@ -874,16 +949,16 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         foreach (var safeNode in safeNodes)
         {
 		    ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, [safeNode], _containment_0_n, index);
-		emitter.CollectOldData();
-		    InsertContainment_0_nRaw(index++, safeNode);
-		emitter.Notify();
+		    emitter.CollectOldData();
+		    if (InsertContainment_0_nRaw(index++, safeNode))
+		        emitter.Notify();
         }
 		return this;
 	}
 
     private bool InsertContainment_0_nRaw(int index, LinkTestConcept node)
     {
-        if (node is null || !IsInRange(index, _containment_0_n))
+        if (node is null || !IsInRange(index, _containment_0_n) || _containment_0_n.Count > index && _containment_0_n[index] == node)
             return false;
 
         AttachChild(node);
@@ -904,9 +979,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     {
         if (node is null)
             return false;
+
+        if (_containment_0_n.Remove(node))
+        {
+            SetParentNull(node);
+            return true;
+        }
         
-        SetParentNull(node);
-        return _containment_0_n.Remove(node);
+        return false;
     }
 
 	private LinkTestConcept? _containment_1 = null;
@@ -931,17 +1011,22 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		AssureNotNull(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_1);
 		ContainmentSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, this, value, _containment_1);
 		emitter.CollectOldData();
-		SetContainment_1Raw(value);
-        emitter.Notify();
+		if (SetContainment_1Raw(value))
+            emitter.Notify();
 		return this;
 	}
 
-    private void SetContainment_1Raw(LinkTestConcept? value)
+    private bool SetContainment_1Raw(LinkTestConcept? value)
     {
+        if (_containment_1 == value)
+            return false;
+        
 		SetParentNull(_containment_1);
 		AttachChild(value);
 		_containment_1 = value;
-	}
+
+        return true;
+    }
 
 	private readonly List<LinkTestConcept> _containment_1_n = [];
 	/// <remarks>Required Multiple Containment</remarks>
@@ -957,10 +1042,15 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return containment_1_n.Count != 0;
 	}
 
-    private void SetContainment_1_nRaw(List<LinkTestConcept> nodes)
+    private bool SetContainment_1_nRaw(List<LinkTestConcept> nodes)
     {
+        if (_containment_1_n.SequenceEqual(nodes))
+            return false;
+        
         RemoveSelfParent(_containment_1_n.ToList(), _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
         _containment_1_n.AddRange(SetSelfParent(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
+
+        return true;
     }
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -975,8 +1065,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		{
 			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, [safeNode], _containment_1_n, null);
 			emitter.CollectOldData();
-            AddContainment_1_nRaw(safeNode);
-			emitter.Notify();
+            if (AddContainment_1_nRaw(safeNode))
+			    emitter.Notify();
 		}
 
 		return this;
@@ -985,7 +1075,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     
     private bool AddContainment_1_nRaw(LinkTestConcept? node)
     {
-        if (node is null)
+        if (node is null || _containment_1_n.Count != 0 && _containment_1_n[^1] == node)
             return false;
         
         AttachChild(node);
@@ -1007,16 +1097,16 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         foreach (var safeNode in safeNodes)
         {
 		    ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, [safeNode], _containment_1_n, index);
-		emitter.CollectOldData();
-		    InsertContainment_1_nRaw(index++, safeNode);
-		emitter.Notify();
+		    emitter.CollectOldData();
+		    if (InsertContainment_1_nRaw(index++, safeNode))
+		        emitter.Notify();
         }
 		return this;
 	}
 
     private bool InsertContainment_1_nRaw(int index, LinkTestConcept node)
     {
-        if (node is null || !IsInRange(index, _containment_1_n))
+        if (node is null || !IsInRange(index, _containment_1_n) || _containment_1_n.Count > index && _containment_1_n[index] == node)
             return false;
 
         AttachChild(node);
@@ -1040,9 +1130,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     {
         if (node is null)
             return false;
+
+        if (_containment_1_n.Remove(node))
+        {
+            SetParentNull(node);
+            return true;
+        }
         
-        SetParentNull(node);
-        return _containment_1_n.Remove(node);
+        return false;
     }
 
 	private ReferenceTarget? _reference_0_1 = null;
@@ -1063,9 +1158,18 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		AssureNullableInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1);
 		emitter.CollectOldData();
-		_reference_0_1 = value;
-		emitter.Notify();
+		if(SetReference_0_1Raw(value))
+		    emitter.Notify();
 		return this;
+	}
+
+	private bool SetReference_0_1Raw(ReferenceTarget? value)
+    {
+        if (_reference_0_1 == value)
+            return false;
+
+        _reference_0_1 = value;
+        return true;
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
@@ -1083,10 +1187,15 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_0_n) => TryGetReference<LinkTestConcept>(_reference_0_n, out reference_0_n);
 
-        private void SetReference_0_nRaw(List<ReferenceTarget> targets)
+        private bool SetReference_0_nRaw(List<ReferenceTarget> targets)
         {
+            if (_reference_0_n.SequenceEqual(targets))
+                return false;
+            
             _reference_0_n.Clear();
             _reference_0_n.AddRange(targets);
+
+            return true;
         }
     
 	/// <remarks>Optional Multiple Reference</remarks>
@@ -1098,9 +1207,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         foreach (var safeNode in safeNodes)
         {
 		    ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, [safeNode], _reference_0_n.Count);
-		emitter.CollectOldData();
-		    AddReference_0_nRaw(safeNode);
-		emitter.Notify();
+		    emitter.CollectOldData();
+		    if (AddReference_0_nRaw(safeNode))
+		        emitter.Notify();
         }
 		return this;
 	}
@@ -1124,9 +1233,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         foreach (var safeNode in safeNodes)
         {
 		    ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, [safeNode], index);
-		emitter.CollectOldData();
-		    InsertReference_0_nRaw(index++, safeNode);
-		emitter.Notify();
+		    emitter.CollectOldData();
+		    if (InsertReference_0_nRaw(index++, safeNode))
+		        emitter.Notify();
         }
 		return this;
 	}
@@ -1151,7 +1260,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	}
 
     private bool RemoveReference_0_nRaw(ReferenceTarget target) =>
-        RemoveAll([target], _reference_0_n);
+        Remove(target, _reference_0_n);
 
 	private ReferenceTarget? _reference_1 = null;
 	/// <remarks>Required Single Reference</remarks>
@@ -1173,10 +1282,19 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		AssureNotNullInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
 		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1);
 		emitter.CollectOldData();
-		_reference_1 = value;
-		emitter.Notify();
+		if (SetReference_1Raw(value))
+		    emitter.Notify();
 		return this;
 	}
+
+    private bool SetReference_1Raw(ReferenceTarget? value)
+    {
+        if (_reference_1 == value)
+            return false;
+
+        _reference_1 = value;
+        return true;
+    }
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -1195,10 +1313,15 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_1_n) => TryGetReference<LinkTestConcept>(_reference_1_n, out reference_1_n);
 
-        private void SetReference_1_nRaw(List<ReferenceTarget> targets)
+        private bool SetReference_1_nRaw(List<ReferenceTarget> targets)
         {
+            if (_reference_1_n.SequenceEqual(targets))
+                return false;
+            
             _reference_1_n.Clear();
             _reference_1_n.AddRange(targets);
+
+            return true;
         }
 
 	/// <remarks>Required Multiple Reference</remarks>
@@ -1211,9 +1334,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         foreach (var safeNode in safeNodes)
         {
 		    ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, [safeNode], _reference_1_n.Count);
-		emitter.CollectOldData();
-		    AddReference_1_nRaw(safeNode);
-		emitter.Notify();
+		    emitter.CollectOldData();
+		    if (AddReference_1_nRaw(safeNode))
+		        emitter.Notify();
         }
 		return this;
 	}
@@ -1239,9 +1362,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         foreach (var safeNode in safeNodes)
         {
 		    ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, [safeNode], index);
-		emitter.CollectOldData();
-		    InsertReference_1_nRaw(index, safeNode);
-		emitter.Notify();
+		    emitter.CollectOldData();
+		    if (InsertReference_1_nRaw(index, safeNode))
+		        emitter.Notify();
         }
 		return this;
 	}
@@ -1269,7 +1392,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	}
 
     private bool RemoveReference_1_nRaw(ReferenceTarget target) =>
-        RemoveAll([target], _reference_1_n);
+        Remove(target, _reference_1_n);
 
 	public LinkTestConcept(string id) : base(id)
 	{
@@ -1467,9 +1590,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value).ToList();
 			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, notificationId);
 			emitter.CollectOldData();
-			RemoveSelfParent(_containment_0_n.ToList(), _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
-			_containment_0_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
-			emitter.Notify();
+            if (SetContainment_0_nRaw(safeNodes))
+    			emitter.Notify();
 			return true;
 		}
 
@@ -1490,9 +1612,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			AssureNonEmpty(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
 			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, notificationId);
 			emitter.CollectOldData();
-			RemoveSelfParent(_containment_1_n.ToList(), _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
-			_containment_1_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
-			emitter.Notify();
+            if (SetContainment_1_nRaw(safeNodes))
+    			emitter.Notify();
 			return true;
 		}
 
@@ -1520,9 +1641,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n, notificationId);
 			emitter.CollectOldData();
-			_reference_0_n.Clear();
-			_reference_0_n.AddRange(safeNodes);
-			emitter.Notify();
+            if (SetReference_0_nRaw(safeNodes))
+    			emitter.Notify();
 			return true;
 		}
 
@@ -1549,9 +1669,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			AssureNonEmpty(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n, notificationId);
 			emitter.CollectOldData();
-			_reference_1_n.Clear();
-			_reference_1_n.AddRange(safeNodes);
-			emitter.Notify();
+            if (SetReference_1_nRaw(safeNodes))
+    			emitter.Notify();
 			return true;
 		}
 
@@ -1583,8 +1702,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		{
 			if (node is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept)
 			{
-				SetContainment_0_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)node);
-				return true;
+				return SetContainment_0_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)node);
 			}
 		}
 
@@ -1592,8 +1710,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		{
 			if (node is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept)
 			{
-				SetContainment_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)node);
-				return true;
+				return SetContainment_1Raw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept?)node);
 			}
 		}
 
@@ -1607,14 +1724,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(reference))
 		{
-				_reference_0_1 = target;
-				return true;
+				return SetReference_0_1Raw(target);
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1.EqualsIdentity(reference))
 		{
-				_reference_1 = target;
-				return true;
+            return SetReference_1Raw(target);
 		}
 
 		return false;
@@ -1947,10 +2062,19 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		AssureNotNull(value, _builtIns.INamed_name);
 		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+        if(SetNameRaw(value))
+    		emitter.Notify();
 		return this;
 	}
+
+    private bool SetNameRaw(string? value)
+    {
+        if (value == _name)
+            return false;
+        
+        _name = value;
+        return true;
+    }
 
 	public TestAnnotation(string id) : base(id)
 	{
@@ -2029,8 +2153,8 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		AssureNotNull(value, _builtIns.INamed_name);
 		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-        SetNameRaw(value);
-		emitter.Notify();
+        if (SetNameRaw(value))
+		    emitter.Notify();
 		return this;
 	}
 
@@ -2056,6 +2180,17 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return links.Count != 0;
 	}
 
+    private bool SetLinksRaw(List<LinkTestConcept> nodes)
+    {
+        if (_links.SequenceEqual(nodes))
+            return false;
+        
+        RemoveSelfParent(_links.ToList(), _links, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
+        _links.AddRange(SetSelfParent(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
+
+        return true;
+    }
+
 	/// <remarks>Optional Multiple Containment</remarks>
         public TestPartition AddLinks(IEnumerable<LinkTestConcept> nodes)
 	{
@@ -2068,8 +2203,8 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		{
 			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_links, this, [safeNode], _links, null);
 			emitter.CollectOldData();
-            AddLinksRaw(safeNode);
-			emitter.Notify();
+            if (AddLinksRaw(safeNode))
+			    emitter.Notify();
 		}
 
 		return this;
@@ -2077,7 +2212,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
     private bool AddLinksRaw(LinkTestConcept node)
     {
-        if (node is null)
+        if (node is null || _links.Count != 0 && _links[^1] == node)
             return false;
         
         AttachChild(node);
@@ -2098,15 +2233,15 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         {
             ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_links, this, [safeNode], _links, index);
             emitter.CollectOldData();
-            InsertLinksRaw(index, safeNode);
-            emitter.Notify();
+            if (InsertLinksRaw(index, safeNode))
+                emitter.Notify();
         }
 		return this;
 	}
 
     private bool InsertLinksRaw(int index, LinkTestConcept node)
     {
-        if (node is null || !IsInRange(index, _links))
+        if (node is null || !IsInRange(index, _links) || _links.Count > index && _links[index] == node)
             return false;
 
         AttachChild(node);
@@ -2127,9 +2262,14 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
     {
         if (node is null)
             return false;
+
+        if (_links.Remove(node))
+        {
+            SetParentNull(node);
+            return true;
+        }
         
-        SetParentNull(node);
-        return _links.Remove(node);
+        return false;
     }
 
     private DataTypeTestConcept? _data = null;
@@ -2150,16 +2290,21 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	{
 		ContainmentSingleNotificationEmitter<DataTypeTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_data, this, value, _data);
 		emitter.CollectOldData();
-		SetDataRaw(value);
-		emitter.Notify();
+		if (SetDataRaw(value))
+		    emitter.Notify();
 		return this;
 	}
 
-    private void SetDataRaw(DataTypeTestConcept? value)
+    private bool SetDataRaw(DataTypeTestConcept? value)
     {
+        if (_data == value)
+            return false;
+        
         SetParentNull(_data);
         AttachChild(value);
         _data = value;
+
+        return true;
     }
 
 	public TestPartition(string id) : base(id)
@@ -2273,9 +2418,8 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			var safeNodes = TestLanguageLanguage.Instance.TestPartition_links.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value).ToList();
 			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_links, this, safeNodes, _links, notificationId);
 			emitter.CollectOldData();
-			RemoveSelfParent(_links.ToList(), _links, TestLanguageLanguage.Instance.TestPartition_links);
-			_links.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.TestPartition_links));
-			emitter.Notify();
+            if (SetLinksRaw(safeNodes))
+    			emitter.Notify();
 			return true;
 		}
 
@@ -2307,8 +2451,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         {
             if (node is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept)
             {
-                SetDataRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept?)node);
-                return true;
+                return SetDataRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept?)node);
             }
         }
 

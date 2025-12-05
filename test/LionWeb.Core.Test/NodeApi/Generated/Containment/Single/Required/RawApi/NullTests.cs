@@ -26,7 +26,7 @@ public class NullTests
     public void Reflective()
     {
         var parent = new LinkTestConcept("od");
-        Assert.IsTrue(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.IsFalse(parent.SetContainmentRaw(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
         Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
     }
 

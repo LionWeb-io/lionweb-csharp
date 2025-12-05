@@ -431,24 +431,32 @@ public abstract partial class NodeBase
         
         foreach (var t in targets)
         {
-            var index = storage.FindIndex(r =>
-            {
-                if (t.Target is not null)
-                    return Equals(t.Target, r.Target);
-                
-                if (t.TargetId is not null)
-                    return Equals(t.TargetId, r.TargetId);
-                
-                return Equals(t.ResolveInfo, r.ResolveInfo);
-            });
-            if (index < 0)
-                continue;
-
-            result = true;
-            storage.RemoveAt(index);
+            result |= Remove(t, storage);
         }
         
         return result;
+    }
+
+    protected bool Remove(ReferenceTarget target, List<ReferenceTarget> storage)
+    {
+        if (target is null)
+            return false;
+        
+        var index = storage.FindIndex(r =>
+        {
+            if (target.Target is not null)
+                return Equals(target.Target, r.Target);
+                
+            if (target.TargetId is not null)
+                return Equals(target.TargetId, r.TargetId);
+                
+            return Equals(target.ResolveInfo, r.ResolveInfo);
+        });
+        if (index < 0)
+            return false;
+
+        storage.RemoveAt(index);
+        return true;
     }
     
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
