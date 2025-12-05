@@ -219,10 +219,10 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
                        && ((IReadOnlyList<IWritableNode>)deletedChildren).All(d => RemoveContainmentsRaw(f, d))
                        && v.All(a => AddContainmentsRaw(f, a));
             
-            case (Reference { Multiple: true } f, IEnumerable<ReferenceTarget> v):
+            case (Reference { Multiple: true } f, IEnumerable<IReferenceTarget> v):
                 return TryGetReferencesRaw(f, out var deletedTargets)
                        && deletedTargets.All(d => RemoveReferencesRaw(f, (ReferenceTarget)d))
-                       && v.All(a => AddReferencesRaw(f, a));
+                       && v.All(a => AddReferencesRaw(f, (ReferenceTarget)a));
             
             default:
                 return false;

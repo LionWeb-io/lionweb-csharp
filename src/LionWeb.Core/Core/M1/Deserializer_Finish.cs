@@ -23,7 +23,7 @@ using M3;
 public partial class Deserializer
 {
     /// <inheritdoc />
-    public override IEnumerable<IWritableNode> Finish()
+    public override IEnumerable<IWritableNodeRaw> Finish()
     {
         foreach (var compressedId in _deserializedNodesById.Keys)
         {
@@ -35,7 +35,7 @@ public partial class Deserializer
         return FilterRootNodes();
     }
 
-    private IEnumerable<IWritableNode> FilterRootNodes() =>
+    private IEnumerable<IWritableNodeRaw> FilterRootNodes() =>
         _deserializedNodesById
             .Values
             .Where(node => node.GetParent() == null);
@@ -47,7 +47,7 @@ public partial class Deserializer
         if (!_containmentsByOwnerId.TryGetValue(compressedId, out var containments))
             return;
 
-        IWritableNode node = _deserializedNodesById[compressedId];
+        IWritableNodeRaw node = _deserializedNodesById[compressedId];
 
         foreach (var (compressedMetaPointer, compressedChildrenIds) in containments)
         {
@@ -80,26 +80,29 @@ public partial class Deserializer
         if (!_annotationsByOwnerId.TryGetValue(compressedId, out var annotationIds))
             return;
 
-        IWritableNode node = _deserializedNodesById[compressedId];
+        IWritableNodeRaw node = _deserializedNodesById[compressedId];
 
         List<IWritableNode> annotations = annotationIds
             .Select(annId => FindAnnotation(node, annId))
             .Where(c => c != null)
             .ToList()!;
 
-        node.AddAnnotations(annotations);
+        foreach (var annotation in annotations)
+        {
+            node.AddAnnotationsRaw((IAnnotationInstance)annotation);
+        }
     }
 
     private IWritableNode? FindAnnotation(IWritableNode node, ICompressedId annotationId)
     {
         if (!_deserializedNodesById.TryGetValue(annotationId, out var result))
-            result = _handler.UnresolvableAnnotation(annotationId, node);
+            result = (IWritableNodeRaw?)_handler.UnresolvableAnnotation(annotationId, node);
 
         if (result == null)
             return null;
 
         if (result.GetClassifier() is not Annotation ann || !ann.CanAnnotate(node.GetClassifier()))
-            result = _handler.InvalidAnnotation(result, node);
+            result = (IWritableNodeRaw?)_handler.InvalidAnnotation(result, node);
 
         return PreventCircularContainment(node, result);
     }

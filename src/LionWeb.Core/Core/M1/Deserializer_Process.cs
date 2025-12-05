@@ -45,7 +45,7 @@ public partial class Deserializer
         RegisterAnnotations(serializedNode, compressedId);
     }
 
-    private void DeserializeProperties(SerializedNode serializedNode, IWritableNode node)
+    private void DeserializeProperties(SerializedNode serializedNode, IWritableNodeRaw node)
     {
         foreach (var serializedProperty in serializedNode.Properties)
         {
@@ -63,7 +63,7 @@ public partial class Deserializer
             if (convertedValue == null)
                 continue;
 
-            node.Set(property, convertedValue);
+            node.SetRaw(property, convertedValue);
         }
     }
 

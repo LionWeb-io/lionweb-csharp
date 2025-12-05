@@ -146,7 +146,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNode node, Feature containment)
+    protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNodeRaw node, Feature containment)
     {
         List<IWritableNode> children = compressedChildrenIds
             .Select<ICompressedId, IWritableNode?>(childId => FindChild(node, containment, childId))
@@ -156,7 +156,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         SetContainment(children, node, containment);
     }
 
-    private void SetContainment<TChild>(List<TChild> children, IWritableNode node, Feature containment)
+    private void SetContainment<TChild>(List<TChild> children, IWritableNodeRaw node, Feature containment)
         where TChild : class, IReadableNode
     {
         if (children.Count == 0)
@@ -165,12 +165,12 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         var single = containment is Containment { Multiple: false };
         try
         {
-            node.Set(containment, single && children.Count == 1 ? children[0] : children);
+            node.SetRaw(containment, single && children.Count == 1 ? children[0] : children);
         } catch (InvalidValueException)
         {
             List<TChild>? replacement = _handler.InvalidLinkValue(children, containment, node);
             if (replacement != null)
-                node.Set(containment, single ? replacement.FirstOrDefault() : replacement);
+                node.SetRaw(containment, single ? replacement.FirstOrDefault() : replacement);
         }
     }
 
@@ -292,7 +292,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     {
         T node = _deserializedNodesById[nodeId];
 
-        if (node is not IWritableNode writable)
+        if (node is not IWritableNodeRaw writable)
         {
             _handler.InvalidReference(node);
             return;
@@ -337,7 +337,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    private void SetReference(List<IReferenceTarget> targets, IWritableNode node, Feature reference)
+    private void SetReference(List<IReferenceTarget> targets, IWritableNodeRaw node, Feature reference)
     {
         if (targets.Count == 0)
             return;
@@ -345,12 +345,12 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         var single = reference is Reference { Multiple: false };
         try
         {
-            node.Set(reference, single && targets.Count == 1 ? targets[0] : targets);
+            node.SetRaw(reference, single && targets.Count == 1 ? targets[0] : targets);
         } catch (InvalidValueException)
         {
             List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(targets.Select(r => r.Target).Where(t => t is not null), reference).ToList(), reference, node);
             if (replacement != null)
-                node.Set(reference, single ? replacement.FirstOrDefault() : replacement);
+                node.SetRaw(reference, single ? replacement.FirstOrDefault() : replacement);
         }
     }
 

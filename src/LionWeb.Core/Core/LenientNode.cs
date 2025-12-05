@@ -240,6 +240,11 @@ public class LenientNode : NodeBase, INode
             return true;
         }
 
+        return SetRaw(feature, value);
+    }
+
+    protected internal override bool SetRaw(Feature feature, object? value)
+    {
         var oldValue = TryGetFeature(feature, out var old) ? old : null;
 
         switch (value)
