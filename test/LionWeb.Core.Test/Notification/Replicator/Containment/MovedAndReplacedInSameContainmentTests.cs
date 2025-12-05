@@ -60,7 +60,7 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
@@ -104,7 +104,7 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
 
         var newIndex = 0;
         var oldIndex = 1;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
@@ -127,7 +127,7 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
 
         var newIndex = 1;
         var oldIndex = 4;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         var sharedNodeMap = new SharedNodeMap();
@@ -157,7 +157,7 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
 
         var newIndex = 4;
         var oldIndex = 1;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
             replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
@@ -179,7 +179,7 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
             nodeWithAnotherId, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

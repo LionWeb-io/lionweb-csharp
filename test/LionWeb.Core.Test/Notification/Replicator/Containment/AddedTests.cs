@@ -54,7 +54,7 @@ public class AddedTests : ReplicatorTestsBase
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new LinkTestConcept("added");
-        originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_contents, [added]);
+        originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_links, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
         Assert.AreNotSame(added, clonedPartition.Links[0]);
@@ -70,7 +70,7 @@ public class AddedTests : ReplicatorTestsBase
 
         var added1 = new LinkTestConcept("added1");
         var added2 = new LinkTestConcept("added2");
-        originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_contents, [added1, added2]);
+        originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_links, [added1, added2]);
 
         AssertEquals([originalPartition], [clonedPartition]);
         Assert.AreNotSame(added2, clonedPartition.Links[0]);
@@ -87,7 +87,7 @@ public class AddedTests : ReplicatorTestsBase
         var added = new LinkTestConcept("added");
         var values = new LinkTestConcept[] { added };
 
-        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_contents, values);
+        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
 
         AssertEquals([originalPartition], [clonedPartition]);
         Assert.AreNotSame(added, clonedPartition.Links[0]);
@@ -105,7 +105,7 @@ public class AddedTests : ReplicatorTestsBase
         var added2 = new LinkTestConcept("added2");
         var values = new LinkTestConcept[] { added1, added2 };
 
-        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_contents, values);
+        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
 
         AssertEquals([originalPartition], [clonedPartition]);
         Assert.AreNotSame(added2, clonedPartition.Links[0]);

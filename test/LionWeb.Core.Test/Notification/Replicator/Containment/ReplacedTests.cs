@@ -131,7 +131,7 @@ public class ReplacedTests : ReplicatorTestsBase
         Assert.IsFalse(sharedNodeMap.ContainsKey(replacement.GetId()));
         
         var childReplacedNotification = new ChildReplacedNotification(replacement, replaced, originalPartition, 
-            TestLanguageLanguage.Instance.TestPartition_contents, 0, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_links, 0, new NumericNotificationId("childReplacedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
@@ -188,7 +188,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var clonedPartition = ClonePartition(originalPartition);
         
         var childReplacedNotification = new ChildReplacedNotification(replacement, replaced, originalPartition, 
-            TestLanguageLanguage.Instance.TestPartition_contents, 0, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_links, 0, new NumericNotificationId("childReplacedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
@@ -234,7 +234,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var clonedPartition = ClonePartition(originalPartition);
 
         var childReplacedNotification = new ChildReplacedNotification(replacement, replaced, originalPartition, 
-            TestLanguageLanguage.Instance.TestPartition_contents, 1, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_links, 1, new NumericNotificationId("childReplacedNotification", 0));
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
@@ -257,7 +257,7 @@ public class ReplacedTests : ReplicatorTestsBase
         var clonedPartition = ClonePartition(originalPartition);
         
         var notification = new ChildReplacedNotification(replacement, nodeWithAnotherId, originalPartition, 
-            TestLanguageLanguage.Instance.TestPartition_contents, 1, new NumericNotificationId("childReplacedNotification", 0));
+            TestLanguageLanguage.Instance.TestPartition_links, 1, new NumericNotificationId("childReplacedNotification", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
@@ -284,7 +284,7 @@ public class ReplacedTests : ReplicatorTestsBase
         sharedNodeMap.RegisterNode(added);
         sharedNodeMap.RegisterNode(nodeWithAnotherId);
 
-        var notification = new ChildReplacedNotification(added, nodeWithAnotherId, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 
+        var notification = new ChildReplacedNotification(added, nodeWithAnotherId, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
             0, new NumericNotificationId("childReplacedNotification", 0));
 
         AssertUniqueNodeIds(originalPartition, added, nodeWithAnotherId);

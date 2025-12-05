@@ -121,7 +121,7 @@ public class ClientTests
                     Parent = _repositoryPartition.GetId()
                 }
             ]),
-            TestLanguageLanguage.Instance.TestPartition_dataType.ToMetaPointer(),
+            TestLanguageLanguage.Instance.TestPartition_data.ToMetaPointer(),
             0,
             [new CommandSource(_clientInfo.ParticipationId, "cmdX")],
             null

@@ -46,14 +46,14 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 		_secondTestEnumeration_literal1 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal1", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal1", Name = "literal1" });
 		_secondTestEnumeration_literal2 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal2", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal2", Name = "literal2" });
 		_secondTestEnumeration_literal3 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal3", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal3", Name = "literal3" });
-		_testAnnotation = new(() => new AnnotationBase<NullableReferencesTestLanguageLanguage>("TestAnnotation", this) { Key = "TestAnnotation", Name = "TestAnnotation", AnnotatesLazy = new(() => _builtIns.Node) });
+		_testAnnotation = new(() => new AnnotationBase<NullableReferencesTestLanguageLanguage>("TestAnnotation", this) { Key = "TestAnnotation", Name = "TestAnnotation", AnnotatesLazy = new(() => _builtIns.Node), ImplementsLazy = new(() => [_builtIns.INamed]) });
 		_testEnumeration = new(() => new EnumerationBase<NullableReferencesTestLanguageLanguage>("TestEnumeration", this) { Key = "TestEnumeration", Name = "TestEnumeration", LiteralsLazy = new(() => [TestEnumeration_literal1, TestEnumeration_literal2, TestEnumeration_literal3]) });
 		_testEnumeration_literal1 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("TestEnumeration-literal1", TestEnumeration, this) { Key = "TestEnumeration-literal1", Name = "literal1" });
 		_testEnumeration_literal2 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("TestEnumeration-literal2", TestEnumeration, this) { Key = "TestEnumeration-literal2", Name = "literal2" });
 		_testEnumeration_literal3 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("TestEnumeration-literal3", TestEnumeration, this) { Key = "TestEnumeration-literal3", Name = "literal3" });
-		_testPartition = new(() => new ConceptBase<NullableReferencesTestLanguageLanguage>("TestPartition", this) { Key = "TestPartition", Name = "TestPartition", Abstract = false, Partition = true, ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [TestPartition_contents, TestPartition_dataType]) });
-		_testPartition_contents = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("TestPartition-contents", TestPartition, this) { Key = "TestPartition-contents", Name = "contents", Optional = true, Multiple = true, Type = LinkTestConcept });
-		_testPartition_dataType = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("TestPartition-dataType", TestPartition, this) { Key = "TestPartition-dataType", Name = "dataType", Optional = true, Multiple = false, Type = DataTypeTestConcept });
+		_testPartition = new(() => new ConceptBase<NullableReferencesTestLanguageLanguage>("TestPartition", this) { Key = "TestPartition", Name = "TestPartition", Abstract = false, Partition = true, ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [TestPartition_data, TestPartition_links]) });
+		_testPartition_data = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("TestPartition-data", TestPartition, this) { Key = "TestPartition-data", Name = "data", Optional = true, Multiple = false, Type = DataTypeTestConcept });
+		_testPartition_links = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("TestPartition-links", TestPartition, this) { Key = "TestPartition-links", Name = "links", Optional = true, Multiple = true, Type = LinkTestConcept });
 		_factory = new NullableReferencesTestLanguageFactory(this);
 	}
 
@@ -158,11 +158,11 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 	private readonly Lazy<Concept> _testPartition;
 	public Concept TestPartition => _testPartition.Value;
 
-	private readonly Lazy<Containment> _testPartition_contents;
-	public Containment TestPartition_contents => _testPartition_contents.Value;
+	private readonly Lazy<Containment> _testPartition_data;
+	public Containment TestPartition_data => _testPartition_data.Value;
 
-	private readonly Lazy<Containment> _testPartition_dataType;
-	public Containment TestPartition_dataType => _testPartition_dataType.Value;
+	private readonly Lazy<Containment> _testPartition_links;
+	public Containment TestPartition_links => _testPartition_links.Value;
 }
 
 public partial interface INullableReferencesTestLanguageFactory : INodeFactory
@@ -1338,14 +1338,85 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 }
 
 [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "TestAnnotation")]
-public partial class TestAnnotation : AnnotationInstanceBase
+public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 {
+	private string? _name = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LionWeb.Core.VersionSpecific.V2024_1.BuiltInsLanguage_2024_1), Key = "LionCore-builtins-INamed-name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
+	{
+		name = _name;
+		return name != null;
+	}
+/// <remarks>Required Property</remarks>
+/// <exception cref="InvalidValueException">If set to null</exception>
+ INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public TestAnnotation SetName(string value, INotificationId? notificationId = null)
+	{
+		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
+		_name = value;
+		emitter.Notify();
+		return this;
+	}
+
 	public TestAnnotation(string id) : base(id)
 	{
 	}
 
 	/// <inheritdoc/>
         public override Annotation GetAnnotation() => NullableReferencesTestLanguageLanguage.Instance.TestAnnotation;
+	/// <inheritdoc/>
+        protected override bool GetInternal(Feature? feature, out object? result)
+	{
+		if (base.GetInternal(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = Name;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+	{
+		if (base.SetInternal(feature, value, notificationId))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			if (value is string v)
+			{
+				SetName(v, notificationId);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        public override IEnumerable<Feature> CollectAllSetFeatures()
+	{
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
+		if (TryGetName(out _))
+			result.Add(_builtIns.INamed_name);
+		return result;
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "TestPartition")]
@@ -1381,32 +1452,57 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return this;
 	}
 
-	private readonly List<LinkTestConcept> _contents = [];
+	private DataTypeTestConcept? _data = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "TestPartition-data")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
+	public DataTypeTestConcept? Data { get => _data; set => SetData(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetData([NotNullWhenAttribute(true)] out DataTypeTestConcept? data)
+	{
+		data = _data;
+		return data != null;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public TestPartition SetData(DataTypeTestConcept? value, INotificationId? notificationId = null)
+	{
+		ContainmentSingleNotificationEmitter<DataTypeTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_data, this, value, _data, notificationId);
+		emitter.CollectOldData();
+		SetParentNull(_data);
+		AttachChild(value);
+		_data = value;
+		emitter.Notify();
+		return this;
+	}
+
+	private readonly List<LinkTestConcept> _links = [];
 	/// <remarks>Optional Multiple Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "TestPartition-contents")]
+        [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "TestPartition-links")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Contents { get => _contents.AsReadOnly(); init => AddContents(value); }
+	public IReadOnlyList<LinkTestConcept> Links { get => _links.AsReadOnly(); init => AddLinks(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public bool TryGetContents([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> contents)
+        public bool TryGetLinks([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> links)
 	{
-		contents = _contents.AsReadOnly();
-		return contents.Count != 0;
+		links = _links.AsReadOnly();
+		return links.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public TestPartition AddContents(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
+        public TestPartition AddLinks(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents);
-		AssureNotNullMembers(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents);
-		if (_contents.SequenceEqual(safeNodes))
+		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links);
+		AssureNotNullMembers(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links);
+		if (_links.SequenceEqual(safeNodes))
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents, this, [safeNode], _contents, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_links, this, [safeNode], _links, null, notificationId);
 			emitter.CollectOldData();
-			_contents.AddRange(SetSelfParent([safeNode], NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents));
+			_links.AddRange(SetSelfParent([safeNode], NullableReferencesTestLanguageLanguage.Instance.TestPartition_links));
 			emitter.Notify();
 		}
 
@@ -1414,49 +1510,24 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public TestPartition InsertContents(int index, IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
+        public TestPartition InsertLinks(int index, IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
-		AssureInRange(index, _contents);
+		AssureInRange(index, _links);
 		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents);
-		AssureNoSelfMove(index, safeNodes, _contents);
-		AssureNotNullMembers(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents);
-		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents, this, safeNodes, _contents, index, notificationId);
+		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links);
+		AssureNoSelfMove(index, safeNodes, _links);
+		AssureNotNullMembers(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links);
+		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_links, this, safeNodes, _links, index, notificationId);
 		emitter.CollectOldData();
-		_contents.InsertRange(index, SetSelfParent(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents));
+		_links.InsertRange(index, SetSelfParent(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links));
 		emitter.Notify();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public TestPartition RemoveContents(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
+        public TestPartition RemoveLinks(IEnumerable<LinkTestConcept> nodes, INotificationId? notificationId = null)
 	{
-		RemoveSelfParent(nodes?.ToList(), _contents, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents, ContainmentRemover<LinkTestConcept>(NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents));
-		return this;
-	}
-
-	private DataTypeTestConcept? _dataType = null;
-	/// <remarks>Optional Single Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "TestPartition-dataType")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
-	public DataTypeTestConcept? DataType { get => _dataType; set => SetDataType(value); }
-
-	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetDataType([NotNullWhenAttribute(true)] out DataTypeTestConcept? dataType)
-	{
-		dataType = _dataType;
-		return dataType != null;
-	}
-
-	/// <remarks>Optional Single Containment</remarks>
-        public TestPartition SetDataType(DataTypeTestConcept? value, INotificationId? notificationId = null)
-	{
-		ContainmentSingleNotificationEmitter<DataTypeTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_dataType, this, value, _dataType, notificationId);
-		emitter.CollectOldData();
-		SetParentNull(_dataType);
-		AttachChild(value);
-		_dataType = value;
-		emitter.Notify();
+		RemoveSelfParent(nodes?.ToList(), _links, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links, ContainmentRemover<LinkTestConcept>(NullableReferencesTestLanguageLanguage.Instance.TestPartition_links));
 		return this;
 	}
 
@@ -1482,15 +1553,15 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			return true;
 		}
 
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(feature))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_data.EqualsIdentity(feature))
 		{
-			result = Contents;
+			result = Data;
 			return true;
 		}
 
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(feature))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature))
 		{
-			result = DataType;
+			result = Links;
 			return true;
 		}
 
@@ -1513,26 +1584,26 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			throw new InvalidValueException(feature, value);
 		}
 
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(feature))
-		{
-			var safeNodes = NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value).ToList();
-			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents, this, safeNodes, _contents, notificationId);
-			emitter.CollectOldData();
-			RemoveSelfParent(_contents.ToList(), _contents, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents);
-			_contents.AddRange(SetSelfParent(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents));
-			emitter.Notify();
-			return true;
-		}
-
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(feature))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_data.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.DataTypeTestConcept)
 			{
-				SetDataType((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.DataTypeTestConcept?)value, notificationId);
+				SetData((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.DataTypeTestConcept?)value, notificationId);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
+		}
+
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature))
+		{
+			var safeNodes = NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value).ToList();
+			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.TestPartition_links, this, safeNodes, _links, notificationId);
+			emitter.CollectOldData();
+			RemoveSelfParent(_links.ToList(), _links, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links);
+			_links.AddRange(SetSelfParent(safeNodes, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links));
+			emitter.Notify();
+			return true;
 		}
 
 		return false;
@@ -1544,10 +1615,10 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (TryGetName(out _))
 			result.Add(_builtIns.INamed_name);
-		if (TryGetContents(out _))
-			result.Add(NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents);
-		if (TryGetDataType(out _))
-			result.Add(NullableReferencesTestLanguageLanguage.Instance.TestPartition_dataType);
+		if (TryGetData(out _))
+			result.Add(NullableReferencesTestLanguageLanguage.Instance.TestPartition_data);
+		if (TryGetLinks(out _))
+			result.Add(NullableReferencesTestLanguageLanguage.Instance.TestPartition_links);
 		return result;
 	}
 
@@ -1556,9 +1627,9 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	{
 		if (base.AddInternal(link, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(link))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(link))
 		{
-			AddContents(NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value));
+			AddLinks(NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value));
 			return true;
 		}
 
@@ -1570,9 +1641,9 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	{
 		if (base.InsertInternal(link, index, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(link))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(link))
 		{
-			InsertContents(index, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value));
+			InsertLinks(index, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value));
 			return true;
 		}
 
@@ -1584,9 +1655,9 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	{
 		if (base.RemoveInternal(link, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(link))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(link))
 		{
-			RemoveContents(NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value));
+			RemoveLinks(NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept>(value));
 			return true;
 		}
 
@@ -1599,15 +1670,15 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		if (base.DetachChild(child))
 			return true;
 		Containment? c = GetContainmentOf(child);
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(c))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_data.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _contents, NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents);
+			_data = null;
 			return true;
 		}
 
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(c))
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(c))
 		{
-			_dataType = null;
+			RemoveSelfParent(child, _links, NullableReferencesTestLanguageLanguage.Instance.TestPartition_links);
 			return true;
 		}
 
@@ -1620,10 +1691,10 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is LinkTestConcept child0 && _contents.Contains(child0))
-			return NullableReferencesTestLanguageLanguage.Instance.TestPartition_contents;
-		if (ReferenceEquals(_dataType, child))
-			return NullableReferencesTestLanguageLanguage.Instance.TestPartition_dataType;
+		if (ReferenceEquals(_data, child))
+			return NullableReferencesTestLanguageLanguage.Instance.TestPartition_data;
+		if (child is LinkTestConcept child1 && _links.Contains(child1))
+			return NullableReferencesTestLanguageLanguage.Instance.TestPartition_links;
 		return null;
 	}
 }

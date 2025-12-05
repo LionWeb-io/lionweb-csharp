@@ -86,7 +86,7 @@ public class UnresolvedReferenceSerializationTests
             Reference_0_1 = new NullableReferencesTestLang.LinkTestConcept("ref0"),
             Reference_0_n = [new NullableReferencesTestLang.LinkTestConcept("ref0"), new NullableReferencesTestLang.LinkTestConcept("refN1")]
         };
-        var inputPartition = new NullableReferencesTestLang.TestPartition("partition") { Contents = [input] };
+        var inputPartition = new NullableReferencesTestLang.TestPartition("partition") { Links = [input] };
 
         var serializer = new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
@@ -109,7 +109,7 @@ public class UnresolvedReferenceSerializationTests
         Assert.HasCount(1, nodes);
 
         var deserializedPartition = nodes.OfType<NullableReferencesTestLang.TestPartition>().Single();
-        var deserialized = (NullableReferencesTestLang.LinkTestConcept)deserializedPartition.Contents.Single();
+        var deserialized = (NullableReferencesTestLang.LinkTestConcept)deserializedPartition.Links.Single();
 
         Assert.IsNull(deserialized.Reference_0_1);
         foreach (var target in deserialized.Reference_0_n)

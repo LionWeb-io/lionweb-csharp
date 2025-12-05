@@ -99,8 +99,8 @@ public class MovedAndReplacedFromOtherContainmentInSameParentTests : ReplicatorT
         var sharedNodeMap = new SharedNodeMap();
         sharedNodeMap.RegisterNode(nodeWithAnotherId);
 
-        var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(TestLanguageLanguage.Instance.TestPartition_contents, 0, 
-            moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_contents, 0, nodeWithAnotherId, 
+        var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(TestLanguageLanguage.Instance.TestPartition_links, 0, 
+            moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 0, nodeWithAnotherId, 
             new NumericNotificationId("childMovedAndReplacedFromOtherContainmentInSameParentNotification", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

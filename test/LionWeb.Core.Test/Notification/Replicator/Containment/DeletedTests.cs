@@ -96,7 +96,7 @@ public class DeletedTests : ReplicatorTestsBase
         var clonedPartition = ClonePartition(originalPartition);
 
         var notification = new ChildDeletedNotification(nodeWithAnotherId, originalPartition,
-            TestLanguageLanguage.Instance.TestPartition_contents, 0, new NumericNotificationId("childDeletedNotificationMultiple", 0));
+            TestLanguageLanguage.Instance.TestPartition_links, 0, new NumericNotificationId("childDeletedNotificationMultiple", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {

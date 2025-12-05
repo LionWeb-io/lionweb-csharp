@@ -129,7 +129,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         var values = new LinkTestConcept[] { a, b };
-        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_contents, values);
+        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
 
         Assert.AreEqual(2, notificationObserver.Count);
 
