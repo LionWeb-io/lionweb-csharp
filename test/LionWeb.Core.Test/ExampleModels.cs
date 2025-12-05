@@ -24,27 +24,21 @@ public class ExampleModels(LionWebVersions lionWebVersion)
 {
     public INode ExampleLine(Language lang)
     {
-        Classifier lineClassifier = lang.ClassifierByKey("key-Line");
+        Classifier lineClassifier = lang.ClassifierByKey("LinkTestConcept");
         var lineName = lineClassifier.FeatureByKey("LionCore-builtins-INamed-name");
-        var lineStart = lineClassifier.FeatureByKey("key-start");
-        var lineEnd = lineClassifier.FeatureByKey("key-end");
-        var coordClassifier = lang.ClassifierByKey("key-Coord");
-        var coordX = coordClassifier.FeatureByKey("key-x");
-        var coordY = coordClassifier.FeatureByKey("key-y");
-        var coordZ = coordClassifier.FeatureByKey("key-z");
+        var lineStart = lineClassifier.FeatureByKey("LinkTestConcept-containment_0_1");
+        var lineEnd = lineClassifier.FeatureByKey("LinkTestConcept-containment_1");
+        var coordClassifier = lang.ClassifierByKey("LinkTestConcept");
+        var coordX = coordClassifier.FeatureByKey("LionCore-builtins-INamed-name");
 
         var line = lang.GetFactory().CreateNode("line", lineClassifier);
         line.Set(lineName, "line1");
 
         var start = lang.GetFactory().CreateNode("start", coordClassifier);
-        start.Set(coordX, -1);
-        start.Set(coordY, -3);
-        start.Set(coordZ, -3);
+        start.Set(coordX, "-1");
 
         var end = lang.GetFactory().CreateNode("end", coordClassifier);
-        end.Set(coordX, 1);
-        end.Set(coordY, 2);
-        end.Set(coordZ, 3);
+        end.Set(coordX, "1");
 
         line.Set(lineStart, start);
         line.Set(lineEnd, end);
@@ -56,13 +50,13 @@ public class ExampleModels(LionWebVersions lionWebVersion)
     {
         Language language = lionWebVersion switch
         {
-            IVersion2023_1 => Languages.Generated.V2023_1.Shapes.M2.ShapesLanguage.Instance,
-            IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance,
-            IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance,
+            IVersion2023_1 => Languages.Generated.V2023_1.TestLanguage.TestLanguageLanguage.Instance,
+            IVersion2024_1 => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance,
+            IVersion2024_1_Compatible => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance,
             _ => throw new UnsupportedVersionException(lionWebVersion)
         };
-        var geometry = language.GetFactory().CreateNode("geo", language.ClassifierByKey("key-Geometry"));
-        geometry.Set(language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes"), new List<INode>{ExampleLine(language)});
+        var geometry = language.GetFactory().CreateNode("geo", language.ClassifierByKey("TestPartition"));
+        geometry.Set(language.ClassifierByKey("TestPartition").FeatureByKey("TestPartition-links"), new List<INode>{ExampleLine(language)});
 
         return geometry;
     }

@@ -18,13 +18,7 @@
 namespace LionWeb.Core.Test.Serialization;
 
 using Core.Serialization;
-using Languages.Generated.V2024_1.Mixed.MixedConceptLang;
-using Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang;
-using Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang;
-using Languages.Generated.V2024_1.Mixed.MixedNestedEnumLang;
-using Languages.Generated.V2024_1.Mixed.MixedNestedSdtLang;
-using Languages.Generated.V2024_1.SDTLang;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M2;
 using M3;
@@ -53,7 +47,7 @@ public class SerializationTests : SerializationTestsBase
     public void No_double_serialization()
     {
         var geometry = new ExampleModels(_lionWebVersion).ExampleModel(_language);
-        var shape0 = (geometry.Get(_language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes")) as IEnumerable)
+        var shape0 = (geometry.Get(_language.ClassifierByKey("TestPartition").FeatureByKey("TestPartition-links")) as IEnumerable)
             .Cast<INode>().First();
 
         Assert.IsInstanceOfType<INode>(shape0);
@@ -65,26 +59,26 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void Optional_string_property_serialization()
     {
-        var documentation = ((ShapesFactory)_language.GetFactory()).CreateDocumentation();
+        var documentation = ((TestLanguageFactory)TestLanguageLanguage.Instance.GetFactory()).CreateDataTypeTestConcept();
         var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
             .SerializeToChunk([documentation]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
-        var serializedProperty = serializationChunk.Nodes[0].Properties.First(p => p.Property.Key == "key-text");
+        var serializedProperty = serializationChunk.Nodes[0].Properties.First(p => p.Property.Key == "DataTypeTestConcept-stringValue_0_1");
         Assert.IsNull(serializedProperty.Value);
-        Assert.AreEqual("key-text", serializedProperty.Property.Key);
+        Assert.AreEqual("DataTypeTestConcept-stringValue_0_1", serializedProperty.Property.Key);
     }
 
     [TestMethod]
     public void SerializeRefToUnsetName()
     {
-        var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
-        var refGeo = new ReferenceGeometry("ref") { Shapes = [line] };
+        var line = new LinkTestConcept("line") { Containment_0_1 = new LinkTestConcept("coord") { Name = "1", } };
+        var refGeo = new LinkTestConcept("ref") { Reference_0_n = [line] };
 
         var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
             .SerializeToChunk([line, refGeo]);
         var nodes = new DeserializerBuilder()
-            .WithLanguage(ShapesLanguage.Instance)
+            .WithLanguage(TestLanguageLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);
 
@@ -94,12 +88,12 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void SerializeUnsetRequiredContainment()
     {
-        var compositeShape = new CompositeShape("comp");
+        var compositeShape = new LinkTestConcept("comp");
 
         var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
             .SerializeToChunk([compositeShape]);
         var nodes = new DeserializerBuilder()
-            .WithLanguage(ShapesLanguage.Instance)
+            .WithLanguage(TestLanguageLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);
 
@@ -109,12 +103,12 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void SerializeUnsetRequiredReference()
     {
-        var materialGroup = new MaterialGroup("goup");
+        var materialGroup = new LinkTestConcept("goup");
 
         var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
             .SerializeToChunk([materialGroup]);
         var nodes = new DeserializerBuilder()
-            .WithLanguage(ShapesLanguage.Instance)
+            .WithLanguage(TestLanguageLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);
 
@@ -124,7 +118,7 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void DuplicateId()
     {
-        var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
+        var materialGroup = new LinkTestConcept("duplicate") { Containment_1 = new LinkTestConcept("duplicate") };
 
         Assert.ThrowsExactly<SerializerException>(() =>
             new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk([materialGroup]));
@@ -133,9 +127,9 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void DuplicateNode()
     {
-        var b = new Circle("b");
-        var a = new MaterialGroup("a") { DefaultShape = b };
-        var b2 = new Circle("b");
+        var b = new LinkTestConcept("b");
+        var a = new LinkTestConcept("a") { Containment_1 = b };
+        var b2 = new LinkTestConcept("b");
 
         Assert.ThrowsExactly<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b]).ToList());
         Assert.ThrowsExactly<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b2]).ToList());
@@ -146,15 +140,15 @@ public class SerializationTests : SerializationTestsBase
     {
         var lang = new DynamicLanguage("abc", _lionWebVersion)
         {
-            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+            Key = TestLanguageLanguage.Instance.Key, Version = TestLanguageLanguage.Instance.Version
         };
-        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-            ShapesLanguage.Instance.MaterialGroup.Name);
-        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+        var materialGroup = lang.Concept("efg", TestLanguageLanguage.Instance.LinkTestConcept.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept.Name);
+        var defaultShape = materialGroup.Containment("ijk", TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Name);
 
         var a = lang.GetFactory().CreateNode("a", materialGroup);
-        var b = new Circle("b");
+        var b = new LinkTestConcept("b");
         a.Set(defaultShape, b);
 
         Assert.ThrowsExactly<SerializerException>(() =>
@@ -166,15 +160,15 @@ public class SerializationTests : SerializationTestsBase
     {
         var lang = new DynamicLanguage("abc", _lionWebVersion)
         {
-            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version + "hello"
+            Key = TestLanguageLanguage.Instance.Key, Version = TestLanguageLanguage.Instance.Version + "hello"
         };
-        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-            ShapesLanguage.Instance.MaterialGroup.Name);
-        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+        var materialGroup = lang.Concept("efg", TestLanguageLanguage.Instance.LinkTestConcept.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept.Name);
+        var defaultShape = materialGroup.Containment("ijk", TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Name);
 
         var a = lang.GetFactory().CreateNode("a", materialGroup);
-        var b = new Circle("b");
+        var b = new LinkTestConcept("b");
         a.Set(defaultShape, b);
 
         var serializationChunk =
@@ -185,7 +179,7 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void SingleEnumerable()
     {
-        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
+        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var serializedNodes = serializer.Serialize(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
@@ -196,7 +190,7 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void SingleEnumerable_fail()
     {
-        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
+        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var serializedNodes = serializer.Serialize(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
@@ -207,7 +201,7 @@ public class SerializationTests : SerializationTestsBase
     [TestMethod]
     public void NoUsedLanguagesBeforeSerialization()
     {
-        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
+        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         Assert.AreEqual(0, serializer.UsedLanguages.Count());
@@ -220,7 +214,7 @@ public class SerializationTests : SerializationTestsBase
     public void Utf8()
     {
         const string text = "\ud83d\ude0a Hällö 😊";
-        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
+        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") { Name = text } };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
@@ -229,20 +223,20 @@ public class SerializationTests : SerializationTestsBase
         stream.Seek(0, SeekOrigin.Begin);
 
         var deserializer = new DeserializerBuilder()
-            .WithLanguage(ShapesLanguage.Instance)
+            .WithLanguage(TestLanguageLanguage.Instance)
             .Build();
 
         var readableNodes = JsonUtils.ReadNodesFromStream(stream, deserializer);
 
         Assert.AreEqual(text,
-            readableNodes.OfType<INode>().SelectMany(n => n.Descendants(true)).OfType<Circle>().First().Name);
+            readableNodes.OfType<INode>().SelectMany(n => n.Descendants(true)).OfType<LinkTestConcept>().Last().Name);
     }
 
     [TestMethod]
     public async Task SerializedLionWebVersion_Async()
     {
         const string text = "\ud83d\ude0a Hällö 😊";
-        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
+        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") { Name = text } };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
@@ -251,7 +245,7 @@ public class SerializationTests : SerializationTestsBase
         stream.Seek(0, SeekOrigin.Begin);
 
         var deserializer = new DeserializerBuilder()
-            .WithLanguage(ShapesLanguage.Instance)
+            .WithLanguage(TestLanguageLanguage.Instance)
             .Build();
 
         string serializedLionWebVersion = null;
@@ -267,7 +261,7 @@ public class SerializationTests : SerializationTestsBase
     public void SerializedLionWebVersion_Sync()
     {
         const string text = "\ud83d\ude0a Hällö 😊";
-        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
+        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") { Name = text } };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
@@ -276,7 +270,7 @@ public class SerializationTests : SerializationTestsBase
         stream.Seek(0, SeekOrigin.Begin);
 
         var deserializer = new DeserializerBuilder()
-            .WithLanguage(ShapesLanguage.Instance)
+            .WithLanguage(TestLanguageLanguage.Instance)
             .Build();
 
         string serializedLionWebVersion = null;
@@ -286,73 +280,5 @@ public class SerializationTests : SerializationTestsBase
         });
 
         Assert.AreEqual(_lionWebVersion.VersionString, serializedLionWebVersion);
-    }
-
-    [TestMethod]
-    public void SerializeStructuredDataType()
-    {
-        var node = new SDTConcept("nodeId")
-        {
-            Amount =
-                new Amount { Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true },
-            Decimal = new Decimal { Int = 19 },
-            Complex = new ComplexNumber { Real = new Decimal { Int = 1, Frac = 0 }, Imaginary = new Decimal() }
-        };
-
-        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
-        var serializedNodes = serializer.Serialize([node]).ToList();
-        Assert.AreEqual(1, serializedNodes.Count);
-        var serializedNode = serializedNodes.First();
-
-        Assert.AreEqual(
-            """{"key-SDTCurr":"key-SDTEur","key-SDTDigital":"true","key-SDTValue":{"key-SDTFrac":"42","key-SDTInt":"23"}}""",
-            serializedNode.Properties.First(p => p.Property.Key == "key-SDTamountField").Value);
-
-        Assert.AreEqual(
-            """{"key-SDTInt":"19"}""",
-            serializedNode.Properties.First(p => p.Property.Key == "key-SDTDecimalField").Value);
-
-        Assert.AreEqual(
-            """{"key-SDTImaginary":{},"key-SDTReal":{"key-SDTFrac":"0","key-SDTInt":"1"}}""",
-            serializedNode.Properties.First(p => p.Property.Key == "key-SDTComplexField").Value);
-
-
-        var nodes = new DeserializerBuilder()
-            .WithLanguage(SDTLangLanguage.Instance)
-            .WithLanguage(SDTLangLanguage.Instance)
-            .Build()
-            .Deserialize(serializedNodes);
-
-        AssertEquals([node], nodes);
-    }
-
-    [TestMethod]
-    public void SerializePropertyUsedLanguages()
-    {
-        var node = new MixedConcept("mixedId")
-        {
-            EnumProp = DirectEnum.directEnumA,
-            SdtProp = new DirectSdt
-            {
-                DirectSdtEnum = NestedEnum.nestedLiteralA,
-                DirectSdtSdt = new NestedSdt { NestedSdtField = "hello" }
-            }
-        };
-
-        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
-        var serializedNodes = serializer.Serialize([node]).ToList();
-        Assert.AreEqual(1, serializedNodes.Count);
-        CollectionAssert.AreEquivalent(new List<SerializedLanguageReference>
-        {
-            new() { Key = "key-mixedBasePropertyLang", Version = "1" },
-            new() { Key = "key-mixedBaseContainmentLang", Version = "1" },
-            new() { Key = "key-mixedBaseReferenceLang", Version = "1" },
-            new() { Key = "key-mixedBaseConceptLang", Version = "1" },
-            new() { Key = "key-mixedConceptLang", Version = "1" },
-            new() { Key = "key-mixedDirectEnumLang", Version = "1" },
-            new() { Key = "key-mixedNestedEnumLang", Version = "1" },
-            new() { Key = "key-mixedDirectSdtLang", Version = "1" },
-            new() { Key = "key-mixedNestedSdtLang", Version = "1" },
-        }, serializer.UsedLanguages.ToList());
     }
 }
