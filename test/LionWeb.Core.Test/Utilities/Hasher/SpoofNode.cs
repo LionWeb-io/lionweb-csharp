@@ -110,6 +110,8 @@ class SpoofNode(string id) : IShape
 
     bool IWritableNodeRaw.RemoveAnnotationsRaw(IAnnotationInstance annotationInstances) => false;
 
+    public bool SetRaw(Feature feature, object? value) => false;
+
     bool IWritableNodeRaw.SetPropertyRaw(Property property, object? value) => false;
 
     bool IWritableNodeRaw.SetContainmentRaw(Containment containment, IWritableNode? node) => false;

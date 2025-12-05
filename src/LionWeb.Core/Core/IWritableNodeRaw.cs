@@ -31,6 +31,8 @@ public interface IWritableNodeRaw : IReadableNodeRaw, IWritableNode
 
     #endregion
 
+    protected internal bool SetRaw(Feature feature, object? value);
+    
     #region Property
 
     protected internal bool SetPropertyRaw(Property property, object? value);
