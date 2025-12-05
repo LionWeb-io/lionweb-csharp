@@ -1970,93 +1970,93 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         return true;
     }
 
-	private readonly List<LinkTestConcept> _contents = [];
+	private readonly List<LinkTestConcept> _links = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "TestPartition-contents")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Contents { get => _contents.AsReadOnly(); init => AddContents(value); }
+	public IReadOnlyList<LinkTestConcept> Links { get => _links.AsReadOnly(); init => AddLinks(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public bool TryGetContents([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> contents)
+        public bool TryGetLinks([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> contents)
 	{
-		contents = _contents.AsReadOnly();
+		contents = _links.AsReadOnly();
 		return contents.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public TestPartition AddContents(IEnumerable<LinkTestConcept> nodes)
+        public TestPartition AddLinks(IEnumerable<LinkTestConcept> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents);
-		if (_contents.SequenceEqual(safeNodes))
+		if (_links.SequenceEqual(safeNodes))
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, [safeNode], _contents, null);
+			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, [safeNode], _links, null);
 			emitter.CollectOldData();
-            AddContentsRaw(safeNode);
+            AddLinksRaw(safeNode);
 			emitter.Notify();
 		}
 
 		return this;
 	}
 
-    private bool AddContentsRaw(LinkTestConcept node)
+    private bool AddLinksRaw(LinkTestConcept node)
     {
         if (node is null)
             return false;
         
         AttachChild(node);
         
-        _contents.Add(node);
+        _links.Add(node);
         return true;
     }
 
     /// <remarks>Optional Multiple Containment</remarks>
-        public TestPartition InsertContents(int index, IEnumerable<LinkTestConcept> nodes)
+        public TestPartition InsertLinks(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		AssureInRange(index, _contents);
+		AssureInRange(index, _links);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents);
-		AssureNoSelfMove(index, safeNodes, _contents);
+		AssureNoSelfMove(index, safeNodes, _links);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents);
         foreach (var safeNode in safeNodes)
         {
-		    ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, [safeNode], _contents, index);
+		    ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, [safeNode], _links, index);
 		    emitter.CollectOldData();
-            InsertContentsRaw(index, safeNode);
+            InsertLinksRaw(index, safeNode);
 		    emitter.Notify();
         }
 		return this;
 	}
 
-    private bool InsertContentsRaw(int index, LinkTestConcept node)
+    private bool InsertLinksRaw(int index, LinkTestConcept node)
     {
-        if (node is null || !IsInRange(index, _contents))
+        if (node is null || !IsInRange(index, _links))
             return false;
 
         AttachChild(node);
         
-        _contents.Insert(index, node);
+        _links.Insert(index, node);
 
         return true;
     }
     
 	/// <remarks>Optional Multiple Containment</remarks>
-        public TestPartition RemoveContents(IEnumerable<LinkTestConcept> nodes)
+        public TestPartition RemoveLinks(IEnumerable<LinkTestConcept> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _contents, TestLanguageLanguage.Instance.TestPartition_contents, ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.TestPartition_contents));
+		RemoveSelfParent(nodes?.ToList(), _links, TestLanguageLanguage.Instance.TestPartition_contents, ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.TestPartition_contents));
 		return this;
 	}
 
-    private bool RemoveContentsRaw(LinkTestConcept? node)
+    private bool RemoveLinksRaw(LinkTestConcept? node)
     {
         if (node is null)
             return false;
         
         SetParentNull(node);
-        return _contents.Remove(node);
+        return _links.Remove(node);
     }
 
     private DataTypeTestConcept? _dataType = null;
@@ -2113,7 +2113,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
 		if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(feature))
 		{
-			result = Contents;
+			result = Links;
 			return true;
 		}
 
@@ -2161,7 +2161,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
         if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(containment))
         {
-            nodes = _contents;
+            nodes = _links;
             return true;
         }
 
@@ -2187,10 +2187,10 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(feature))
 		{
 			var safeNodes = TestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value).ToList();
-			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, safeNodes, _contents, notificationId);
+			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_contents, this, safeNodes, _links, notificationId);
 			emitter.CollectOldData();
-			RemoveSelfParent(_contents.ToList(), _contents, TestLanguageLanguage.Instance.TestPartition_contents);
-			_contents.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents));
+			RemoveSelfParent(_links.ToList(), _links, TestLanguageLanguage.Instance.TestPartition_contents);
+			_links.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.TestPartition_contents));
 			emitter.Notify();
 			return true;
 		}
@@ -2248,7 +2248,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (TryGetName(out _))
 			result.Add(_builtIns.INamed_name);
-		if (TryGetContents(out _))
+		if (TryGetLinks(out _))
 			result.Add(TestLanguageLanguage.Instance.TestPartition_contents);
 		if (TryGetDataType(out _))
 			result.Add(TestLanguageLanguage.Instance.TestPartition_dataType);
@@ -2262,7 +2262,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			return true;
 		if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(link))
 		{
-			AddContents(TestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value));
+			AddLinks(TestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value));
 			return true;
 		}
 
@@ -2278,7 +2278,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         {
             if (node is LinkTestConcept v)
             {
-                return AddContentsRaw(v);
+                return AddLinksRaw(v);
             }
         }
 
@@ -2292,7 +2292,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			return true;
 		if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(link))
 		{
-			InsertContents(index, TestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value));
+			InsertLinks(index, TestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value));
 			return true;
 		}
 
@@ -2308,7 +2308,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         {
             if (node is LinkTestConcept v)
             {
-                return InsertContentsRaw(index, v);
+                return InsertLinksRaw(index, v);
             }
         }
 
@@ -2322,7 +2322,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			return true;
 		if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(link))
 		{
-			RemoveContents(TestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value));
+			RemoveLinks(TestLanguageLanguage.Instance.TestPartition_contents.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value));
 			return true;
 		}
 
@@ -2338,7 +2338,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         {
             if (node is null or LinkTestConcept)
             {
-                return RemoveContentsRaw((LinkTestConcept?) node);
+                return RemoveLinksRaw((LinkTestConcept?) node);
             }
         }
 
@@ -2353,7 +2353,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		Containment? c = GetContainmentOf(child);
 		if (TestLanguageLanguage.Instance.TestPartition_contents.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _contents, TestLanguageLanguage.Instance.TestPartition_contents);
+			RemoveSelfParent(child, _links, TestLanguageLanguage.Instance.TestPartition_contents);
 			return true;
 		}
 
@@ -2372,7 +2372,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is LinkTestConcept child0 && _contents.Contains(child0))
+		if (child is LinkTestConcept child0 && _links.Contains(child0))
 			return TestLanguageLanguage.Instance.TestPartition_contents;
 		if (ReferenceEquals(_dataType, child))
 			return TestLanguageLanguage.Instance.TestPartition_dataType;

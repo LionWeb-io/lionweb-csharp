@@ -30,7 +30,7 @@ public class NotificationsTestSerialized : DeltaTestsBase
     public void PropertyAdded()
     {
         var circle = new LinkTestConcept("c");
-        var originalPartition = new TestPartition("a") { Contents = [circle] };
+        var originalPartition = new TestPartition("a") { Links = [circle] };
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
         var notificationObserver = new NotificationObserver();
@@ -47,7 +47,7 @@ public class NotificationsTestSerialized : DeltaTestsBase
     public void ChildReplaced_Single_with_same_node_id()
     {
         var documentation = new LinkTestConcept("doc") { Name = "a" };
-        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("parent") {Containment_1 = documentation}]};
+        var originalPartition = new TestPartition("a") { Links = [new LinkTestConcept("parent") {Containment_1 = documentation}]};
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
@@ -55,7 +55,7 @@ public class NotificationsTestSerialized : DeltaTestsBase
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         var documentation2 = new LinkTestConcept("doc") { Name = "b" };
-        originalPartition.Contents[0].Containment_1 = documentation2;
+        originalPartition.Links[0].Containment_1 = documentation2;
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
@@ -66,7 +66,7 @@ public class NotificationsTestSerialized : DeltaTestsBase
     public void ChildAdded_ForwardReference()
     {
         var originalParent = new LinkTestConcept("parent");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
@@ -102,7 +102,7 @@ public class NotificationsTestSerialized : DeltaTestsBase
         {
             Containment_1 = new LinkTestConcept("replacedChild")
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
@@ -129,7 +129,7 @@ public class NotificationsTestSerialized : DeltaTestsBase
     public void PartitionAdded_ForwardReference()
     {
         var originalParent = new LinkTestConcept("parent");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         var originalForest = new Forest();
         originalForest.AddPartitions([originalPartition]);
 
@@ -139,7 +139,7 @@ public class NotificationsTestSerialized : DeltaTestsBase
         originalForest.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         var referencedParent = new LinkTestConcept("referencedParent");
-        var referencedPartition = new TestPartition("referencedPartition") { Contents = [referencedParent] };
+        var referencedPartition = new TestPartition("referencedPartition") { Links = [referencedParent] };
         var childWithForwardReference = new LinkTestConcept("childWithForwardReference")
         {
             Reference_0_1 = referencedParent

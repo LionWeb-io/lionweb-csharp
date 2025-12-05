@@ -31,7 +31,7 @@ public class FollowingSiblingTests
         var circleB = new LinkTestConcept("b");
         var circleC = new LinkTestConcept("c");
         var circleD = new LinkTestConcept("d");
-        var ancestor = new TestPartition("a") { Contents = [circleA, circleB, circleC, circleD] };
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB, circleC, circleD] };
         CollectionAssert.AreEqual(new List<INode> { circleD }, circleC.FollowingSiblings().ToList());
     }
 
@@ -42,7 +42,7 @@ public class FollowingSiblingTests
         var circleB = new LinkTestConcept("b");
         var circleC = new LinkTestConcept("c");
         var circleD = new LinkTestConcept("d");
-        var ancestor = new TestPartition("a") { Contents = [circleA, circleB, circleC, circleD] };
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB, circleC, circleD] };
         CollectionAssert.AreEqual(new List<INode> { circleC, circleD }, circleC.FollowingSiblings(true).ToList());
     }
 
@@ -66,7 +66,7 @@ public class FollowingSiblingTests
     {
         var circleA = new LinkTestConcept("a");
         var circleB = new LinkTestConcept("b");
-        var ancestor = new TestPartition("a") { Contents = [circleA, circleB] };
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB] };
         CollectionAssert.AreEqual(new List<INode> { }, circleB.FollowingSiblings().ToList());
     }
 
@@ -75,7 +75,7 @@ public class FollowingSiblingTests
     {
         var circleA = new LinkTestConcept("a");
         var circleB = new LinkTestConcept("b");
-        var ancestor = new TestPartition("a") { Contents = [circleA, circleB] };
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB] };
         CollectionAssert.AreEqual(new List<INode> { circleB }, circleB.FollowingSiblings(true).ToList());
     }
 }

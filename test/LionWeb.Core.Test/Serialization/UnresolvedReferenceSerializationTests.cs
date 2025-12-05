@@ -37,7 +37,7 @@ public class UnresolvedReferenceSerializationTests
             Reference_0_1 = new LinkTestConcept("ref0"),
             Reference_0_n = [new LinkTestConcept("ref0"), new LinkTestConcept("refN1")]
         };
-        var inputPartition = new TestPartition("partition") { Contents = [input] };
+        var inputPartition = new TestPartition("partition") { Links = [input] };
 
         var serializer = new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
@@ -60,7 +60,7 @@ public class UnresolvedReferenceSerializationTests
         Assert.HasCount(1, nodes);
 
         var deserializedPartition = nodes.OfType<TestPartition>().Single();
-        var deserialized = (LinkTestConcept)deserializedPartition.Contents.Single();
+        var deserialized = (LinkTestConcept)deserializedPartition.Links.Single();
 
         Assert.Throws<UnresolvedReferenceException>(() => deserialized.Reference_0_1);
         Assert.Throws<UnresolvedReferenceException>(() => deserialized.Reference_0_n);

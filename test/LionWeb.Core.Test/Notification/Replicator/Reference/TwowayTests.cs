@@ -29,11 +29,11 @@ public class TwowayTests : TwowayReplicatorTestsBase
     {
         var bof = new LinkTestConcept("bof");
         var line = new LinkTestConcept("line");
-        var node = new TestPartition("a") { Contents =  [line] };
-        node.AddContents([bof]);
+        var node = new TestPartition("a") { Links =  [line] };
+        node.AddLinks([bof]);
 
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("line")] };
-        clone.AddContents([new LinkTestConcept("bof")]);
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("line")] };
+        clone.AddLinks([new LinkTestConcept("bof")]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -49,12 +49,12 @@ public class TwowayTests : TwowayReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle] };
         var line = new LinkTestConcept("line");
-        var node = new TestPartition("a") { Contents =  [line, circle] };
-        node.AddContents([bof]);
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
         var cloneCircle = new LinkTestConcept("circle");
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("line"), cloneCircle] };
-        clone.AddContents([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle] }]);
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("line"), cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -70,12 +70,12 @@ public class TwowayTests : TwowayReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle] };
         var line = new LinkTestConcept("line");
-        var node = new TestPartition("a") { Contents =  [line, circle] };
-        node.AddContents([bof]);
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
         var cloneCircle = new LinkTestConcept("circle");
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("line"), cloneCircle] };
-        clone.AddContents([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle] }]);
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("line"), cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -90,9 +90,9 @@ public class TwowayTests : TwowayReplicatorTestsBase
     {
         var circle = new LinkTestConcept("circle");
         var od = new LinkTestConcept("od");
-        var node = new TestPartition("a") { Contents =  [od, circle] };
+        var node = new TestPartition("a") { Links =  [od, circle] };
 
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("od"), new LinkTestConcept("circle")] };
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("od"), new LinkTestConcept("circle")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -111,12 +111,12 @@ public class TwowayTests : TwowayReplicatorTestsBase
     {
         var line = new LinkTestConcept("line");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [line] };
-        var node = new TestPartition("a") { Contents =  [line] };
-        node.AddContents([bof]);
+        var node = new TestPartition("a") { Links =  [line] };
+        node.AddLinks([bof]);
 
         var cloneLine = new LinkTestConcept("line");
-        var clone = new TestPartition("a") { Contents =  [cloneLine] };
-        clone.AddContents([new LinkTestConcept("bof") { Reference_0_n =  [cloneLine] }]);
+        var clone = new TestPartition("a") { Links =  [cloneLine] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneLine] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -132,13 +132,13 @@ public class TwowayTests : TwowayReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var line = new LinkTestConcept("line");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [line, circle] };
-        var node = new TestPartition("a") { Contents =  [line, circle] };
-        node.AddContents([bof]);
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
         var cloneCircle = new LinkTestConcept("circle");
         var cloneLine = new LinkTestConcept("line");
-        var clone = new TestPartition("a") { Contents =  [cloneLine, cloneCircle] };
-        clone.AddContents([new LinkTestConcept("bof") { Reference_0_n =  [cloneLine, cloneCircle] }]);
+        var clone = new TestPartition("a") { Links =  [cloneLine, cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneLine, cloneCircle] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -154,13 +154,13 @@ public class TwowayTests : TwowayReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var line = new LinkTestConcept("line");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle, line] };
-        var node = new TestPartition("a") { Contents =  [line, circle] };
-        node.AddContents([bof]);
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
         var cloneCircle = new LinkTestConcept("circle");
         var cloneLine = new LinkTestConcept("line");
-        var clone = new TestPartition("a") { Contents =  [cloneLine, cloneCircle] };
-        clone.AddContents([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle, cloneLine] }]);
+        var clone = new TestPartition("a") { Links =  [cloneLine, cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle, cloneLine] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -175,10 +175,10 @@ public class TwowayTests : TwowayReplicatorTestsBase
     {
         var circle = new LinkTestConcept("circle");
         var od = new LinkTestConcept("od") { Reference_0_1 = circle };
-        var node = new TestPartition("a") { Contents =  [od, circle] };
+        var node = new TestPartition("a") { Links =  [od, circle] };
 
         var cloneCircle = new LinkTestConcept("circle");
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("od") { Reference_0_1 = cloneCircle }, cloneCircle] };
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("od") { Reference_0_1 = cloneCircle }, cloneCircle] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -198,12 +198,12 @@ public class TwowayTests : TwowayReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var line = new LinkTestConcept("line");
         var od = new LinkTestConcept("od") { Reference_1 = circle };
-        var node = new TestPartition("a") { Contents =  [od, circle, line] };
+        var node = new TestPartition("a") { Links =  [od, circle, line] };
 
         var cloneCircle = new LinkTestConcept("circle");
         var clone = new TestPartition("a")
         {
-            Contents =  [new LinkTestConcept("od") { Reference_1 = cloneCircle }, cloneCircle, new LinkTestConcept("line")]
+            Links =  [new LinkTestConcept("od") { Reference_1 = cloneCircle }, cloneCircle, new LinkTestConcept("line")]
         };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);

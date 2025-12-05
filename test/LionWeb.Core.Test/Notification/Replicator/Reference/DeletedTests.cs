@@ -27,8 +27,8 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var line = new LinkTestConcept("line");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [line] };
-        var originalPartition = new TestPartition("a") { Contents =  [line] };
-        originalPartition.AddContents([bof]);
+        var originalPartition = new TestPartition("a") { Links =  [line] };
+        originalPartition.AddLinks([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -44,8 +44,8 @@ public class DeletedTests : ReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var line = new LinkTestConcept("line");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [line, circle] };
-        var originalPartition = new TestPartition("a") { Contents =  [line, circle] };
-        originalPartition.AddContents([bof]);
+        var originalPartition = new TestPartition("a") { Links =  [line, circle] };
+        originalPartition.AddLinks([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -61,8 +61,8 @@ public class DeletedTests : ReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var line = new LinkTestConcept("line");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle, line] };
-        var originalPartition = new TestPartition("a") { Contents =  [line, circle] };
-        originalPartition.AddContents([bof]);
+        var originalPartition = new TestPartition("a") { Links =  [line, circle] };
+        originalPartition.AddLinks([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -77,7 +77,7 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var circle = new LinkTestConcept("circle");
         var od = new LinkTestConcept("od") { Reference_0_1 = circle };
-        var originalPartition = new TestPartition("a") { Contents =  [od, circle] };
+        var originalPartition = new TestPartition("a") { Links =  [od, circle] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);

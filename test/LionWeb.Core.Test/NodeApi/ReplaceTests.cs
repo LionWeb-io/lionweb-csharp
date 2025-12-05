@@ -35,14 +35,14 @@ public class ReplaceTests_Containment
         
         var actual = new TestPartition("a")
         {
-            Contents = [replacement, replaced]
+            Links = [replacement, replaced]
         };
         
         replaced.ReplaceWith(replacement);
         
         var expected = new TestPartition("a")
         {
-            Contents = [new LinkTestConcept("replacement")]
+            Links = [new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -56,14 +56,14 @@ public class ReplaceTests_Containment
         
         var actual = new TestPartition("a")
         {
-            Contents = [replaced, replacement]
+            Links = [replaced, replacement]
         };
         
         replaced.ReplaceWith(replacement);
         
         var expected = new TestPartition("a")
         {
-            Contents = [new LinkTestConcept("replacement")]
+            Links = [new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -77,14 +77,14 @@ public class ReplaceTests_Containment
         
         var actual = new TestPartition("a")
         {
-            Contents = [NewLtc("child"), replacement, replaced]
+            Links = [NewLtc("child"), replacement, replaced]
         };
         
         replaced.ReplaceWith(replacement);
         
         var expected = new TestPartition("a")
         {
-            Contents = [NewLtc("child"), new LinkTestConcept("replacement")]
+            Links = [NewLtc("child"), new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -99,14 +99,14 @@ public class ReplaceTests_Containment
         
         var actual = new TestPartition("a")
         {
-            Contents = [NewLtc("child"), replaced, replacement]
+            Links = [NewLtc("child"), replaced, replacement]
         };
         
         replaced.ReplaceWith(replacement);
         
         var expected = new TestPartition("a")
         {
-            Contents = [NewLtc("child"), new LinkTestConcept("replacement")]
+            Links = [NewLtc("child"), new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -120,14 +120,14 @@ public class ReplaceTests_Containment
         
         var actual = new TestPartition("a")
         {
-            Contents = [replaced, NewLtc("child"), replacement]
+            Links = [replaced, NewLtc("child"), replacement]
         };
         
         replaced.ReplaceWith(replacement);
         
         var expected = new TestPartition("a")
         {
-            Contents = [new LinkTestConcept("replacement"), NewLtc("child")]
+            Links = [new LinkTestConcept("replacement"), NewLtc("child")]
         };
         
         AssertEquals([expected], [actual]);
@@ -141,14 +141,14 @@ public class ReplaceTests_Containment
         
         var actual = new TestPartition("container")
         {
-            Contents = [NewLtc("A"), replaced, NewLtc("C"), NewLtc("D"), replacement, NewLtc("F")]
+            Links = [NewLtc("A"), replaced, NewLtc("C"), NewLtc("D"), replacement, NewLtc("F")]
         };
         
         replaced.ReplaceWith(replacement);
         
         var expected = new TestPartition("container")
         {
-            Contents = [NewLtc("A"), new LinkTestConcept("E"), NewLtc("C"), NewLtc("D"), NewLtc("F")]
+            Links = [NewLtc("A"), new LinkTestConcept("E"), NewLtc("C"), NewLtc("D"), NewLtc("F")]
         };
         
         AssertEquals([expected], [actual]);
@@ -172,7 +172,7 @@ public class ReplaceTests_Containment
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle,
                 offsetDuplicate
@@ -184,7 +184,7 @@ public class ReplaceTests_Containment
         Assert.AreEqual(geometry, line.GetParent());
         Assert.IsNull(circle.GetParent());
 
-        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, offsetDuplicate }, geometry.Contents.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, offsetDuplicate }, geometry.Links.ToList());
     }
 
     [TestMethod]
@@ -196,7 +196,7 @@ public class ReplaceTests_Containment
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle,
                 offsetDuplicate,
@@ -209,7 +209,7 @@ public class ReplaceTests_Containment
         Assert.AreEqual(geometry, line.GetParent());
         Assert.IsNull(offsetDuplicate.GetParent());
 
-        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line, composite }, geometry.Contents.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line, composite }, geometry.Links.ToList());
     }
 
     [TestMethod]
@@ -242,7 +242,7 @@ public class ReplaceTests_Containment
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle
             ]
@@ -258,7 +258,7 @@ public class ReplaceTests_Containment
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle
             ]

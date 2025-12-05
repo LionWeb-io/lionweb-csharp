@@ -33,7 +33,7 @@ public class ReplacedTests : ReplicatorTestsBase
         {
             Containment_0_1 = replaced
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
@@ -69,7 +69,7 @@ public class ReplacedTests : ReplicatorTestsBase
         {
             Containment_1 = new LinkTestConcept("mg") { Name = "liquid" }
         };
-        originalPartition.AddContents([bof]);
+        originalPartition.AddLinks([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -94,7 +94,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [replaced]
+            Links =  [replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -117,7 +117,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [replaced]
+            Links =  [replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -135,8 +135,8 @@ public class ReplacedTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
-        Assert.AreEqual(1, clonedPartition.Contents.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Links.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Links[0].GetId());
 
         Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
         Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
@@ -151,7 +151,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [replaced, new LinkTestConcept("child")]
+            Links =  [replaced, new LinkTestConcept("child")]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -183,7 +183,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [replaced, new LinkTestConcept("child")]
+            Links =  [replaced, new LinkTestConcept("child")]
         };
         var clonedPartition = ClonePartition(originalPartition);
         
@@ -192,8 +192,8 @@ public class ReplacedTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
-        Assert.AreEqual(2, clonedPartition.Contents.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[0].GetId());
+        Assert.AreEqual(2, clonedPartition.Links.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Links[0].GetId());
     }
 
     [TestMethod]
@@ -205,7 +205,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [new LinkTestConcept("child"), replaced]
+            Links =  [new LinkTestConcept("child"), replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -229,7 +229,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [new LinkTestConcept("child"), replaced]
+            Links =  [new LinkTestConcept("child"), replaced]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -238,8 +238,8 @@ public class ReplacedTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, childReplacedNotification);
 
-        Assert.AreEqual(2, clonedPartition.Contents.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Contents[^1].GetId());
+        Assert.AreEqual(2, clonedPartition.Links.Count);
+        Assert.AreEqual(replacement.GetId(), clonedPartition.Links[^1].GetId());
     }
 
     [TestMethod]
@@ -251,7 +251,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [new LinkTestConcept("child"), replaced, nodeWithAnotherId]
+            Links =  [new LinkTestConcept("child"), replaced, nodeWithAnotherId]
         };
         
         var clonedPartition = ClonePartition(originalPartition);
@@ -273,7 +273,7 @@ public class ReplacedTests : ReplicatorTestsBase
         {
             Containment_0_1 = replaced
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -314,7 +314,7 @@ public class ReplacedTests : ReplicatorTestsBase
 
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [new LinkTestConcept("child"), replaced]
+            Links =  [new LinkTestConcept("child"), replaced]
         };
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -351,7 +351,7 @@ public class ReplacedTests : ReplicatorTestsBase
 
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [replacement, replaced]
+            Links =  [replacement, replaced]
         };
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -384,7 +384,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var destinationPartition = new TestPartition("a")
         {
-            Contents =  [replaced]
+            Links =  [replaced]
         };
         
         var replacement = new LinkTestConcept("replacement")
@@ -394,7 +394,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originPartition = new TestPartition("b")
         {
-            Contents =  [replacement]
+            Links =  [replacement]
         };
         
         var originalForest = new Forest();
@@ -425,7 +425,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var destinationPartition = new TestPartition("a")
         {
-            Contents =  [replaced]
+            Links =  [replaced]
         };
         
         var replacement = new LinkTestConcept("replacement")
@@ -435,7 +435,7 @@ public class ReplacedTests : ReplicatorTestsBase
         
         var originPartition = new TestPartition("b")
         {
-            Contents =  [replacement]
+            Links =  [replacement]
         };
 
         var otherForest = new Forest();

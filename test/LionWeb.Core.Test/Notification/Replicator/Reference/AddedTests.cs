@@ -27,8 +27,8 @@ public class AddedTests : ReplicatorTestsBase
     {
         var bof = new LinkTestConcept("bof");
         var line = new LinkTestConcept("line");
-        var originalPartition = new TestPartition("a") { Contents =  [line] };
-        originalPartition.AddContents([bof]);
+        var originalPartition = new TestPartition("a") { Links =  [line] };
+        originalPartition.AddLinks([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -44,8 +44,8 @@ public class AddedTests : ReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle] };
         var line = new LinkTestConcept("line");
-        var originalPartition = new TestPartition("a") { Contents =  [line, circle] };
-        originalPartition.AddContents([bof]);
+        var originalPartition = new TestPartition("a") { Links =  [line, circle] };
+        originalPartition.AddLinks([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -61,8 +61,8 @@ public class AddedTests : ReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle] };
         var line = new LinkTestConcept("line");
-        var originalPartition = new TestPartition("a") { Contents =  [line, circle] };
-        originalPartition.AddContents([bof]);
+        var originalPartition = new TestPartition("a") { Links =  [line, circle] };
+        originalPartition.AddLinks([bof]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -77,7 +77,7 @@ public class AddedTests : ReplicatorTestsBase
     {
         var circle = new LinkTestConcept("circle");
         var od = new LinkTestConcept("od");
-        var originalPartition = new TestPartition("a") { Contents =  [od, circle] };
+        var originalPartition = new TestPartition("a") { Links =  [od, circle] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -86,8 +86,8 @@ public class AddedTests : ReplicatorTestsBase
 
         AssertEquals([originalPartition], [clonedPartition]);
 
-        var clonedOffsetDuplicate = clonedPartition.Contents[0];
-        var clonedCircle = clonedPartition.Contents[1];
+        var clonedOffsetDuplicate = clonedPartition.Links[0];
+        var clonedCircle = clonedPartition.Links[1];
         Assert.AreSame(clonedCircle, clonedOffsetDuplicate.Reference_0_1);
     }
 }

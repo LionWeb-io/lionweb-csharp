@@ -31,7 +31,7 @@ public class InsertBeforeTests
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle,
                 offsetDuplicate
@@ -43,7 +43,7 @@ public class InsertBeforeTests
         Assert.AreEqual(geometry, line.GetParent());
         Assert.AreEqual(geometry, circle.GetParent());
 
-        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circle, offsetDuplicate }, geometry.Contents.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circle, offsetDuplicate }, geometry.Links.ToList());
     }
 
     [TestMethod]
@@ -54,7 +54,7 @@ public class InsertBeforeTests
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle,
                 offsetDuplicate
@@ -66,7 +66,7 @@ public class InsertBeforeTests
         Assert.AreEqual(geometry, line.GetParent());
         Assert.AreEqual(geometry, offsetDuplicate.GetParent());
 
-        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line, offsetDuplicate }, geometry.Contents.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line, offsetDuplicate }, geometry.Links.ToList());
     }
 
     [TestMethod]
@@ -96,7 +96,7 @@ public class InsertBeforeTests
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle
             ]
@@ -112,7 +112,7 @@ public class InsertBeforeTests
 
         var geometry = new TestPartition("geom")
         {
-            Contents =
+            Links =
             [
                 circle
             ]

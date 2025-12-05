@@ -27,7 +27,7 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
-        var originalPartition = new TestPartition("a") { Contents =  [origin] };
+        var originalPartition = new TestPartition("a") { Links =  [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -42,7 +42,7 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
-        var originalPartition = new TestPartition("a") { Contents =  [origin] };
+        var originalPartition = new TestPartition("a") { Links =  [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -63,7 +63,7 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
             Containment_0_1 = moved1,
             Containment_1 = moved2,
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -86,7 +86,7 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
             Containment_0_1 = moved1,
             Containment_1 = moved2,
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         
         var clonedPartition = ClonePartition(originalPartition);
 

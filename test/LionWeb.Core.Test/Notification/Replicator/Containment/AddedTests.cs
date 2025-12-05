@@ -37,10 +37,10 @@ public class AddedTests : ReplicatorTestsBase
         
         Assert.IsFalse(sharedNodeMap.ContainsKey(added.GetId()));
 
-        originalPartition.AddContents([added]);
+        originalPartition.AddLinks([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0]);
+        Assert.AreNotSame(added, clonedPartition.Links[0]);
         
         Assert.IsTrue(sharedNodeMap.ContainsKey(added.GetId()));
     }
@@ -57,7 +57,7 @@ public class AddedTests : ReplicatorTestsBase
         originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_contents, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0]);
+        Assert.AreNotSame(added, clonedPartition.Links[0]);
     }
 
     [TestMethod]
@@ -73,7 +73,7 @@ public class AddedTests : ReplicatorTestsBase
         originalPartition.Add(TestLanguageLanguage.Instance.TestPartition_contents, [added1, added2]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added2, clonedPartition.Contents[0]);
+        Assert.AreNotSame(added2, clonedPartition.Links[0]);
     }
 
     [TestMethod]
@@ -90,7 +90,7 @@ public class AddedTests : ReplicatorTestsBase
         originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_contents, values);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0]);
+        Assert.AreNotSame(added, clonedPartition.Links[0]);
     }
 
     [TestMethod]
@@ -108,44 +108,44 @@ public class AddedTests : ReplicatorTestsBase
         originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_contents, values);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added2, clonedPartition.Contents[0]);
+        Assert.AreNotSame(added2, clonedPartition.Links[0]);
     }
 
     [TestMethod]
     public void Multiple_First()
     {
-        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("l")] };
+        var originalPartition = new TestPartition("a") { Links = [new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new LinkTestConcept("added");
-        originalPartition.InsertContents(0, [added]);
+        originalPartition.InsertLinks(0, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0]);
+        Assert.AreNotSame(added, clonedPartition.Links[0]);
     }
 
     [TestMethod]
     public void Multiple_Last()
     {
-        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("l")] };
+        var originalPartition = new TestPartition("a") { Links = [new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new LinkTestConcept("added");
-        originalPartition.InsertContents(1, [added]);
+        originalPartition.InsertLinks(1, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[1]);
+        Assert.AreNotSame(added, clonedPartition.Links[1]);
     }
 
     [TestMethod]
     public void Single()
     {
         var parent = new LinkTestConcept("parent");
-        var originalPartition = new TestPartition("a") {Contents = [parent]};
+        var originalPartition = new TestPartition("a") {Links = [parent]};
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -154,7 +154,7 @@ public class AddedTests : ReplicatorTestsBase
         parent.Containment_0_1 = added;
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0].Containment_0_1);
+        Assert.AreNotSame(added, clonedPartition.Links[0].Containment_0_1);
     }
 
     [TestMethod]
@@ -166,9 +166,9 @@ public class AddedTests : ReplicatorTestsBase
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new LinkTestConcept("added") { Containment_1 = new LinkTestConcept("coord") { Name = "1" } };
-        originalPartition.AddContents([added]);
+        originalPartition.AddLinks([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0]);
+        Assert.AreNotSame(added, clonedPartition.Links[0]);
     }
 }

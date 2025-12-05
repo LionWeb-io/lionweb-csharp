@@ -35,7 +35,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         {
             Reference_0_n = [ref1, ref2, moved]
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent, ref1, ref2, moved] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, moved] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -46,7 +46,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification);
 
-        var clonedReferences = clonedPartition.Contents[0].Reference_0_n;
+        var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(3, clonedReferences.Count);
         Assert.AreEqual(moved.GetId(), clonedReferences[0].GetId());
     }
@@ -62,7 +62,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         {
             Reference_0_n = [moved, ref1, ref2]
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent, ref1, ref2, moved] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, moved] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -73,7 +73,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification);
 
-        var clonedReferences = clonedPartition.Contents[0].Reference_0_n;
+        var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(3, clonedReferences.Count);
         Assert.AreEqual(moved.GetId(), clonedReferences[^1].GetId());
     }
@@ -91,7 +91,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         {
             Reference_0_n = [ref1, moved, ref2, ref3, ref4]
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent, ref1, ref2, ref3, ref4, moved] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, ref3, ref4, moved] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -102,7 +102,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification);
 
-        var clonedReferences = clonedPartition.Contents[0].Reference_0_n;
+        var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(5, clonedReferences.Count);
         Assert.AreEqual(moved.GetId(), clonedReferences[3].GetId());
     }
@@ -120,7 +120,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         {
             Reference_0_n = [ref1, ref2, ref3, moved, ref4]
         };
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent, ref1, ref2, ref3, ref4, moved] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, ref3, ref4, moved] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -131,7 +131,7 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification);
 
-        var clonedReferences = clonedPartition.Contents[0].Reference_0_n;
+        var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(5, clonedReferences.Count);
         Assert.AreEqual(moved.GetId(), clonedReferences[1].GetId());
     }

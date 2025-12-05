@@ -28,7 +28,7 @@ public class ChangedTests : ReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var line = new LinkTestConcept("line");
         var od = new LinkTestConcept("od") { Reference_1 = circle };
-        var originalPartition = new TestPartition("a") { Contents = [od, circle, line] };
+        var originalPartition = new TestPartition("a") { Links = [od, circle, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);

@@ -26,10 +26,10 @@ public class TwowayTests : TwowayReplicatorTestsBase
     public void PropertyAdded()
     {
         var circle = new LinkTestConcept("c");
-        var node = new TestPartition("a") { Contents =  [circle] };
+        var node = new TestPartition("a") { Links =  [circle] };
 
         var cloneCircle = new LinkTestConcept("c");
-        var clone = new TestPartition("a") { Contents =  [cloneCircle] };
+        var clone = new TestPartition("a") { Links =  [cloneCircle] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 

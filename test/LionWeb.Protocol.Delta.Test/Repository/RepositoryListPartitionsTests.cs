@@ -82,7 +82,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         var part0 = new TestPartition("partition")
         {
             Name = "my partition", 
-            Contents = [containment01]
+            Links = [containment01]
         };
         part0.AddAnnotations([new TestAnnotation("ann")]);
         _aForest.AddPartitions([part0]);
@@ -95,6 +95,6 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         Assert.AreEqual(part0.GetId(), actual.GetId());
         Assert.AreEqual(part0.GetConcept(), actual.GetConcept());
         Assert.AreEqual(part0.Name, actual.Name);
-        Assert.IsEmpty(actual.Contents);
+        Assert.IsEmpty(actual.Links);
     }
 }

@@ -84,7 +84,7 @@ public class ForestTests : ReplicatorTestsBase
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
-        var node = new TestPartition("a") { Contents =  [origin] };
+        var node = new TestPartition("a") { Links =  [origin] };
 
         var originalForest = new Forest();
         var clonedForest = new Forest();
@@ -92,7 +92,7 @@ public class ForestTests : ReplicatorTestsBase
         CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([node]);
-        node.AddContents([moved]);
+        node.AddLinks([moved]);
 
         AssertEquals([node], clonedForest.Partitions);
     }
@@ -104,9 +104,9 @@ public class ForestTests : ReplicatorTestsBase
         // One approach to tackle this: cloned forest can check available partitions in original forest, and can clone them.
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
-        var originPartition = new TestPartition("g") { Contents =  [origin] };
+        var originPartition = new TestPartition("g") { Links =  [origin] };
 
-        var destinationPartition = new TestPartition("a") { Contents =  [] };
+        var destinationPartition = new TestPartition("a") { Links =  [] };
 
         var originalForest = new Forest();
         originalForest.AddPartitions([originPartition]);
@@ -117,28 +117,28 @@ public class ForestTests : ReplicatorTestsBase
 
         originalForest.AddPartitions([destinationPartition]);
         // Node "moved" is unknown in the cloned forest
-        Assert.ThrowsExactly<NotImplementedException>(() => destinationPartition.AddContents([moved]));
+        Assert.ThrowsExactly<NotImplementedException>(() => destinationPartition.AddLinks([moved]));
     }
 
     [TestMethod]
     public void ChildMovedFromOtherContainment_AddBeforeSubscribe_CloneExists_Replicated()
     {
         var moved = new LinkTestConcept("moved");
-        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_0_1 = moved }] };
+        var node = new TestPartition("a") { Links =  [new LinkTestConcept("l") { Containment_0_1 = moved }] };
 
         var originalForest = new Forest();
         originalForest.AddPartitions([node]);
 
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_0_1 = new LinkTestConcept("moved") }] };
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("l") { Containment_0_1 = new LinkTestConcept("moved") }] };
 
         var clonedForest = new Forest();
         clonedForest.AddPartitions([clone]);
 
         CreateForestReplicator(clonedForest, originalForest);
 
-        node.Contents[0].Containment_1 = moved;
+        node.Links[0].Containment_1 = moved;
 
-        Assert.AreSame(node.Contents[0], moved.GetParent());
+        Assert.AreSame(node.Links[0], moved.GetParent());
         AssertEquals([node], [clone]);
         AssertEquals(originalForest.Partitions, clonedForest.Partitions);
     }
@@ -147,7 +147,7 @@ public class ForestTests : ReplicatorTestsBase
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_DifferentPartitions_Works()
     {
         var moved = new LinkTestConcept("moved");
-        var originPartition = new TestPartition("g") { Contents =  [new LinkTestConcept("l") { Containment_0_1 = moved }] };
+        var originPartition = new TestPartition("g") { Links =  [new LinkTestConcept("l") { Containment_0_1 = moved }] };
 
         var node = new TestPartition("a") { };
 
@@ -162,7 +162,7 @@ public class ForestTests : ReplicatorTestsBase
 
         originalForest.AddPartitions([node, originPartition]);
 
-        node.AddContents([moved]);
+        node.AddLinks([moved]);
 
         Assert.AreEqual(
             notificationObserver.Notifications.DistinctBy(n => n.NotificationId).Count(),

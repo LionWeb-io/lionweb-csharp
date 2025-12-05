@@ -28,7 +28,7 @@ public class NotificationsTestJson : DeltaTestsBase
     public void PropertyAdded()
     {
         var circle = new LinkTestConcept("c");
-        var originalPartition = new TestPartition("a") { Contents = [circle] };
+        var originalPartition = new TestPartition("a") { Links = [circle] };
         var clonedPartition = CreateDeltaReplicatorWithJson(originalPartition);
 
         var notificationObserver = new NotificationObserver();
@@ -45,7 +45,7 @@ public class NotificationsTestJson : DeltaTestsBase
     public void ChildReplaced_Single_with_same_node_id()
     {
         var documentation = new LinkTestConcept("doc") { Name = "a" };
-        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("parent") {Containment_1 = documentation }]};
+        var originalPartition = new TestPartition("a") { Links = [new LinkTestConcept("parent") {Containment_1 = documentation }]};
 
         var clonedPartition = CreateDeltaReplicatorWithJson(originalPartition);
 
@@ -53,7 +53,7 @@ public class NotificationsTestJson : DeltaTestsBase
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         var documentation2 = new LinkTestConcept("doc") { Name = "b" };
-        originalPartition.Contents[0].Containment_1 = documentation2;
+        originalPartition.Links[0].Containment_1 = documentation2;
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);

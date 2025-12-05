@@ -11,7 +11,7 @@ public class PropertyTests : ReplicatorTestsBase
     public void PropertyAdded()
     {
         var circle = new LinkTestConcept("c");
-        var originalPartition = new TestPartition("a") { Contents =  [circle] };
+        var originalPartition = new TestPartition("a") { Links =  [circle] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -25,7 +25,7 @@ public class PropertyTests : ReplicatorTestsBase
     public void PropertyChanged()
     {
         var circle = new LinkTestConcept("c") { Name = "Hello" };
-        var originalPartition = new TestPartition("a") { Contents =  [circle] };
+        var originalPartition = new TestPartition("a") { Links =  [circle] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);

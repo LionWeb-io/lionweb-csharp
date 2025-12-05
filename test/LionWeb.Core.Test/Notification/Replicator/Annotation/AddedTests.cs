@@ -27,7 +27,7 @@ public class AddedTests : ReplicatorTestsBase
     public void Multiple_Only()
     {
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
@@ -41,7 +41,7 @@ public class AddedTests : ReplicatorTestsBase
         originalParent.AddAnnotations([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[0]);
+        Assert.AreNotSame(added, clonedPartition.Links[0].GetAnnotations()[0]);
 
         Assert.IsTrue(sharedNodeMap.ContainsKey(added.GetId()));
     }
@@ -50,7 +50,7 @@ public class AddedTests : ReplicatorTestsBase
     public void Multiple_First()
     {
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("bof")]);
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -60,14 +60,14 @@ public class AddedTests : ReplicatorTestsBase
         originalParent.InsertAnnotations(0, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[0]);
+        Assert.AreNotSame(added, clonedPartition.Links[0].GetAnnotations()[0]);
     }
 
     [TestMethod]
     public void Multiple_Last()
     {
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("bof")]);
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -77,7 +77,7 @@ public class AddedTests : ReplicatorTestsBase
         originalParent.InsertAnnotations(1, [added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[1]);
+        Assert.AreNotSame(added, clonedPartition.Links[0].GetAnnotations()[1]);
     }
 
     [TestMethod]

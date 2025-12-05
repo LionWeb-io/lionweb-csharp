@@ -28,7 +28,7 @@ public class MovedFromOtherParentTests : ReplicatorTestsBase
         var moved = new TestAnnotation("moved");
         var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var originalPartition = new TestPartition("a") { Contents = [origin] };
+        var originalPartition = new TestPartition("a") { Links = [origin] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);

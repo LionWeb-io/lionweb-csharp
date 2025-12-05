@@ -29,7 +29,7 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var deleted = new TestAnnotation("deleted");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([deleted]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -52,7 +52,7 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var deleted = new TestAnnotation("deleted");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([deleted, new TestAnnotation("bof")]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -68,7 +68,7 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var deleted = new TestAnnotation("deleted");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("bof"), deleted]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -85,7 +85,7 @@ public class DeletedTests : ReplicatorTestsBase
         var deleted = new TestAnnotation("deleted");
         var nodeWithAnotherId = new TestAnnotation("node-with-another-id");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("bof"), deleted, nodeWithAnotherId]);
 
         var clonedPartition = ClonePartition(originalPartition);

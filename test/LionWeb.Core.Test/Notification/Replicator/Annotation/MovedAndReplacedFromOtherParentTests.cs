@@ -36,7 +36,7 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         var origin = new LinkTestConcept("origin");
         var moved = new TestAnnotation("moved");
         origin.AddAnnotations([moved]);
-        var originalPartition = new TestPartition("a") { Contents = [origin, line] };
+        var originalPartition = new TestPartition("a") { Links = [origin, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -63,7 +63,7 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         var origin = new LinkTestConcept("origin");
         var moved = new TestAnnotation("moved");
         origin.AddAnnotations([moved]);
-        var originalPartition = new TestPartition("a") { Contents = [origin, line] };
+        var originalPartition = new TestPartition("a") { Links = [origin, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         
@@ -74,8 +74,8 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification);
         
-        Assert.AreEqual(1, clonedPartition.Contents[1].GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[1].GetAnnotations()[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Links[1].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[1].GetAnnotations()[0].GetId());
     }
 
     [TestMethod]
@@ -88,7 +88,7 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         var origin = new LinkTestConcept("origin");
         var moved = new TestAnnotation("moved");
         origin.AddAnnotations([moved]);
-        var originalPartition = new TestPartition("a") { Contents = [origin, line] };
+        var originalPartition = new TestPartition("a") { Links = [origin, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         
@@ -99,8 +99,8 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification);
        
-        Assert.AreEqual(2, clonedPartition.Contents[1].GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[1].GetAnnotations()[0].GetId());
+        Assert.AreEqual(2, clonedPartition.Links[1].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[1].GetAnnotations()[0].GetId());
     }
     
     [TestMethod]
@@ -113,7 +113,7 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         var origin = new LinkTestConcept("origin");
         var moved = new TestAnnotation("moved");
         origin.AddAnnotations([moved]);
-        var originalPartition = new TestPartition("a") { Contents = [origin, line] };
+        var originalPartition = new TestPartition("a") { Links = [origin, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         
@@ -124,8 +124,8 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification);
        
-        Assert.AreEqual(2, clonedPartition.Contents[1].GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[1].GetAnnotations()[^1].GetId());
+        Assert.AreEqual(2, clonedPartition.Links[1].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[1].GetAnnotations()[^1].GetId());
     }
 
     [TestMethod]
@@ -139,7 +139,7 @@ public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
         var origin = new LinkTestConcept("origin");
         var moved = new TestAnnotation("moved");
         origin.AddAnnotations([moved]);
-        var originalPartition = new TestPartition("a") { Contents = [origin, line] };
+        var originalPartition = new TestPartition("a") { Links = [origin, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         

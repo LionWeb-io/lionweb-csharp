@@ -28,7 +28,7 @@ public class DeletedTests : ReplicatorTestsBase
     public void Multiple_Only()
     {
         var deleted = new LinkTestConcept("deleted");
-        var originalPartition = new TestPartition("a") { Contents = [deleted] };
+        var originalPartition = new TestPartition("a") { Links = [deleted] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();
@@ -37,7 +37,7 @@ public class DeletedTests : ReplicatorTestsBase
 
         Assert.IsTrue(sharedNodeMap.ContainsKey(deleted.GetId()));
 
-        originalPartition.RemoveContents([deleted]);
+        originalPartition.RemoveLinks([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
 
@@ -48,12 +48,12 @@ public class DeletedTests : ReplicatorTestsBase
     public void Multiple_First()
     {
         var deleted = new LinkTestConcept("deleted");
-        var originalPartition = new TestPartition("a") { Contents = [deleted, new LinkTestConcept("l")] };
+        var originalPartition = new TestPartition("a") { Links = [deleted, new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.RemoveContents([deleted]);
+        originalPartition.RemoveLinks([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -62,12 +62,12 @@ public class DeletedTests : ReplicatorTestsBase
     public void Multiple_Last()
     {
         var deleted = new LinkTestConcept("deleted");
-        var originalPartition = new TestPartition("a") { Contents = [new LinkTestConcept("l"), deleted] };
+        var originalPartition = new TestPartition("a") { Links = [new LinkTestConcept("l"), deleted] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.RemoveContents([deleted]);
+        originalPartition.RemoveLinks([deleted]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -77,7 +77,7 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var deleted = new LinkTestConcept("deleted");
         var parent = new LinkTestConcept("parent") { Containment_0_1 = deleted };
-        var originalPartition = new TestPartition("a") { Contents = [parent]};
+        var originalPartition = new TestPartition("a") { Links = [parent]};
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -92,7 +92,7 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var deleted = new LinkTestConcept("deleted");
         var nodeWithAnotherId = new LinkTestConcept("node-with-another-id");
-        var originalPartition = new TestPartition("a") { Contents = [deleted, nodeWithAnotherId, new LinkTestConcept("l")] };
+        var originalPartition = new TestPartition("a") { Links = [deleted, nodeWithAnotherId, new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var notification = new ChildDeletedNotification(nodeWithAnotherId, originalPartition,
@@ -114,7 +114,7 @@ public class DeletedTests : ReplicatorTestsBase
     {
         var deleted = new LinkTestConcept("deleted");
         var origin = new LinkTestConcept("origin") { Containment_1_n = [deleted] };
-        var originalPartition = new TestPartition("a") { Contents = [origin] };
+        var originalPartition = new TestPartition("a") { Links = [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var notification = new ChildDeletedNotification(deleted, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0,
@@ -122,7 +122,7 @@ public class DeletedTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, notification);
 
-        Assert.ThrowsExactly<UnsetFeatureException>(() => clonedPartition.Contents[0].Containment_1_n);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => clonedPartition.Links[0].Containment_1_n);
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public class DeletedTests : ReplicatorTestsBase
         var deleted = new LinkTestConcept("deleted");
         var origin = new LinkTestConcept("c") { Containment_1 = deleted };
 
-        var originalPartition = new TestPartition("a") { Contents = [origin] };
+        var originalPartition = new TestPartition("a") { Links = [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var notification = new ChildDeletedNotification(deleted, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1, 0,
@@ -143,7 +143,7 @@ public class DeletedTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, notification);
 
-        Assert.ThrowsExactly<UnsetFeatureException>(() => clonedPartition.Contents[0].Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => clonedPartition.Links[0].Containment_1);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ public class DeletedTests : ReplicatorTestsBase
         var deleted = new LinkTestConcept("deleted");
         var origin = new LinkTestConcept("c") { Containment_1 = deleted };
 
-        var originalPartition = new TestPartition("a") { Contents = [origin] };
+        var originalPartition = new TestPartition("a") { Links = [origin] };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
@@ -175,7 +175,7 @@ public class DeletedTests : ReplicatorTestsBase
         {
             Containment_0_1 = deleted
         };
-        var originalPartition = new TestPartition("a") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("a") { Links = [originalParent] };
         var clonedPartition = ClonePartition(originalPartition);
 
         var sharedNodeMap = new SharedNodeMap();

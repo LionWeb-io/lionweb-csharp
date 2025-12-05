@@ -33,7 +33,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([moved, replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -59,7 +59,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([replaced, moved]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -78,7 +78,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("A"), replaced, new TestAnnotation("B"), moved, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -97,7 +97,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("A"), moved, new TestAnnotation("B"), replaced, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -119,7 +119,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([moved, replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -131,8 +131,8 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(1, clonedPartition.Contents[0].GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[0].GetAnnotations()[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[0].GetId());
     }
 
     [TestMethod]
@@ -141,7 +141,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([replaced, moved]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -153,8 +153,8 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(1, clonedPartition.Contents[0].GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[0].GetAnnotations()[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[0].GetId());
     }
 
     [TestMethod]
@@ -163,7 +163,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("A"), replaced, new TestAnnotation("B"), moved, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -175,8 +175,8 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(4, clonedPartition.Contents[0].GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[0].GetAnnotations()[1].GetId());
+        Assert.AreEqual(4, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[1].GetId());
     }
 
 
@@ -186,7 +186,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var replaced = new TestAnnotation("replaced");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([new TestAnnotation("A"), moved, new TestAnnotation("B"), replaced, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -198,8 +198,8 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(4, clonedPartition.Contents[0].GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Contents[0].GetAnnotations()[2].GetId());
+        Assert.AreEqual(4, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[2].GetId());
     }
     
     [TestMethod]
@@ -209,7 +209,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
         var nodeWithAnotherId = new TestAnnotation("node-with-another-id");
         var moved = new TestAnnotation("moved");
         var originalParent = new LinkTestConcept("a");
-        var originalPartition = new TestPartition("partition") { Contents = [originalParent] };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         originalParent.AddAnnotations([moved, replaced, nodeWithAnotherId]);
 
         var clonedPartition = ClonePartition(originalPartition);

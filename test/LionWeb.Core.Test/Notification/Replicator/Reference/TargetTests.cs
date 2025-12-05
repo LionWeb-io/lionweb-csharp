@@ -29,7 +29,7 @@ public class TargetTests : ReplicatorTestsBase
     {
         var circle = new LinkTestConcept("circle");
         var od = new LinkTestConcept("od");
-        var originalPartition = new TestPartition("a") { Contents =  [od, circle] };
+        var originalPartition = new TestPartition("a") { Links =  [od, circle] };
 
         var clonedPartition = ClonePartition(originalPartition);
         var sharedNodeMap = new SharedNodeMap();
@@ -52,7 +52,7 @@ public class TargetTests : ReplicatorTestsBase
         var circle = new LinkTestConcept("circle");
         var line = new LinkTestConcept("line");
         var od = new LinkTestConcept("od") { Reference_1 = circle };
-        var originalPartition = new TestPartition("a") { Contents =  [od, circle, line] };
+        var originalPartition = new TestPartition("a") { Links =  [od, circle, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         var sharedNodeMap = new SharedNodeMap();
@@ -73,7 +73,7 @@ public class TargetTests : ReplicatorTestsBase
     {
         var circle = new LinkTestConcept("circle");
         var od = new LinkTestConcept("od") { Reference_1 = circle };
-        var originalPartition = new TestPartition("a") { Contents =  [od, circle] };
+        var originalPartition = new TestPartition("a") { Links =  [od, circle] };
 
         var clonedPartition = ClonePartition(originalPartition);
         var sharedNodeMap = new SharedNodeMap();

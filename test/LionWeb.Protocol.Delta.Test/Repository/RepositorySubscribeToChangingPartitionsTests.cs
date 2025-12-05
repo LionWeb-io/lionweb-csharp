@@ -33,14 +33,14 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
 
         var aPart = new TestPartition("part")
         {
-            Contents = [new LinkTestConcept("cont")]
+            Links = [new LinkTestConcept("cont")]
         };
         _aForest.AddPartitions([aPart]);
         WaitForReceived(1);
 
         var bPart = (TestPartition)_bForest.Partitions.First();
         Assert.IsNotNull(bPart);
-        Assert.IsNotEmpty(bPart.Contents);
+        Assert.IsNotEmpty(bPart.Links);
 
         aPart.Name = "changed";
         _aClient.WaitForReceived(1);
@@ -63,7 +63,7 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
 
         var aPart = new TestPartition("part")
         {
-            Contents = [new LinkTestConcept("cont")]
+            Links = [new LinkTestConcept("cont")]
         };
         _aForest.AddPartitions([aPart]);
         WaitForReceived(1);
@@ -87,14 +87,14 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
 
         var aPart = new TestPartition("part")
         {
-            Contents = [new LinkTestConcept("cont")]
+            Links = [new LinkTestConcept("cont")]
         };
         _aForest.AddPartitions([aPart]);
         WaitForReceived(1);
 
         var bPart = (TestPartition)_bForest.Partitions.First();
         Assert.IsNotNull(bPart);
-        Assert.IsNotEmpty(bPart.Contents);
+        Assert.IsNotEmpty(bPart.Links);
 
         aPart.Name = "changed";
         WaitForReceived(1);

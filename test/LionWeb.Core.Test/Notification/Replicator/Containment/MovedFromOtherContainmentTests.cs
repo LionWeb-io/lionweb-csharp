@@ -29,12 +29,12 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
-        var originalPartition = new TestPartition("a") { Contents =  [origin] };
+        var originalPartition = new TestPartition("a") { Links =  [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.AddContents([moved]);
+        originalPartition.AddLinks([moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -46,7 +46,7 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
         var parent = new LinkTestConcept("parent");
         var originalPartition = new TestPartition("a")
         {
-            Contents =  [new LinkTestConcept("l") { Containment_1 = moved }, parent]
+            Links =  [new LinkTestConcept("l") { Containment_1 = moved }, parent]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -67,7 +67,7 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
         
         var destinationPartition = new TestPartition("a")
         {
-            Contents =  [replaced]
+            Links =  [replaced]
         };
         
         var replacement = new LinkTestConcept("replacement")
@@ -77,7 +77,7 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
         
         var originPartition = new TestPartition("b")
         {
-            Contents =  [replacement]
+            Links =  [replacement]
         };
         
         var originalForest = new Forest();

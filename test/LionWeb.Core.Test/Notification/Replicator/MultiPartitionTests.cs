@@ -33,9 +33,9 @@ public class MultiPartitionTests : ReplicatorTestsBase
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
-        var node = new TestPartition("a") { Contents =  [origin] };
+        var node = new TestPartition("a") { Links =  [origin] };
 
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("origin") { Containment_1_n = [new LinkTestConcept("moved")] }] };
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("origin") { Containment_1_n = [new LinkTestConcept("moved")] }] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -45,7 +45,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.AddContents([moved]);
+        node.AddLinks([moved]);
 
         AssertEquals([node], [clone]);
         Assert.IsFalse(deletions.Any());
@@ -62,11 +62,11 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
-        var originPartition = new TestPartition("g") { Contents =  [origin] };
+        var originPartition = new TestPartition("g") { Links =  [origin] };
 
-        var node = new TestPartition("a") { Contents =  [] };
+        var node = new TestPartition("a") { Links =  [] };
 
-        var clone = new TestPartition("a") { Contents =  [] };
+        var clone = new TestPartition("a") { Links =  [] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -77,7 +77,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.AddContents([moved]);
+        node.AddLinks([moved]);
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -95,11 +95,11 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
-        var originPartition = new TestPartition("g") { Contents =  [origin] };
+        var originPartition = new TestPartition("g") { Links =  [origin] };
 
-        var node = new TestPartition("a") { Contents =  [] };
+        var node = new TestPartition("a") { Links =  [] };
 
-        var clone = new TestPartition("a") { Contents =  [] };
+        var clone = new TestPartition("a") { Links =  [] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -110,7 +110,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.InsertContents(0, [moved]);
+        node.InsertLinks(0, [moved]);
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -122,9 +122,9 @@ public class MultiPartitionTests : ReplicatorTestsBase
     public void ChildMovedFromOtherContainment_Single_SamePartition()
     {
         var moved = new LinkTestConcept("moved");
-        var node = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_1 = moved }, new LinkTestConcept("ll")] };
+        var node = new TestPartition("a") { Links =  [new LinkTestConcept("l") { Containment_1 = moved }, new LinkTestConcept("ll")] };
 
-        var clone = new TestPartition("a") { Contents =  [new LinkTestConcept("l") { Containment_1 = new LinkTestConcept("moved") }, new LinkTestConcept("ll")] };
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("l") { Containment_1 = new LinkTestConcept("moved") }, new LinkTestConcept("ll")] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -134,7 +134,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.Contents[1].Containment_0_1 = moved;
+        node.Links[1].Containment_0_1 = moved;
 
         AssertEquals([node], [clone]);
         Assert.IsFalse(deletions.Any());
@@ -150,11 +150,11 @@ public class MultiPartitionTests : ReplicatorTestsBase
         // Therefore, rewriting of notification is needed.   
 
         var moved = new LinkTestConcept("moved");
-        var originPartition = new TestPartition("g") { Contents =  [new LinkTestConcept("l") { Containment_1 = moved }] };
+        var originPartition = new TestPartition("g") { Links =  [new LinkTestConcept("l") { Containment_1 = moved }] };
 
-        var node = new TestPartition("a") {Contents = [new LinkTestConcept("b")]};
+        var node = new TestPartition("a") {Links = [new LinkTestConcept("b")]};
 
-        var clone = new TestPartition("a") {Contents = [new LinkTestConcept("b")] };
+        var clone = new TestPartition("a") {Links = [new LinkTestConcept("b")] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -165,7 +165,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        node.Contents[0].Containment_0_1 = moved;
+        node.Links[0].Containment_0_1 = moved;
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -187,11 +187,11 @@ public class MultiPartitionTests : ReplicatorTestsBase
         var moved = new TestAnnotation("moved");
         var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var node = new TestPartition("a") { Contents =  [origin] };
+        var node = new TestPartition("a") { Links =  [origin] };
 
         var cloneOrigin = new LinkTestConcept("origin");
         cloneOrigin.AddAnnotations([new TestAnnotation("moved")]);
-        var clone = new TestPartition("a") { Contents =  [cloneOrigin] };
+        var clone = new TestPartition("a") { Links =  [cloneOrigin] };
 
         CreatePartitionReplicator(clone, node);
 
@@ -220,7 +220,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         var moved = new TestAnnotation("moved");
         var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var originPartition = new TestPartition("g") { Contents =  [origin] };
+        var originPartition = new TestPartition("g") { Links =  [origin] };
 
         var node = new TestPartition("a") { };
 
@@ -255,7 +255,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
         var moved = new TestAnnotation("moved");
         var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var originPartition = new TestPartition("g") { Contents =  [origin] };
+        var originPartition = new TestPartition("g") { Links =  [origin] };
 
         var node = new TestPartition("a") { };
 

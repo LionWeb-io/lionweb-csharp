@@ -27,12 +27,12 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
     public void Forward()
     {
         var moved = new LinkTestConcept("moved");
-        var originalPartition = new TestPartition("a") { Contents =  [moved, new LinkTestConcept("l")] };
+        var originalPartition = new TestPartition("a") { Links =  [moved, new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.AddContents([moved]);
+        originalPartition.AddLinks([moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -41,12 +41,12 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
     public void Backward()
     {
         var moved = new LinkTestConcept("moved");
-        var originalPartition = new TestPartition("a") { Contents =  [new LinkTestConcept("l"), moved] };
+        var originalPartition = new TestPartition("a") { Links =  [new LinkTestConcept("l"), moved] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.InsertContents(0, [moved]);
+        originalPartition.InsertLinks(0, [moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -58,7 +58,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var b = new LinkTestConcept("b");
         var c = new LinkTestConcept("c");
         var d = new LinkTestConcept("d");
-        var originalPartition = new TestPartition("geo") { Contents =  [a, b, c, d] };
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -67,7 +67,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddContents([a]);
+        originalPartition.AddLinks([a]);
 
         Assert.AreEqual(1, notificationObserver.Count);
         
@@ -78,7 +78,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         Assert.AreEqual(0, childMovedInSameContainmentNotification!.OldIndex);
         Assert.AreEqual(3, childMovedInSameContainmentNotification.NewIndex);
         
-        AssertEquals(originalPartition.Contents, clonedPartition.Contents);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
@@ -88,7 +88,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var b = new LinkTestConcept("b");
         var c = new LinkTestConcept("c");
         var d = new LinkTestConcept("d");
-        var originalPartition = new TestPartition("geo") { Contents =  [a, b, c, d] };
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -97,7 +97,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddContents([a, b]);
+        originalPartition.AddLinks([a, b]);
 
         Assert.AreEqual(2, notificationObserver.Count);
 
@@ -109,7 +109,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }
         
-        AssertEquals(originalPartition.Contents, clonedPartition.Contents);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
@@ -119,7 +119,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var b = new LinkTestConcept("b");
         var c = new LinkTestConcept("c");
         var d = new LinkTestConcept("d");
-        var originalPartition = new TestPartition("geo") { Contents =  [a, b, c, d] };
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -140,7 +140,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
             Assert.AreEqual(2, childDeletedNotification?.Index);
         }
 
-        AssertEquals(originalPartition.Contents, clonedPartition.Contents);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
@@ -150,7 +150,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var b = new LinkTestConcept("b");
         var c = new LinkTestConcept("c");
         var d = new LinkTestConcept("d");
-        var originalPartition = new TestPartition("geo") { Contents =  [a, b, c, d] };
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -159,7 +159,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddContents([a, b, c]);
+        originalPartition.AddLinks([a, b, c]);
 
         Assert.AreEqual(3, notificationObserver.Count);
 
@@ -171,7 +171,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }
         
-        AssertEquals(originalPartition.Contents, clonedPartition.Contents);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
@@ -181,7 +181,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var b = new LinkTestConcept("b");
         var c = new LinkTestConcept("c");
         var d = new LinkTestConcept("d");
-        var originalPartition = new TestPartition("geo") { Contents =  [a, b, c, d] };
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -190,7 +190,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddContents([c, a, b]);
+        originalPartition.AddLinks([c, a, b]);
 
         Assert.AreEqual(3, notificationObserver.Count);
 
@@ -211,7 +211,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         Assert.AreEqual(0, lastNotification?.OldIndex);
         Assert.AreEqual(3, lastNotification?.NewIndex);
         
-        AssertEquals(originalPartition.Contents, clonedPartition.Contents);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
@@ -221,7 +221,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var b = new LinkTestConcept("b");
         var c = new LinkTestConcept("c");
         var d = new LinkTestConcept("d");
-        var originalPartition = new TestPartition("geo") { Contents =  [a, b, c, d] };
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -231,7 +231,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         var e = new LinkTestConcept("e");
-        originalPartition.AddContents([a, b, c, d, e]);
+        originalPartition.AddLinks([a, b, c, d, e]);
 
         Assert.AreEqual(5, notificationObserver.Count);
 
@@ -245,6 +245,6 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
 
         Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[^1]);
 
-        AssertEquals(originalPartition.Contents, clonedPartition.Contents);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 }

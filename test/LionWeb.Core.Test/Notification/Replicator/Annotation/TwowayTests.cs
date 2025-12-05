@@ -168,11 +168,11 @@ public class TwowayTests : TwowayReplicatorTestsBase
         var moved = new TestAnnotation("moved");
         var origin = new LinkTestConcept("origin");
         origin.AddAnnotations([moved]);
-        var node = new TestPartition("a") { Contents = [origin] };
+        var node = new TestPartition("a") { Links = [origin] };
 
         var cloneOrigin = new LinkTestConcept("origin");
         cloneOrigin.AddAnnotations([new TestAnnotation("moved")]);
-        var clone = new TestPartition("a") { Contents = [cloneOrigin] };
+        var clone = new TestPartition("a") { Links = [cloneOrigin] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
