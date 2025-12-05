@@ -2059,34 +2059,34 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         return _links.Remove(node);
     }
 
-    private DataTypeTestConcept? _dataType = null;
+    private DataTypeTestConcept? _data = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "TestPartition-dataType")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
-	public DataTypeTestConcept? DataType { get => _dataType; set => SetDataType(value); }
+	public DataTypeTestConcept? Data { get => _data; set => SetData(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetDataType([NotNullWhenAttribute(true)] out DataTypeTestConcept? dataType)
+        public bool TryGetData([NotNullWhenAttribute(true)] out DataTypeTestConcept? dataType)
 	{
-		dataType = _dataType;
+		dataType = _data;
 		return dataType != null;
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public TestPartition SetDataType(DataTypeTestConcept? value)
+        public TestPartition SetData(DataTypeTestConcept? value)
 	{
-		ContainmentSingleNotificationEmitter<DataTypeTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_dataType, this, value, _dataType);
+		ContainmentSingleNotificationEmitter<DataTypeTestConcept> emitter = new(TestLanguageLanguage.Instance.TestPartition_dataType, this, value, _data);
 		emitter.CollectOldData();
-		SetDataTypeRaw(value);
+		SetDataRaw(value);
 		emitter.Notify();
 		return this;
 	}
 
-    private void SetDataTypeRaw(DataTypeTestConcept? value)
+    private void SetDataRaw(DataTypeTestConcept? value)
     {
-        SetParentNull(_dataType);
+        SetParentNull(_data);
         AttachChild(value);
-        _dataType = value;
+        _data = value;
     }
 
     public TestPartition(string id) : base(id)
@@ -2119,7 +2119,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
 		if (TestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(feature))
 		{
-			result = DataType;
+			result = Data;
 			return true;
 		}
 
@@ -2147,7 +2147,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
         if (TestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(containment))
         {
-            node = _dataType;
+            node = _data;
             return true;
         }
 
@@ -2199,7 +2199,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept)
 			{
-				SetDataType((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept?)value);
+				SetData((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept?)value);
 				return true;
 			}
 
@@ -2234,7 +2234,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         {
             if (node is null or LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept)
             {
-                SetDataTypeRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept?)node);
+                SetDataRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept?)node);
                 return true;
             }
         }
@@ -2250,7 +2250,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			result.Add(_builtIns.INamed_name);
 		if (TryGetLinks(out _))
 			result.Add(TestLanguageLanguage.Instance.TestPartition_contents);
-		if (TryGetDataType(out _))
+		if (TryGetData(out _))
 			result.Add(TestLanguageLanguage.Instance.TestPartition_dataType);
 		return result;
 	}
@@ -2359,7 +2359,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 
 		if (TestLanguageLanguage.Instance.TestPartition_dataType.EqualsIdentity(c))
 		{
-			_dataType = null;
+			_data = null;
 			return true;
 		}
 
@@ -2374,7 +2374,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 			return result;
 		if (child is LinkTestConcept child0 && _links.Contains(child0))
 			return TestLanguageLanguage.Instance.TestPartition_contents;
-		if (ReferenceEquals(_dataType, child))
+		if (ReferenceEquals(_data, child))
 			return TestLanguageLanguage.Instance.TestPartition_dataType;
 		return null;
 	}

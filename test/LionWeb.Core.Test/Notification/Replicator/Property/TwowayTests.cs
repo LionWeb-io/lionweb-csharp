@@ -43,10 +43,10 @@ public class TwowayTests : TwowayReplicatorTestsBase
     public void PropertyChanged()
     {
         var docs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
-        var node = new TestPartition("a") { DataType = docs };
+        var node = new TestPartition("a") { Data = docs };
 
         var cloneDocs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
-        var clone = new TestPartition("a") { DataType = cloneDocs };
+        var clone = new TestPartition("a") { Data = cloneDocs };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -60,10 +60,10 @@ public class TwowayTests : TwowayReplicatorTestsBase
     public void PropertyDeleted()
     {
         var docs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
-        var node = new TestPartition("a") { DataType = docs };
+        var node = new TestPartition("a") { Data = docs };
 
         var cloneDocs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
-        var clone = new TestPartition("a") { DataType = cloneDocs };
+        var clone = new TestPartition("a") { Data = cloneDocs };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 

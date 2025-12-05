@@ -39,7 +39,7 @@ public class PropertyTests : ReplicatorTestsBase
     public void PropertyDeleted()
     {
         var docs = new DataTypeTestConcept("c") { StringValue_0_1 = "Hello" };
-        var originalPartition = new TestPartition("a") { DataType = docs };
+        var originalPartition = new TestPartition("a") { Data = docs };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -67,7 +67,7 @@ public class PropertyTests : ReplicatorTestsBase
         };
         var originalPartition = new TestPartition("a")
         {
-            DataType =  coord
+            Data =  coord
         };
         
         var clonedPartition = ClonePartition(originalPartition);

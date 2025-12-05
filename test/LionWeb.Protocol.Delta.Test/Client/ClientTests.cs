@@ -76,7 +76,7 @@ public class ClientTests
     [Timeout(6000)]
     public void ConnectionWorks()
     {
-        _clientPartition.DataType = new DataTypeTestConcept("doc");
+        _clientPartition.Data = new DataTypeTestConcept("doc");
 
         _repository.WaitForReceived(1);
 
@@ -91,7 +91,7 @@ public class ClientTests
         _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
         _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
 
-        AssertEquals(new TestPartition("partition") { DataType = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
+        AssertEquals(new TestPartition("partition") { Data = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
             _clientPartition);
     }
 
@@ -103,7 +103,7 @@ public class ClientTests
         _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
         _repositoryConnector.SendToAllClients(ChildAdded(0), []);
 
-        AssertEquals(new TestPartition("partition") { DataType = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
+        AssertEquals(new TestPartition("partition") { Data = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
             _clientPartition);
     }
 
