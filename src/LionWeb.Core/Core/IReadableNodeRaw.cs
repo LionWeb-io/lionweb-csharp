@@ -27,10 +27,10 @@ public interface IReadableNodeRaw : IReadableNode
     {
         switch (feature)
         {
-            case Property:
-                return TryGetPropertyRaw(feature, out value);
-            case Containment { Multiple: false }:
-                if (TryGetContainmentRaw(feature, out var c))
+            case Property f:
+                return TryGetPropertyRaw(f, out value);
+            case Containment { Multiple: false } f:
+                if (TryGetContainmentRaw(f, out var c))
                 {
                     value = c;
                     return true;
@@ -38,24 +38,24 @@ public interface IReadableNodeRaw : IReadableNode
                 value = null;
                 return false;
 
-            case Reference { Multiple: false }:
-                if (TryGetReferenceRaw(feature, out var r))
+            case Reference { Multiple: false } f:
+                if (TryGetReferenceRaw(f, out var r))
                 {
                     value = r;
                     return true;
                 }
                 value = null;
                 return false;
-            case Containment { Multiple: true }:
-                if (TryGetContainmentsRaw(feature, out var cs))
+            case Containment { Multiple: true } f:
+                if (TryGetContainmentsRaw(f, out var cs))
                 {
                     value = cs;
                     return true;
                 }
                 value = null;
                 return false;
-            case Reference { Multiple: true }:
-                if (TryGetReferencesRaw(feature, out var rs))
+            case Reference { Multiple: true } f:
+                if (TryGetReferencesRaw(f, out var rs))
                 {
                     value = rs;
                     return true;
@@ -68,11 +68,11 @@ public interface IReadableNodeRaw : IReadableNode
         }
     }
 
-    protected internal bool TryGetPropertyRaw(Feature property, out object? value);
-    protected internal bool TryGetContainmentRaw(Feature containment, out IWritableNode? node);
-    protected internal bool TryGetContainmentsRaw(Feature containment, out IReadOnlyList<IWritableNode> nodes);
-    protected internal bool TryGetReferenceRaw(Feature reference, out IReferenceTarget? target);
-    protected internal bool TryGetReferencesRaw(Feature reference, out IReadOnlyList<IReferenceTarget> targets);
+    protected internal bool TryGetPropertyRaw(Property property, out object? value);
+    protected internal bool TryGetContainmentRaw(Containment containment, out IWritableNode? node);
+    protected internal bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IWritableNode> nodes);
+    protected internal bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target);
+    protected internal bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets);
 }
 
 public interface IReadableNodeRaw<out T> : IReadableNode<T>, IReadableNodeRaw where T : IReadableNode;

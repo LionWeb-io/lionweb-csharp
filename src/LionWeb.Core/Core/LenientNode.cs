@@ -208,15 +208,17 @@ public class LenientNode : NodeBase, INode
         return result != default;
     }
 
-    protected internal override bool TryGetPropertyRaw(Feature property, out object? value) => base.TryGetPropertyRaw(property, out value);
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value) => base.TryGetPropertyRaw(property, out value);
 
-    protected internal override bool TryGetContainmentRaw(Feature containment, out IWritableNode? node) => base.TryGetContainmentRaw(containment, out node);
+    protected internal override bool TryGetContainmentRaw(Containment containment, out IWritableNode? node) => base.TryGetContainmentRaw(containment, out node);
 
-    protected internal override bool TryGetContainmentsRaw(Feature containment, out IReadOnlyList<IWritableNode> nodes) => base.TryGetContainmentsRaw(containment, out nodes);
+    protected internal override bool TryGetContainmentsRaw(Containment containment,
+        out IReadOnlyList<IWritableNode> nodes) => base.TryGetContainmentsRaw(containment, out nodes);
 
-    protected internal override bool TryGetReferenceRaw(Feature reference, out IReferenceTarget? target) => base.TryGetReferenceRaw(reference, out target);
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target) => base.TryGetReferenceRaw(reference, out target);
 
-    protected internal override bool TryGetReferencesRaw(Feature reference, out IReadOnlyList<IReferenceTarget> targets) => base.TryGetReferencesRaw(reference, out targets);
+    protected internal override bool TryGetReferencesRaw(Reference reference,
+        out IReadOnlyList<IReferenceTarget> targets) => base.TryGetReferencesRaw(reference, out targets);
 
     /// <summary>
     /// <see cref="IWritableNode.Set"/> never fails, it accepts any feature and feature value that makes sense in LW context.

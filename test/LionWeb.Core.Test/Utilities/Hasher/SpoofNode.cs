@@ -74,31 +74,31 @@ class SpoofNode(string id) : IShape
 
     IReadOnlyList<IAnnotationInstance> IReadableNodeRaw.GetAnnotationsRaw() => [];
 
-    bool IReadableNodeRaw.TryGetPropertyRaw(Feature property, out object? value)
+    bool IReadableNodeRaw.TryGetPropertyRaw(Property property, out object? value)
     {
         value = null;
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetContainmentRaw(Feature containment, out IWritableNode? node)
+    bool IReadableNodeRaw.TryGetContainmentRaw(Containment containment, out IWritableNode? node)
     {
         node = null;
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetContainmentsRaw(Feature containment, out IReadOnlyList<IWritableNode> nodes)
+    bool IReadableNodeRaw.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IWritableNode> nodes)
     {
         nodes = [];
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetReferenceRaw(Feature reference, out IReferenceTarget? target)
+    bool IReadableNodeRaw.TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
     {
         target = null;
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetReferencesRaw(Feature reference, out IReadOnlyList<IReferenceTarget> targets)
+    bool IReadableNodeRaw.TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
     {
         targets = [];
         return false;
