@@ -110,21 +110,21 @@ class SpoofNode(string id) : IShape
 
     bool IWritableNodeRaw.RemoveAnnotationsRaw(IAnnotationInstance annotationInstances) => false;
 
-    bool IWritableNodeRaw.SetPropertyRaw(Feature property, object? value) => false;
+    bool IWritableNodeRaw.SetPropertyRaw(Property property, object? value) => false;
 
-    bool IWritableNodeRaw.SetContainmentRaw(Feature containment, IWritableNode? node) => false;
+    bool IWritableNodeRaw.SetContainmentRaw(Containment containment, IWritableNode? node) => false;
 
-    bool IWritableNodeRaw.AddContainmentsRaw(Feature containment, IWritableNode node) => false;
+    bool IWritableNodeRaw.AddContainmentsRaw(Containment containment, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.InsertContainmentsRaw(Feature containment, Index index, IWritableNode node) => false;
+    bool IWritableNodeRaw.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.RemoveContainmentsRaw(Feature containment, IWritableNode node) => false;
+    bool IWritableNodeRaw.RemoveContainmentsRaw(Containment containment, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.SetReferenceRaw(Feature reference, ReferenceTarget? targets) => false;
+    bool IWritableNodeRaw.SetReferenceRaw(Reference reference, ReferenceTarget? targets) => false;
 
-    bool IWritableNodeRaw.AddReferencesRaw(Feature reference, ReferenceTarget target) => false;
+    bool IWritableNodeRaw.AddReferencesRaw(Reference reference, ReferenceTarget target) => false;
 
-    bool IWritableNodeRaw.InsertReferencesRaw(Feature reference, Index index, ReferenceTarget target) => false;
+    bool IWritableNodeRaw.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) => false;
 
-    bool IWritableNodeRaw.RemoveReferencesRaw(Feature reference, ReferenceTarget target) => false;
+    bool IWritableNodeRaw.RemoveReferencesRaw(Reference reference, ReferenceTarget target) => false;
 }

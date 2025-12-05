@@ -196,22 +196,22 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         return false;
     }
 
-    bool IWritableNodeRaw.SetPropertyRaw(Feature property, object? value) => 
+    bool IWritableNodeRaw.SetPropertyRaw(Property property, object? value) => 
         SetPropertyRaw(property, value);
 
-    protected internal virtual bool SetPropertyRaw(Feature property, object? value) =>
+    protected internal virtual bool SetPropertyRaw(Property property, object? value) =>
         false;
 
-    bool IWritableNodeRaw.SetContainmentRaw(Feature containment, IWritableNode? node) => 
+    bool IWritableNodeRaw.SetContainmentRaw(Containment containment, IWritableNode? node) => 
         SetContainmentRaw(containment, node);
 
-    protected internal virtual bool SetContainmentRaw(Feature containment, IWritableNode? node) =>
+    protected internal virtual bool SetContainmentRaw(Containment containment, IWritableNode? node) =>
         false;
 
-    bool IWritableNodeRaw.SetReferenceRaw(Feature reference, ReferenceTarget? targets) => 
+    bool IWritableNodeRaw.SetReferenceRaw(Reference reference, ReferenceTarget? targets) => 
         SetReferenceRaw(reference, targets);
 
-    protected internal virtual bool SetReferenceRaw(Feature reference, ReferenceTarget? target) =>
+    protected internal virtual bool SetReferenceRaw(Reference reference, ReferenceTarget? target) =>
         false;
 
     /// <inheritdoc />
@@ -235,16 +235,16 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         return false;
     }
 
-    bool IWritableNodeRaw.AddContainmentsRaw(Feature containment, IWritableNode node) => 
+    bool IWritableNodeRaw.AddContainmentsRaw(Containment containment, IWritableNode node) => 
     AddContainmentsRaw(containment, node);
 
-    protected internal virtual bool AddContainmentsRaw(Feature containment, IWritableNode node) =>
+    protected internal virtual bool AddContainmentsRaw(Containment containment, IWritableNode node) =>
         false;
 
-    bool IWritableNodeRaw.AddReferencesRaw(Feature reference, ReferenceTarget target) =>
+    bool IWritableNodeRaw.AddReferencesRaw(Reference reference, ReferenceTarget target) =>
     AddReferencesRaw(reference, target);
 
-    protected internal virtual bool AddReferencesRaw(Feature reference, ReferenceTarget target) =>
+    protected internal virtual bool AddReferencesRaw(Reference reference, ReferenceTarget target) =>
         false;
 
     /// <inheritdoc />
@@ -268,16 +268,16 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         return false;
     }
 
-    bool IWritableNodeRaw.InsertContainmentsRaw(Feature containment, Index index, IWritableNode node) =>
+    bool IWritableNodeRaw.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) =>
         InsertContainmentsRaw(containment, index, node);
 
-    protected internal virtual bool InsertContainmentsRaw(Feature containment, Index index, IWritableNode node) =>
+    protected internal virtual bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) =>
         false;
 
-    bool IWritableNodeRaw.InsertReferencesRaw(Feature reference, Index index, ReferenceTarget target) =>
+    bool IWritableNodeRaw.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) =>
         InsertReferencesRaw(reference, index, target);
 
-    protected internal virtual bool InsertReferencesRaw(Feature reference, Index index, ReferenceTarget target) =>
+    protected internal virtual bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) =>
         false;
 
     /// <inheritdoc />
@@ -301,16 +301,16 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         return false;
     }
 
-    bool IWritableNodeRaw.RemoveContainmentsRaw(Feature containment, IWritableNode node) =>
+    bool IWritableNodeRaw.RemoveContainmentsRaw(Containment containment, IWritableNode node) =>
         RemoveContainmentsRaw(containment, node);
 
-    protected internal virtual bool RemoveContainmentsRaw(Feature containment, IWritableNode node) =>
+    protected internal virtual bool RemoveContainmentsRaw(Containment containment, IWritableNode node) =>
         false;
 
-    bool IWritableNodeRaw.RemoveReferencesRaw(Feature reference, ReferenceTarget target) =>
+    bool IWritableNodeRaw.RemoveReferencesRaw(Reference reference, ReferenceTarget target) =>
         RemoveReferencesRaw(reference, target);
 
-    protected internal virtual bool RemoveReferencesRaw(Feature reference, ReferenceTarget target) =>
+    protected internal virtual bool RemoveReferencesRaw(Reference reference, ReferenceTarget target) =>
         false;
 
     /// <summary>

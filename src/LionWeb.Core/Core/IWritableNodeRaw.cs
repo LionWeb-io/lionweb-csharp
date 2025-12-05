@@ -33,32 +33,32 @@ public interface IWritableNodeRaw : IReadableNodeRaw, IWritableNode
 
     #region Property
 
-    protected internal bool SetPropertyRaw(Feature property, object? value);
+    protected internal bool SetPropertyRaw(Property property, object? value);
 
     #endregion
 
 
     #region Containment
 
-    protected internal bool SetContainmentRaw(Feature containment, IWritableNode? node);
+    protected internal bool SetContainmentRaw(Containment containment, IWritableNode? node);
 
-    protected internal bool AddContainmentsRaw(Feature containment, IWritableNode node);
+    protected internal bool AddContainmentsRaw(Containment containment, IWritableNode node);
 
-    protected internal bool InsertContainmentsRaw(Feature containment, Index index, IWritableNode node);
+    protected internal bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node);
 
-    protected internal bool RemoveContainmentsRaw(Feature containment, IWritableNode node);
+    protected internal bool RemoveContainmentsRaw(Containment containment, IWritableNode node);
 
     #endregion
 
     #region Reference
 
-    protected internal bool SetReferenceRaw(Feature reference, ReferenceTarget? target);
+    protected internal bool SetReferenceRaw(Reference reference, ReferenceTarget? target);
 
-    protected internal bool AddReferencesRaw(Feature reference, ReferenceTarget target);
+    protected internal bool AddReferencesRaw(Reference reference, ReferenceTarget target);
 
-    protected internal bool InsertReferencesRaw(Feature reference, Index index, ReferenceTarget target);
+    protected internal bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target);
 
-    protected internal bool RemoveReferencesRaw(Feature reference, ReferenceTarget target);
+    protected internal bool RemoveReferencesRaw(Reference reference, ReferenceTarget target);
 
     #endregion
 }

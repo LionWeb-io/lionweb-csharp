@@ -638,7 +638,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 		return false;
 	}
 
-    protected internal override bool SetPropertyRaw(Feature property, object? value)
+    protected internal override bool SetPropertyRaw(Property property, object? value)
 	{
 		if (base.SetPropertyRaw(property, value))
 			return true;
@@ -1558,7 +1558,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-    protected internal override bool SetPropertyRaw(Feature property, object? value)
+    protected internal override bool SetPropertyRaw(Property property, object? value)
     {
 		if (base.SetPropertyRaw(property, value))
 			return true;
@@ -1574,7 +1574,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
     }
 
-    protected internal override bool SetContainmentRaw(Feature containment, IWritableNode? node)
+    protected internal override bool SetContainmentRaw(Containment containment, IWritableNode? node)
     {
 		if (base.SetContainmentRaw(containment, node))
 			return true;
@@ -1600,7 +1600,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
     }
 
-    protected internal override bool SetReferenceRaw(Feature reference, ReferenceTarget? target)
+    protected internal override bool SetReferenceRaw(Reference reference, ReferenceTarget? target)
     {
 		if (base.SetReferenceRaw(reference, target))
 			return true;
@@ -1677,7 +1677,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-    protected internal override bool AddContainmentsRaw(Feature containment, IWritableNode node)
+    protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
     {
         if (base.AddContainmentsRaw(containment, node))
             return true;
@@ -1701,7 +1701,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         return false;
     }
 
-    protected internal override bool AddReferencesRaw(Feature reference, ReferenceTarget target)
+    protected internal override bool AddReferencesRaw(Reference reference, ReferenceTarget target)
     {
         if (base.AddReferencesRaw(reference, target))
             return true;
@@ -1751,7 +1751,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-    protected internal override bool InsertContainmentsRaw(Feature containment, Int32 index, IWritableNode node)
+    protected internal override bool InsertContainmentsRaw(Containment containment, Int32 index, IWritableNode node)
     {
         if (base.InsertContainmentsRaw(containment, index, node))
             return true;
@@ -1775,7 +1775,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         return false;
     }
 
-    protected internal override bool InsertReferencesRaw(Feature reference, Int32 index, ReferenceTarget target)
+    protected internal override bool InsertReferencesRaw(Reference reference, Int32 index, ReferenceTarget target)
     {
         if (base.InsertReferencesRaw(reference, index, target))
             return true;
@@ -1825,7 +1825,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-    protected internal override bool RemoveContainmentsRaw(Feature containment, IWritableNode node)
+    protected internal override bool RemoveContainmentsRaw(Containment containment, IWritableNode node)
     {
         if (base.RemoveContainmentsRaw(containment, node))
             return true;
@@ -1849,7 +1849,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
         return false;
     }
 
-    protected internal override bool RemoveReferencesRaw(Feature reference, ReferenceTarget target)
+    protected internal override bool RemoveReferencesRaw(Reference reference, ReferenceTarget target)
     {
         if (base.RemoveReferencesRaw(reference, target))
             return true;
@@ -2283,7 +2283,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return false;
 	}
 
-    protected internal override bool SetPropertyRaw(Feature property, object? value)
+    protected internal override bool SetPropertyRaw(Property property, object? value)
     {
         if (base.SetPropertyRaw(property, value))
             return true;
@@ -2299,7 +2299,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
         return false;
     }
 
-    protected internal override bool SetContainmentRaw(Feature containment, IWritableNode? node)
+    protected internal override bool SetContainmentRaw(Containment containment, IWritableNode? node)
     {
         if (base.SetContainmentRaw(containment, node))
             return true;
@@ -2343,7 +2343,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return false;
 	}
 
-    protected internal override bool AddContainmentsRaw(Feature containment, IWritableNode node)
+    protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
     {
         if (base.AddContainmentsRaw(containment, node))
             return true;
@@ -2373,7 +2373,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return false;
 	}
 
-    protected internal override bool InsertContainmentsRaw(Feature containment, Int32 index, IWritableNode node)
+    protected internal override bool InsertContainmentsRaw(Containment containment, Int32 index, IWritableNode node)
     {
         if (base.InsertContainmentsRaw(containment, index, node))
             return true;
@@ -2403,7 +2403,7 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return false;
 	}
 
-    protected internal override bool RemoveContainmentsRaw(Feature containment, IWritableNode node)
+    protected internal override bool RemoveContainmentsRaw(Containment containment, IWritableNode node)
     {
         if (base.RemoveContainmentsRaw(containment, node))
             return true;
