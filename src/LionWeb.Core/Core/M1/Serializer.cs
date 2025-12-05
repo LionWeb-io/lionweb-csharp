@@ -134,7 +134,7 @@ public class Serializer : ISerializer
         Dictionary<Feature, object?> properties = CollectProperties(featureValues);
         RemoveFromFeatureValues(properties.Keys);
 
-        Dictionary<Feature, IReadOnlyList<IWritableNode>?> containmentsMultiple = CollectContainmentsMultiple(node, featureValues);
+        Dictionary<Feature, IReadOnlyList<IReadableNode>?> containmentsMultiple = CollectContainmentsMultiple(node, featureValues);
         RemoveFromFeatureValues(containmentsMultiple.Keys);
         Dictionary<Feature, IReadableNode?> containmentsSingle = CollectContainmentsSingle(node, featureValues);
         RemoveFromFeatureValues(containmentsSingle.Keys);
@@ -233,12 +233,12 @@ public class Serializer : ISerializer
         return containments;
     }
 
-    private Dictionary<Feature, IReadOnlyList<IWritableNode>?> CollectContainmentsMultiple(IReadableNode node,
+    private Dictionary<Feature, IReadOnlyList<IReadableNode>?> CollectContainmentsMultiple(IReadableNode node,
         Dictionary<Feature, object?> featureValues)
     {
         var containments = featureValues
-            .Where(pair => pair.Value is IReadOnlyList<IWritableNode>)
-            .ToDictionary(p => p.Key, p => (IReadOnlyList<IWritableNode>?)p.Value);
+            .Where(pair => pair.Value is IReadOnlyList<IReadableNode>)
+            .ToDictionary(p => p.Key, p => (IReadOnlyList<IReadableNode>?)p.Value);
         return containments;
     }
 

@@ -23,7 +23,7 @@ public interface IReadableNodeRaw : IReadableNode
 {
     protected internal IReadOnlyList<IAnnotationInstance> GetAnnotationsRaw();
 
-    protected internal bool TryGetRaw(Feature feature, out object? value)
+    protected internal virtual bool TryGetRaw(Feature feature, out object? value)
     {
         switch (feature)
         {
