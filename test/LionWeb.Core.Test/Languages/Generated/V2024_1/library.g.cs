@@ -602,6 +602,10 @@ public partial class GuideBookWriter : Writer
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Library")]
 public partial class Library : ConceptInstanceBase
 {
+	private bool SetBooksRaw(List<Book> nodes) => ExchangeChildrenRaw(nodes, _books);
+	private bool AddBooksRaw(Book? value) => AddChildRaw(value, _books);
+	private bool InsertBooksRaw(int index, Book? value) => InsertChildRaw(index, value, _books);
+	private bool RemoveBooksRaw(Book? value) => RemoveChildRaw(value, _books);
 	private readonly List<Book> _books = [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
@@ -616,48 +620,6 @@ public partial class Library : ConceptInstanceBase
 		return books.Count != 0;
 	}
 
-	private bool SetBooksRaw(List<Book> nodes)
-	{
-		if (_books.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_books, _books, LibraryLanguage.Instance.Library_books);
-		_books.AddRange(SetSelfParent(nodes, LibraryLanguage.Instance.Library_books));
-		return true;
-	}
-
-	private bool AddBooksRaw(Book? value)
-	{
-		if (value is null || _books.Count != 0 && _books[^1] == value)
-			return false;
-		AttachChild(value);
-		_books.Add(value);
-		return true;
-	}
-
-	private bool InsertBooksRaw(int index, Book? value)
-	{
-		if (value is null || !IsInRange(index, _books) || _books.Count > index && _books[index] == value)
-			return false;
-		AttachChild(value);
-		_books.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveBooksRaw(Book? value)
-	{
-		if (value is null)
-			return false;
-		if (_books.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
         public Library AddBooks(IEnumerable<Book> nodes)
@@ -668,7 +630,7 @@ public partial class Library : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, [safeNode], _books, null);
+			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNode, _books, null);
 			emitter.CollectOldData();
 			if (AddBooksRaw(safeNode))
 				emitter.Notify();
@@ -688,7 +650,7 @@ public partial class Library : ConceptInstanceBase
 		AssureNoSelfMove(index, safeNodes, _books);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, [safeNode], _books, index);
+			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNode, _books, index);
 			emitter.CollectOldData();
 			if (InsertBooksRaw(index++, safeNode))
 				emitter.Notify();

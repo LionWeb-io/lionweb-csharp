@@ -127,10 +127,8 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 
 	private bool SetIfaceContainmentRaw(INode? value)
 	{
-		if (value == _ifaceContainment)
+		if (!ExchangeChildRaw(value, _ifaceContainment))
 			return false;
-		SetParentNull(_ifaceContainment);
-		AttachChild(value);
 		_ifaceContainment = value;
 		return true;
 	}

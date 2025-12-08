@@ -331,6 +331,10 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-BillOfMaterials")]
 public partial class BillOfMaterials : AnnotationInstanceBase
 {
+	private bool SetAltGroupsRaw(List<MaterialGroup> nodes) => ExchangeChildrenRaw(nodes, _altGroups);
+	private bool AddAltGroupsRaw(MaterialGroup? value) => AddChildRaw(value, _altGroups);
+	private bool InsertAltGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, _altGroups);
+	private bool RemoveAltGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _altGroups);
 	private readonly List<MaterialGroup> _altGroups = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-groups")]
@@ -344,48 +348,6 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return altGroups.Count != 0;
 	}
 
-	private bool SetAltGroupsRaw(List<MaterialGroup> nodes)
-	{
-		if (_altGroups.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_altGroups, _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		_altGroups.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
-		return true;
-	}
-
-	private bool AddAltGroupsRaw(MaterialGroup? value)
-	{
-		if (value is null || _altGroups.Count != 0 && _altGroups[^1] == value)
-			return false;
-		AttachChild(value);
-		_altGroups.Add(value);
-		return true;
-	}
-
-	private bool InsertAltGroupsRaw(int index, MaterialGroup? value)
-	{
-		if (value is null || !IsInRange(index, _altGroups) || _altGroups.Count > index && _altGroups[index] == value)
-			return false;
-		AttachChild(value);
-		_altGroups.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveAltGroupsRaw(MaterialGroup? value)
-	{
-		if (value is null)
-			return false;
-		if (_altGroups.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
@@ -396,7 +358,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, [safeNode], _altGroups, null);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNode, _altGroups, null);
 			emitter.CollectOldData();
 			if (AddAltGroupsRaw(safeNode))
 				emitter.Notify();
@@ -415,7 +377,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, [safeNode], _altGroups, index);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNode, _altGroups, index);
 			emitter.CollectOldData();
 			if (InsertAltGroupsRaw(index++, safeNode))
 				emitter.Notify();
@@ -446,10 +408,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 	private bool SetDefaultGroupRaw(MaterialGroup? value)
 	{
-		if (value == _defaultGroup)
+		if (!ExchangeChildRaw(value, _defaultGroup))
 			return false;
-		SetParentNull(_defaultGroup);
-		AttachChild(value);
 		_defaultGroup = value;
 		return true;
 	}
@@ -464,6 +424,10 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return this;
 	}
 
+	private bool SetGroupsRaw(List<MaterialGroup> nodes) => ExchangeChildrenRaw(nodes, _groups);
+	private bool AddGroupsRaw(MaterialGroup? value) => AddChildRaw(value, _groups);
+	private bool InsertGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, _groups);
+	private bool RemoveGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _groups);
 	private readonly List<MaterialGroup> _groups = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-groups")]
@@ -477,48 +441,6 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return groups.Count != 0;
 	}
 
-	private bool SetGroupsRaw(List<MaterialGroup> nodes)
-	{
-		if (_groups.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_groups, _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
-		_groups.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.BillOfMaterials_groups));
-		return true;
-	}
-
-	private bool AddGroupsRaw(MaterialGroup? value)
-	{
-		if (value is null || _groups.Count != 0 && _groups[^1] == value)
-			return false;
-		AttachChild(value);
-		_groups.Add(value);
-		return true;
-	}
-
-	private bool InsertGroupsRaw(int index, MaterialGroup? value)
-	{
-		if (value is null || !IsInRange(index, _groups) || _groups.Count > index && _groups[index] == value)
-			return false;
-		AttachChild(value);
-		_groups.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveGroupsRaw(MaterialGroup? value)
-	{
-		if (value is null)
-			return false;
-		if (_groups.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
 	{
@@ -529,7 +451,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, [safeNode], _groups, null);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNode, _groups, null);
 			emitter.CollectOldData();
 			if (AddGroupsRaw(safeNode))
 				emitter.Notify();
@@ -548,7 +470,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, [safeNode], _groups, index);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNode, _groups, index);
 			emitter.CollectOldData();
 			if (InsertGroupsRaw(index++, safeNode))
 				emitter.Notify();
@@ -994,10 +916,8 @@ public partial class Circle : Shape
 
 	private bool SetCenterRaw(Coord? value)
 	{
-		if (value == _center)
+		if (!ExchangeChildRaw(value, _center))
 			return false;
-		SetParentNull(_center);
-		AttachChild(value);
 		_center = value;
 		return true;
 	}
@@ -1187,6 +1107,10 @@ public partial class Circle : Shape
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-CompositeShape")]
 public partial class CompositeShape : Shape
 {
+	private bool SetDisabledPartsRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, _disabledParts);
+	private bool AddDisabledPartsRaw(IShape? value) => AddChildRaw(value, _disabledParts);
+	private bool InsertDisabledPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, _disabledParts);
+	private bool RemoveDisabledPartsRaw(IShape? value) => RemoveChildRaw(value, _disabledParts);
 	private readonly List<IShape> _disabledParts = [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If DisabledParts is empty</exception>
@@ -1201,48 +1125,6 @@ public partial class CompositeShape : Shape
 		return disabledParts.Count != 0;
 	}
 
-	private bool SetDisabledPartsRaw(List<IShape> nodes)
-	{
-		if (_disabledParts.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_disabledParts, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		_disabledParts.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
-		return true;
-	}
-
-	private bool AddDisabledPartsRaw(IShape? value)
-	{
-		if (value is null || _disabledParts.Count != 0 && _disabledParts[^1] == value)
-			return false;
-		AttachChild(value);
-		_disabledParts.Add(value);
-		return true;
-	}
-
-	private bool InsertDisabledPartsRaw(int index, IShape? value)
-	{
-		if (value is null || !IsInRange(index, _disabledParts) || _disabledParts.Count > index && _disabledParts[index] == value)
-			return false;
-		AttachChild(value);
-		_disabledParts.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveDisabledPartsRaw(IShape? value)
-	{
-		if (value is null)
-			return false;
-		if (_disabledParts.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
         public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes)
@@ -1253,7 +1135,7 @@ public partial class CompositeShape : Shape
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, [safeNode], _disabledParts, null);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNode, _disabledParts, null);
 			emitter.CollectOldData();
 			if (AddDisabledPartsRaw(safeNode))
 				emitter.Notify();
@@ -1273,7 +1155,7 @@ public partial class CompositeShape : Shape
 		AssureNoSelfMove(index, safeNodes, _disabledParts);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, [safeNode], _disabledParts, index);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNode, _disabledParts, index);
 			emitter.CollectOldData();
 			if (InsertDisabledPartsRaw(index++, safeNode))
 				emitter.Notify();
@@ -1310,10 +1192,8 @@ public partial class CompositeShape : Shape
 
 	private bool SetEvilPartRaw(IShape? value)
 	{
-		if (value == _evilPart)
+		if (!ExchangeChildRaw(value, _evilPart))
 			return false;
-		SetParentNull(_evilPart);
-		AttachChild(value);
 		_evilPart = value;
 		return true;
 	}
@@ -1330,6 +1210,10 @@ public partial class CompositeShape : Shape
 		return this;
 	}
 
+	private bool SetPartsRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, _parts);
+	private bool AddPartsRaw(IShape? value) => AddChildRaw(value, _parts);
+	private bool InsertPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, _parts);
+	private bool RemovePartsRaw(IShape? value) => RemoveChildRaw(value, _parts);
 	private readonly List<IShape> _parts = [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Parts is empty</exception>
@@ -1344,48 +1228,6 @@ public partial class CompositeShape : Shape
 		return parts.Count != 0;
 	}
 
-	private bool SetPartsRaw(List<IShape> nodes)
-	{
-		if (_parts.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_parts, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		_parts.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.CompositeShape_parts));
-		return true;
-	}
-
-	private bool AddPartsRaw(IShape? value)
-	{
-		if (value is null || _parts.Count != 0 && _parts[^1] == value)
-			return false;
-		AttachChild(value);
-		_parts.Add(value);
-		return true;
-	}
-
-	private bool InsertPartsRaw(int index, IShape? value)
-	{
-		if (value is null || !IsInRange(index, _parts) || _parts.Count > index && _parts[index] == value)
-			return false;
-		AttachChild(value);
-		_parts.Insert(index, value);
-		return true;
-	}
-
-	private bool RemovePartsRaw(IShape? value)
-	{
-		if (value is null)
-			return false;
-		if (_parts.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
         public CompositeShape AddParts(IEnumerable<IShape> nodes)
@@ -1396,7 +1238,7 @@ public partial class CompositeShape : Shape
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, [safeNode], _parts, null);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNode, _parts, null);
 			emitter.CollectOldData();
 			if (AddPartsRaw(safeNode))
 				emitter.Notify();
@@ -1416,7 +1258,7 @@ public partial class CompositeShape : Shape
 		AssureNoSelfMove(index, safeNodes, _parts);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, [safeNode], _parts, index);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNode, _parts, index);
 			emitter.CollectOldData();
 			if (InsertPartsRaw(index++, safeNode))
 				emitter.Notify();
@@ -2104,10 +1946,8 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 	private bool SetDocumentationRaw(Documentation? value)
 	{
-		if (value == _documentation)
+		if (!ExchangeChildRaw(value, _documentation))
 			return false;
-		SetParentNull(_documentation);
-		AttachChild(value);
 		_documentation = value;
 		return true;
 	}
@@ -2122,6 +1962,10 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return this;
 	}
 
+	private bool SetShapesRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, _shapes);
+	private bool AddShapesRaw(IShape? value) => AddChildRaw(value, _shapes);
+	private bool InsertShapesRaw(int index, IShape? value) => InsertChildRaw(index, value, _shapes);
+	private bool RemoveShapesRaw(IShape? value) => RemoveChildRaw(value, _shapes);
 	private readonly List<IShape> _shapes = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes")]
@@ -2135,48 +1979,6 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return shapes.Count != 0;
 	}
 
-	private bool SetShapesRaw(List<IShape> nodes)
-	{
-		if (_shapes.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_shapes, _shapes, ShapesLanguage.Instance.Geometry_shapes);
-		_shapes.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.Geometry_shapes));
-		return true;
-	}
-
-	private bool AddShapesRaw(IShape? value)
-	{
-		if (value is null || _shapes.Count != 0 && _shapes[^1] == value)
-			return false;
-		AttachChild(value);
-		_shapes.Add(value);
-		return true;
-	}
-
-	private bool InsertShapesRaw(int index, IShape? value)
-	{
-		if (value is null || !IsInRange(index, _shapes) || _shapes.Count > index && _shapes[index] == value)
-			return false;
-		AttachChild(value);
-		_shapes.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveShapesRaw(IShape? value)
-	{
-		if (value is null)
-			return false;
-		if (_shapes.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry AddShapes(IEnumerable<IShape> nodes)
 	{
@@ -2187,7 +1989,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, null);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNode, _shapes, null);
 			emitter.CollectOldData();
 			if (AddShapesRaw(safeNode))
 				emitter.Notify();
@@ -2206,7 +2008,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, index);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNode, _shapes, index);
 			emitter.CollectOldData();
 			if (InsertShapesRaw(index++, safeNode))
 				emitter.Notify();
@@ -2475,10 +2277,8 @@ public partial class Line : Shape, INamedWritable
 
 	private bool SetEndRaw(Coord? value)
 	{
-		if (value == _end)
+		if (!ExchangeChildRaw(value, _end))
 			return false;
-		SetParentNull(_end);
-		AttachChild(value);
 		_end = value;
 		return true;
 	}
@@ -2512,10 +2312,8 @@ public partial class Line : Shape, INamedWritable
 
 	private bool SetStartRaw(Coord? value)
 	{
-		if (value == _start)
+		if (!ExchangeChildRaw(value, _start))
 			return false;
-		SetParentNull(_start);
-		AttachChild(value);
 		_start = value;
 		return true;
 	}
@@ -2682,10 +2480,8 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	private bool SetDefaultShapeRaw(IShape? value)
 	{
-		if (value == _defaultShape)
+		if (!ExchangeChildRaw(value, _defaultShape))
 			return false;
-		SetParentNull(_defaultShape);
-		AttachChild(value);
 		_defaultShape = value;
 		return true;
 	}
@@ -3102,10 +2898,8 @@ public partial class OffsetDuplicate : Shape
 
 	private bool SetDocsRaw(Documentation? value)
 	{
-		if (value == _docs)
+		if (!ExchangeChildRaw(value, _docs))
 			return false;
-		SetParentNull(_docs);
-		AttachChild(value);
 		_docs = value;
 		return true;
 	}
@@ -3137,10 +2931,8 @@ public partial class OffsetDuplicate : Shape
 
 	private bool SetOffsetRaw(Coord? value)
 	{
-		if (value == _offset)
+		if (!ExchangeChildRaw(value, _offset))
 			return false;
-		SetParentNull(_offset);
-		AttachChild(value);
 		_offset = value;
 		return true;
 	}
@@ -3172,10 +2964,8 @@ public partial class OffsetDuplicate : Shape
 
 	private bool SetSecretDocsRaw(Documentation? value)
 	{
-		if (value == _secretDocs)
+		if (!ExchangeChildRaw(value, _secretDocs))
 			return false;
-		SetParentNull(_secretDocs);
-		AttachChild(value);
 		_secretDocs = value;
 		return true;
 	}
@@ -3729,6 +3519,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		return this;
 	}
 
+	private bool SetFixpointsRaw(List<Coord> nodes) => ExchangeChildrenRaw(nodes, _fixpoints);
+	private bool AddFixpointsRaw(Coord? value) => AddChildRaw(value, _fixpoints);
+	private bool InsertFixpointsRaw(int index, Coord? value) => InsertChildRaw(index, value, _fixpoints);
+	private bool RemoveFixpointsRaw(Coord? value) => RemoveChildRaw(value, _fixpoints);
 	private readonly List<Coord> _fixpoints = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-fixpoints")]
@@ -3740,48 +3534,6 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	{
 		fixpoints = _fixpoints.AsReadOnly();
 		return fixpoints.Count != 0;
-	}
-
-	private bool SetFixpointsRaw(List<Coord> nodes)
-	{
-		if (_fixpoints.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_fixpoints, _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
-		_fixpoints.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.IShape_fixpoints));
-		return true;
-	}
-
-	private bool AddFixpointsRaw(Coord? value)
-	{
-		if (value is null || _fixpoints.Count != 0 && _fixpoints[^1] == value)
-			return false;
-		AttachChild(value);
-		_fixpoints.Add(value);
-		return true;
-	}
-
-	private bool InsertFixpointsRaw(int index, Coord? value)
-	{
-		if (value is null || !IsInRange(index, _fixpoints) || _fixpoints.Count > index && _fixpoints[index] == value)
-			return false;
-		AttachChild(value);
-		_fixpoints.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveFixpointsRaw(Coord? value)
-	{
-		if (value is null)
-			return false;
-		if (_fixpoints.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
  IShape IShape.AddFixpoints(IEnumerable<Coord> nodes) => AddFixpoints(nodes);
@@ -3795,7 +3547,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, [safeNode], _fixpoints, null);
+			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNode, _fixpoints, null);
 			emitter.CollectOldData();
 			if (AddFixpointsRaw(safeNode))
 				emitter.Notify();
@@ -3815,7 +3567,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, [safeNode], _fixpoints, index);
+			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNode, _fixpoints, index);
 			emitter.CollectOldData();
 			if (InsertFixpointsRaw(index++, safeNode))
 				emitter.Notify();
@@ -3885,10 +3637,8 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 
 	private bool SetShapeDocsRaw(Documentation? value)
 	{
-		if (value == _shapeDocs)
+		if (!ExchangeChildRaw(value, _shapeDocs))
 			return false;
-		SetParentNull(_shapeDocs);
-		AttachChild(value);
 		_shapeDocs = value;
 		return true;
 	}

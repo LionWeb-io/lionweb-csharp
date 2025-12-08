@@ -92,6 +92,10 @@ public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
 [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "Container")]
 public partial class Container : ConceptInstanceBase
 {
+	private bool SetLibrariesRaw(List<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes) => ExchangeChildrenRaw(nodes, _libraries);
+	private bool AddLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value) => AddChildRaw(value, _libraries);
+	private bool InsertLibrariesRaw(int index, LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value) => InsertChildRaw(index, value, _libraries);
+	private bool RemoveLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value) => RemoveChildRaw(value, _libraries);
 	private readonly List<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> _libraries = [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Libraries is empty</exception>
@@ -106,48 +110,6 @@ public partial class Container : ConceptInstanceBase
 		return libraries.Count != 0;
 	}
 
-	private bool SetLibrariesRaw(List<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes)
-	{
-		if (_libraries.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_libraries, _libraries, MultiLanguage.Instance.Container_libraries);
-		_libraries.AddRange(SetSelfParent(nodes, MultiLanguage.Instance.Container_libraries));
-		return true;
-	}
-
-	private bool AddLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value)
-	{
-		if (value is null || _libraries.Count != 0 && _libraries[^1] == value)
-			return false;
-		AttachChild(value);
-		_libraries.Add(value);
-		return true;
-	}
-
-	private bool InsertLibrariesRaw(int index, LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value)
-	{
-		if (value is null || !IsInRange(index, _libraries) || _libraries.Count > index && _libraries[index] == value)
-			return false;
-		AttachChild(value);
-		_libraries.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value)
-	{
-		if (value is null)
-			return false;
-		if (_libraries.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
         public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes)
@@ -158,7 +120,7 @@ public partial class Container : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, [safeNode], _libraries, null);
+			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNode, _libraries, null);
 			emitter.CollectOldData();
 			if (AddLibrariesRaw(safeNode))
 				emitter.Notify();
@@ -178,7 +140,7 @@ public partial class Container : ConceptInstanceBase
 		AssureNoSelfMove(index, safeNodes, _libraries);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, [safeNode], _libraries, index);
+			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNode, _libraries, index);
 			emitter.CollectOldData();
 			if (InsertLibrariesRaw(index++, safeNode))
 				emitter.Notify();

@@ -178,10 +178,8 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	private bool SetContRaw(INode? value)
 	{
-		if (value == _cont)
+		if (!ExchangeChildRaw(value, _cont))
 			return false;
-		SetParentNull(_cont);
-		AttachChild(value);
 		_cont = value;
 		return true;
 	}

@@ -177,6 +177,10 @@ public partial class DeprAnnotation : AnnotationInstanceBase
 [Obsolete]
 public partial class DeprConcept : ConceptInstanceBase
 {
+	private bool SetDeprChildRaw(List<DeprIface> nodes) => ExchangeChildrenRaw(nodes, _deprChild);
+	private bool AddDeprChildRaw(DeprIface? value) => AddChildRaw(value, _deprChild);
+	private bool InsertDeprChildRaw(int index, DeprIface? value) => InsertChildRaw(index, value, _deprChild);
+	private bool RemoveDeprChildRaw(DeprIface? value) => RemoveChildRaw(value, _deprChild);
 	private readonly List<DeprIface> _deprChild = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw")]
@@ -192,48 +196,6 @@ public partial class DeprConcept : ConceptInstanceBase
 		return deprChild.Count != 0;
 	}
 
-	private bool SetDeprChildRaw(List<DeprIface> nodes)
-	{
-		if (_deprChild.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_deprChild, _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		_deprChild.AddRange(SetSelfParent(nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
-		return true;
-	}
-
-	private bool AddDeprChildRaw(DeprIface? value)
-	{
-		if (value is null || _deprChild.Count != 0 && _deprChild[^1] == value)
-			return false;
-		AttachChild(value);
-		_deprChild.Add(value);
-		return true;
-	}
-
-	private bool InsertDeprChildRaw(int index, DeprIface? value)
-	{
-		if (value is null || !IsInRange(index, _deprChild) || _deprChild.Count > index && _deprChild[index] == value)
-			return false;
-		AttachChild(value);
-		_deprChild.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveDeprChildRaw(DeprIface? value)
-	{
-		if (value is null)
-			return false;
-		if (_deprChild.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete]
 	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
@@ -245,7 +207,7 @@ public partial class DeprConcept : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, [safeNode], _deprChild, null);
+			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNode, _deprChild, null);
 			emitter.CollectOldData();
 			if (AddDeprChildRaw(safeNode))
 				emitter.Notify();
@@ -265,7 +227,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, [safeNode], _deprChild, index);
+			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNode, _deprChild, index);
 			emitter.CollectOldData();
 			if (InsertDeprChildRaw(index++, safeNode))
 				emitter.Notify();

@@ -120,6 +120,10 @@ public class GeneralNodeLangFactory : AbstractBaseNodeFactory, IGeneralNodeLangF
 [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-GeneralNodeConcept")]
 public partial class GeneralNodeConcept : ConceptInstanceBase
 {
+	private bool SetMultipleContainmentRaw(List<INode> nodes) => ExchangeChildrenRaw(nodes, _multipleContainment);
+	private bool AddMultipleContainmentRaw(INode? value) => AddChildRaw(value, _multipleContainment);
+	private bool InsertMultipleContainmentRaw(int index, INode? value) => InsertChildRaw(index, value, _multipleContainment);
+	private bool RemoveMultipleContainmentRaw(INode? value) => RemoveChildRaw(value, _multipleContainment);
 	private readonly List<INode> _multipleContainment = [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultipleContainment is empty</exception>
@@ -134,48 +138,6 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return multipleContainment.Count != 0;
 	}
 
-	private bool SetMultipleContainmentRaw(List<INode> nodes)
-	{
-		if (_multipleContainment.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_multipleContainment, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
-		_multipleContainment.AddRange(SetSelfParent(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment));
-		return true;
-	}
-
-	private bool AddMultipleContainmentRaw(INode? value)
-	{
-		if (value is null || _multipleContainment.Count != 0 && _multipleContainment[^1] == value)
-			return false;
-		AttachChild(value);
-		_multipleContainment.Add(value);
-		return true;
-	}
-
-	private bool InsertMultipleContainmentRaw(int index, INode? value)
-	{
-		if (value is null || !IsInRange(index, _multipleContainment) || _multipleContainment.Count > index && _multipleContainment[index] == value)
-			return false;
-		AttachChild(value);
-		_multipleContainment.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveMultipleContainmentRaw(INode? value)
-	{
-		if (value is null)
-			return false;
-		if (_multipleContainment.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both MultipleContainment and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleContainment(IEnumerable<INode> nodes)
@@ -186,7 +148,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, [safeNode], _multipleContainment, null);
+			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, safeNode, _multipleContainment, null);
 			emitter.CollectOldData();
 			if (AddMultipleContainmentRaw(safeNode))
 				emitter.Notify();
@@ -206,7 +168,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		AssureNoSelfMove(index, safeNodes, _multipleContainment);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, [safeNode], _multipleContainment, index);
+			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, safeNode, _multipleContainment, index);
 			emitter.CollectOldData();
 			if (InsertMultipleContainmentRaw(index++, safeNode))
 				emitter.Notify();
@@ -226,6 +188,10 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
+	private bool SetMultipleOptionalContainmentRaw(List<INode> nodes) => ExchangeChildrenRaw(nodes, _multipleOptionalContainment);
+	private bool AddMultipleOptionalContainmentRaw(INode? value) => AddChildRaw(value, _multipleOptionalContainment);
+	private bool InsertMultipleOptionalContainmentRaw(int index, INode? value) => InsertChildRaw(index, value, _multipleOptionalContainment);
+	private bool RemoveMultipleOptionalContainmentRaw(INode? value) => RemoveChildRaw(value, _multipleOptionalContainment);
 	private readonly List<INode> _multipleOptionalContainment = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalContainment")]
@@ -239,48 +205,6 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return multipleOptionalContainment.Count != 0;
 	}
 
-	private bool SetMultipleOptionalContainmentRaw(List<INode> nodes)
-	{
-		if (_multipleOptionalContainment.SequenceEqual(nodes))
-			return false;
-		RemoveSelfParent(_multipleOptionalContainment, _multipleOptionalContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
-		_multipleOptionalContainment.AddRange(SetSelfParent(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment));
-		return true;
-	}
-
-	private bool AddMultipleOptionalContainmentRaw(INode? value)
-	{
-		if (value is null || _multipleOptionalContainment.Count != 0 && _multipleOptionalContainment[^1] == value)
-			return false;
-		AttachChild(value);
-		_multipleOptionalContainment.Add(value);
-		return true;
-	}
-
-	private bool InsertMultipleOptionalContainmentRaw(int index, INode? value)
-	{
-		if (value is null || !IsInRange(index, _multipleOptionalContainment) || _multipleOptionalContainment.Count > index && _multipleOptionalContainment[index] == value)
-			return false;
-		AttachChild(value);
-		_multipleOptionalContainment.Insert(index, value);
-		return true;
-	}
-
-	private bool RemoveMultipleOptionalContainmentRaw(INode? value)
-	{
-		if (value is null)
-			return false;
-		if (_multipleOptionalContainment.Remove(value))
-		{
-			{
-				SetParentNull(value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/// <remarks>Optional Multiple Containment</remarks>
         public GeneralNodeConcept AddMultipleOptionalContainment(IEnumerable<INode> nodes)
 	{
@@ -291,7 +215,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, [safeNode], _multipleOptionalContainment, null);
+			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, safeNode, _multipleOptionalContainment, null);
 			emitter.CollectOldData();
 			if (AddMultipleOptionalContainmentRaw(safeNode))
 				emitter.Notify();
@@ -310,7 +234,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, [safeNode], _multipleOptionalContainment, index);
+			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, safeNode, _multipleOptionalContainment, index);
 			emitter.CollectOldData();
 			if (InsertMultipleOptionalContainmentRaw(index++, safeNode))
 				emitter.Notify();
@@ -491,10 +415,8 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private bool SetSingleContainmentRaw(INode? value)
 	{
-		if (value == _singleContainment)
+		if (!ExchangeChildRaw(value, _singleContainment))
 			return false;
-		SetParentNull(_singleContainment);
-		AttachChild(value);
 		_singleContainment = value;
 		return true;
 	}
@@ -526,10 +448,8 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private bool SetSingleOptionalContainmentRaw(INode? value)
 	{
-		if (value == _singleOptionalContainment)
+		if (!ExchangeChildRaw(value, _singleOptionalContainment))
 			return false;
-		SetParentNull(_singleOptionalContainment);
-		AttachChild(value);
 		_singleOptionalContainment = value;
 		return true;
 	}

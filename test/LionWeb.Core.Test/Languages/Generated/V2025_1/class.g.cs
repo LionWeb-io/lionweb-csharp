@@ -349,10 +349,8 @@ public partial class @record : AnnotationInstanceBase, @interface
 
 	private bool SetDoubleRaw(@interface? value)
 	{
-		if (value == _double)
+		if (!ExchangeChildRaw(value, _double))
 			return false;
-		SetParentNull(_double);
-		AttachChild(value);
 		_double = value;
 		return true;
 	}

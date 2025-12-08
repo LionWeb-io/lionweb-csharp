@@ -168,10 +168,8 @@ public partial class MYConcept : ConceptInstanceBase
 
 	private bool SetMYContainmentRaw(INode? value)
 	{
-		if (value == _mYContainment)
+		if (!ExchangeChildRaw(value, _mYContainment))
 			return false;
-		SetParentNull(_mYContainment);
-		AttachChild(value);
 		_mYContainment = value;
 		return true;
 	}
