@@ -143,32 +143,10 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef) => TryGetReference<INamed>(_multivaluedRef, out multivaluedRef);
-	private bool SetMultivaluedRefRaw(List<ReferenceTarget> targets)
-	{
-		if (_multivaluedRef.SequenceEqual(targets))
-			return false;
-		_multivaluedRef.Clear();
-		_multivaluedRef.AddRange(targets);
-		return true;
-	}
-
-	private bool AddMultivaluedRefRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_multivaluedRef.Add(target);
-		return true;
-	}
-
-	private bool InsertMultivaluedRefRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _multivaluedRef))
-			return false;
-		_multivaluedRef.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveMultivaluedRefRaw(ReferenceTarget? target) => Remove(target, _multivaluedRef);
+	private bool SetMultivaluedRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _multivaluedRef);
+	private bool AddMultivaluedRefRaw(ReferenceTarget target) => AddReferencesRaw(target, _multivaluedRef);
+	private bool InsertMultivaluedRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _multivaluedRef);
+	private bool RemoveMultivaluedRefRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
         public MyConcept AddMultivaluedRef(IEnumerable<INamed> nodes)
@@ -176,10 +154,14 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef.Count);
-		emitter.CollectOldData();
-		_multivaluedRef.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNode, _multivaluedRef.Count);
+			emitter.CollectOldData();
+			if (AddMultivaluedRefRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -192,10 +174,14 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, index);
-		emitter.CollectOldData();
-		_multivaluedRef.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertMultivaluedRefRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -400,7 +386,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return result;
 	}
 
-	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.AddReferencesRaw(feature, value))
 			return true;
@@ -409,7 +395,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget value)
 	{
 		if (base.InsertReferencesRaw(feature, index, value))
 			return true;
@@ -418,7 +404,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.RemoveReferencesRaw(feature, value))
 			return true;

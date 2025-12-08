@@ -221,30 +221,30 @@ public partial class Container : ConceptInstanceBase
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library)
-			return AddLibrariesRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library?)value);
+		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library v0)
+			return AddLibrariesRaw(v0);
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library)
-			return InsertLibrariesRaw(index, (LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library?)value);
+		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library v0)
+			return InsertLibrariesRaw(index, v0);
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library)
-			return RemoveLibrariesRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library?)value);
+		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library v0)
+			return RemoveLibrariesRaw(v0);
 		return false;
 	}
 

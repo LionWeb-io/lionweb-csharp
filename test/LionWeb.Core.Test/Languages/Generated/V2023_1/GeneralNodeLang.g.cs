@@ -258,42 +258,24 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMultipleOptionalRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalRef) => TryGetReference<IReadableNode>(_multipleOptionalRef, out multipleOptionalRef);
-	private bool SetMultipleOptionalRefRaw(List<ReferenceTarget> targets)
-	{
-		if (_multipleOptionalRef.SequenceEqual(targets))
-			return false;
-		_multipleOptionalRef.Clear();
-		_multipleOptionalRef.AddRange(targets);
-		return true;
-	}
-
-	private bool AddMultipleOptionalRefRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_multipleOptionalRef.Add(target);
-		return true;
-	}
-
-	private bool InsertMultipleOptionalRefRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _multipleOptionalRef))
-			return false;
-		_multipleOptionalRef.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveMultipleOptionalRefRaw(ReferenceTarget? target) => Remove(target, _multipleOptionalRef);
+	private bool SetMultipleOptionalRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _multipleOptionalRef);
+	private bool AddMultipleOptionalRefRaw(ReferenceTarget target) => AddReferencesRaw(target, _multipleOptionalRef);
+	private bool InsertMultipleOptionalRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _multipleOptionalRef);
+	private bool RemoveMultipleOptionalRefRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept AddMultipleOptionalRef(IEnumerable<IReadableNode> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNodes, _multipleOptionalRef.Count);
-		emitter.CollectOldData();
-		_multipleOptionalRef.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNode, _multipleOptionalRef.Count);
+			emitter.CollectOldData();
+			if (AddMultipleOptionalRefRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -304,10 +286,14 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
 		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNodes, index);
-		emitter.CollectOldData();
-		_multipleOptionalRef.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertMultipleOptionalRefRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -330,32 +316,10 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultipleRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleRef) => TryGetReference<IReadableNode>(_multipleRef, out multipleRef);
-	private bool SetMultipleRefRaw(List<ReferenceTarget> targets)
-	{
-		if (_multipleRef.SequenceEqual(targets))
-			return false;
-		_multipleRef.Clear();
-		_multipleRef.AddRange(targets);
-		return true;
-	}
-
-	private bool AddMultipleRefRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_multipleRef.Add(target);
-		return true;
-	}
-
-	private bool InsertMultipleRefRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _multipleRef))
-			return false;
-		_multipleRef.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveMultipleRefRaw(ReferenceTarget? target) => Remove(target, _multipleRef);
+	private bool SetMultipleRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _multipleRef);
+	private bool AddMultipleRefRaw(ReferenceTarget target) => AddReferencesRaw(target, _multipleRef);
+	private bool InsertMultipleRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _multipleRef);
+	private bool RemoveMultipleRefRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultipleRef and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleRef(IEnumerable<IReadableNode> nodes)
@@ -363,10 +327,14 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNodes, _multipleRef.Count);
-		emitter.CollectOldData();
-		_multipleRef.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNode, _multipleRef.Count);
+			emitter.CollectOldData();
+			if (AddMultipleRefRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -379,10 +347,14 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
 		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNodes, index);
-		emitter.CollectOldData();
-		_multipleRef.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertMultipleRefRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -832,18 +804,18 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature) && value is null or INode)
-			return AddMultipleContainmentRaw((INode?)value);
-		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature) && value is null or INode)
-			return AddMultipleOptionalContainmentRaw((INode?)value);
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature) && value is INode v0)
+			return AddMultipleContainmentRaw(v0);
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature) && value is INode v1)
+			return AddMultipleOptionalContainmentRaw(v1);
 		return false;
 	}
 
-	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.AddReferencesRaw(feature, value))
 			return true;
@@ -854,18 +826,18 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature) && value is null or INode)
-			return InsertMultipleContainmentRaw(index, (INode?)value);
-		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature) && value is null or INode)
-			return InsertMultipleOptionalContainmentRaw(index, (INode?)value);
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature) && value is INode v0)
+			return InsertMultipleContainmentRaw(index, v0);
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature) && value is INode v1)
+			return InsertMultipleOptionalContainmentRaw(index, v1);
 		return false;
 	}
 
-	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget value)
 	{
 		if (base.InsertReferencesRaw(feature, index, value))
 			return true;
@@ -876,18 +848,18 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature) && value is null or INode)
-			return RemoveMultipleContainmentRaw((INode?)value);
-		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature) && value is null or INode)
-			return RemoveMultipleOptionalContainmentRaw((INode?)value);
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature) && value is INode v0)
+			return RemoveMultipleContainmentRaw(v0);
+		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature) && value is INode v1)
+			return RemoveMultipleOptionalContainmentRaw(v1);
 		return false;
 	}
 
-	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.RemoveReferencesRaw(feature, value))
 			return true;

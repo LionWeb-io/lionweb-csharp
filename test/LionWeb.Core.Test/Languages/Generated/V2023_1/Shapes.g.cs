@@ -494,42 +494,24 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
-	private bool SetMaterialsRaw(List<ReferenceTarget> targets)
-	{
-		if (_materials.SequenceEqual(targets))
-			return false;
-		_materials.Clear();
-		_materials.AddRange(targets);
-		return true;
-	}
-
-	private bool AddMaterialsRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_materials.Add(target);
-		return true;
-	}
-
-	private bool InsertMaterialsRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _materials))
-			return false;
-		_materials.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveMaterialsRaw(ReferenceTarget? target) => Remove(target, _materials);
+	private bool SetMaterialsRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _materials);
+	private bool AddMaterialsRaw(ReferenceTarget target) => AddReferencesRaw(target, _materials);
+	private bool InsertMaterialsRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _materials);
+	private bool RemoveMaterialsRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _materials);
 	/// <remarks>Optional Multiple Reference</remarks>
         public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count);
-		emitter.CollectOldData();
-		_materials.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNode, _materials.Count);
+			emitter.CollectOldData();
+			if (AddMaterialsRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -540,10 +522,14 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index);
-		emitter.CollectOldData();
-		_materials.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertMaterialsRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -715,18 +701,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
-			return AddAltGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
-		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
-			return AddGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup v0)
+			return AddAltGroupsRaw(v0);
+		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup v1)
+			return AddGroupsRaw(v1);
 		return false;
 	}
 
-	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.AddReferencesRaw(feature, value))
 			return true;
@@ -735,18 +721,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
-			return InsertAltGroupsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
-		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
-			return InsertGroupsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup v0)
+			return InsertAltGroupsRaw(index, v0);
+		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup v1)
+			return InsertGroupsRaw(index, v1);
 		return false;
 	}
 
-	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget value)
 	{
 		if (base.InsertReferencesRaw(feature, index, value))
 			return true;
@@ -755,18 +741,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
-			return RemoveAltGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
-		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
-			return RemoveGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup v0)
+			return RemoveAltGroupsRaw(v0);
+		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup v1)
+			return RemoveGroupsRaw(v1);
 		return false;
 	}
 
-	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.RemoveReferencesRaw(feature, value))
 			return true;
@@ -1405,36 +1391,36 @@ public partial class CompositeShape : Shape
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return AddDisabledPartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
-		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return AddPartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v0)
+			return AddDisabledPartsRaw(v0);
+		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v1)
+			return AddPartsRaw(v1);
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return InsertDisabledPartsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
-		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return InsertPartsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v0)
+			return InsertDisabledPartsRaw(index, v0);
+		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v1)
+			return InsertPartsRaw(index, v1);
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return RemoveDisabledPartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
-		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return RemovePartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v0)
+			return RemoveDisabledPartsRaw(v0);
+		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v1)
+			return RemovePartsRaw(v1);
 		return false;
 	}
 
@@ -2130,30 +2116,30 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return AddShapesRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v0)
+			return AddShapesRaw(v0);
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return InsertShapesRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v0)
+			return InsertShapesRaw(index, v0);
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
-			return RemoveShapesRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v0)
+			return RemoveShapesRaw(v0);
 		return false;
 	}
 
@@ -2505,32 +2491,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
-	private bool SetMaterialsRaw(List<ReferenceTarget> targets)
-	{
-		if (_materials.SequenceEqual(targets))
-			return false;
-		_materials.Clear();
-		_materials.AddRange(targets);
-		return true;
-	}
-
-	private bool AddMaterialsRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_materials.Add(target);
-		return true;
-	}
-
-	private bool InsertMaterialsRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _materials))
-			return false;
-		_materials.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveMaterialsRaw(ReferenceTarget? target) => Remove(target, _materials);
+	private bool SetMaterialsRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _materials);
+	private bool AddMaterialsRaw(ReferenceTarget target) => AddReferencesRaw(target, _materials);
+	private bool InsertMaterialsRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _materials);
+	private bool RemoveMaterialsRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _materials);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
         public MaterialGroup AddMaterials(IEnumerable<IShape> nodes)
@@ -2538,10 +2502,14 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count);
-		emitter.CollectOldData();
-		_materials.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNode, _materials.Count);
+			emitter.CollectOldData();
+			if (AddMaterialsRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -2554,10 +2522,14 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index);
-		emitter.CollectOldData();
-		_materials.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertMaterialsRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -2747,7 +2719,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return result;
 	}
 
-	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.AddReferencesRaw(feature, value))
 			return true;
@@ -2756,7 +2728,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return false;
 	}
 
-	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget value)
 	{
 		if (base.InsertReferencesRaw(feature, index, value))
 			return true;
@@ -2765,7 +2737,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return false;
 	}
 
-	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.RemoveReferencesRaw(feature, value))
 			return true;
@@ -3278,42 +3250,24 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes) => TryGetReference<IShape>(_shapes, out shapes);
-	private bool SetShapesRaw(List<ReferenceTarget> targets)
-	{
-		if (_shapes.SequenceEqual(targets))
-			return false;
-		_shapes.Clear();
-		_shapes.AddRange(targets);
-		return true;
-	}
-
-	private bool AddShapesRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_shapes.Add(target);
-		return true;
-	}
-
-	private bool InsertShapesRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _shapes))
-			return false;
-		_shapes.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveShapesRaw(ReferenceTarget? target) => Remove(target, _shapes);
+	private bool SetShapesRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _shapes);
+	private bool AddShapesRaw(ReferenceTarget target) => AddReferencesRaw(target, _shapes);
+	private bool InsertShapesRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _shapes);
+	private bool RemoveShapesRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
         public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count);
-		emitter.CollectOldData();
-		_shapes.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNode, _shapes.Count);
+			emitter.CollectOldData();
+			if (AddShapesRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -3324,10 +3278,14 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index);
-		emitter.CollectOldData();
-		_shapes.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertShapesRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -3408,7 +3366,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		return result;
 	}
 
-	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.AddReferencesRaw(feature, value))
 			return true;
@@ -3417,7 +3375,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		return false;
 	}
 
-	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget value)
 	{
 		if (base.InsertReferencesRaw(feature, index, value))
 			return true;
@@ -3426,7 +3384,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		return false;
 	}
 
-	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.RemoveReferencesRaw(feature, value))
 			return true;
@@ -3822,30 +3780,30 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
-			return AddFixpointsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord v0)
+			return AddFixpointsRaw(v0);
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
-			return InsertFixpointsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord v0)
+			return InsertFixpointsRaw(index, v0);
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
-			return RemoveFixpointsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord v0)
+			return RemoveFixpointsRaw(v0);
 		return false;
 	}
 

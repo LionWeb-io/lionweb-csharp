@@ -469,30 +469,30 @@ public partial class DeprConcept : ConceptInstanceBase
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface)
-			return AddDeprChildRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface?)value);
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface v0)
+			return AddDeprChildRaw(v0);
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface)
-			return InsertDeprChildRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface?)value);
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface v0)
+			return InsertDeprChildRaw(index, v0);
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface)
-			return RemoveDeprChildRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface?)value);
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface v0)
+			return RemoveDeprChildRaw(v0);
 		return false;
 	}
 

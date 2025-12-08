@@ -808,30 +808,30 @@ public partial class Library : ConceptInstanceBase
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book)
-			return AddBooksRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book?)value);
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book v0)
+			return AddBooksRaw(v0);
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book)
-			return InsertBooksRaw(index, (LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book?)value);
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book v0)
+			return InsertBooksRaw(index, v0);
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book)
-			return RemoveBooksRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book?)value);
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book v0)
+			return RemoveBooksRaw(v0);
 		return false;
 	}
 

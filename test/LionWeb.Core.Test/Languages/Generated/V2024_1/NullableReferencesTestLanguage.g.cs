@@ -1035,42 +1035,24 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return reference_0_n.Count != 0;
 	}
 
-	private bool SetReference_0_nRaw(List<ReferenceTarget> targets)
-	{
-		if (_reference_0_n.SequenceEqual(targets))
-			return false;
-		_reference_0_n.Clear();
-		_reference_0_n.AddRange(targets);
-		return true;
-	}
-
-	private bool AddReference_0_nRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_reference_0_n.Add(target);
-		return true;
-	}
-
-	private bool InsertReference_0_nRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _reference_0_n))
-			return false;
-		_reference_0_n.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveReference_0_nRaw(ReferenceTarget? target) => Remove(target, _reference_0_n);
+	private bool SetReference_0_nRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _reference_0_n);
+	private bool AddReference_0_nRaw(ReferenceTarget target) => AddReferencesRaw(target, _reference_0_n);
+	private bool InsertReference_0_nRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _reference_0_n);
+	private bool RemoveReference_0_nRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _reference_0_n);
 	/// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept AddReference_0_n(IEnumerable<LinkTestConcept> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		AssureNotNullMembers(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n.Count);
-		emitter.CollectOldData();
-		_reference_0_n.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNode, _reference_0_n.Count);
+			emitter.CollectOldData();
+			if (AddReference_0_nRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -1081,10 +1063,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		AssureNotNullMembers(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, index);
-		emitter.CollectOldData();
-		_reference_0_n.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertReference_0_nRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -1152,32 +1138,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return reference_1_n.Count != 0;
 	}
 
-	private bool SetReference_1_nRaw(List<ReferenceTarget> targets)
-	{
-		if (_reference_1_n.SequenceEqual(targets))
-			return false;
-		_reference_1_n.Clear();
-		_reference_1_n.AddRange(targets);
-		return true;
-	}
-
-	private bool AddReference_1_nRaw(ReferenceTarget? target)
-	{
-		if (target is null)
-			return false;
-		_reference_1_n.Add(target);
-		return true;
-	}
-
-	private bool InsertReference_1_nRaw(int index, ReferenceTarget? target)
-	{
-		if (target is null || !IsInRange(index, _reference_1_n))
-			return false;
-		_reference_1_n.Insert(index, target);
-		return true;
-	}
-
-	private bool RemoveReference_1_nRaw(ReferenceTarget? target) => Remove(target, _reference_1_n);
+	private bool SetReference_1_nRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _reference_1_n);
+	private bool AddReference_1_nRaw(ReferenceTarget target) => AddReferencesRaw(target, _reference_1_n);
+	private bool InsertReference_1_nRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _reference_1_n);
+	private bool RemoveReference_1_nRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _reference_1_n);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Reference_1_n and nodes are empty</exception>
         public LinkTestConcept AddReference_1_n(IEnumerable<LinkTestConcept> nodes)
@@ -1185,10 +1149,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n.Count);
-		emitter.CollectOldData();
-		_reference_1_n.AddRange(safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNode, _reference_1_n.Count);
+			emitter.CollectOldData();
+			if (AddReference_1_nRaw(safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -1201,10 +1169,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, index);
-		emitter.CollectOldData();
-		_reference_1_n.InsertRange(index, safeNodes);
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNode, index);
+			emitter.CollectOldData();
+			if (InsertReference_1_nRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
@@ -1552,18 +1524,18 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return AddContainment_0_nRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
-		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return AddContainment_1_nRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v0)
+			return AddContainment_0_nRaw(v0);
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v1)
+			return AddContainment_1_nRaw(v1);
 		return false;
 	}
 
-	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.AddReferencesRaw(feature, value))
 			return true;
@@ -1574,18 +1546,18 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return InsertContainment_0_nRaw(index, (LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
-		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return InsertContainment_1_nRaw(index, (LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v0)
+			return InsertContainment_0_nRaw(index, v0);
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v1)
+			return InsertContainment_1_nRaw(index, v1);
 		return false;
 	}
 
-	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget value)
 	{
 		if (base.InsertReferencesRaw(feature, index, value))
 			return true;
@@ -1596,18 +1568,18 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return RemoveContainment_0_nRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
-		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return RemoveContainment_1_nRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v0)
+			return RemoveContainment_0_nRaw(v0);
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v1)
+			return RemoveContainment_1_nRaw(v1);
 		return false;
 	}
 
-	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget value)
 	{
 		if (base.RemoveReferencesRaw(feature, value))
 			return true;
@@ -2158,30 +2130,30 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 		return result;
 	}
 
-	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.AddContainmentsRaw(feature, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return AddLinksRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v0)
+			return AddLinksRaw(v0);
 		return false;
 	}
 
-	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode value)
 	{
 		if (base.InsertContainmentsRaw(feature, index, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return InsertLinksRaw(index, (LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v0)
+			return InsertLinksRaw(index, v0);
 		return false;
 	}
 
-	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode value)
 	{
 		if (base.RemoveContainmentsRaw(feature, value))
 			return true;
-		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept)
-			return RemoveLinksRaw((LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept?)value);
+		if (NullableReferencesTestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(feature) && value is LionWeb.Core.Test.Languages.Generated.V2024_1.NullableReferencesTestLang.LinkTestConcept v0)
+			return RemoveLinksRaw(v0);
 		return false;
 	}
 
