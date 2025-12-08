@@ -23,7 +23,6 @@ using M3;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : INode
 {
-    private readonly List<T> _existingValues;
     private Index _newIndex;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
@@ -32,6 +31,7 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
     /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    [Obsolete]
     public ContainmentAddMultipleNotificationEmitter(Containment containment,
         INotifiableNode destinationParent,
         List<T>? addedValues,
@@ -39,8 +39,20 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
         Index? startIndex = null,
         INotificationId? notificationId = null) : base(containment, destinationParent, addedValues, notificationId)
     {
-        _existingValues = existingValues;
         _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
+    }
+    
+    /// <param name="containment">Represented <see cref="Containment"/>.</param>
+    /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
+    /// <param name="addedValue">Newly added value.</param>
+    /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
+    /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <paramref name="containment"/>.</param>
+    public ContainmentAddMultipleNotificationEmitter(Containment containment,
+        INotifiableNode destinationParent,
+        T addedValue,
+        List<T> existingValues,
+        Index? startIndex = null) : this(containment, destinationParent, [addedValue], existingValues, startIndex, null)
+    {
     }
 
     /// <inheritdoc />

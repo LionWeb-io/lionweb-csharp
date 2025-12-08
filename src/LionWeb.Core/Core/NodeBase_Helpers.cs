@@ -188,17 +188,14 @@ public abstract partial class NodeBase
         var result = new List<IWritableNode>(annotations.Count);
         foreach (var a in annotations)
         {
-            if (!CanAnnotate(a))
+            if (!(a?.GetClassifier() is Annotation ann && ann.CanAnnotate(GetClassifier())))
                 throw new InvalidValueException(null, a);
             result.Add(a);
         }
-        
+
         return result;
     }
 
-    protected bool CanAnnotate(INode? candidate) =>
-        candidate?.GetClassifier() is Annotation ann && ann.CanAnnotate(GetClassifier());
-    
     /// <summary>
     /// Unsets <paramref name="child">child's</paramref> parent, if applicable. 
     /// Does <i>not</i> update parent's containments.
@@ -218,11 +215,89 @@ public abstract partial class NodeBase
     /// <param name="child">Node to become a child of <c>this</c> node.</param>
     protected void AttachChild(IReadableNode? child)
     {
-        if (child != null && child is INode n)
+        if (child == null)
+            return;
+
+        DetachChildInternal((INode)child);
+        SetParentInternal((INode)child, this);
+    }
+
+    protected bool ExchangeChildRaw(IReadableNode? newValue, IReadableNode? storage)
+    {
+        if (newValue == storage)
+            return false;
+
+        SetParentNull((INode?)storage);
+        AttachChild(newValue);
+        return true;
+    }
+
+    protected bool ExchangeChildrenRaw<T>(List<T> newValue, List<T> storage) where T : IWritableNode
+    {
+        if (storage.SequenceEqual(newValue))
+            return false;
+
+        RemoveSelfParentRaw(storage);
+        storage.Clear();
+        storage.AddRange(SetSelfParentRaw(newValue));
+        return true;
+    }
+
+    private void RemoveSelfParentRaw<T>(List<T> storage) where T : IReadableNode
+    {
+        foreach (T node in storage)
         {
-            DetachChildInternal(n);
-            SetParentInternal(n, this);
+            SetParentInternal((INode)node, null);
         }
+    }
+
+    private List<T> SetSelfParentRaw<T>(List<T> list) where T : IReadableNode
+    {
+        foreach (T n in list)
+        {
+            if (n.GetParent() != this)
+            {
+                DetachChildInternal((INode)n);
+                SetParentInternal((INode)n, this);
+            }
+        }
+
+        return list;
+    }
+
+
+    protected bool AddChildRaw<T>(T? newValue, List<T> storage) where T : class, IWritableNode
+    {
+        if (newValue is null || storage.Count != 0 && storage[^1] == newValue)
+            return false;
+
+        AttachChild(newValue);
+        storage.Add(newValue);
+        return true;
+    }
+
+    protected bool InsertChildRaw<T>(Index index, T? newValue, List<T> storage) where T : class, IWritableNode
+    {
+        if (newValue is null || !IsInRange(index, storage) || storage.Count > index && storage[index] == newValue)
+            return false;
+
+        AttachChild(newValue);
+        storage.Insert(index, newValue);
+        return true;
+    }
+
+    protected bool RemoveChildRaw<T>(T? valueToRemove, List<T> current) where T : class, IWritableNode
+    {
+        if (valueToRemove is null)
+            return false;
+
+        if (current.Remove(valueToRemove))
+        {
+            SetParentNull((INode)valueToRemove);
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -401,7 +476,7 @@ public abstract partial class NodeBase
                 remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
         }
     }
-    
+
     /// <inheritdoc cref="RemoveAll{T}(List{T}, List{T}, Action{IPartitionNotificationProducer, Index, T, INotificationId?}?, INotificationId?)"/>
     protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceTarget> storage,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
@@ -422,34 +497,19 @@ public abstract partial class NodeBase
         }
     }
 
-    protected bool RemoveAll(List<ReferenceTarget> targets, List<ReferenceTarget> storage)
-    {
-        if (targets is null || storage is null)
-            return false;
-        
-        bool result = false;
-        
-        foreach (var t in targets)
-        {
-            result |= Remove(t, storage);
-        }
-        
-        return result;
-    }
-
     protected bool Remove(ReferenceTarget target, List<ReferenceTarget> storage)
     {
         if (target is null)
             return false;
-        
+
         var index = storage.FindIndex(r =>
         {
             if (target.Target is not null)
                 return Equals(target.Target, r.Target);
-                
+
             if (target.TargetId is not null)
                 return Equals(target.TargetId, r.TargetId);
-                
+
             return Equals(target.ResolveInfo, r.ResolveInfo);
         });
         if (index < 0)
@@ -458,7 +518,7 @@ public abstract partial class NodeBase
         storage.RemoveAt(index);
         return true;
     }
-    
+
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
     protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
         ReferenceRemover<T>(Reference reference) where T : IReadableNode =>

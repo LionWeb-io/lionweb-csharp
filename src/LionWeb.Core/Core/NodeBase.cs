@@ -62,15 +62,14 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     public virtual void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
         var safeAnnotations = AssureAnnotations(annotations?.ToList());
-        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
-            startIndex: null, notificationId: notificationId);
-        notification.CollectOldData();
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AddAnnotationsRaw(safeAnnotation);
+            AnnotationAddMultipleNotificationEmitter emitter = new(this, safeAnnotation, _annotations);
+            emitter.CollectOldData();
+            if (AddAnnotationsRaw(safeAnnotation))
+                emitter.Notify();
         }
 
-        notification.Notify();
     }
 
     bool IWritableNodeRaw.AddAnnotationsRaw(IWritableNode annotation) =>
@@ -96,11 +95,11 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         var safeAnnotations = AssureAnnotations(annotations?.ToList());
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AnnotationAddMultipleNotificationEmitter notification = new(this, [safeAnnotation], _annotations,
-                startIndex: index, notificationId: notificationId);
+            AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotation, _annotations,
+                startIndex: index);
             notification.CollectOldData();
-            InsertAnnotationsRaw(index++, safeAnnotation);
-            notification.Notify();
+            if (InsertAnnotationsRaw(index++, safeAnnotation))
+                notification.Notify();
         }
     }
 
@@ -180,21 +179,21 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     /// <inheritdoc cref="IWritableNode.Set"/>
     protected virtual bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
-        if (feature == null)
-        {
-            if (value is not IEnumerable)
-                throw new InvalidValueException(feature, value);
-            var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
-            AssureAnnotations(safeNodes);
-            AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
-            notification.CollectOldData();
-            RemoveSelfParent(_annotations.ToList(), _annotations, null);
-            _annotations.AddRange(SetSelfParent(safeNodes, null));
-            notification.Notify();
-            return true;
-        }
+        if (feature != null)
+            return false;
 
-        return false;
+        if (value is not IEnumerable)
+            throw new InvalidValueException(feature, value);
+        var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
+        AssureAnnotations(safeNodes);
+        AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
+        notification.CollectOldData();
+        RemoveSelfParent(_annotations.ToList(), _annotations, null);
+        _annotations.AddRange(SetSelfParent(safeNodes, null));
+        notification.Notify();
+        
+        return true;
+
     }
 
     bool IWritableNodeRaw.SetRaw(Feature feature, object? value) =>
