@@ -164,8 +164,8 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
     protected ExpressionStatementSyntax AttachChildCall() =>
         ExpressionStatement(Call("AttachChild", IdentifierName("value")));
 
-    protected ExpressionStatementSyntax AssignFeatureField(ExpressionSyntax? value = null) =>
-        Assignment(FeatureField(feature).ToString(), value ?? IdentifierName("value"));
+    protected ExpressionStatementSyntax AssignFeatureField() =>
+        Assignment(FeatureField(feature).ToString(), IdentifierName("value"));
 
     protected FieldDeclarationSyntax SingleFeatureField(bool writable = false) =>
         Field(FeatureField(feature).ToString(), NullableType(AsType(feature.GetFeatureType(), writeable: writable)),
@@ -282,8 +282,7 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
     private MethodDeclarationSyntax AbstractRequiredFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier),
                 [
-                    Param("value", AsType(feature.GetFeatureType(), writeable: writeable)),
-                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                    Param("value", AsType(feature.GetFeatureType(), writeable: writeable))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -305,6 +304,22 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
             );
 
         return result;
+    }
+
+    protected MethodDeclarationSyntax FeatureSetterRaw(TypeSyntax paramType)
+    {
+        return Method(FeatureSetRaw(feature).ToString(), AsType(typeof(bool)), [
+                Param("value", NullableType(paramType))
+            ])
+            .WithBody(AsStatements([
+                IfStatement(
+                    EqualsSign(IdentifierName("value"), FeatureField(feature)),
+                    ReturnStatement(False())
+                    ),
+                AssignFeatureField(),
+                ReturnStatement(True())
+            ]))
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
     }
 
     protected IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
@@ -359,15 +374,14 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
 
     private MethodDeclarationSyntax AbstractOptionalFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier), [
-                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable))),
-                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(feature));
 
     protected ExpressionSyntax FeatureSet() =>
-        IdentifierName($"Set{feature.Name.ToFirstUpper()}");
+        IdentifierName(FeatureSet(feature));
 
     protected string FeatureTryGetParam() =>
         _names.FeatureParam(feature);

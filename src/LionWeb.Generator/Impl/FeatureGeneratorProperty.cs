@@ -35,8 +35,10 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
         [
             PropertyEmitterVariable(),
             EmitterCollectOldDataCall(),
-            AssignFeatureField(),
-            EmitterNotifyCall(),
+            IfStatement(
+                InvocationExpression(FeatureSetRaw(property), AsArguments([IdentifierName("value")])),
+                EmitterNotifyCall()
+            ),
             ReturnStatement(This())
         ];
         if (IsReferenceType(property))
@@ -45,11 +47,19 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
         var prop = SingleRequiredFeatureProperty(AsType(property.GetFeatureType()));
         var setter = RequiredFeatureSetter(setterBody);
 
-        var members = new List<MemberDeclarationSyntax> { prop, TryGet() }.Concat(setter);
+        var members = new List<MemberDeclarationSyntax>
+        {
+            prop,
+            TryGet()
+        }.Concat(setter);
         if (IsReferenceType(property))
             members = members.Select(member => member.Xdoc(XdocThrowsIfSetToNull()));
 
-        return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
+        return new List<MemberDeclarationSyntax>
+        {
+            SingleFeatureField(),
+            FeatureSetterRaw(AsType(property.Type))
+        }.Concat(members);
     }
 
     public IEnumerable<MemberDeclarationSyntax> OptionalProperty() =>
@@ -57,14 +67,17 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
             {
                 SingleFeatureField(),
                 SingleOptionalFeatureProperty(),
-                TryGet()
+                TryGet(),
+                FeatureSetterRaw(AsType(property.Type))
             }
             .Concat(
                 OptionalFeatureSetter([
                     PropertyEmitterVariable(),
                     EmitterCollectOldDataCall(),
-                    AssignFeatureField(),
-                    EmitterNotifyCall(),
+                    IfStatement(
+                        InvocationExpression(FeatureSetRaw(property), AsArguments([IdentifierName("value")])),
+                        EmitterNotifyCall()
+                    ),
                     ReturnStatement(This())
                 ])
             );
@@ -74,8 +87,10 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
             "emitter",
             AsType(typeof(PropertyNotificationEmitter)),
             NewCall([
-                MetaProperty(property), This(), IdentifierName("value"),
-                FeatureField(property), IdentifierName("notificationId")
+                MetaProperty(property),
+                This(),
+                IdentifierName("value"),
+                FeatureField(property)
             ])
         );
 

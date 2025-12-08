@@ -82,6 +82,22 @@ public abstract class GeneratorBase
     protected ExpressionSyntax LinkAdd(Link link) =>
         IdentifierName($"Add{link.Name.ToFirstUpper()}");
 
+    protected ExpressionSyntax LinkAddRaw(Link link) =>
+        IdentifierName(LinkAdd(link) + "Raw");
+
+    protected ExpressionSyntax LinkInsert(Link link) =>
+        IdentifierName($"Insert{link.Name.ToFirstUpper()}");
+
+    protected ExpressionSyntax LinkInsertRaw(Link link) =>
+        IdentifierName(LinkInsert(link) + "Raw");
+
+    protected ExpressionSyntax LinkRemove(Link link) =>
+        IdentifierName($"Remove{link.Name.ToFirstUpper()}");
+
+    protected ExpressionSyntax LinkRemoveRaw(Link link) =>
+        IdentifierName(LinkRemove(link) + "Raw");
+
+
     /// <inheritdoc cref="INames.FeatureField"/>
     protected ExpressionSyntax FeatureField(Feature feature) =>
         _names.FeatureField(feature);

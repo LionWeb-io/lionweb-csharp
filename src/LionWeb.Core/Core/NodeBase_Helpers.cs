@@ -216,12 +216,12 @@ public abstract partial class NodeBase
     /// Does <i>not</i> update parent's containments.
     /// </summary>
     /// <param name="child">Node to become a child of <c>this</c> node.</param>
-    protected void AttachChild(INode? child)
+    protected void AttachChild(IReadableNode? child)
     {
-        if (child != null)
+        if (child != null && child is INode n)
         {
-            DetachChildInternal(child);
-            SetParentInternal(child, this);
+            DetachChildInternal(n);
+            SetParentInternal(n, this);
         }
     }
 

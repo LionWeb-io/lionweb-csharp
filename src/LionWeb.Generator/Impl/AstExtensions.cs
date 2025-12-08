@@ -459,9 +459,24 @@ public static class AstExtensions
     public static BinaryExpressionSyntax NotEquals(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.NotEqualsExpression, left, right);
 
+    /// <returns><c>==</c></returns>
+    public static BinaryExpressionSyntax EqualsSign(ExpressionSyntax left, ExpressionSyntax right) =>
+        BinaryExpression(SyntaxKind.EqualsExpression, left, right);
+
     /// <returns><c>||</c></returns>
     public static BinaryExpressionSyntax Or(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.LogicalOrExpression, left, right);
+
+    /// <returns><c>&&</c></returns>
+    public static BinaryExpressionSyntax And(ExpressionSyntax left, ExpressionSyntax right) =>
+        BinaryExpression(SyntaxKind.LogicalAndExpression, left, right);
+
+    /// <returns><c>!</c></returns>
+    public static PrefixUnaryExpressionSyntax Not(ExpressionSyntax inner) =>
+        PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, inner);
+
+    public static IsPatternExpressionSyntax IsNull(string name) =>
+        IsPatternExpression(IdentifierName(name), ConstantPattern(Null()));
 
     /// <returns><paramref name="value"/> <c>?? throw</c> <paramref name="exception"/></returns>
     public static ExpressionSyntax NotNullOrThrow(ExpressionSyntax value, ExpressionSyntax exception) =>

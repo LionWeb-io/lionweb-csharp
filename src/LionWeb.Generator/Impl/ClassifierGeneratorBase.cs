@@ -93,4 +93,7 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
                 )
             ])
         ));
+    
+    protected ExpressionSyntax FeatureSetRaw(Feature feature) =>
+        IdentifierName(FeatureSet(feature) + "Raw");
 }

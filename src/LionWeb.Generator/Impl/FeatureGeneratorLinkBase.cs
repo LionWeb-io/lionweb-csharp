@@ -128,8 +128,7 @@ public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link,
         Method(LinkRemove().ToString(), AsType(classifier),
                 [
                     Param("nodes",
-                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
-                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -158,8 +157,7 @@ public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link,
     private MethodDeclarationSyntax AbstractLinkInserter(bool writeable = false) =>
         Method(LinkInsert().ToString(), AsType(classifier), [
                 Param("index", AsType(typeof(int))),
-                Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
-                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(link)]))
@@ -186,8 +184,7 @@ public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link,
         Method(LinkAdd(link).ToString(), AsType(classifier),
                 [
                     Param("nodes",
-                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
-                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -195,10 +192,10 @@ public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link,
             .Xdoc(XdocDefault(link));
 
     private ExpressionSyntax LinkInsert() =>
-        IdentifierName($"Insert{link.Name.ToFirstUpper()}");
+        LinkInsert(link);
 
     private ExpressionSyntax LinkRemove() =>
-        IdentifierName($"Remove{link.Name.ToFirstUpper()}");
+        LinkRemove(link);
 
     protected LocalDeclarationStatementSyntax SafeNodesVariable() => 
         SafeNodesVariable(OptionalNodesToList());
