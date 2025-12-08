@@ -124,20 +124,28 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 		ifaceContainment = _ifaceContainment;
 		return ifaceContainment != null;
 	}
-/// <remarks>Required Single Containment</remarks>
-/// <exception cref="InvalidValueException">If set to null</exception>
- BaseIface BaseIface.SetIfaceContainment(INode value, INotificationId? notificationId = null) => SetIfaceContainment(value);
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public AbstractConcept SetIfaceContainment(INode value, INotificationId? notificationId = null)
+
+	private bool SetIfaceContainmentRaw(INode? value)
 	{
-		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
-		ContainmentSingleNotificationEmitter<INode> emitter = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment, notificationId);
-		emitter.CollectOldData();
+		if (value == _ifaceContainment)
+			return false;
 		SetParentNull(_ifaceContainment);
 		AttachChild(value);
 		_ifaceContainment = value;
-		emitter.Notify();
+		return true;
+	}
+/// <remarks>Required Single Containment</remarks>
+/// <exception cref="InvalidValueException">If set to null</exception>
+ BaseIface BaseIface.SetIfaceContainment(INode value) => SetIfaceContainment(value);
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public AbstractConcept SetIfaceContainment(INode value)
+	{
+		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
+		ContainmentSingleNotificationEmitter<INode> emitter = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment);
+		emitter.CollectOldData();
+		if (SetIfaceContainmentRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -161,6 +169,19 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 		return false;
 	}
 
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment.EqualsIdentity(feature))
+		{
+			result = _ifaceContainment;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -170,13 +191,22 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 		{
 			if (value is INode v)
 			{
-				SetIfaceContainment(v, notificationId);
+				SetIfaceContainment(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment.EqualsIdentity(feature) && value is null or INode)
+			return SetIfaceContainmentRaw((INode?)value);
 		return false;
 	}
 
@@ -225,7 +255,7 @@ public partial interface BaseIface : INode
 	public INode IfaceContainment { get; set; }
 
 	/// <remarks>Required Single Containment</remarks>
-        public BaseIface SetIfaceContainment(INode value, INotificationId? notificationId = null);
+        public BaseIface SetIfaceContainment(INode value);
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-CombinedConcept")]

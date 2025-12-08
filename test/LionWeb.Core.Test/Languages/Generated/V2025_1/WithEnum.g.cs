@@ -107,6 +107,14 @@ public class WithEnumFactory : AbstractBaseNodeFactory, IWithEnumFactory
 public partial class EnumHolder : ConceptInstanceBase
 {
 	private MyEnum? _enumValue = null;
+	private bool SetEnumValueRaw(MyEnum? value)
+	{
+		if (value == _enumValue)
+			return false;
+		_enumValue = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If EnumValue has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -124,13 +132,13 @@ public partial class EnumHolder : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public EnumHolder SetEnumValue(MyEnum value, INotificationId? notificationId = null)
+        public EnumHolder SetEnumValue(MyEnum value)
 	{
 		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
-		PropertyNotificationEmitter emitter = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue, notificationId);
+		PropertyNotificationEmitter emitter = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue);
 		emitter.CollectOldData();
-		_enumValue = value;
-		emitter.Notify();
+		if (SetEnumValueRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -154,6 +162,19 @@ public partial class EnumHolder : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (WithEnumLanguage.Instance.EnumHolder_enumValue.EqualsIdentity(feature))
+		{
+			result = _enumValue;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -163,13 +184,22 @@ public partial class EnumHolder : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.WithEnum.M2.MyEnum v)
 			{
-				SetEnumValue(v, notificationId);
+				SetEnumValue(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (WithEnumLanguage.Instance.EnumHolder_enumValue.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.WithEnum.M2.MyEnum)
+			return SetEnumValueRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.WithEnum.M2.MyEnum?)value);
 		return false;
 	}
 

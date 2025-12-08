@@ -97,6 +97,14 @@ public class TinyRefLangFactory : AbstractBaseNodeFactory, ITinyRefLangFactory
 public partial class MyConcept : ConceptInstanceBase, INamedWritable
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -113,16 +121,16 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public MyConcept SetName(string value, INotificationId? notificationId = null)
+        public MyConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -135,14 +143,40 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef) => TryGetReference<INamed>(_multivaluedRef, out multivaluedRef);
+	private bool SetMultivaluedRefRaw(List<ReferenceTarget> targets)
+	{
+		if (_multivaluedRef.SequenceEqual(targets))
+			return false;
+		_multivaluedRef.Clear();
+		_multivaluedRef.AddRange(targets);
+		return true;
+	}
+
+	private bool AddMultivaluedRefRaw(ReferenceTarget? target)
+	{
+		if (target is null)
+			return false;
+		_multivaluedRef.Add(target);
+		return true;
+	}
+
+	private bool InsertMultivaluedRefRaw(int index, ReferenceTarget? target)
+	{
+		if (target is null || !IsInRange(index, _multivaluedRef))
+			return false;
+		_multivaluedRef.Insert(index, target);
+		return true;
+	}
+
+	private bool RemoveMultivaluedRefRaw(ReferenceTarget? target) => Remove(target, _multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
-        public MyConcept AddMultivaluedRef(IEnumerable<INamed> nodes, INotificationId? notificationId = null)
+        public MyConcept AddMultivaluedRef(IEnumerable<INamed> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef.Count, notificationId);
+		ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef.Count);
 		emitter.CollectOldData();
 		_multivaluedRef.AddRange(safeNodes);
 		emitter.Notify();
@@ -152,13 +186,13 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultivaluedRef.Count</exception>
-        public MyConcept InsertMultivaluedRef(int index, IEnumerable<INamed> nodes, INotificationId? notificationId = null)
+        public MyConcept InsertMultivaluedRef(int index, IEnumerable<INamed> nodes)
 	{
 		AssureInRange(index, _multivaluedRef);
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, index, notificationId);
+		ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, index);
 		emitter.CollectOldData();
 		_multivaluedRef.InsertRange(index, safeNodes);
 		emitter.Notify();
@@ -167,7 +201,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If MultivaluedRef would be empty</exception>
-        public MyConcept RemoveMultivaluedRef(IEnumerable<INamed> nodes, INotificationId? notificationId = null)
+        public MyConcept RemoveMultivaluedRef(IEnumerable<INamed> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
@@ -192,21 +226,29 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return singularRef != null;
 	}
 
-	private MyConcept SetSingularRef(ReferenceTarget? value, INotificationId? notificationId = null)
+	private MyConcept SetSingularRef(ReferenceTarget? value)
 	{
 		AssureNotNullInstance<INamed>(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
-		ReferenceSingleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_singularRef, this, value, _singularRef, notificationId);
+		ReferenceSingleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_singularRef, this, value, _singularRef);
 		emitter.CollectOldData();
-		_singularRef = value;
-		emitter.Notify();
+		if (SetSingularRefRaw(value))
+			emitter.Notify();
 		return this;
+	}
+
+	private bool SetSingularRefRaw(ReferenceTarget? value)
+	{
+		if (value == _singularRef)
+			return false;
+		_singularRef = value;
+		return true;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public MyConcept SetSingularRef(INamed value, INotificationId? notificationId = null)
+        public MyConcept SetSingularRef(INamed value)
 	{
-		return SetSingularRef(ReferenceTarget.FromNodeOptional(value), notificationId);
+		return SetSingularRef(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	public MyConcept(string id) : base(id)
@@ -241,6 +283,45 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_singularRef.EqualsIdentity(feature))
+		{
+			result = _singularRef;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferencesRaw(Reference feature, out IReadOnlyList<IReferenceTarget> result)
+	{
+		if (base.TryGetReferencesRaw(feature, out result))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
+		{
+			result = _multivaluedRef;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -250,7 +331,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
@@ -261,11 +342,10 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		{
 			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsReferenceTargets<INamed>(value).ToList();
 			AssureNonEmpty(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-			ReferenceSetNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef, notificationId);
+			ReferenceSetNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef);
 			emitter.CollectOldData();
-			_multivaluedRef.Clear();
-			_multivaluedRef.AddRange(safeNodes);
-			emitter.Notify();
+			if (SetMultivaluedRefRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -273,19 +353,37 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		{
 			if (value is INamed v)
 			{
-				SetSingularRef(v, notificationId);
+				SetSingularRef(v);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetSingularRef(target, notificationId);
+				SetSingularRef(target);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_singularRef.EqualsIdentity(feature))
+			return SetSingularRefRaw(value);
 		return false;
 	}
 
@@ -300,6 +398,33 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		if (TryGetSingularRef(out _))
 			result.Add(TinyRefLangLanguage.Instance.MyConcept_singularRef);
 		return result;
+	}
+
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.AddReferencesRaw(feature, value))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
+			return AddMultivaluedRefRaw(value);
+		return false;
+	}
+
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	{
+		if (base.InsertReferencesRaw(feature, index, value))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
+			return InsertMultivaluedRefRaw(index, value);
+		return false;
+	}
+
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.RemoveReferencesRaw(feature, value))
+			return true;
+		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
+			return RemoveMultivaluedRefRaw(value);
+		return false;
 	}
 
 	/// <inheritdoc/>

@@ -166,21 +166,37 @@ public partial class MYConcept : ConceptInstanceBase
 		return mYContainment != null;
 	}
 
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public MYConcept SetMYContainment(INode value, INotificationId? notificationId = null)
+	private bool SetMYContainmentRaw(INode? value)
 	{
-		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment);
-		ContainmentSingleNotificationEmitter<INode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment, this, value, _mYContainment, notificationId);
-		emitter.CollectOldData();
+		if (value == _mYContainment)
+			return false;
 		SetParentNull(_mYContainment);
 		AttachChild(value);
 		_mYContainment = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public MYConcept SetMYContainment(INode value)
+	{
+		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment);
+		ContainmentSingleNotificationEmitter<INode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment, this, value, _mYContainment);
+		emitter.CollectOldData();
+		if (SetMYContainmentRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
 	private string? _mYProperty = null;
+	private bool SetMYPropertyRaw(string? value)
+	{
+		if (value == _mYProperty)
+			return false;
+		_mYProperty = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If MYProperty has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -198,13 +214,13 @@ public partial class MYConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public MYConcept SetMYProperty(string value, INotificationId? notificationId = null)
+        public MYConcept SetMYProperty(string value)
 	{
 		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYProperty);
-		PropertyNotificationEmitter emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYProperty, this, value, _mYProperty, notificationId);
+		PropertyNotificationEmitter emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYProperty, this, value, _mYProperty);
 		emitter.CollectOldData();
-		_mYProperty = value;
-		emitter.Notify();
+		if (SetMYPropertyRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -223,21 +239,29 @@ public partial class MYConcept : ConceptInstanceBase
 		return mYReference != null;
 	}
 
-	private MYConcept SetMYReference(ReferenceTarget? value, INotificationId? notificationId = null)
+	private MYConcept SetMYReference(ReferenceTarget? value)
 	{
 		AssureNotNullInstance<IReadableNode>(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
-		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference, notificationId);
+		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference);
 		emitter.CollectOldData();
-		_mYReference = value;
-		emitter.Notify();
+		if (SetMYReferenceRaw(value))
+			emitter.Notify();
 		return this;
+	}
+
+	private bool SetMYReferenceRaw(ReferenceTarget? value)
+	{
+		if (value == _mYReference)
+			return false;
+		_mYReference = value;
+		return true;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public MYConcept SetMYReference(IReadableNode value, INotificationId? notificationId = null)
+        public MYConcept SetMYReference(IReadableNode value)
 	{
-		return SetMYReference(ReferenceTarget.FromNodeOptional(value), notificationId);
+		return SetMYReference(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	public MYConcept(string id) : base(id)
@@ -272,6 +296,45 @@ public partial class MYConcept : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (MYUpperCaseLangLanguage.Instance.MYConcept_MYProperty.EqualsIdentity(feature))
+		{
+			result = _mYProperty;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment.EqualsIdentity(feature))
+		{
+			result = _mYContainment;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (MYUpperCaseLangLanguage.Instance.MYConcept_MYReference.EqualsIdentity(feature))
+		{
+			result = _mYReference;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -281,7 +344,7 @@ public partial class MYConcept : ConceptInstanceBase
 		{
 			if (value is INode v)
 			{
-				SetMYContainment(v, notificationId);
+				SetMYContainment(v);
 				return true;
 			}
 
@@ -292,7 +355,7 @@ public partial class MYConcept : ConceptInstanceBase
 		{
 			if (value is string v)
 			{
-				SetMYProperty(v, notificationId);
+				SetMYProperty(v);
 				return true;
 			}
 
@@ -303,19 +366,46 @@ public partial class MYConcept : ConceptInstanceBase
 		{
 			if (value is IReadableNode v)
 			{
-				SetMYReference(v, notificationId);
+				SetMYReference(v);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetMYReference(target, notificationId);
+				SetMYReference(target);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (MYUpperCaseLangLanguage.Instance.MYConcept_MYProperty.EqualsIdentity(feature) && value is null or string)
+			return SetMYPropertyRaw((string?)value);
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment.EqualsIdentity(feature) && value is null or INode)
+			return SetMYContainmentRaw((INode?)value);
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (MYUpperCaseLangLanguage.Instance.MYConcept_MYReference.EqualsIdentity(feature))
+			return SetMYReferenceRaw(value);
 		return false;
 	}
 

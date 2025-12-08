@@ -8,7 +8,6 @@ namespace LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyL
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
-using LionWeb.Core.Notification;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
@@ -89,5 +88,5 @@ public partial interface BasePropertyIface : INode
 	public string Prop { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public BasePropertyIface SetProp(string value, INotificationId? notificationId = null);
+        public BasePropertyIface SetProp(string value);
 }

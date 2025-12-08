@@ -249,6 +249,14 @@ public class SDTLangFactory : AbstractBaseNodeFactory, ISDTLangFactory
 public partial class SDTConcept : ConceptInstanceBase
 {
 	private A? _a = null;
+	private bool SetARaw(A? value)
+	{
+		if (value == _a)
+			return false;
+		_a = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If A has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -266,17 +274,25 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetA(A value, INotificationId? notificationId = null)
+        public SDTConcept SetA(A value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
-		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a, notificationId);
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a);
 		emitter.CollectOldData();
-		_a = value;
-		emitter.Notify();
+		if (SetARaw(value))
+			emitter.Notify();
 		return this;
 	}
 
 	private Amount? _amount = null;
+	private bool SetAmountRaw(Amount? value)
+	{
+		if (value == _amount)
+			return false;
+		_amount = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Amount has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -294,17 +310,25 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetAmount(Amount value, INotificationId? notificationId = null)
+        public SDTConcept SetAmount(Amount value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_amount);
-		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount, notificationId);
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount);
 		emitter.CollectOldData();
-		_amount = value;
-		emitter.Notify();
+		if (SetAmountRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
 	private ComplexNumber? _complex = null;
+	private bool SetComplexRaw(ComplexNumber? value)
+	{
+		if (value == _complex)
+			return false;
+		_complex = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Complex has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -322,13 +346,13 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetComplex(ComplexNumber value, INotificationId? notificationId = null)
+        public SDTConcept SetComplex(ComplexNumber value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_complex);
-		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex, notificationId);
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex);
 		emitter.CollectOldData();
-		_complex = value;
-		emitter.Notify();
+		if (SetComplexRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -345,13 +369,21 @@ public partial class SDTConcept : ConceptInstanceBase
 		return @decimal != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public SDTConcept SetDecimal(Decimal? value, INotificationId? notificationId = null)
+	private bool SetDecimalRaw(Decimal? value)
 	{
-		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal, notificationId);
-		emitter.CollectOldData();
+		if (value == _decimal)
+			return false;
 		_decimal = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public SDTConcept SetDecimal(Decimal? value)
+	{
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal);
+		emitter.CollectOldData();
+		if (SetDecimalRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -393,6 +425,37 @@ public partial class SDTConcept : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (SDTLangLanguage.Instance.SDTConcept_A.EqualsIdentity(feature))
+		{
+			result = _a;
+			return true;
+		}
+
+		if (SDTLangLanguage.Instance.SDTConcept_amount.EqualsIdentity(feature))
+		{
+			result = _amount;
+			return true;
+		}
+
+		if (SDTLangLanguage.Instance.SDTConcept_complex.EqualsIdentity(feature))
+		{
+			result = _complex;
+			return true;
+		}
+
+		if (SDTLangLanguage.Instance.SDTConcept_decimal.EqualsIdentity(feature))
+		{
+			result = _decimal;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -402,7 +465,7 @@ public partial class SDTConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.A v)
 			{
-				SetA(v, notificationId);
+				SetA(v);
 				return true;
 			}
 
@@ -413,7 +476,7 @@ public partial class SDTConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Amount v)
 			{
-				SetAmount(v, notificationId);
+				SetAmount(v);
 				return true;
 			}
 
@@ -424,7 +487,7 @@ public partial class SDTConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.ComplexNumber v)
 			{
-				SetComplex(v, notificationId);
+				SetComplex(v);
 				return true;
 			}
 
@@ -435,13 +498,28 @@ public partial class SDTConcept : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal)
 			{
-				SetDecimal((LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal?)value, notificationId);
+				SetDecimal((LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (SDTLangLanguage.Instance.SDTConcept_A.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.A)
+			return SetARaw((LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.A?)value);
+		if (SDTLangLanguage.Instance.SDTConcept_amount.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Amount)
+			return SetAmountRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Amount?)value);
+		if (SDTLangLanguage.Instance.SDTConcept_complex.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.ComplexNumber)
+			return SetComplexRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.ComplexNumber?)value);
+		if (SDTLangLanguage.Instance.SDTConcept_decimal.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal)
+			return SetDecimalRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal?)value);
 		return false;
 	}
 

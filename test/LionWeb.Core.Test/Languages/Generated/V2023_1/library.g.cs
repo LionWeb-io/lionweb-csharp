@@ -193,24 +193,40 @@ public partial class Book : ConceptInstanceBase
 		return author != null;
 	}
 
-	private Book SetAuthor(ReferenceTarget? value, INotificationId? notificationId = null)
+	private Book SetAuthor(ReferenceTarget? value)
 	{
 		AssureNotNullInstance<Writer>(value, LibraryLanguage.Instance.Book_author);
-		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
+		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author);
 		emitter.CollectOldData();
-		_author = value;
-		emitter.Notify();
+		if (SetAuthorRaw(value))
+			emitter.Notify();
 		return this;
+	}
+
+	private bool SetAuthorRaw(ReferenceTarget? value)
+	{
+		if (value == _author)
+			return false;
+		_author = value;
+		return true;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetAuthor(Writer value, INotificationId? notificationId = null)
+        public Book SetAuthor(Writer value)
 	{
-		return SetAuthor(ReferenceTarget.FromNodeOptional(value), notificationId);
+		return SetAuthor(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	private int? _pages = null;
+	private bool SetPagesRaw(int? value)
+	{
+		if (value == _pages)
+			return false;
+		_pages = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Pages has not been set</exception>
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "pages")]
@@ -225,16 +241,24 @@ public partial class Book : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Book SetPages(int value, INotificationId? notificationId = null)
+        public Book SetPages(int value)
 	{
-		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_pages, this, value, _pages, notificationId);
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_pages, this, value, _pages);
 		emitter.CollectOldData();
-		_pages = value;
-		emitter.Notify();
+		if (SetPagesRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
 	private string? _title = null;
+	private bool SetTitleRaw(string? value)
+	{
+		if (value == _title)
+			return false;
+		_title = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Title has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -252,13 +276,13 @@ public partial class Book : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetTitle(string value, INotificationId? notificationId = null)
+        public Book SetTitle(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
-		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_title, this, value, _title, notificationId);
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_title, this, value, _title);
 		emitter.CollectOldData();
-		_title = value;
-		emitter.Notify();
+		if (SetTitleRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -275,13 +299,21 @@ public partial class Book : ConceptInstanceBase
 		return @type != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public Book SetType(BookType? value, INotificationId? notificationId = null)
+	private bool SetTypeRaw(BookType? value)
 	{
-		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_type, this, value, _type, notificationId);
-		emitter.CollectOldData();
+		if (value == _type)
+			return false;
 		_type = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public Book SetType(BookType? value)
+	{
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_type, this, value, _type);
+		emitter.CollectOldData();
+		if (SetTypeRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -323,6 +355,44 @@ public partial class Book : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.Book_pages.EqualsIdentity(feature))
+		{
+			result = _pages;
+			return true;
+		}
+
+		if (LibraryLanguage.Instance.Book_title.EqualsIdentity(feature))
+		{
+			result = _title;
+			return true;
+		}
+
+		if (LibraryLanguage.Instance.Book_type.EqualsIdentity(feature))
+		{
+			result = _type;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
+		{
+			result = _author;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -332,13 +402,13 @@ public partial class Book : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Writer v)
 			{
-				SetAuthor(v, notificationId);
+				SetAuthor(v);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetAuthor(target, notificationId);
+				SetAuthor(target);
 				return true;
 			}
 
@@ -349,7 +419,7 @@ public partial class Book : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				SetPages(v, notificationId);
+				SetPages(v);
 				return true;
 			}
 
@@ -360,7 +430,7 @@ public partial class Book : ConceptInstanceBase
 		{
 			if (value is string v)
 			{
-				SetTitle(v, notificationId);
+				SetTitle(v);
 				return true;
 			}
 
@@ -371,13 +441,35 @@ public partial class Book : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.BookType)
 			{
-				SetType((LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.BookType?)value, notificationId);
+				SetType((LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.BookType?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Book_pages.EqualsIdentity(feature) && value is null or int)
+			return SetPagesRaw((int?)value);
+		if (LibraryLanguage.Instance.Book_title.EqualsIdentity(feature) && value is null or string)
+			return SetTitleRaw((string?)value);
+		if (LibraryLanguage.Instance.Book_type.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.BookType)
+			return SetTypeRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.BookType?)value);
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
+			return SetAuthorRaw(value);
 		return false;
 	}
 
@@ -401,6 +493,14 @@ public partial class Book : ConceptInstanceBase
 public partial class GuideBookWriter : Writer
 {
 	private string? _countries = null;
+	private bool SetCountriesRaw(string? value)
+	{
+		if (value == _countries)
+			return false;
+		_countries = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Countries has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -418,13 +518,13 @@ public partial class GuideBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public GuideBookWriter SetCountries(string value, INotificationId? notificationId = null)
+        public GuideBookWriter SetCountries(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
-		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.GuideBookWriter_countries, this, value, _countries, notificationId);
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.GuideBookWriter_countries, this, value, _countries);
 		emitter.CollectOldData();
-		_countries = value;
-		emitter.Notify();
+		if (SetCountriesRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -448,6 +548,19 @@ public partial class GuideBookWriter : Writer
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.GuideBookWriter_countries.EqualsIdentity(feature))
+		{
+			result = _countries;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -457,13 +570,22 @@ public partial class GuideBookWriter : Writer
 		{
 			if (value is string v)
 			{
-				SetCountries(v, notificationId);
+				SetCountries(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.GuideBookWriter_countries.EqualsIdentity(feature) && value is null or string)
+			return SetCountriesRaw((string?)value);
 		return false;
 	}
 
@@ -494,9 +616,51 @@ public partial class Library : ConceptInstanceBase
 		return books.Count != 0;
 	}
 
+	private bool SetBooksRaw(List<Book> nodes)
+	{
+		if (_books.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_books, _books, LibraryLanguage.Instance.Library_books);
+		_books.AddRange(SetSelfParent(nodes, LibraryLanguage.Instance.Library_books));
+		return true;
+	}
+
+	private bool AddBooksRaw(Book? value)
+	{
+		if (value is null || _books.Count != 0 && _books[^1] == value)
+			return false;
+		AttachChild(value);
+		_books.Add(value);
+		return true;
+	}
+
+	private bool InsertBooksRaw(int index, Book? value)
+	{
+		if (value is null || !IsInRange(index, _books) || _books.Count > index && _books[index] == value)
+			return false;
+		AttachChild(value);
+		_books.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveBooksRaw(Book? value)
+	{
+		if (value is null)
+			return false;
+		if (_books.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
-        public Library AddBooks(IEnumerable<Book> nodes, INotificationId? notificationId = null)
+        public Library AddBooks(IEnumerable<Book> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
@@ -504,10 +668,10 @@ public partial class Library : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, [safeNode], _books, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, [safeNode], _books, null);
 			emitter.CollectOldData();
-			_books.AddRange(SetSelfParent([safeNode], LibraryLanguage.Instance.Library_books));
-			emitter.Notify();
+			if (AddBooksRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
@@ -516,22 +680,26 @@ public partial class Library : ConceptInstanceBase
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
-        public Library InsertBooks(int index, IEnumerable<Book> nodes, INotificationId? notificationId = null)
+        public Library InsertBooks(int index, IEnumerable<Book> nodes)
 	{
 		AssureInRange(index, _books);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		AssureNoSelfMove(index, safeNodes, _books);
-		ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index, notificationId);
-		emitter.CollectOldData();
-		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, [safeNode], _books, index);
+			emitter.CollectOldData();
+			if (InsertBooksRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If Books would be empty</exception>
-        public Library RemoveBooks(IEnumerable<Book> nodes, INotificationId? notificationId = null)
+        public Library RemoveBooks(IEnumerable<Book> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
@@ -541,6 +709,14 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -558,13 +734,13 @@ public partial class Library : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Library SetName(string value, INotificationId? notificationId = null)
+        public Library SetName(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
-		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Library_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Library_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -594,6 +770,32 @@ public partial class Library : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.Library_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentsRaw(Containment feature, out IReadOnlyList<IReadableNode> result)
+	{
+		if (base.TryGetContainmentsRaw(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
+		{
+			result = _books;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -603,11 +805,10 @@ public partial class Library : ConceptInstanceBase
 		{
 			var safeNodes = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Book>(value).ToList();
 			AssureNonEmpty(safeNodes, LibraryLanguage.Instance.Library_books);
-			ContainmentSetNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, notificationId);
+			ContainmentSetNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books);
 			emitter.CollectOldData();
-			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
-			_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-			emitter.Notify();
+			if (SetBooksRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -615,13 +816,22 @@ public partial class Library : ConceptInstanceBase
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 
@@ -634,6 +844,33 @@ public partial class Library : ConceptInstanceBase
 		if (TryGetName(out _))
 			result.Add(LibraryLanguage.Instance.Library_name);
 		return result;
+	}
+
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.AddContainmentsRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Book)
+			return AddBooksRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Book?)value);
+		return false;
+	}
+
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	{
+		if (base.InsertContainmentsRaw(feature, index, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Book)
+			return InsertBooksRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Book?)value);
+		return false;
+	}
+
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.RemoveContainmentsRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Book)
+			return RemoveBooksRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Book?)value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -709,6 +946,14 @@ public partial class Library : ConceptInstanceBase
 public partial class SpecialistBookWriter : Writer
 {
 	private string? _subject = null;
+	private bool SetSubjectRaw(string? value)
+	{
+		if (value == _subject)
+			return false;
+		_subject = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Subject has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -726,13 +971,13 @@ public partial class SpecialistBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SpecialistBookWriter SetSubject(string value, INotificationId? notificationId = null)
+        public SpecialistBookWriter SetSubject(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
-		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.SpecialistBookWriter_subject, this, value, _subject, notificationId);
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.SpecialistBookWriter_subject, this, value, _subject);
 		emitter.CollectOldData();
-		_subject = value;
-		emitter.Notify();
+		if (SetSubjectRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -756,6 +1001,19 @@ public partial class SpecialistBookWriter : Writer
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.SpecialistBookWriter_subject.EqualsIdentity(feature))
+		{
+			result = _subject;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -765,13 +1023,22 @@ public partial class SpecialistBookWriter : Writer
 		{
 			if (value is string v)
 			{
-				SetSubject(v, notificationId);
+				SetSubject(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.SpecialistBookWriter_subject.EqualsIdentity(feature) && value is null or string)
+			return SetSubjectRaw((string?)value);
 		return false;
 	}
 
@@ -789,6 +1056,14 @@ public partial class SpecialistBookWriter : Writer
 public partial class Writer : ConceptInstanceBase
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -806,13 +1081,13 @@ public partial class Writer : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Writer SetName(string value, INotificationId? notificationId = null)
+        public Writer SetName(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
-		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Writer_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Writer_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -836,6 +1111,19 @@ public partial class Writer : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -845,13 +1133,22 @@ public partial class Writer : ConceptInstanceBase
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 

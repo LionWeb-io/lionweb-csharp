@@ -173,13 +173,21 @@ public partial interface @interface : INode
 	public @enum String { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public @interface SetString(@enum value, INotificationId? notificationId = null);
+        public @interface SetString(@enum value);
 }
 
 [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-concept2")]
 public partial class @out : @struct
 {
 	private @if? _default = null;
+	private bool SetDefaultRaw(@if? value)
+	{
+		if (value == _default)
+			return false;
+		_default = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Default has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -197,13 +205,13 @@ public partial class @out : @struct
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @out SetDefault(@if value, INotificationId? notificationId = null)
+        public @out SetDefault(@if value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
-		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.out_default, this, value, _default, notificationId);
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.out_default, this, value, _default);
 		emitter.CollectOldData();
-		_default = value;
-		emitter.Notify();
+		if (SetDefaultRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -227,6 +235,19 @@ public partial class @out : @struct
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ClassLanguage.Instance.out_default.EqualsIdentity(feature))
+		{
+			result = _default;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -236,13 +257,22 @@ public partial class @out : @struct
 		{
 			if (value is @namespace.@int.@public.V2025_1.@if v)
 			{
-				SetDefault(v, notificationId);
+				SetDefault(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ClassLanguage.Instance.out_default.EqualsIdentity(feature) && value is null or @namespace.@int.@public.V2025_1.@if)
+			return SetDefaultRaw((@namespace.@int.@public.V2025_1.@if?)value);
 		return false;
 	}
 
@@ -265,6 +295,14 @@ public partial interface @partial : @interface
 public partial class @record : AnnotationInstanceBase, @interface
 {
 	private @enum? _string = null;
+	private bool SetStringRaw(@enum? value)
+	{
+		if (value == _string)
+			return false;
+		_string = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If String has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -281,16 +319,16 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- @interface @interface.SetString(@enum value, INotificationId? notificationId = null) => SetString(value);
+ @interface @interface.SetString(@enum value) => SetString(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @record SetString(@enum value, INotificationId? notificationId = null)
+        public @record SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string);
 		emitter.CollectOldData();
-		_string = value;
-		emitter.Notify();
+		if (SetStringRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -309,17 +347,25 @@ public partial class @record : AnnotationInstanceBase, @interface
 		return @double != null;
 	}
 
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @record SetDouble(@interface value, INotificationId? notificationId = null)
+	private bool SetDoubleRaw(@interface? value)
 	{
-		AssureNotNull(value, ClassLanguage.Instance.record_double);
-		ContainmentSingleNotificationEmitter<@interface> emitter = new(ClassLanguage.Instance.record_double, this, value, _double, notificationId);
-		emitter.CollectOldData();
+		if (value == _double)
+			return false;
 		SetParentNull(_double);
 		AttachChild(value);
 		_double = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public @record SetDouble(@interface value)
+	{
+		AssureNotNull(value, ClassLanguage.Instance.record_double);
+		ContainmentSingleNotificationEmitter<@interface> emitter = new(ClassLanguage.Instance.record_double, this, value, _double);
+		emitter.CollectOldData();
+		if (SetDoubleRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -349,6 +395,32 @@ public partial class @record : AnnotationInstanceBase, @interface
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
+		{
+			result = _string;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ClassLanguage.Instance.record_double.EqualsIdentity(feature))
+		{
+			result = _double;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -358,7 +430,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2025_1.@enum v)
 			{
-				SetString(v, notificationId);
+				SetString(v);
 				return true;
 			}
 
@@ -369,13 +441,31 @@ public partial class @record : AnnotationInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2025_1.@interface v)
 			{
-				SetDouble(v, notificationId);
+				SetDouble(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature) && value is null or @namespace.@int.@public.V2025_1.@enum)
+			return SetStringRaw((@namespace.@int.@public.V2025_1.@enum?)value);
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ClassLanguage.Instance.record_double.EqualsIdentity(feature) && value is null or @namespace.@int.@public.V2025_1.@interface)
+			return SetDoubleRaw((@namespace.@int.@public.V2025_1.@interface?)value);
 		return false;
 	}
 
@@ -421,6 +511,14 @@ public partial class @record : AnnotationInstanceBase, @interface
 public partial class @struct : ConceptInstanceBase, @interface
 {
 	private @enum? _string = null;
+	private bool SetStringRaw(@enum? value)
+	{
+		if (value == _string)
+			return false;
+		_string = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If String has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -437,16 +535,16 @@ public partial class @struct : ConceptInstanceBase, @interface
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- @interface @interface.SetString(@enum value, INotificationId? notificationId = null) => SetString(value);
+ @interface @interface.SetString(@enum value) => SetString(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @struct SetString(@enum value, INotificationId? notificationId = null)
+        public @struct SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string);
 		emitter.CollectOldData();
-		_string = value;
-		emitter.Notify();
+		if (SetStringRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -465,21 +563,29 @@ public partial class @struct : ConceptInstanceBase, @interface
 		return @ref != null;
 	}
 
-	private @struct SetRef(ReferenceTarget? value, INotificationId? notificationId = null)
+	private @struct SetRef(ReferenceTarget? value)
 	{
 		AssureNotNullInstance<@record>(value, ClassLanguage.Instance.struct_ref);
-		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
+		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref);
 		emitter.CollectOldData();
-		_ref = value;
-		emitter.Notify();
+		if (SetRefRaw(value))
+			emitter.Notify();
 		return this;
+	}
+
+	private bool SetRefRaw(ReferenceTarget? value)
+	{
+		if (value == _ref)
+			return false;
+		_ref = value;
+		return true;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @struct SetRef(@record value, INotificationId? notificationId = null)
+        public @struct SetRef(@record value)
 	{
-		return SetRef(ReferenceTarget.FromNodeOptional(value), notificationId);
+		return SetRef(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	public @struct(string id) : base(id)
@@ -508,6 +614,32 @@ public partial class @struct : ConceptInstanceBase, @interface
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
+		{
+			result = _string;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (ClassLanguage.Instance.struct_ref.EqualsIdentity(feature))
+		{
+			result = _ref;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -517,7 +649,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2025_1.@enum v)
 			{
-				SetString(v, notificationId);
+				SetString(v);
 				return true;
 			}
 
@@ -528,19 +660,37 @@ public partial class @struct : ConceptInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2025_1.@record v)
 			{
-				SetRef(v, notificationId);
+				SetRef(v);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetRef(target, notificationId);
+				SetRef(target);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature) && value is null or @namespace.@int.@public.V2025_1.@enum)
+			return SetStringRaw((@namespace.@int.@public.V2025_1.@enum?)value);
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (ClassLanguage.Instance.struct_ref.EqualsIdentity(feature))
+			return SetRefRaw(value);
 		return false;
 	}
 

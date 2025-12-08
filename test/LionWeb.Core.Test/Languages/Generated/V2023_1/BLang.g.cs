@@ -100,6 +100,14 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 public partial class BConcept : ConceptInstanceBase
 {
 	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum? _aEnumProp = null;
+	private bool SetAEnumPropRaw(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum? value)
+	{
+		if (value == _aEnumProp)
+			return false;
+		_aEnumProp = value;
+		return true;
+	}
+
 	/// enum desc
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
@@ -126,13 +134,13 @@ public partial class BConcept : ConceptInstanceBase
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
     	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum value, INotificationId? notificationId = null)
+        public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum value)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
-		PropertyNotificationEmitter emitter = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp, notificationId);
+		PropertyNotificationEmitter emitter = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp);
 		emitter.CollectOldData();
-		_aEnumProp = value;
-		emitter.Notify();
+		if (SetAEnumPropRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -149,20 +157,28 @@ public partial class BConcept : ConceptInstanceBase
 		return aRef != null;
 	}
 
-	private BConcept SetARef(ReferenceTarget? value, INotificationId? notificationId = null)
+	private BConcept SetARef(ReferenceTarget? value)
 	{
 		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept>(value, BLangLanguage.Instance.BConcept_ARef);
-		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
+		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef);
 		emitter.CollectOldData();
-		_aRef = value;
-		emitter.Notify();
+		if (SetARefRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
-	/// <remarks>Optional Single Reference</remarks>
-        public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? value, INotificationId? notificationId = null)
+	private bool SetARefRaw(ReferenceTarget? value)
 	{
-		return SetARef(ReferenceTarget.FromNodeOptional(value), notificationId);
+		if (value == _aRef)
+			return false;
+		_aRef = value;
+		return true;
+	}
+
+	/// <remarks>Optional Single Reference</remarks>
+        public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? value)
+	{
+		return SetARef(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	public BConcept(string id) : base(id)
@@ -191,6 +207,32 @@ public partial class BConcept : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature))
+		{
+			result = _aEnumProp;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
+		{
+			result = _aRef;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -200,7 +242,7 @@ public partial class BConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum v)
 			{
-				SetAEnumProp(v, notificationId);
+				SetAEnumProp(v);
 				return true;
 			}
 
@@ -211,19 +253,37 @@ public partial class BConcept : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept)
 			{
-				SetARef((LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept?)value, notificationId);
+				SetARef((LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept?)value);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetARef(target, notificationId);
+				SetARef(target);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum)
+			return SetAEnumPropRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum?)value);
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
+			return SetARefRaw(value);
 		return false;
 	}
 

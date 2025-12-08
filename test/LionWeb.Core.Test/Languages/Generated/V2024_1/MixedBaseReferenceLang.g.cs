@@ -8,7 +8,6 @@ namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReference
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
-using LionWeb.Core.Notification;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
@@ -89,5 +88,5 @@ public partial interface BaseReferenceIface : INode
 	public IReadableNode Ref { get; set; }
 
 	/// <remarks>Required Single Reference</remarks>
-        public BaseReferenceIface SetRef(IReadableNode value, INotificationId? notificationId = null);
+        public BaseReferenceIface SetRef(IReadableNode value);
 }

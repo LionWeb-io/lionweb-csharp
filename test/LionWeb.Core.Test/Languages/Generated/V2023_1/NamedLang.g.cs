@@ -177,6 +177,14 @@ public partial class IfaceConcept : ConceptInstanceBase, Iface
 public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamedWritable
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -193,16 +201,16 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedAbstractConcept SetName(string value, INotificationId? notificationId = null)
+        public NamedAbstractConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -226,6 +234,19 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -235,13 +256,22 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 
@@ -259,6 +289,14 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -275,16 +313,16 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedAnn SetName(string value, INotificationId? notificationId = null)
+        public NamedAnn SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -308,6 +346,19 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -317,13 +368,22 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 
@@ -341,6 +401,14 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -357,16 +425,16 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedConcept SetName(string value, INotificationId? notificationId = null)
+        public NamedConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -390,6 +458,19 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -399,13 +480,22 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 
@@ -439,6 +529,14 @@ public partial interface NamedIface : INamedWritable, INode
 public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedWritable
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -455,16 +553,16 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedIfaceAnn SetName(string value, INotificationId? notificationId = null)
+        public NamedIfaceAnn SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -488,6 +586,19 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -497,13 +608,22 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 
@@ -521,6 +641,14 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamedWritable
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -537,16 +665,16 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedIfaceConcept SetName(string value, INotificationId? notificationId = null)
+        public NamedIfaceConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -570,6 +698,19 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -579,13 +720,22 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 

@@ -132,23 +132,31 @@ public partial class AConcept : ConceptInstanceBase
 		return bRef != null;
 	}
 
-	private AConcept SetBRef(ReferenceTarget? value, INotificationId? notificationId = null)
+	private AConcept SetBRef(ReferenceTarget? value)
 	{
 		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept>(value, ALangLanguage.Instance.AConcept_BRef);
-		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept> emitter = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, notificationId);
+		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept> emitter = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef);
 		emitter.CollectOldData();
-		_bRef = value;
-		emitter.Notify();
+		if (SetBRefRaw(value))
+			emitter.Notify();
 		return this;
+	}
+
+	private bool SetBRefRaw(ReferenceTarget? value)
+	{
+		if (value == _bRef)
+			return false;
+		_bRef = value;
+		return true;
 	}
 
 	/// bRef desc
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
-        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? value, INotificationId? notificationId = null)
+        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? value)
 	{
-		return SetBRef(ReferenceTarget.FromNodeOptional(value), notificationId);
+		return SetBRef(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	public AConcept(string id) : base(id)
@@ -171,6 +179,19 @@ public partial class AConcept : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (ALangLanguage.Instance.AConcept_BRef.EqualsIdentity(feature))
+		{
+			result = _bRef;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -180,19 +201,28 @@ public partial class AConcept : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept)
 			{
-				SetBRef((LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept?)value, notificationId);
+				SetBRef((LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept?)value);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetBRef(target, notificationId);
+				SetBRef(target);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (ALangLanguage.Instance.AConcept_BRef.EqualsIdentity(feature))
+			return SetBRefRaw(value);
 		return false;
 	}
 

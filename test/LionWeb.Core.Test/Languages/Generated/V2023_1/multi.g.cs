@@ -106,9 +106,51 @@ public partial class Container : ConceptInstanceBase
 		return libraries.Count != 0;
 	}
 
+	private bool SetLibrariesRaw(List<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes)
+	{
+		if (_libraries.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_libraries, _libraries, MultiLanguage.Instance.Container_libraries);
+		_libraries.AddRange(SetSelfParent(nodes, MultiLanguage.Instance.Container_libraries));
+		return true;
+	}
+
+	private bool AddLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value)
+	{
+		if (value is null || _libraries.Count != 0 && _libraries[^1] == value)
+			return false;
+		AttachChild(value);
+		_libraries.Add(value);
+		return true;
+	}
+
+	private bool InsertLibrariesRaw(int index, LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value)
+	{
+		if (value is null || !IsInRange(index, _libraries) || _libraries.Count > index && _libraries[index] == value)
+			return false;
+		AttachChild(value);
+		_libraries.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library? value)
+	{
+		if (value is null)
+			return false;
+		if (_libraries.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
-        public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes, INotificationId? notificationId = null)
+        public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
@@ -116,10 +158,10 @@ public partial class Container : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, [safeNode], _libraries, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, [safeNode], _libraries, null);
 			emitter.CollectOldData();
-			_libraries.AddRange(SetSelfParent([safeNode], MultiLanguage.Instance.Container_libraries));
-			emitter.Notify();
+			if (AddLibrariesRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
@@ -128,22 +170,26 @@ public partial class Container : ConceptInstanceBase
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Libraries.Count</exception>
-        public Container InsertLibraries(int index, IEnumerable<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes, INotificationId? notificationId = null)
+        public Container InsertLibraries(int index, IEnumerable<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes)
 	{
 		AssureInRange(index, _libraries);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		AssureNoSelfMove(index, safeNodes, _libraries);
-		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, index, notificationId);
-		emitter.CollectOldData();
-		_libraries.InsertRange(index, SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, [safeNode], _libraries, index);
+			emitter.CollectOldData();
+			if (InsertLibrariesRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If Libraries would be empty</exception>
-        public Container RemoveLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes, INotificationId? notificationId = null)
+        public Container RemoveLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, MultiLanguage.Instance.Container_libraries);
@@ -172,6 +218,19 @@ public partial class Container : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetContainmentsRaw(Containment feature, out IReadOnlyList<IReadableNode> result)
+	{
+		if (base.TryGetContainmentsRaw(feature, out result))
+			return true;
+		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature))
+		{
+			result = _libraries;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -181,11 +240,10 @@ public partial class Container : ConceptInstanceBase
 		{
 			var safeNodes = MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library>(value).ToList();
 			AssureNonEmpty(safeNodes, MultiLanguage.Instance.Container_libraries);
-			ContainmentSetNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, notificationId);
+			ContainmentSetNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries);
 			emitter.CollectOldData();
-			RemoveSelfParent(_libraries.ToList(), _libraries, MultiLanguage.Instance.Container_libraries);
-			_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-			emitter.Notify();
+			if (SetLibrariesRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -199,6 +257,33 @@ public partial class Container : ConceptInstanceBase
 		if (TryGetLibraries(out _))
 			result.Add(MultiLanguage.Instance.Container_libraries);
 		return result;
+	}
+
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.AddContainmentsRaw(feature, value))
+			return true;
+		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library)
+			return AddLibrariesRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library?)value);
+		return false;
+	}
+
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	{
+		if (base.InsertContainmentsRaw(feature, index, value))
+			return true;
+		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library)
+			return InsertLibrariesRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library?)value);
+		return false;
+	}
+
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.RemoveContainmentsRaw(feature, value))
+			return true;
+		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library)
+			return RemoveLibrariesRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library?)value);
+		return false;
 	}
 
 	/// <inheritdoc/>

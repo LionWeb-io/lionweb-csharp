@@ -63,14 +63,14 @@ class SpoofNode(string id) : IShape
     public bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) => false;
 
     public IReadOnlyList<Coord> Fixpoints { get => []; init { } }
-    public IShape AddFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null) => this;
+    public IShape AddFixpoints(IEnumerable<Coord> nodes) => this;
 
-    public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes, INotificationId? notificationId = null) => this;
+    public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes) => this;
 
-    public IShape RemoveFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null) => this;
+    public IShape RemoveFixpoints(IEnumerable<Coord> nodes) => this;
         
     public string Uuid { get => null; set { } }
-    public IShape SetUuid(string value, INotificationId? notificationId = null) => this;
+    public IShape SetUuid(string value) => this;
 
     IReadOnlyList<IReadableNode> IReadableNodeRaw.GetAnnotationsRaw() => [];
 

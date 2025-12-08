@@ -55,31 +55,31 @@ public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
         public override string Version => _version;
 
 	private readonly Lazy<Annotation> _deprAnnotation;
-	[Obsolete("deprAnnotation comment")]
+	[Obsolete]
 	public Annotation DeprAnnotation => _deprAnnotation.Value;
 
 	private readonly Lazy<Concept> _deprConcept;
-	[Obsolete("deprConcept comment")]
+	[Obsolete]
 	public Concept DeprConcept => _deprConcept.Value;
 
 	private readonly Lazy<Containment> _deprConcept_deprChild;
-	[Obsolete("deprChild comment")]
+	[Obsolete]
 	public Containment DeprConcept_deprChild => _deprConcept_deprChild.Value;
 
 	private readonly Lazy<Property> _deprConcept_deprProp;
-	[Obsolete("deprProp comment")]
+	[Obsolete]
 	public Property DeprConcept_deprProp => _deprConcept_deprProp.Value;
 
 	private readonly Lazy<Reference> _deprConcept_deprRef;
-	[Obsolete("deprRef comment")]
+	[Obsolete]
 	public Reference DeprConcept_deprRef => _deprConcept_deprRef.Value;
 
 	private readonly Lazy<PrimitiveType> _deprDatatype;
-	[Obsolete("deprDatatype comment")]
+	[Obsolete]
 	public PrimitiveType DeprDatatype => _deprDatatype.Value;
 
 	private readonly Lazy<Enumeration> _deprEnum;
-	[Obsolete("deprEnum comment")]
+	[Obsolete]
 	public Enumeration DeprEnum => _deprEnum.Value;
 
 	private readonly Lazy<EnumerationLiteral> _deprEnum_A;
@@ -89,7 +89,7 @@ public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 	public EnumerationLiteral DeprEnum_B => _deprEnum_B.Value;
 
 	private readonly Lazy<Interface> _deprIface;
-	[Obsolete("deprIface comment")]
+	[Obsolete]
 	public Interface DeprIface => _deprIface.Value;
 
 	private readonly Lazy<Concept> _deprNoComment;
@@ -99,13 +99,13 @@ public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 
 public partial interface IDeprecatedFactory : INodeFactory
 {
-	[Obsolete("deprAnnotation comment")]
+	[Obsolete]
 	public DeprAnnotation NewDeprAnnotation(string id);
-	[Obsolete("deprAnnotation comment")]
+	[Obsolete]
 	public DeprAnnotation CreateDeprAnnotation();
-	[Obsolete("deprConcept comment")]
+	[Obsolete]
 	public DeprConcept NewDeprConcept(string id);
-	[Obsolete("deprConcept comment")]
+	[Obsolete]
 	public DeprConcept CreateDeprConcept();
 	[Obsolete]
 	public DeprNoComment NewDeprNoComment(string id);
@@ -147,13 +147,13 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
-	[Obsolete("deprAnnotation comment")]
+	[Obsolete]
 	public virtual DeprAnnotation NewDeprAnnotation(string id) => new(id);
-	[Obsolete("deprAnnotation comment")]
+	[Obsolete]
 	public virtual DeprAnnotation CreateDeprAnnotation() => NewDeprAnnotation(GetNewId());
-	[Obsolete("deprConcept comment")]
+	[Obsolete]
 	public virtual DeprConcept NewDeprConcept(string id) => new(id);
-	[Obsolete("deprConcept comment")]
+	[Obsolete]
 	public virtual DeprConcept CreateDeprConcept() => NewDeprConcept(GetNewId());
 	[Obsolete]
 	public virtual DeprNoComment NewDeprNoComment(string id) => new(id);
@@ -162,7 +162,7 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE")]
-[Obsolete("deprAnnotation comment")]
+[Obsolete]
 public partial class DeprAnnotation : AnnotationInstanceBase
 {
 	public DeprAnnotation(string id) : base(id)
@@ -174,27 +174,69 @@ public partial class DeprAnnotation : AnnotationInstanceBase
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY")]
-[Obsolete("deprConcept comment")]
+[Obsolete]
 public partial class DeprConcept : ConceptInstanceBase
 {
 	private readonly List<DeprIface> _deprChild = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	[Obsolete("deprChild comment")]
+	[Obsolete]
 	public IReadOnlyList<DeprIface> DeprChild { get => _deprChild.AsReadOnly(); init => AddDeprChild(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        [Obsolete("deprChild comment")]
+        [Obsolete]
 	public bool TryGetDeprChild([NotNullWhenAttribute(true)] out IReadOnlyList<DeprIface> deprChild)
 	{
 		deprChild = _deprChild.AsReadOnly();
 		return deprChild.Count != 0;
 	}
 
+	private bool SetDeprChildRaw(List<DeprIface> nodes)
+	{
+		if (_deprChild.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_deprChild, _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+		_deprChild.AddRange(SetSelfParent(nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
+		return true;
+	}
+
+	private bool AddDeprChildRaw(DeprIface? value)
+	{
+		if (value is null || _deprChild.Count != 0 && _deprChild[^1] == value)
+			return false;
+		AttachChild(value);
+		_deprChild.Add(value);
+		return true;
+	}
+
+	private bool InsertDeprChildRaw(int index, DeprIface? value)
+	{
+		if (value is null || !IsInRange(index, _deprChild) || _deprChild.Count > index && _deprChild[index] == value)
+			return false;
+		AttachChild(value);
+		_deprChild.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveDeprChildRaw(DeprIface? value)
+	{
+		if (value is null)
+			return false;
+		if (_deprChild.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Optional Multiple Containment</remarks>
-        [Obsolete("deprChild comment")]
-	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes, INotificationId? notificationId = null)
+        [Obsolete]
+	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
@@ -203,34 +245,38 @@ public partial class DeprConcept : ConceptInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, [safeNode], _deprChild, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, [safeNode], _deprChild, null);
 			emitter.CollectOldData();
-			_deprChild.AddRange(SetSelfParent([safeNode], DeprecatedLanguage.Instance.DeprConcept_deprChild));
-			emitter.Notify();
+			if (AddDeprChildRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        [Obsolete("deprChild comment")]
-	public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes, INotificationId? notificationId = null)
+        [Obsolete]
+	public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes)
 	{
 		AssureInRange(index, _deprChild);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNoSelfMove(index, safeNodes, _deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, index, notificationId);
-		emitter.CollectOldData();
-		_deprChild.InsertRange(index, SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, [safeNode], _deprChild, index);
+			emitter.CollectOldData();
+			if (InsertDeprChildRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        [Obsolete("deprChild comment")]
-	public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes, INotificationId? notificationId = null)
+        [Obsolete]
+	public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes)
 	{
 		RemoveSelfParent(nodes?.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild, ContainmentRemover<DeprIface>(DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		return this;
@@ -240,25 +286,33 @@ public partial class DeprConcept : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
-	[Obsolete("deprProp comment")]
+	[Obsolete]
 	public string? DeprProp { get => _deprProp; set => SetDeprProp(value); }
 
 	/// <remarks>Optional Property</remarks>
-        [Obsolete("deprProp comment")]
+        [Obsolete]
 	public bool TryGetDeprProp([NotNullWhenAttribute(true)] out string? deprProp)
 	{
 		deprProp = _deprProp;
 		return deprProp != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        [Obsolete("deprProp comment")]
-	public DeprConcept SetDeprProp(string? value, INotificationId? notificationId = null)
+	private bool SetDeprPropRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprProp, this, value, _deprProp, notificationId);
-		emitter.CollectOldData();
+		if (value == _deprProp)
+			return false;
 		_deprProp = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        [Obsolete]
+	public DeprConcept SetDeprProp(string? value)
+	{
+		PropertyNotificationEmitter emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprProp, this, value, _deprProp);
+		emitter.CollectOldData();
+		if (SetDeprPropRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -268,33 +322,41 @@ public partial class DeprConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	[Obsolete("deprRef comment")]
+	[Obsolete]
 	public DeprAnnotation DeprRef { get => ReferenceTargetNonNullTarget<DeprAnnotation>(_deprRef, DeprecatedLanguage.Instance.DeprConcept_deprRef) ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
 
 	/// <remarks>Required Single Reference</remarks>
-        [Obsolete("deprRef comment")]
+        [Obsolete]
 	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)
 	{
 		deprRef = ReferenceTargetNullableTarget<DeprAnnotation>(_deprRef, DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		return deprRef != null;
 	}
 
-	private DeprConcept SetDeprRef(ReferenceTarget? value, INotificationId? notificationId = null)
+	private DeprConcept SetDeprRef(ReferenceTarget? value)
 	{
 		AssureNotNullInstance<DeprAnnotation>(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
-		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef, notificationId);
+		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef);
 		emitter.CollectOldData();
-		_deprRef = value;
-		emitter.Notify();
+		if (SetDeprRefRaw(value))
+			emitter.Notify();
 		return this;
+	}
+
+	private bool SetDeprRefRaw(ReferenceTarget? value)
+	{
+		if (value == _deprRef)
+			return false;
+		_deprRef = value;
+		return true;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [Obsolete("deprRef comment")]
-	public DeprConcept SetDeprRef(DeprAnnotation value, INotificationId? notificationId = null)
+        [Obsolete]
+	public DeprConcept SetDeprRef(DeprAnnotation value)
 	{
-		return SetDeprRef(ReferenceTarget.FromNodeOptional(value), notificationId);
+		return SetDeprRef(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	public DeprConcept(string id) : base(id)
@@ -329,6 +391,45 @@ public partial class DeprConcept : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprProp.EqualsIdentity(feature))
+		{
+			result = _deprProp;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentsRaw(Containment feature, out IReadOnlyList<IReadableNode> result)
+	{
+		if (base.TryGetContainmentsRaw(feature, out result))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
+		{
+			result = _deprChild;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprRef.EqualsIdentity(feature))
+		{
+			result = _deprRef;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -337,11 +438,10 @@ public partial class DeprConcept : ConceptInstanceBase
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
 			var safeNodes = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprIface>(value).ToList();
-			ContainmentSetNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, notificationId);
+			ContainmentSetNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild);
 			emitter.CollectOldData();
-			RemoveSelfParent(_deprChild.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-			_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
-			emitter.Notify();
+			if (SetDeprChildRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -349,7 +449,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetDeprProp((string?)value, notificationId);
+				SetDeprProp((string?)value);
 				return true;
 			}
 
@@ -360,19 +460,37 @@ public partial class DeprConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprAnnotation v)
 			{
-				SetDeprRef(v, notificationId);
+				SetDeprRef(v);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetDeprRef(target, notificationId);
+				SetDeprRef(target);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprProp.EqualsIdentity(feature) && value is null or string)
+			return SetDeprPropRaw((string?)value);
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprRef.EqualsIdentity(feature))
+			return SetDeprRefRaw(value);
 		return false;
 	}
 
@@ -387,6 +505,33 @@ public partial class DeprConcept : ConceptInstanceBase
 		if (TryGetDeprRef(out _))
 			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		return result;
+	}
+
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.AddContainmentsRaw(feature, value))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprIface)
+			return AddDeprChildRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprIface?)value);
+		return false;
+	}
+
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	{
+		if (base.InsertContainmentsRaw(feature, index, value))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprIface)
+			return InsertDeprChildRaw(index, (LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprIface?)value);
+		return false;
+	}
+
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.RemoveContainmentsRaw(feature, value))
+			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprIface)
+			return RemoveDeprChildRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.DeprecatedLang.DeprIface?)value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -459,7 +604,7 @@ public partial class DeprConcept : ConceptInstanceBase
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU")]
-[Obsolete("deprIface comment")]
+[Obsolete]
 public partial interface DeprIface : INode
 {
 }
@@ -477,7 +622,7 @@ public partial class DeprNoComment : ConceptInstanceBase
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzE")]
-[Obsolete("deprEnum comment")]
+[Obsolete]
 public enum DeprEnum
 {
 	[LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3Mg")]

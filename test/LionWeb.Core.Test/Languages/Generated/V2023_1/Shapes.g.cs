@@ -344,8 +344,50 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return altGroups.Count != 0;
 	}
 
+	private bool SetAltGroupsRaw(List<MaterialGroup> nodes)
+	{
+		if (_altGroups.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_altGroups, _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		_altGroups.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		return true;
+	}
+
+	private bool AddAltGroupsRaw(MaterialGroup? value)
+	{
+		if (value is null || _altGroups.Count != 0 && _altGroups[^1] == value)
+			return false;
+		AttachChild(value);
+		_altGroups.Add(value);
+		return true;
+	}
+
+	private bool InsertAltGroupsRaw(int index, MaterialGroup? value)
+	{
+		if (value is null || !IsInRange(index, _altGroups) || _altGroups.Count > index && _altGroups[index] == value)
+			return false;
+		AttachChild(value);
+		_altGroups.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveAltGroupsRaw(MaterialGroup? value)
+	{
+		if (value is null)
+			return false;
+		if (_altGroups.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
@@ -354,32 +396,36 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, [safeNode], _altGroups, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, [safeNode], _altGroups, null);
 			emitter.CollectOldData();
-			_altGroups.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.BillOfMaterials_altGroups));
-			emitter.Notify();
+			if (AddAltGroupsRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials InsertAltGroups(int index, IEnumerable<MaterialGroup> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials InsertAltGroups(int index, IEnumerable<MaterialGroup> nodes)
 	{
 		AssureInRange(index, _altGroups);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNoSelfMove(index, safeNodes, _altGroups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, index, notificationId);
-		emitter.CollectOldData();
-		_altGroups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, [safeNode], _altGroups, index);
+			emitter.CollectOldData();
+			if (InsertAltGroupsRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
 		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		return this;
@@ -398,15 +444,23 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return defaultGroup != null;
 	}
 
-	/// <remarks>Optional Single Containment</remarks>
-        public BillOfMaterials SetDefaultGroup(MaterialGroup? value, INotificationId? notificationId = null)
+	private bool SetDefaultGroupRaw(MaterialGroup? value)
 	{
-		ContainmentSingleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, this, value, _defaultGroup, notificationId);
-		emitter.CollectOldData();
+		if (value == _defaultGroup)
+			return false;
 		SetParentNull(_defaultGroup);
 		AttachChild(value);
 		_defaultGroup = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public BillOfMaterials SetDefaultGroup(MaterialGroup? value)
+	{
+		ContainmentSingleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, this, value, _defaultGroup);
+		emitter.CollectOldData();
+		if (SetDefaultGroupRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -423,8 +477,50 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return groups.Count != 0;
 	}
 
+	private bool SetGroupsRaw(List<MaterialGroup> nodes)
+	{
+		if (_groups.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_groups, _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
+		_groups.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+		return true;
+	}
+
+	private bool AddGroupsRaw(MaterialGroup? value)
+	{
+		if (value is null || _groups.Count != 0 && _groups[^1] == value)
+			return false;
+		AttachChild(value);
+		_groups.Add(value);
+		return true;
+	}
+
+	private bool InsertGroupsRaw(int index, MaterialGroup? value)
+	{
+		if (value is null || !IsInRange(index, _groups) || _groups.Count > index && _groups[index] == value)
+			return false;
+		AttachChild(value);
+		_groups.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveGroupsRaw(MaterialGroup? value)
+	{
+		if (value is null)
+			return false;
+		if (_groups.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
@@ -433,32 +529,36 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, [safeNode], _groups, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, [safeNode], _groups, null);
 			emitter.CollectOldData();
-			_groups.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.BillOfMaterials_groups));
-			emitter.Notify();
+			if (AddGroupsRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials InsertGroups(int index, IEnumerable<MaterialGroup> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials InsertGroups(int index, IEnumerable<MaterialGroup> nodes)
 	{
 		AssureInRange(index, _groups);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNoSelfMove(index, safeNodes, _groups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
-		ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, index, notificationId);
-		emitter.CollectOldData();
-		_groups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, [safeNode], _groups, index);
+			emitter.CollectOldData();
+			if (InsertGroupsRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes)
 	{
 		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_groups));
 		return this;
@@ -472,13 +572,39 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
+	private bool SetMaterialsRaw(List<ReferenceTarget> targets)
+	{
+		if (_materials.SequenceEqual(targets))
+			return false;
+		_materials.Clear();
+		_materials.AddRange(targets);
+		return true;
+	}
+
+	private bool AddMaterialsRaw(ReferenceTarget? target)
+	{
+		if (target is null)
+			return false;
+		_materials.Add(target);
+		return true;
+	}
+
+	private bool InsertMaterialsRaw(int index, ReferenceTarget? target)
+	{
+		if (target is null || !IsInRange(index, _materials))
+			return false;
+		_materials.Insert(index, target);
+		return true;
+	}
+
+	private bool RemoveMaterialsRaw(ReferenceTarget? target) => Remove(target, _materials);
 	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count, notificationId);
+		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count);
 		emitter.CollectOldData();
 		_materials.AddRange(safeNodes);
 		emitter.Notify();
@@ -486,13 +612,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes)
 	{
 		AssureInRange(index, _materials);
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index, notificationId);
+		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index);
 		emitter.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
 		emitter.Notify();
@@ -500,7 +626,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials RemoveMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public BillOfMaterials RemoveMaterials(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
@@ -547,6 +673,51 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_defaultGroup.EqualsIdentity(feature))
+		{
+			result = _defaultGroup;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentsRaw(Containment feature, out IReadOnlyList<IReadableNode> result)
+	{
+		if (base.TryGetContainmentsRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
+		{
+			result = _altGroups;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
+		{
+			result = _groups;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferencesRaw(Reference feature, out IReadOnlyList<IReferenceTarget> result)
+	{
+		if (base.TryGetReferencesRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
+		{
+			result = _materials;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -555,11 +726,10 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value).ToList();
-			ContainmentSetNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, notificationId);
+			ContainmentSetNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups);
 			emitter.CollectOldData();
-			RemoveSelfParent(_altGroups.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-			_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
-			emitter.Notify();
+			if (SetAltGroupsRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -567,7 +737,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
 			{
-				SetDefaultGroup((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value, notificationId);
+				SetDefaultGroup((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
 				return true;
 			}
 
@@ -577,11 +747,10 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value).ToList();
-			ContainmentSetNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, notificationId);
+			ContainmentSetNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups);
 			emitter.CollectOldData();
-			RemoveSelfParent(_groups.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
-			_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
-			emitter.Notify();
+			if (SetGroupsRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -590,14 +759,22 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials, notificationId);
+			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials);
 			emitter.CollectOldData();
-			_materials.Clear();
-			_materials.AddRange(safeNodes);
-			emitter.Notify();
+			if (SetMaterialsRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_defaultGroup.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
+			return SetDefaultGroupRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
 		return false;
 	}
 
@@ -614,6 +791,66 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (TryGetMaterials(out _))
 			result.Add(ShapesLanguage.Instance.BillOfMaterials_materials);
 		return result;
+	}
+
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.AddContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
+			return AddAltGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
+			return AddGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		return false;
+	}
+
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.AddReferencesRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
+			return AddMaterialsRaw(value);
+		return false;
+	}
+
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	{
+		if (base.InsertContainmentsRaw(feature, index, value))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
+			return InsertAltGroupsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
+			return InsertGroupsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		return false;
+	}
+
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	{
+		if (base.InsertReferencesRaw(feature, index, value))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
+			return InsertMaterialsRaw(index, value);
+		return false;
+	}
+
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.RemoveContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
+			return RemoveAltGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup)
+			return RemoveGroupsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup?)value);
+		return false;
+	}
+
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.RemoveReferencesRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
+			return RemoveMaterialsRaw(value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -755,21 +992,37 @@ public partial class Circle : Shape
 		return center != null;
 	}
 
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Circle SetCenter(Coord value, INotificationId? notificationId = null)
+	private bool SetCenterRaw(Coord? value)
 	{
-		AssureNotNull(value, ShapesLanguage.Instance.Circle_center);
-		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.Circle_center, this, value, _center, notificationId);
-		emitter.CollectOldData();
+		if (value == _center)
+			return false;
 		SetParentNull(_center);
 		AttachChild(value);
 		_center = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Circle SetCenter(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.Circle_center);
+		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.Circle_center, this, value, _center);
+		emitter.CollectOldData();
+		if (SetCenterRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
 	private int? _r = null;
+	private bool SetRRaw(int? value)
+	{
+		if (value == _r)
+			return false;
+		_r = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If R has not been set</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-r")]
@@ -784,12 +1037,12 @@ public partial class Circle : Shape
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Circle SetR(int value, INotificationId? notificationId = null)
+        public Circle SetR(int value)
 	{
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Circle_r, this, value, _r, notificationId);
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Circle_r, this, value, _r);
 		emitter.CollectOldData();
-		_r = value;
-		emitter.Notify();
+		if (SetRRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -819,6 +1072,32 @@ public partial class Circle : Shape
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Circle_r.EqualsIdentity(feature))
+		{
+			result = _r;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Circle_center.EqualsIdentity(feature))
+		{
+			result = _center;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -828,7 +1107,7 @@ public partial class Circle : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord v)
 			{
-				SetCenter(v, notificationId);
+				SetCenter(v);
 				return true;
 			}
 
@@ -839,13 +1118,31 @@ public partial class Circle : Shape
 		{
 			if (value is int v)
 			{
-				SetR(v, notificationId);
+				SetR(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Circle_r.EqualsIdentity(feature) && value is null or int)
+			return SetRRaw((int?)value);
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Circle_center.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
+			return SetCenterRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
 		return false;
 	}
 
@@ -904,9 +1201,51 @@ public partial class CompositeShape : Shape
 		return disabledParts.Count != 0;
 	}
 
+	private bool SetDisabledPartsRaw(List<IShape> nodes)
+	{
+		if (_disabledParts.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_disabledParts, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		_disabledParts.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+		return true;
+	}
+
+	private bool AddDisabledPartsRaw(IShape? value)
+	{
+		if (value is null || _disabledParts.Count != 0 && _disabledParts[^1] == value)
+			return false;
+		AttachChild(value);
+		_disabledParts.Add(value);
+		return true;
+	}
+
+	private bool InsertDisabledPartsRaw(int index, IShape? value)
+	{
+		if (value is null || !IsInRange(index, _disabledParts) || _disabledParts.Count > index && _disabledParts[index] == value)
+			return false;
+		AttachChild(value);
+		_disabledParts.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveDisabledPartsRaw(IShape? value)
+	{
+		if (value is null)
+			return false;
+		if (_disabledParts.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
-        public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
@@ -914,10 +1253,10 @@ public partial class CompositeShape : Shape
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, [safeNode], _disabledParts, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, [safeNode], _disabledParts, null);
 			emitter.CollectOldData();
-			_disabledParts.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.CompositeShape_disabledParts));
-			emitter.Notify();
+			if (AddDisabledPartsRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
@@ -926,22 +1265,26 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than DisabledParts.Count</exception>
-        public CompositeShape InsertDisabledParts(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public CompositeShape InsertDisabledParts(int index, IEnumerable<IShape> nodes)
 	{
 		AssureInRange(index, _disabledParts);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNoSelfMove(index, safeNodes, _disabledParts);
-		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, index, notificationId);
-		emitter.CollectOldData();
-		_disabledParts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, [safeNode], _disabledParts, index);
+			emitter.CollectOldData();
+			if (InsertDisabledPartsRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If DisabledParts would be empty</exception>
-        public CompositeShape RemoveDisabledParts(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public CompositeShape RemoveDisabledParts(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
@@ -965,17 +1308,25 @@ public partial class CompositeShape : Shape
 		return evilPart != null;
 	}
 
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public CompositeShape SetEvilPart(IShape value, INotificationId? notificationId = null)
+	private bool SetEvilPartRaw(IShape? value)
 	{
-		AssureNotNull(value, ShapesLanguage.Instance.CompositeShape_evilPart);
-		ContainmentSingleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_evilPart, this, value, _evilPart, notificationId);
-		emitter.CollectOldData();
+		if (value == _evilPart)
+			return false;
 		SetParentNull(_evilPart);
 		AttachChild(value);
 		_evilPart = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public CompositeShape SetEvilPart(IShape value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.CompositeShape_evilPart);
+		ContainmentSingleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_evilPart, this, value, _evilPart);
+		emitter.CollectOldData();
+		if (SetEvilPartRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -993,9 +1344,51 @@ public partial class CompositeShape : Shape
 		return parts.Count != 0;
 	}
 
+	private bool SetPartsRaw(List<IShape> nodes)
+	{
+		if (_parts.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_parts, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		_parts.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.CompositeShape_parts));
+		return true;
+	}
+
+	private bool AddPartsRaw(IShape? value)
+	{
+		if (value is null || _parts.Count != 0 && _parts[^1] == value)
+			return false;
+		AttachChild(value);
+		_parts.Add(value);
+		return true;
+	}
+
+	private bool InsertPartsRaw(int index, IShape? value)
+	{
+		if (value is null || !IsInRange(index, _parts) || _parts.Count > index && _parts[index] == value)
+			return false;
+		AttachChild(value);
+		_parts.Insert(index, value);
+		return true;
+	}
+
+	private bool RemovePartsRaw(IShape? value)
+	{
+		if (value is null)
+			return false;
+		if (_parts.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
-        public CompositeShape AddParts(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public CompositeShape AddParts(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
@@ -1003,10 +1396,10 @@ public partial class CompositeShape : Shape
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, [safeNode], _parts, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, [safeNode], _parts, null);
 			emitter.CollectOldData();
-			_parts.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.CompositeShape_parts));
-			emitter.Notify();
+			if (AddPartsRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
@@ -1015,22 +1408,26 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Parts.Count</exception>
-        public CompositeShape InsertParts(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public CompositeShape InsertParts(int index, IEnumerable<IShape> nodes)
 	{
 		AssureInRange(index, _parts);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNoSelfMove(index, safeNodes, _parts);
-		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, index, notificationId);
-		emitter.CollectOldData();
-		_parts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, [safeNode], _parts, index);
+			emitter.CollectOldData();
+			if (InsertPartsRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If Parts would be empty</exception>
-        public CompositeShape RemoveParts(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public CompositeShape RemoveParts(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
@@ -1071,6 +1468,38 @@ public partial class CompositeShape : Shape
 		return false;
 	}
 
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.CompositeShape_evilPart.EqualsIdentity(feature))
+		{
+			result = _evilPart;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentsRaw(Containment feature, out IReadOnlyList<IReadableNode> result)
+	{
+		if (base.TryGetContainmentsRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature))
+		{
+			result = _disabledParts;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature))
+		{
+			result = _parts;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -1080,11 +1509,10 @@ public partial class CompositeShape : Shape
 		{
 			var safeNodes = ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
-			ContainmentSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, notificationId);
+			ContainmentSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts);
 			emitter.CollectOldData();
-			RemoveSelfParent(_disabledParts.ToList(), _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-			_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
-			emitter.Notify();
+			if (SetDisabledPartsRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -1092,7 +1520,7 @@ public partial class CompositeShape : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape v)
 			{
-				SetEvilPart(v, notificationId);
+				SetEvilPart(v);
 				return true;
 			}
 
@@ -1103,14 +1531,22 @@ public partial class CompositeShape : Shape
 		{
 			var safeNodes = ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
-			ContainmentSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, notificationId);
+			ContainmentSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts);
 			emitter.CollectOldData();
-			RemoveSelfParent(_parts.ToList(), _parts, ShapesLanguage.Instance.CompositeShape_parts);
-			_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
-			emitter.Notify();
+			if (SetPartsRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.CompositeShape_evilPart.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return SetEvilPartRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
 		return false;
 	}
 
@@ -1125,6 +1561,39 @@ public partial class CompositeShape : Shape
 		if (TryGetParts(out _))
 			result.Add(ShapesLanguage.Instance.CompositeShape_parts);
 		return result;
+	}
+
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.AddContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return AddDisabledPartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return AddPartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		return false;
+	}
+
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	{
+		if (base.InsertContainmentsRaw(feature, index, value))
+			return true;
+		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return InsertDisabledPartsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return InsertPartsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		return false;
+	}
+
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.RemoveContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return RemoveDisabledPartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return RemovePartsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -1234,6 +1703,14 @@ public partial class CompositeShape : Shape
 public partial class Coord : ConceptInstanceBase
 {
 	private int? _x = null;
+	private bool SetXRaw(int? value)
+	{
+		if (value == _x)
+			return false;
+		_x = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If X has not been set</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-x")]
@@ -1248,16 +1725,24 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Coord SetX(int value, INotificationId? notificationId = null)
+        public Coord SetX(int value)
 	{
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Coord_x, this, value, _x, notificationId);
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Coord_x, this, value, _x);
 		emitter.CollectOldData();
-		_x = value;
-		emitter.Notify();
+		if (SetXRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
 	private int? _y = null;
+	private bool SetYRaw(int? value)
+	{
+		if (value == _y)
+			return false;
+		_y = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Y has not been set</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-y")]
@@ -1272,16 +1757,24 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Coord SetY(int value, INotificationId? notificationId = null)
+        public Coord SetY(int value)
 	{
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Coord_y, this, value, _y, notificationId);
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Coord_y, this, value, _y);
 		emitter.CollectOldData();
-		_y = value;
-		emitter.Notify();
+		if (SetYRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
 	private int? _z = null;
+	private bool SetZRaw(int? value)
+	{
+		if (value == _z)
+			return false;
+		_z = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Z has not been set</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-z")]
@@ -1296,12 +1789,12 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Coord SetZ(int value, INotificationId? notificationId = null)
+        public Coord SetZ(int value)
 	{
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Coord_z, this, value, _z, notificationId);
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Coord_z, this, value, _z);
 		emitter.CollectOldData();
-		_z = value;
-		emitter.Notify();
+		if (SetZRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -1337,6 +1830,31 @@ public partial class Coord : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Coord_x.EqualsIdentity(feature))
+		{
+			result = _x;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.Coord_y.EqualsIdentity(feature))
+		{
+			result = _y;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.Coord_z.EqualsIdentity(feature))
+		{
+			result = _z;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -1346,7 +1864,7 @@ public partial class Coord : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				SetX(v, notificationId);
+				SetX(v);
 				return true;
 			}
 
@@ -1357,7 +1875,7 @@ public partial class Coord : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				SetY(v, notificationId);
+				SetY(v);
 				return true;
 			}
 
@@ -1368,13 +1886,26 @@ public partial class Coord : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				SetZ(v, notificationId);
+				SetZ(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Coord_x.EqualsIdentity(feature) && value is null or int)
+			return SetXRaw((int?)value);
+		if (ShapesLanguage.Instance.Coord_y.EqualsIdentity(feature) && value is null or int)
+			return SetYRaw((int?)value);
+		if (ShapesLanguage.Instance.Coord_z.EqualsIdentity(feature) && value is null or int)
+			return SetZRaw((int?)value);
 		return false;
 	}
 
@@ -1408,13 +1939,21 @@ public partial class Documentation : AnnotationInstanceBase
 		return technical != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public Documentation SetTechnical(bool? value, INotificationId? notificationId = null)
+	private bool SetTechnicalRaw(bool? value)
 	{
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Documentation_technical, this, value, _technical, notificationId);
-		emitter.CollectOldData();
+		if (value == _technical)
+			return false;
 		_technical = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public Documentation SetTechnical(bool? value)
+	{
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Documentation_technical, this, value, _technical);
+		emitter.CollectOldData();
+		if (SetTechnicalRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -1431,13 +1970,21 @@ public partial class Documentation : AnnotationInstanceBase
 		return text != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public Documentation SetText(string? value, INotificationId? notificationId = null)
+	private bool SetTextRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Documentation_text, this, value, _text, notificationId);
-		emitter.CollectOldData();
+		if (value == _text)
+			return false;
 		_text = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public Documentation SetText(string? value)
+	{
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.Documentation_text, this, value, _text);
+		emitter.CollectOldData();
+		if (SetTextRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -1467,6 +2014,25 @@ public partial class Documentation : AnnotationInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Documentation_technical.EqualsIdentity(feature))
+		{
+			result = _technical;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.Documentation_text.EqualsIdentity(feature))
+		{
+			result = _text;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -1476,7 +2042,7 @@ public partial class Documentation : AnnotationInstanceBase
 		{
 			if (value is null or bool)
 			{
-				SetTechnical((bool?)value, notificationId);
+				SetTechnical((bool?)value);
 				return true;
 			}
 
@@ -1487,13 +2053,24 @@ public partial class Documentation : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetText((string?)value, notificationId);
+				SetText((string?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Documentation_technical.EqualsIdentity(feature) && value is null or bool)
+			return SetTechnicalRaw((bool?)value);
+		if (ShapesLanguage.Instance.Documentation_text.EqualsIdentity(feature) && value is null or string)
+			return SetTextRaw((string?)value);
 		return false;
 	}
 
@@ -1525,15 +2102,23 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return documentation != null;
 	}
 
-	/// <remarks>Optional Single Containment</remarks>
-        public Geometry SetDocumentation(Documentation? value, INotificationId? notificationId = null)
+	private bool SetDocumentationRaw(Documentation? value)
 	{
-		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation, notificationId);
-		emitter.CollectOldData();
+		if (value == _documentation)
+			return false;
 		SetParentNull(_documentation);
 		AttachChild(value);
 		_documentation = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public Geometry SetDocumentation(Documentation? value)
+	{
+		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation);
+		emitter.CollectOldData();
+		if (SetDocumentationRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -1550,8 +2135,50 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return shapes.Count != 0;
 	}
 
+	private bool SetShapesRaw(List<IShape> nodes)
+	{
+		if (_shapes.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_shapes, _shapes, ShapesLanguage.Instance.Geometry_shapes);
+		_shapes.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.Geometry_shapes));
+		return true;
+	}
+
+	private bool AddShapesRaw(IShape? value)
+	{
+		if (value is null || _shapes.Count != 0 && _shapes[^1] == value)
+			return false;
+		AttachChild(value);
+		_shapes.Add(value);
+		return true;
+	}
+
+	private bool InsertShapesRaw(int index, IShape? value)
+	{
+		if (value is null || !IsInRange(index, _shapes) || _shapes.Count > index && _shapes[index] == value)
+			return false;
+		AttachChild(value);
+		_shapes.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveShapesRaw(IShape? value)
+	{
+		if (value is null)
+			return false;
+		if (_shapes.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry AddShapes(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public Geometry AddShapes(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
@@ -1560,32 +2187,36 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, null);
 			emitter.CollectOldData();
-			_shapes.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.Geometry_shapes));
-			emitter.Notify();
+			if (AddShapesRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry InsertShapes(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public Geometry InsertShapes(int index, IEnumerable<IShape> nodes)
 	{
 		AssureInRange(index, _shapes);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNoSelfMove(index, safeNodes, _shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, index, notificationId);
-		emitter.CollectOldData();
-		_shapes.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, [safeNode], _shapes, index);
+			emitter.CollectOldData();
+			if (InsertShapesRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry RemoveShapes(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public Geometry RemoveShapes(IEnumerable<IShape> nodes)
 	{
 		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes, ContainmentRemover<IShape>(ShapesLanguage.Instance.Geometry_shapes));
 		return this;
@@ -1622,6 +2253,32 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return false;
 	}
 
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Geometry_documentation.EqualsIdentity(feature))
+		{
+			result = _documentation;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentsRaw(Containment feature, out IReadOnlyList<IReadableNode> result)
+	{
+		if (base.TryGetContainmentsRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
+		{
+			result = _shapes;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -1631,7 +2288,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
 			{
-				SetDocumentation((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value, notificationId);
+				SetDocumentation((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
 				return true;
 			}
 
@@ -1641,14 +2298,22 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
-			ContainmentSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, notificationId);
+			ContainmentSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes);
 			emitter.CollectOldData();
-			RemoveSelfParent(_shapes.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
-			_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
-			emitter.Notify();
+			if (SetShapesRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Geometry_documentation.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
+			return SetDocumentationRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
 		return false;
 	}
 
@@ -1661,6 +2326,33 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		if (TryGetShapes(out _))
 			result.Add(ShapesLanguage.Instance.Geometry_shapes);
 		return result;
+	}
+
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.AddContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return AddShapesRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		return false;
+	}
+
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	{
+		if (base.InsertContainmentsRaw(feature, index, value))
+			return true;
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return InsertShapesRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		return false;
+	}
+
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.RemoveContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return RemoveShapesRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -1749,18 +2441,18 @@ public partial interface IShape : INode
 	public IReadOnlyList<Coord> Fixpoints { get; init; }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public IShape AddFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null);
+        public IShape AddFixpoints(IEnumerable<Coord> nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes, INotificationId? notificationId = null);
+        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public IShape RemoveFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null);
+        public IShape RemoveFixpoints(IEnumerable<Coord> nodes);
 	/// <remarks>Required Property</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-uuid")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Uuid { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public IShape SetUuid(string value, INotificationId? notificationId = null);
+        public IShape SetUuid(string value);
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Line")]
@@ -1781,17 +2473,25 @@ public partial class Line : Shape, INamedWritable
 		return end != null;
 	}
 
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Line SetEnd(Coord value, INotificationId? notificationId = null)
+	private bool SetEndRaw(Coord? value)
 	{
-		AssureNotNull(value, ShapesLanguage.Instance.Line_end);
-		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.Line_end, this, value, _end, notificationId);
-		emitter.CollectOldData();
+		if (value == _end)
+			return false;
 		SetParentNull(_end);
 		AttachChild(value);
 		_end = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Line SetEnd(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.Line_end);
+		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.Line_end, this, value, _end);
+		emitter.CollectOldData();
+		if (SetEndRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -1810,17 +2510,25 @@ public partial class Line : Shape, INamedWritable
 		return start != null;
 	}
 
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Line SetStart(Coord value, INotificationId? notificationId = null)
+	private bool SetStartRaw(Coord? value)
 	{
-		AssureNotNull(value, ShapesLanguage.Instance.Line_start);
-		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.Line_start, this, value, _start, notificationId);
-		emitter.CollectOldData();
+		if (value == _start)
+			return false;
 		SetParentNull(_start);
 		AttachChild(value);
 		_start = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Line SetStart(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.Line_start);
+		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.Line_start, this, value, _start);
+		emitter.CollectOldData();
+		if (SetStartRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -1850,6 +2558,25 @@ public partial class Line : Shape, INamedWritable
 		return false;
 	}
 
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Line_end.EqualsIdentity(feature))
+		{
+			result = _end;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.Line_start.EqualsIdentity(feature))
+		{
+			result = _start;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -1859,7 +2586,7 @@ public partial class Line : Shape, INamedWritable
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord v)
 			{
-				SetEnd(v, notificationId);
+				SetEnd(v);
 				return true;
 			}
 
@@ -1870,13 +2597,24 @@ public partial class Line : Shape, INamedWritable
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord v)
 			{
-				SetStart(v, notificationId);
+				SetStart(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Line_end.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
+			return SetEndRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		if (ShapesLanguage.Instance.Line_start.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
+			return SetStartRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
 		return false;
 	}
 
@@ -1942,15 +2680,23 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return defaultShape != null;
 	}
 
-	/// <remarks>Optional Single Containment</remarks>
-        public MaterialGroup SetDefaultShape(IShape? value, INotificationId? notificationId = null)
+	private bool SetDefaultShapeRaw(IShape? value)
 	{
-		ContainmentSingleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_defaultShape, this, value, _defaultShape, notificationId);
-		emitter.CollectOldData();
+		if (value == _defaultShape)
+			return false;
 		SetParentNull(_defaultShape);
 		AttachChild(value);
 		_defaultShape = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public MaterialGroup SetDefaultShape(IShape? value)
+	{
+		ContainmentSingleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_defaultShape, this, value, _defaultShape);
+		emitter.CollectOldData();
+		if (SetDefaultShapeRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -1963,14 +2709,40 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
+	private bool SetMaterialsRaw(List<ReferenceTarget> targets)
+	{
+		if (_materials.SequenceEqual(targets))
+			return false;
+		_materials.Clear();
+		_materials.AddRange(targets);
+		return true;
+	}
+
+	private bool AddMaterialsRaw(ReferenceTarget? target)
+	{
+		if (target is null)
+			return false;
+		_materials.Add(target);
+		return true;
+	}
+
+	private bool InsertMaterialsRaw(int index, ReferenceTarget? target)
+	{
+		if (target is null || !IsInRange(index, _materials))
+			return false;
+		_materials.Insert(index, target);
+		return true;
+	}
+
+	private bool RemoveMaterialsRaw(ReferenceTarget? target) => Remove(target, _materials);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
-        public MaterialGroup AddMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public MaterialGroup AddMaterials(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count, notificationId);
+		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count);
 		emitter.CollectOldData();
 		_materials.AddRange(safeNodes);
 		emitter.Notify();
@@ -1980,13 +2752,13 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Materials.Count</exception>
-        public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes)
 	{
 		AssureInRange(index, _materials);
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index, notificationId);
+		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index);
 		emitter.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
 		emitter.Notify();
@@ -1995,7 +2767,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If Materials would be empty</exception>
-        public MaterialGroup RemoveMaterials(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public MaterialGroup RemoveMaterials(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
@@ -2018,13 +2790,21 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return matterState != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public MaterialGroup SetMatterState(MatterState? value, INotificationId? notificationId = null)
+	private bool SetMatterStateRaw(MatterState? value)
 	{
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.MaterialGroup_matterState, this, value, _matterState, notificationId);
-		emitter.CollectOldData();
+		if (value == _matterState)
+			return false;
 		_matterState = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public MaterialGroup SetMatterState(MatterState? value)
+	{
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.MaterialGroup_matterState, this, value, _matterState);
+		emitter.CollectOldData();
+		if (SetMatterStateRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -2060,6 +2840,45 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_matterState.EqualsIdentity(feature))
+		{
+			result = _matterState;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_defaultShape.EqualsIdentity(feature))
+		{
+			result = _defaultShape;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferencesRaw(Reference feature, out IReadOnlyList<IReferenceTarget> result)
+	{
+		if (base.TryGetReferencesRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
+		{
+			result = _materials;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -2069,7 +2888,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
 			{
-				SetDefaultShape((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value, notificationId);
+				SetDefaultShape((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
 				return true;
 			}
 
@@ -2080,11 +2899,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
-			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials, notificationId);
+			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials);
 			emitter.CollectOldData();
-			_materials.Clear();
-			_materials.AddRange(safeNodes);
-			emitter.Notify();
+			if (SetMaterialsRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -2092,13 +2910,31 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MatterState)
 			{
-				SetMatterState((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MatterState?)value, notificationId);
+				SetMatterState((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MatterState?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_matterState.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MatterState)
+			return SetMatterStateRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MatterState?)value);
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_defaultShape.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape)
+			return SetDefaultShapeRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape?)value);
 		return false;
 	}
 
@@ -2113,6 +2949,33 @@ public partial class MaterialGroup : ConceptInstanceBase
 		if (TryGetMatterState(out _))
 			result.Add(ShapesLanguage.Instance.MaterialGroup_matterState);
 		return result;
+	}
+
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.AddReferencesRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
+			return AddMaterialsRaw(value);
+		return false;
+	}
+
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	{
+		if (base.InsertReferencesRaw(feature, index, value))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
+			return InsertMaterialsRaw(index, value);
+		return false;
+	}
+
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.RemoveReferencesRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
+			return RemoveMaterialsRaw(value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -2200,20 +3063,28 @@ public partial class OffsetDuplicate : Shape
 		return altSource != null;
 	}
 
-	private OffsetDuplicate SetAltSource(ReferenceTarget? value, INotificationId? notificationId = null)
+	private OffsetDuplicate SetAltSource(ReferenceTarget? value)
 	{
 		AssureNullableInstance<Shape>(value, ShapesLanguage.Instance.OffsetDuplicate_altSource);
-		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource, notificationId);
+		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource);
 		emitter.CollectOldData();
-		_altSource = value;
-		emitter.Notify();
+		if (SetAltSourceRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
-	/// <remarks>Optional Single Reference</remarks>
-        public OffsetDuplicate SetAltSource(Shape? value, INotificationId? notificationId = null)
+	private bool SetAltSourceRaw(ReferenceTarget? value)
 	{
-		return SetAltSource(ReferenceTarget.FromNodeOptional(value), notificationId);
+		if (value == _altSource)
+			return false;
+		_altSource = value;
+		return true;
+	}
+
+	/// <remarks>Optional Single Reference</remarks>
+        public OffsetDuplicate SetAltSource(Shape? value)
+	{
+		return SetAltSource(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	private Documentation? _docs = null;
@@ -2229,15 +3100,23 @@ public partial class OffsetDuplicate : Shape
 		return docs != null;
 	}
 
-	/// <remarks>Optional Single Containment</remarks>
-        public OffsetDuplicate SetDocs(Documentation? value, INotificationId? notificationId = null)
+	private bool SetDocsRaw(Documentation? value)
 	{
-		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_docs, this, value, _docs, notificationId);
-		emitter.CollectOldData();
+		if (value == _docs)
+			return false;
 		SetParentNull(_docs);
 		AttachChild(value);
 		_docs = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public OffsetDuplicate SetDocs(Documentation? value)
+	{
+		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_docs, this, value, _docs);
+		emitter.CollectOldData();
+		if (SetDocsRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -2256,17 +3135,25 @@ public partial class OffsetDuplicate : Shape
 		return offset != null;
 	}
 
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public OffsetDuplicate SetOffset(Coord value, INotificationId? notificationId = null)
+	private bool SetOffsetRaw(Coord? value)
 	{
-		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_offset);
-		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_offset, this, value, _offset, notificationId);
-		emitter.CollectOldData();
+		if (value == _offset)
+			return false;
 		SetParentNull(_offset);
 		AttachChild(value);
 		_offset = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public OffsetDuplicate SetOffset(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_offset);
+		ContainmentSingleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_offset, this, value, _offset);
+		emitter.CollectOldData();
+		if (SetOffsetRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -2283,15 +3170,23 @@ public partial class OffsetDuplicate : Shape
 		return secretDocs != null;
 	}
 
-	/// <remarks>Optional Single Containment</remarks>
-        public OffsetDuplicate SetSecretDocs(Documentation? value, INotificationId? notificationId = null)
+	private bool SetSecretDocsRaw(Documentation? value)
 	{
-		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, this, value, _secretDocs, notificationId);
-		emitter.CollectOldData();
+		if (value == _secretDocs)
+			return false;
 		SetParentNull(_secretDocs);
 		AttachChild(value);
 		_secretDocs = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public OffsetDuplicate SetSecretDocs(Documentation? value)
+	{
+		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, this, value, _secretDocs);
+		emitter.CollectOldData();
+		if (SetSecretDocsRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -2310,21 +3205,29 @@ public partial class OffsetDuplicate : Shape
 		return source != null;
 	}
 
-	private OffsetDuplicate SetSource(ReferenceTarget? value, INotificationId? notificationId = null)
+	private OffsetDuplicate SetSource(ReferenceTarget? value)
 	{
 		AssureNotNullInstance<Shape>(value, ShapesLanguage.Instance.OffsetDuplicate_source);
-		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source, notificationId);
+		ReferenceSingleNotificationEmitter<Shape> emitter = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source);
 		emitter.CollectOldData();
-		_source = value;
-		emitter.Notify();
+		if (SetSourceRaw(value))
+			emitter.Notify();
 		return this;
+	}
+
+	private bool SetSourceRaw(ReferenceTarget? value)
+	{
+		if (value == _source)
+			return false;
+		_source = value;
+		return true;
 	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public OffsetDuplicate SetSource(Shape value, INotificationId? notificationId = null)
+        public OffsetDuplicate SetSource(Shape value)
 	{
-		return SetSource(ReferenceTarget.FromNodeOptional(value), notificationId);
+		return SetSource(ReferenceTarget.FromNodeOptional(value));
 	}
 
 	public OffsetDuplicate(string id) : base(id)
@@ -2371,6 +3274,50 @@ public partial class OffsetDuplicate : Shape
 		return false;
 	}
 
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.OffsetDuplicate_docs.EqualsIdentity(feature))
+		{
+			result = _docs;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.OffsetDuplicate_offset.EqualsIdentity(feature))
+		{
+			result = _offset;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.OffsetDuplicate_secretDocs.EqualsIdentity(feature))
+		{
+			result = _secretDocs;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.OffsetDuplicate_altSource.EqualsIdentity(feature))
+		{
+			result = _altSource;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.OffsetDuplicate_source.EqualsIdentity(feature))
+		{
+			result = _source;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -2380,13 +3327,13 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Shape)
 			{
-				SetAltSource((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Shape?)value, notificationId);
+				SetAltSource((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Shape?)value);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetAltSource(target, notificationId);
+				SetAltSource(target);
 				return true;
 			}
 
@@ -2397,7 +3344,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
 			{
-				SetDocs((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value, notificationId);
+				SetDocs((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
 				return true;
 			}
 
@@ -2408,7 +3355,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord v)
 			{
-				SetOffset(v, notificationId);
+				SetOffset(v);
 				return true;
 			}
 
@@ -2419,7 +3366,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
 			{
-				SetSecretDocs((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value, notificationId);
+				SetSecretDocs((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
 				return true;
 			}
 
@@ -2430,19 +3377,43 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Shape v)
 			{
-				SetSource(v, notificationId);
+				SetSource(v);
 				return true;
 			}
 
 			if (value is ReferenceTarget target)
 			{
-				SetSource(target, notificationId);
+				SetSource(target);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.OffsetDuplicate_docs.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
+			return SetDocsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
+		if (ShapesLanguage.Instance.OffsetDuplicate_offset.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
+			return SetOffsetRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		if (ShapesLanguage.Instance.OffsetDuplicate_secretDocs.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
+			return SetSecretDocsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
+		return false;
+	}
+
+	protected internal override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.OffsetDuplicate_altSource.EqualsIdentity(feature))
+			return SetAltSourceRaw(value);
+		if (ShapesLanguage.Instance.OffsetDuplicate_source.EqualsIdentity(feature))
+			return SetSourceRaw(value);
 		return false;
 	}
 
@@ -2517,13 +3488,39 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes) => TryGetReference<IShape>(_shapes, out shapes);
+	private bool SetShapesRaw(List<ReferenceTarget> targets)
+	{
+		if (_shapes.SequenceEqual(targets))
+			return false;
+		_shapes.Clear();
+		_shapes.AddRange(targets);
+		return true;
+	}
+
+	private bool AddShapesRaw(ReferenceTarget? target)
+	{
+		if (target is null)
+			return false;
+		_shapes.Add(target);
+		return true;
+	}
+
+	private bool InsertShapesRaw(int index, ReferenceTarget? target)
+	{
+		if (target is null || !IsInRange(index, _shapes))
+			return false;
+		_shapes.Insert(index, target);
+		return true;
+	}
+
+	private bool RemoveShapesRaw(ReferenceTarget? target) => Remove(target, _shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count, notificationId);
+		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count);
 		emitter.CollectOldData();
 		_shapes.AddRange(safeNodes);
 		emitter.Notify();
@@ -2531,13 +3528,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes)
 	{
 		AssureInRange(index, _shapes);
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index, notificationId);
+		ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index);
 		emitter.CollectOldData();
 		_shapes.InsertRange(index, safeNodes);
 		emitter.Notify();
@@ -2545,7 +3542,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry RemoveShapes(IEnumerable<IShape> nodes, INotificationId? notificationId = null)
+        public ReferenceGeometry RemoveShapes(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
@@ -2579,6 +3576,19 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		return false;
 	}
 
+	protected internal override bool TryGetReferencesRaw(Reference feature, out IReadOnlyList<IReferenceTarget> result)
+	{
+		if (base.TryGetReferencesRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
+		{
+			result = _shapes;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -2589,11 +3599,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsReferenceTargets<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes, notificationId);
+			ReferenceSetNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes);
 			emitter.CollectOldData();
-			_shapes.Clear();
-			_shapes.AddRange(safeNodes);
-			emitter.Notify();
+			if (SetShapesRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -2607,6 +3616,33 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		if (TryGetShapes(out _))
 			result.Add(ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		return result;
+	}
+
+	protected internal override bool AddReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.AddReferencesRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
+			return AddShapesRaw(value);
+		return false;
+	}
+
+	protected internal override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget? value)
+	{
+		if (base.InsertReferencesRaw(feature, index, value))
+			return true;
+		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
+			return InsertShapesRaw(index, value);
+		return false;
+	}
+
+	protected internal override bool RemoveReferencesRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.RemoveReferencesRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
+			return RemoveShapesRaw(value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -2656,6 +3692,14 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShape
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -2672,16 +3716,16 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Shape SetName(string value, INotificationId? notificationId = null)
+        public Shape SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name);
 		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		if (SetNameRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -2697,10 +3741,52 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		fixpoints = _fixpoints.AsReadOnly();
 		return fixpoints.Count != 0;
 	}
+
+	private bool SetFixpointsRaw(List<Coord> nodes)
+	{
+		if (_fixpoints.SequenceEqual(nodes))
+			return false;
+		RemoveSelfParent(_fixpoints, _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
+		_fixpoints.AddRange(SetSelfParent(nodes, ShapesLanguage.Instance.IShape_fixpoints));
+		return true;
+	}
+
+	private bool AddFixpointsRaw(Coord? value)
+	{
+		if (value is null || _fixpoints.Count != 0 && _fixpoints[^1] == value)
+			return false;
+		AttachChild(value);
+		_fixpoints.Add(value);
+		return true;
+	}
+
+	private bool InsertFixpointsRaw(int index, Coord? value)
+	{
+		if (value is null || !IsInRange(index, _fixpoints) || _fixpoints.Count > index && _fixpoints[index] == value)
+			return false;
+		AttachChild(value);
+		_fixpoints.Insert(index, value);
+		return true;
+	}
+
+	private bool RemoveFixpointsRaw(Coord? value)
+	{
+		if (value is null)
+			return false;
+		if (_fixpoints.Remove(value))
+		{
+			{
+				SetParentNull(value);
+				return true;
+			}
+		}
+
+		return false;
+	}
 /// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.AddFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null) => AddFixpoints(nodes);
+ IShape IShape.AddFixpoints(IEnumerable<Coord> nodes) => AddFixpoints(nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape AddFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null)
+        public Shape AddFixpoints(IEnumerable<Coord> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
@@ -2709,40 +3795,52 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 			return this;
 		foreach (var safeNode in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, [safeNode], _fixpoints, null, notificationId);
+			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, [safeNode], _fixpoints, null);
 			emitter.CollectOldData();
-			_fixpoints.AddRange(SetSelfParent([safeNode], ShapesLanguage.Instance.IShape_fixpoints));
-			emitter.Notify();
+			if (AddFixpointsRaw(safeNode))
+				emitter.Notify();
 		}
 
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.InsertFixpoints(int index, IEnumerable<Coord> nodes, INotificationId? notificationId = null) => InsertFixpoints(index, nodes);
+ IShape IShape.InsertFixpoints(int index, IEnumerable<Coord> nodes) => InsertFixpoints(index, nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape InsertFixpoints(int index, IEnumerable<Coord> nodes, INotificationId? notificationId = null)
+        public Shape InsertFixpoints(int index, IEnumerable<Coord> nodes)
 	{
 		AssureInRange(index, _fixpoints);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNoSelfMove(index, safeNodes, _fixpoints);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
-		ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, index, notificationId);
-		emitter.CollectOldData();
-		_fixpoints.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
-		emitter.Notify();
+		foreach (var safeNode in safeNodes)
+		{
+			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, [safeNode], _fixpoints, index);
+			emitter.CollectOldData();
+			if (InsertFixpointsRaw(index++, safeNode))
+				emitter.Notify();
+		}
+
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.RemoveFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null) => RemoveFixpoints(nodes);
+ IShape IShape.RemoveFixpoints(IEnumerable<Coord> nodes) => RemoveFixpoints(nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape RemoveFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null)
+        public Shape RemoveFixpoints(IEnumerable<Coord> nodes)
 	{
 		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints, ContainmentRemover<Coord>(ShapesLanguage.Instance.IShape_fixpoints));
 		return this;
 	}
 
 	private string? _uuid = null;
+	private bool SetUuidRaw(string? value)
+	{
+		if (value == _uuid)
+			return false;
+		_uuid = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Uuid has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -2759,16 +3857,16 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- IShape IShape.SetUuid(string value, INotificationId? notificationId = null) => SetUuid(value);
+ IShape IShape.SetUuid(string value) => SetUuid(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Shape SetUuid(string value, INotificationId? notificationId = null)
+        public Shape SetUuid(string value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.IShape_uuid);
-		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.IShape_uuid, this, value, _uuid, notificationId);
+		PropertyNotificationEmitter emitter = new(ShapesLanguage.Instance.IShape_uuid, this, value, _uuid);
 		emitter.CollectOldData();
-		_uuid = value;
-		emitter.Notify();
+		if (SetUuidRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -2785,15 +3883,23 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		return shapeDocs != null;
 	}
 
-	/// <remarks>Optional Single Containment</remarks>
-        public Shape SetShapeDocs(Documentation? value, INotificationId? notificationId = null)
+	private bool SetShapeDocsRaw(Documentation? value)
 	{
-		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.Shape_shapeDocs, this, value, _shapeDocs, notificationId);
-		emitter.CollectOldData();
+		if (value == _shapeDocs)
+			return false;
 		SetParentNull(_shapeDocs);
 		AttachChild(value);
 		_shapeDocs = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public Shape SetShapeDocs(Documentation? value)
+	{
+		ContainmentSingleNotificationEmitter<Documentation> emitter = new(ShapesLanguage.Instance.Shape_shapeDocs, this, value, _shapeDocs);
+		emitter.CollectOldData();
+		if (SetShapeDocsRaw(value))
+			emitter.Notify();
 		return this;
 	}
 
@@ -2835,6 +3941,51 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		return false;
 	}
 
+	protected internal override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		if (ShapesLanguage.Instance.IShape_uuid.EqualsIdentity(feature))
+		{
+			result = _uuid;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.Shape_shapeDocs.EqualsIdentity(feature))
+		{
+			result = _shapeDocs;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected internal override bool TryGetContainmentsRaw(Containment feature, out IReadOnlyList<IReadableNode> result)
+	{
+		if (base.TryGetContainmentsRaw(feature, out result))
+			return true;
+		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
+		{
+			result = _fixpoints;
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
@@ -2844,7 +3995,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
@@ -2854,11 +4005,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord>(value).ToList();
-			ContainmentSetNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, notificationId);
+			ContainmentSetNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints);
 			emitter.CollectOldData();
-			RemoveSelfParent(_fixpoints.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
-			_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
-			emitter.Notify();
+			if (SetFixpointsRaw(safeNodes))
+				emitter.Notify();
 			return true;
 		}
 
@@ -2866,7 +4016,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		{
 			if (value is string v)
 			{
-				SetUuid(v, notificationId);
+				SetUuid(v);
 				return true;
 			}
 
@@ -2877,13 +4027,33 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
 			{
-				SetShapeDocs((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value, notificationId);
+				SetShapeDocs((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected internal override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
+		if (ShapesLanguage.Instance.IShape_uuid.EqualsIdentity(feature) && value is null or string)
+			return SetUuidRaw((string?)value);
+		return false;
+	}
+
+	protected internal override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.Shape_shapeDocs.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation)
+			return SetShapeDocsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Documentation?)value);
 		return false;
 	}
 
@@ -2900,6 +4070,33 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		if (TryGetShapeDocs(out _))
 			result.Add(ShapesLanguage.Instance.Shape_shapeDocs);
 		return result;
+	}
+
+	protected internal override bool AddContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.AddContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
+			return AddFixpointsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		return false;
+	}
+
+	protected internal override bool InsertContainmentsRaw(Containment feature, int index, IWritableNode? value)
+	{
+		if (base.InsertContainmentsRaw(feature, index, value))
+			return true;
+		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
+			return InsertFixpointsRaw(index, (LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		return false;
+	}
+
+	protected internal override bool RemoveContainmentsRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.RemoveContainmentsRaw(feature, value))
+			return true;
+		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord)
+			return RemoveFixpointsRaw((LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord?)value);
+		return false;
 	}
 
 	/// <inheritdoc/>
