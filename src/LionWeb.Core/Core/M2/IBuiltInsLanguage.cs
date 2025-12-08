@@ -88,5 +88,5 @@ public interface INamedWritable : INamed, IWritableNode
     public new string Name { get; set; }
 
     /// <inheritdoc cref="INamed.Name"/>
-    public INamedWritable SetName(string value, INotificationId? notificationId = null);
+    public INamedWritable SetName(string value);
 }
