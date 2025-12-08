@@ -111,123 +111,59 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                 ReturnTrue()
             ])
         );
+    
+    #endregion
 
-    private MethodDeclarationSyntax? GenTryGetPropertyRaw()
-    {
-        var properties = FeaturesToImplement(classifier).OfType<Property>().ToList();
-        if (properties.Count == 0)
-            return null;
-        
-        return Method("TryGetPropertyRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Property))),
-                Param("result", NullableType(AsType(typeof(object))))
-                    .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword, SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.TryGetPropertyRaw(feature, out result)"), ReturnTrue())
-                }
-                .Concat(properties.Select(GenGetInternalRaw))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    #region TryGetRaw
 
-    private MethodDeclarationSyntax? GenTryGetContainmentRaw()
-    {
-        var containments = FeaturesToImplement(classifier)
-            .OfType<Containment>()
-            .Where(c => !c.Multiple)
-            .ToList();
-        if (containments.Count == 0)
-            return null;
-        
-        return Method("TryGetContainmentRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Containment))),
-                Param("result", NullableType(AsType(typeof(IReadableNode))))
-                    .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword, SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.TryGetContainmentRaw(feature, out result)"), ReturnTrue())
-                }
-                .Concat(containments.Select(GenGetInternalRaw))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    private MethodDeclarationSyntax? GenTryGetPropertyRaw() =>
+        AbstractGetRaw("TryGetPropertyRaw", typeof(Property), NullableType(AsType(typeof(object))),
+            FeaturesToImplement(classifier).OfType<Property>().ToList());
 
-    private MethodDeclarationSyntax? GenTryGetContainmentsRaw()
-    {
-        var containments = FeaturesToImplement(classifier)
-            .OfType<Containment>()
-            .Where(c => c.Multiple)
-            .ToList();
-        if (containments.Count == 0)
-            return null;
-        
-        return Method("TryGetContainmentsRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Containment))),
-                Param("result", AsType(typeof(IReadOnlyList<IReadableNode>)))
-                    .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword, SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.TryGetContainmentsRaw(feature, out result)"), ReturnTrue())
-                }
-                .Concat(containments.Select(GenGetInternalRaw))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    private MethodDeclarationSyntax? GenTryGetContainmentRaw() =>
+        AbstractGetRaw("TryGetContainmentRaw", typeof(Containment), NullableType(AsType(typeof(IReadableNode))),
+            FeaturesToImplement(classifier)
+                .OfType<Containment>()
+                .Where(c => !c.Multiple)
+                .ToList());
 
-    private MethodDeclarationSyntax? GenTryGetReferenceRaw()
-    {
-        var references = FeaturesToImplement(classifier)
-            .OfType<Reference>()
-            .Where(r => !r.Multiple)
-            .ToList();
-        if (references.Count == 0)
-            return null;
-        
-        return Method("TryGetReferenceRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Reference))),
-                Param("result", NullableType(AsType(typeof(IReferenceTarget))))
-                    .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword, SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.TryGetReferenceRaw(feature, out result)"), ReturnTrue())
-                }
-                .Concat(references.Select(GenGetInternalRaw))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    private MethodDeclarationSyntax? GenTryGetContainmentsRaw() =>
+        AbstractGetRaw("TryGetContainmentsRaw", typeof(Containment), AsType(typeof(IReadOnlyList<IReadableNode>)),
+            FeaturesToImplement(classifier)
+                .OfType<Containment>()
+                .Where(c => c.Multiple)
+                .ToList());
 
-    private MethodDeclarationSyntax? GenTryGetReferencesRaw()
-    {
-        var references = FeaturesToImplement(classifier)
-            .OfType<Reference>()
-            .Where(r => r.Multiple)
-            .ToList();
-        if (references.Count == 0)
-            return null;
-        
-        return Method("TryGetReferencesRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Reference))),
-                Param("result", AsType(typeof(IReadOnlyList<IReferenceTarget>)))
-                    .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword, SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.TryGetReferencesRaw(feature, out result)"), ReturnTrue())
-                }
-                .Concat(references.Select(GenGetInternalRaw))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    private MethodDeclarationSyntax? GenTryGetReferenceRaw() =>
+        AbstractGetRaw("TryGetReferenceRaw", typeof(Reference), NullableType(AsType(typeof(IReferenceTarget))),
+            FeaturesToImplement(classifier)
+                .OfType<Reference>()
+                .Where(r => !r.Multiple)
+                .ToList());
+
+    private MethodDeclarationSyntax? GenTryGetReferencesRaw() =>
+        AbstractGetRaw("TryGetReferencesRaw", typeof(Reference), AsType(typeof(IReadOnlyList<IReferenceTarget>)),
+            FeaturesToImplement(classifier)
+                .OfType<Reference>()
+                .Where(r => r.Multiple)
+                .ToList());
+
+    private MethodDeclarationSyntax? AbstractGetRaw(string methodName, Type featureType, TypeSyntax resultType, IReadOnlyList<Feature> features) =>
+        features.Count == 0
+            ? null
+            : Method(methodName, AsType(typeof(bool)), [
+                    Param("feature", AsType(featureType)),
+                    Param("result", resultType)
+                        .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
+                ])
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword, SyntaxKind.OverrideKeyword))
+                .WithBody(AsStatements(new List<StatementSyntax>
+                    {
+                        IfStatement(ParseExpression($"base.{methodName}(feature, out result)"), ReturnTrue())
+                    }
+                    .Concat(features.Select(GenGetInternalRaw))
+                    .Append(ReturnStatement(false.AsLiteral()))
+                ));
 
     private StatementSyntax GenGetInternalRaw(Feature feature) =>
         IfStatement(GenEqualsIdentityFeature(feature),
@@ -241,11 +177,15 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     #region SetInternal
 
-    private MethodDeclarationSyntax GenSetInternal() =>
-        Method("SetInternal", AsType(typeof(bool)), [
+    private MethodDeclarationSyntax GenSetInternal()
+    {
+        TypeSyntax type = AsType(typeof(INotificationId));
+        return Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
                 Param("value", NullableType(AsType(typeof(object)))),
-                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                Parameter(Identifier("notificationId"))
+                    .WithType(NullableType(type))
+                    .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
@@ -257,6 +197,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                 .Concat(FeaturesToImplement(classifier).Select(GenSetInternal))
                 .Append(ReturnStatement(false.AsLiteral()))
             ));
+    }
 
     private StatementSyntax GenSetInternal(Feature feature)
     {
