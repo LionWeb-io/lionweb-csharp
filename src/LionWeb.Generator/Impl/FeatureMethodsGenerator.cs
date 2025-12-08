@@ -39,7 +39,11 @@ using Property = Core.M3.Property;
 /// - RemoveInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+public class FeatureMethodsGenerator(
+    Classifier classifier,
+    INames names,
+    LionWebVersions lionWebVersion,
+    GeneratorConfig config)
     : ClassifierGeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
@@ -74,7 +78,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             return featureMethods;
         }
 
-        var addInternal =  GenAddInternal();
+        var addInternal = GenAddInternal();
         var insertInternal = GenInsertInternal();
         var removeInternal = GenRemoveInternal();
 
@@ -111,44 +115,33 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                 ReturnTrue()
             ])
         );
-    
+
     #endregion
 
     #region TryGetRaw
 
     private MethodDeclarationSyntax? GenTryGetPropertyRaw() =>
         AbstractGetRaw("TryGetPropertyRaw", typeof(Property), NullableType(AsType(typeof(object))),
-            FeaturesToImplement(classifier).OfType<Property>().ToList());
+            PropertiesToImplement());
 
     private MethodDeclarationSyntax? GenTryGetContainmentRaw() =>
         AbstractGetRaw("TryGetContainmentRaw", typeof(Containment), NullableType(AsType(typeof(IReadableNode))),
-            FeaturesToImplement(classifier)
-                .OfType<Containment>()
-                .Where(c => !c.Multiple)
-                .ToList());
+            ContainmentsToImplement(false));
 
     private MethodDeclarationSyntax? GenTryGetContainmentsRaw() =>
         AbstractGetRaw("TryGetContainmentsRaw", typeof(Containment), AsType(typeof(IReadOnlyList<IReadableNode>)),
-            FeaturesToImplement(classifier)
-                .OfType<Containment>()
-                .Where(c => c.Multiple)
-                .ToList());
+            ContainmentsToImplement(true));
 
     private MethodDeclarationSyntax? GenTryGetReferenceRaw() =>
         AbstractGetRaw("TryGetReferenceRaw", typeof(Reference), NullableType(AsType(typeof(IReferenceTarget))),
-            FeaturesToImplement(classifier)
-                .OfType<Reference>()
-                .Where(r => !r.Multiple)
-                .ToList());
+            ReferencesToImplement(false));
 
     private MethodDeclarationSyntax? GenTryGetReferencesRaw() =>
         AbstractGetRaw("TryGetReferencesRaw", typeof(Reference), AsType(typeof(IReadOnlyList<IReferenceTarget>)),
-            FeaturesToImplement(classifier)
-                .OfType<Reference>()
-                .Where(r => r.Multiple)
-                .ToList());
+            ReferencesToImplement(true));
 
-    private MethodDeclarationSyntax? AbstractGetRaw(string methodName, Type featureType, TypeSyntax resultType, IReadOnlyList<Feature> features) =>
+    private MethodDeclarationSyntax? AbstractGetRaw(string methodName, Type featureType, TypeSyntax resultType,
+        IReadOnlyList<Feature> features) =>
         features.Count == 0
             ? null
             : Method(methodName, AsType(typeof(bool)), [
@@ -156,7 +149,8 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                     Param("result", resultType)
                         .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
                 ])
-                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword, SyntaxKind.OverrideKeyword))
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
+                    SyntaxKind.OverrideKeyword))
                 .WithBody(AsStatements(new List<StatementSyntax>
                     {
                         IfStatement(ParseExpression($"base.{methodName}(feature, out result)"), ReturnTrue())
@@ -385,271 +379,149 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
             AsArguments([IdentifierName("safeNodes")])));
 
-    private MethodDeclarationSyntax? GenSetPropertyRaw()
-    {
-        var properties = FeaturesToImplement(classifier).OfType<Property>().ToList();
-        if (properties.Count == 0)
-            return null;
-        
-        return Method("SetPropertyRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Property))),
-                Param("value", NullableType(AsType(typeof(object))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.SetPropertyRaw(feature, value)"),
-                        ReturnTrue())
-                }
-                .Concat(properties.Select(p => GenSetSingleFeatureRaw(p)))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    #region Raw
 
-    private MethodDeclarationSyntax? GenSetContainmentRaw()
-    {
-        var containments = FeaturesToImplement(classifier)
-            .OfType<Containment>()
-            .Where(c => !c.Multiple)
-            .ToList();
-        if (containments.Count == 0)
-            return null;
-        
-        return Method("SetContainmentRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Containment))),
-                Param("value", NullableType(AsType(typeof(IWritableNode))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.SetContainmentRaw(feature, value)"),
-                        ReturnTrue())
-                }
-                .Concat(containments.Select(c => GenSetSingleFeatureRaw(c, writeable:true)))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    #region SetRaw
 
-    private MethodDeclarationSyntax? GenSetReferenceRaw()
-    {
-        var references = FeaturesToImplement(classifier)
-            .OfType<Reference>()
-            .Where(r => !r.Multiple)
-            .ToList();
-        if (references.Count == 0)
-            return null;
-        
-        return Method("SetReferenceRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Reference))),
-                Param("value", NullableType(AsType(typeof(ReferenceTarget))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.SetReferenceRaw(feature, value)"),
-                        ReturnTrue())
-                }
-                .Concat(references.Select(feature => IfStatement(
-                        GenEqualsIdentityFeature(feature),
-                    ReturnStatement(Call(FeatureSetRaw(feature).ToString(), IdentifierName("value")))
-                )))
-                .Append(ReturnStatement(false.AsLiteral()))
+    private MethodDeclarationSyntax? GenSetPropertyRaw() =>
+        AbstractGenSetRaw("SetPropertyRaw", NullableType(AsType(typeof(object))), PropertiesToImplement(),
+            p => GenSetSingleFeatureRaw(p));
+
+    private MethodDeclarationSyntax? GenSetContainmentRaw() =>
+        AbstractGenSetRaw("SetContainmentRaw", NullableType(AsType(typeof(IWritableNode))),
+            ContainmentsToImplement(false),
+            c => GenSetSingleFeatureRaw(c, writeable: true));
+
+    private MethodDeclarationSyntax? GenSetReferenceRaw() =>
+        AbstractGenSetRaw("SetReferenceRaw", NullableType(AsType(typeof(ReferenceTarget))),
+            ReferencesToImplement(false),
+            feature => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(FeatureSetRaw(feature).ToString(), IdentifierName("value")))
             ));
-    }
 
     private IfStatementSyntax GenSetSingleFeatureRaw(Feature feature, bool writeable = false) =>
         IfStatement(
             And(
                 GenEqualsIdentityFeature(feature),
-                IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable:writeable))
+                IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: writeable))
             ),
             ReturnStatement(Call(FeatureSetRaw(feature).ToString(), CastValueType(feature, writeable: writeable)))
         );
 
-    private MethodDeclarationSyntax? GenAddContainmentsRaw()
-    {
-        var containments = FeaturesToImplement(classifier)
-            .OfType<Containment>()
-            .Where(r => r.Multiple)
-            .ToList();
-        if (containments.Count == 0)
-            return null;
-        
-        return Method("AddContainmentsRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Containment))),
-                Param("value", NullableType(AsType(typeof(IWritableNode))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.AddContainmentsRaw(feature, value)"),
-                        ReturnTrue())
-                }
-                .Concat(containments.Select(feature => IfStatement(
-                    And(
-                        GenEqualsIdentityFeature(feature),
-                        IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable:true))
-                        
-                    ),
-                    ReturnStatement(Call(LinkAddRaw(feature).ToString(), CastValueType(feature, writeable:true)))
-                )))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    #endregion
 
-    private MethodDeclarationSyntax? GenAddReferencesRaw()
-    {
-        var references = FeaturesToImplement(classifier)
-            .OfType<Reference>()
-            .Where(r => r.Multiple)
-            .ToList();
-        if (references.Count == 0)
-            return null;
-        
-        return Method("AddReferencesRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Reference))),
-                Param("value", NullableType(AsType(typeof(ReferenceTarget))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.AddReferencesRaw(feature, value)"),
-                        ReturnTrue())
-                }
-                .Concat(references.Select(feature => IfStatement(
-                        GenEqualsIdentityFeature(feature),
-                    ReturnStatement(Call(LinkAddRaw(feature).ToString(), IdentifierName("value")))
-                )))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    #region AddRaw
 
-    private MethodDeclarationSyntax? GenInsertContainmentsRaw()
-    {
-        var containments = FeaturesToImplement(classifier)
-            .OfType<Containment>()
-            .Where(r => r.Multiple)
-            .ToList();
-        if (containments.Count == 0)
-            return null;
-        
-        return Method("InsertContainmentsRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Containment))),
-                Param("index", AsType(typeof(int))),
-                Param("value", NullableType(AsType(typeof(IWritableNode))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.InsertContainmentsRaw(feature, index, value)"),
-                        ReturnTrue())
-                }
-                .Concat(containments.Select(feature => IfStatement(
-                    And(
-                        GenEqualsIdentityFeature(feature),
-                        IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable:true))
-                        
-                    ),
-                    ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"), CastValueType(feature, writeable:true)))
-                )))
-                .Append(ReturnStatement(false.AsLiteral()))
+    private MethodDeclarationSyntax? GenAddContainmentsRaw() =>
+        AbstractGenSetRaw("AddContainmentsRaw", NullableType(AsType(typeof(IWritableNode))),
+            ContainmentsToImplement(true),
+            feature => IfStatement(
+                And(
+                    GenEqualsIdentityFeature(feature),
+                    IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: true))
+                ),
+                ReturnStatement(Call(LinkAddRaw(feature).ToString(), CastValueType(feature, writeable: true)))
             ));
-    }
 
-    private MethodDeclarationSyntax? GenInsertReferencesRaw()
-    {
-        var references = FeaturesToImplement(classifier)
-            .OfType<Reference>()
-            .Where(r => r.Multiple)
-            .ToList();
-        if (references.Count == 0)
-            return null;
-        
-        return Method("InsertReferencesRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Reference))),
-                Param("index", AsType(typeof(int))),
-                Param("value", NullableType(AsType(typeof(ReferenceTarget))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.InsertReferencesRaw(feature, index, value)"),
-                        ReturnTrue())
-                }
-                .Concat(references.Select(feature => IfStatement(
-                        GenEqualsIdentityFeature(feature),
-                    ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"), IdentifierName("value")))
-                )))
-                .Append(ReturnStatement(false.AsLiteral()))
+    private MethodDeclarationSyntax? GenAddReferencesRaw() =>
+        AbstractGenSetRaw("AddReferencesRaw", NullableType(AsType(typeof(ReferenceTarget))),
+            ReferencesToImplement(true),
+            feature => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(LinkAddRaw(feature).ToString(), IdentifierName("value")))
             ));
-    }
 
-        private MethodDeclarationSyntax? GenRemoveContainmentsRaw()
-    {
-        var containments = FeaturesToImplement(classifier)
-            .OfType<Containment>()
-            .Where(r => r.Multiple)
-            .ToList();
-        if (containments.Count == 0)
-            return null;
-        
-        return Method("RemoveContainmentsRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Containment))),
-                Param("value", NullableType(AsType(typeof(IWritableNode))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.RemoveContainmentsRaw(feature, value)"),
-                        ReturnTrue())
-                }
-                .Concat(containments.Select(feature => IfStatement(
-                    And(
-                        GenEqualsIdentityFeature(feature),
-                        IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable:true))
-                        
-                    ),
-                    ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), CastValueType(feature, writeable:true)))
-                )))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-    }
+    #endregion
 
-    private MethodDeclarationSyntax? GenRemoveReferencesRaw()
-    {
-        var references = FeaturesToImplement(classifier)
-            .OfType<Reference>()
-            .Where(r => r.Multiple)
-            .ToList();
-        if (references.Count == 0)
-            return null;
-        
-        return Method("RemoveReferencesRaw", AsType(typeof(bool)), [
-                Param("feature", AsType(typeof(Reference))),
-                Param("value", NullableType(AsType(typeof(ReferenceTarget))))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                SyntaxKind.OverrideKeyword))
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.RemoveReferencesRaw(feature, value)"),
-                        ReturnTrue())
-                }
-                .Concat(references.Select(feature => IfStatement(
-                        GenEqualsIdentityFeature(feature),
-                    ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), IdentifierName("value")))
-                )))
-                .Append(ReturnStatement(false.AsLiteral()))
+    #region InsertRaw
+
+    private MethodDeclarationSyntax? GenInsertContainmentsRaw() =>
+        AbstractInsertRaw("InsertContainmentsRaw", NullableType(AsType(typeof(IWritableNode))),
+            ContainmentsToImplement(true),
+            feature => IfStatement(
+                And(
+                    GenEqualsIdentityFeature(feature),
+                    IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: true))
+                ),
+                ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"),
+                    CastValueType(feature, writeable: true)))
             ));
-    }
+
+    private MethodDeclarationSyntax? GenInsertReferencesRaw() =>
+        AbstractInsertRaw("InsertReferencesRaw", NullableType(AsType(typeof(ReferenceTarget))),
+            ReferencesToImplement(true),
+            feature => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"),
+                    IdentifierName("value")))
+            ));
+
+    private MethodDeclarationSyntax? AbstractInsertRaw<T>(string methodName, TypeSyntax resultType,
+        IReadOnlyList<T> features, Func<T, StatementSyntax> converter) where T : Feature =>
+        features.Count == 0
+            ? null
+            : Method(methodName, AsType(typeof(bool)), [
+                    Param("feature", AsType(typeof(T))),
+                    Param("index", AsType(typeof(int))),
+                    Param("value", resultType)
+                ])
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
+                    SyntaxKind.OverrideKeyword))
+                .WithBody(AsStatements(new List<StatementSyntax>
+                    {
+                        IfStatement(ParseExpression($"base.{methodName}(feature, index, value)"),
+                            ReturnTrue())
+                    }
+                    .Concat(features.Select(converter))
+                    .Append(ReturnStatement(false.AsLiteral()))
+                ));
+
+    #endregion
+
+    #region RemoveRaw
+
+    private MethodDeclarationSyntax? GenRemoveContainmentsRaw() =>
+        AbstractGenSetRaw("RemoveContainmentsRaw", NullableType(AsType(typeof(IWritableNode))),
+            ContainmentsToImplement(true),
+            feature => IfStatement(
+                And(
+                    GenEqualsIdentityFeature(feature),
+                    IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: true))
+                ),
+                ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), CastValueType(feature, writeable: true)))
+            ));
+
+    private MethodDeclarationSyntax? GenRemoveReferencesRaw() =>
+        AbstractGenSetRaw("RemoveReferencesRaw", NullableType(AsType(typeof(ReferenceTarget))),
+            ReferencesToImplement(true),
+            feature => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), IdentifierName("value")))
+            ));
+
+    #endregion
+
+    private MethodDeclarationSyntax? AbstractGenSetRaw<T>(string methodName, TypeSyntax resultType,
+        IReadOnlyList<T> features, Func<T, StatementSyntax> converter) where T : Feature =>
+        features.Count == 0
+            ? null
+            : Method(methodName, AsType(typeof(bool)), [
+                    Param("feature", AsType(typeof(T))),
+                    Param("value", resultType)
+                ])
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
+                    SyntaxKind.OverrideKeyword))
+                .WithBody(AsStatements(new List<StatementSyntax>
+                    {
+                        IfStatement(ParseExpression($"base.{methodName}(feature, value)"),
+                            ReturnTrue())
+                    }
+                    .Concat(features.Select(converter))
+                    .Append(ReturnStatement(false.AsLiteral()))
+                ));
+    
+    #endregion
 
     private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
         Variable(
@@ -730,7 +602,8 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         );
 
     private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) =>
-        CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)), IdentifierName("value"));
+        CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)),
+            IdentifierName("value"));
 
     private InvocationExpressionSyntax AsNodesCall(Link link, bool writeable = false)
     {
@@ -794,7 +667,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                 IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
-    
+
     #endregion
 
     #region InsertInternal
@@ -816,7 +689,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                 .Append(ReturnStatement(false.AsLiteral()))
             ));
 
-    
+
     private StatementSyntax GenInsertInternal(Link link)
     {
         List<StatementSyntax> body = link switch
@@ -848,7 +721,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                 AsArguments([IdentifierName("index"), AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
-    
+
     #endregion
 
     #region RemoveInternal
@@ -870,7 +743,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             ));
 
     #endregion
-    
+
     private StatementSyntax GenRemoveInternal(Link link)
     {
         List<StatementSyntax> body = link switch
@@ -902,7 +775,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                 AsArguments([AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
-    
+
     #region CollectAllSetFeatures
 
     private MethodDeclarationSyntax GenCollectAllSetFeatures() =>
@@ -940,8 +813,24 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         InvocationExpression(MemberAccess(MetaProperty(feature), IdentifierName("EqualsIdentity")),
             AsArguments([IdentifierName("feature")])
         );
+
     private InvocationExpressionSyntax GenEqualsIdentityLink(Link link) =>
         InvocationExpression(MemberAccess(MetaProperty(link), IdentifierName("EqualsIdentity")),
             AsArguments([IdentifierName("link")])
         );
+
+    private List<Property> PropertiesToImplement() =>
+        FeaturesToImplement(classifier).OfType<Property>().ToList();
+
+    private List<Containment> ContainmentsToImplement(bool multiple) =>
+        FeaturesToImplement(classifier)
+            .OfType<Containment>()
+            .Where(c => c.Multiple == multiple)
+            .ToList();
+
+    private List<Reference> ReferencesToImplement(bool multiple) =>
+        FeaturesToImplement(classifier)
+            .OfType<Reference>()
+            .Where(r => r.Multiple == multiple)
+            .ToList();
 }
