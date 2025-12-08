@@ -52,7 +52,7 @@ public class FeatureMethodsGenerator(
         if (!FeaturesToImplement(classifier).Any())
             return [];
 
-        IEnumerable<MemberDeclarationSyntax> featureMethods = new List<MemberDeclarationSyntax>
+        IEnumerable<MemberDeclarationSyntax> featureMethods = new List<MemberDeclarationSyntax?>
         {
             GenGetInternal(),
             GenTryGetPropertyRaw(),
@@ -71,7 +71,7 @@ public class FeatureMethodsGenerator(
             GenInsertReferencesRaw(),
             GenRemoveContainmentsRaw(),
             GenRemoveReferencesRaw()
-        }.Where(m => m is not null);
+        }.Where(m => m is not null)!;
 
         if (!FeaturesToImplement(classifier).OfType<Link>().Any(link => link.Multiple))
         {
@@ -372,13 +372,6 @@ public class FeatureMethodsGenerator(
         ReturnTrue()
     ];
 
-    private ExpressionStatementSyntax ClearFieldCall(Reference reference) =>
-        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear"))));
-
-    private ExpressionStatementSyntax ReferenceAddRangeCall(Reference reference) =>
-        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
-            AsArguments([IdentifierName("safeNodes")])));
-
     #region Raw
 
     #region SetRaw
@@ -560,20 +553,9 @@ public class FeatureMethodsGenerator(
             SingleVariableDesignation(Identifier("v"))
         );
 
-    private ExpressionStatementSyntax AssignToFeatureProperty(Feature feature, ExpressionSyntax expression) =>
-        Assignment(FeatureProperty(feature).ToString(), expression);
-
     private ThrowStatementSyntax GenThrowInvalidValueException() =>
         ThrowStatement(
             NewCall([IdentifierName("feature"), IdentifierName("value")], AsType(typeof(InvalidValueException)))
-        );
-
-    private LocalDeclarationStatementSyntax EnumerableVar(Link link, bool writeable = false) =>
-        Variable("enumerable", Var(), AsNodesCall(link, writeable: writeable));
-
-    private LocalDeclarationStatementSyntax EnumerableToListVar(Link link, bool writeable = false) =>
-        Variable("enumerable", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
         );
 
     private LocalDeclarationStatementSyntax SafeNodesVar(Link link, bool writeable = false) =>
@@ -583,23 +565,6 @@ public class FeatureMethodsGenerator(
 
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
         ExpressionStatement(Call("AssureNonEmpty", IdentifierName("safeNodes"), MetaProperty(link)));
-
-    private ExpressionStatementSyntax RemoveSelfParentCall(Containment containment) =>
-        ExpressionStatement(Call("RemoveSelfParent",
-            InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("ToList"))),
-            FeatureField(containment),
-            MetaProperty(containment)
-        ));
-
-    private ExpressionStatementSyntax LinkAddCall(Link link) =>
-        ExpressionStatement(InvocationExpression(LinkAdd(link),
-            AsArguments([IdentifierName("enumerable")])
-        ));
-
-    private ExpressionStatementSyntax ClearCall(Reference reference) =>
-        ExpressionStatement(
-            InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
-        );
 
     private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) =>
         CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)),
