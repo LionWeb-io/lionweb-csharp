@@ -378,17 +378,17 @@ public class FeatureMethodsGenerator(
 
     private MethodDeclarationSyntax? GenSetPropertyRaw() =>
         AbstractGenSetRaw("SetPropertyRaw", NullableType(AsType(typeof(object))), PropertiesToImplement(),
-            p => GenSetSingleFeatureRaw(p));
+            (p, _) => GenSetSingleFeatureRaw(p));
 
     private MethodDeclarationSyntax? GenSetContainmentRaw() =>
         AbstractGenSetRaw("SetContainmentRaw", NullableType(AsType(typeof(IWritableNode))),
             ContainmentsToImplement(false),
-            c => GenSetSingleFeatureRaw(c, writeable: true));
+            (c, _) => GenSetSingleFeatureRaw(c, writeable: true));
 
     private MethodDeclarationSyntax? GenSetReferenceRaw() =>
         AbstractGenSetRaw("SetReferenceRaw", NullableType(AsType(typeof(ReferenceTarget))),
             ReferencesToImplement(false),
-            feature => IfStatement(
+            (feature, _) => IfStatement(
                 GenEqualsIdentityFeature(feature),
                 ReturnStatement(Call(FeatureSetRaw(feature).ToString(), IdentifierName("value")))
             ));
@@ -407,20 +407,24 @@ public class FeatureMethodsGenerator(
     #region AddRaw
 
     private MethodDeclarationSyntax? GenAddContainmentsRaw() =>
-        AbstractGenSetRaw("AddContainmentsRaw", NullableType(AsType(typeof(IWritableNode))),
+        AbstractGenSetRaw("AddContainmentsRaw", AsType(typeof(IWritableNode)),
             ContainmentsToImplement(true),
-            feature => IfStatement(
-                And(
-                    GenEqualsIdentityFeature(feature),
-                    IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: true))
-                ),
-                ReturnStatement(Call(LinkAddRaw(feature).ToString(), CastValueType(feature, writeable: true)))
-            ));
+            (feature, i) =>
+            {
+                var variableName = $"v{i}";
+                return IfStatement(
+                    And(
+                        GenEqualsIdentityFeature(feature),
+                        IsPatternExpression(IdentifierName("value"), AsTypePattern(feature, variableName, writeable: true))
+                    ),
+                    ReturnStatement(Call(LinkAddRaw(feature).ToString(), IdentifierName(variableName)))
+                );
+            });
 
     private MethodDeclarationSyntax? GenAddReferencesRaw() =>
-        AbstractGenSetRaw("AddReferencesRaw", NullableType(AsType(typeof(ReferenceTarget))),
+        AbstractGenSetRaw("AddReferencesRaw", AsType(typeof(ReferenceTarget)),
             ReferencesToImplement(true),
-            feature => IfStatement(
+            (feature, _) => IfStatement(
                 GenEqualsIdentityFeature(feature),
                 ReturnStatement(Call(LinkAddRaw(feature).ToString(), IdentifierName("value")))
             ));
@@ -430,28 +434,32 @@ public class FeatureMethodsGenerator(
     #region InsertRaw
 
     private MethodDeclarationSyntax? GenInsertContainmentsRaw() =>
-        AbstractInsertRaw("InsertContainmentsRaw", NullableType(AsType(typeof(IWritableNode))),
+        AbstractInsertRaw("InsertContainmentsRaw", AsType(typeof(IWritableNode)),
             ContainmentsToImplement(true),
-            feature => IfStatement(
-                And(
-                    GenEqualsIdentityFeature(feature),
-                    IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: true))
-                ),
-                ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"),
-                    CastValueType(feature, writeable: true)))
-            ));
+            (feature, i) =>
+            {
+                var variableName = $"v{i}";
+                return IfStatement(
+                    And(
+                        GenEqualsIdentityFeature(feature),
+                        IsPatternExpression(IdentifierName("value"), AsTypePattern(feature, variableName, writeable: true))
+                    ),
+                    ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"),
+                        IdentifierName(variableName)))
+                );
+            });
 
     private MethodDeclarationSyntax? GenInsertReferencesRaw() =>
-        AbstractInsertRaw("InsertReferencesRaw", NullableType(AsType(typeof(ReferenceTarget))),
+        AbstractInsertRaw("InsertReferencesRaw", AsType(typeof(ReferenceTarget)),
             ReferencesToImplement(true),
-            feature => IfStatement(
+            (feature, _) => IfStatement(
                 GenEqualsIdentityFeature(feature),
                 ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"),
                     IdentifierName("value")))
             ));
 
     private MethodDeclarationSyntax? AbstractInsertRaw<T>(string methodName, TypeSyntax resultType,
-        IReadOnlyList<T> features, Func<T, StatementSyntax> converter) where T : Feature =>
+        IReadOnlyList<T> features, Func<T, int, StatementSyntax> converter) where T : Feature =>
         features.Count == 0
             ? null
             : Method(methodName, AsType(typeof(bool)), [
@@ -475,20 +483,24 @@ public class FeatureMethodsGenerator(
     #region RemoveRaw
 
     private MethodDeclarationSyntax? GenRemoveContainmentsRaw() =>
-        AbstractGenSetRaw("RemoveContainmentsRaw", NullableType(AsType(typeof(IWritableNode))),
+        AbstractGenSetRaw("RemoveContainmentsRaw", AsType(typeof(IWritableNode)),
             ContainmentsToImplement(true),
-            feature => IfStatement(
-                And(
-                    GenEqualsIdentityFeature(feature),
-                    IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: true))
-                ),
-                ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), CastValueType(feature, writeable: true)))
-            ));
+            (feature, i) =>
+            {
+                var variableName = $"v{i}";
+                return IfStatement(
+                    And(
+                        GenEqualsIdentityFeature(feature),
+                        IsPatternExpression(IdentifierName("value"), AsTypePattern(feature, variableName, writeable: true))
+                    ),
+                    ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), IdentifierName(variableName)))
+                );
+            });
 
     private MethodDeclarationSyntax? GenRemoveReferencesRaw() =>
-        AbstractGenSetRaw("RemoveReferencesRaw", NullableType(AsType(typeof(ReferenceTarget))),
+        AbstractGenSetRaw("RemoveReferencesRaw", AsType(typeof(ReferenceTarget)),
             ReferencesToImplement(true),
-            feature => IfStatement(
+            (feature, _) => IfStatement(
                 GenEqualsIdentityFeature(feature),
                 ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), IdentifierName("value")))
             ));
@@ -496,7 +508,7 @@ public class FeatureMethodsGenerator(
     #endregion
 
     private MethodDeclarationSyntax? AbstractGenSetRaw<T>(string methodName, TypeSyntax resultType,
-        IReadOnlyList<T> features, Func<T, StatementSyntax> converter) where T : Feature =>
+        IReadOnlyList<T> features, Func<T, int, StatementSyntax> converter) where T : Feature =>
         features.Count == 0
             ? null
             : Method(methodName, AsType(typeof(bool)), [
@@ -548,9 +560,12 @@ public class FeatureMethodsGenerator(
         );
 
     private DeclarationPatternSyntax AsTypePattern(Feature feature, bool writeable = false) =>
+        AsTypePattern(feature, "v", writeable);
+
+    private DeclarationPatternSyntax AsTypePattern(Feature feature, string variableName, bool writeable = false) =>
         DeclarationPattern(
             AsType(feature.GetFeatureType(), true, writeable: writeable),
-            SingleVariableDesignation(Identifier("v"))
+            SingleVariableDesignation(Identifier(variableName))
         );
 
     private ThrowStatementSyntax GenThrowInvalidValueException() =>

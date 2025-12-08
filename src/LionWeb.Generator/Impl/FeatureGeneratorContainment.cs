@@ -252,13 +252,6 @@ public class FeatureGeneratorContainment(
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private ForEachStatementSyntax LoopOverSafeNodes(IEnumerable<StatementSyntax> loopBody) =>
-        ForEachStatement(
-            type: IdentifierName("var"),
-            identifier: Identifier("safeNode"),
-            expression: IdentifierName("safeNodes"),
-            statement: Block(loopBody));
-
     private IfStatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes() =>
         IfStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),

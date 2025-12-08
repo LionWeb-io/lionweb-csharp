@@ -222,6 +222,8 @@ public abstract partial class NodeBase
         SetParentInternal((INode)child, this);
     }
 
+    #region child raw api
+
     protected bool ExchangeChildRaw(IReadableNode? newValue, IReadableNode? storage)
     {
         if (newValue == storage)
@@ -265,7 +267,6 @@ public abstract partial class NodeBase
         return list;
     }
 
-
     protected bool AddChildRaw<T>(T? newValue, List<T> storage) where T : class, IWritableNode
     {
         if (newValue is null || storage.Count != 0 && storage[^1] == newValue)
@@ -299,6 +300,62 @@ public abstract partial class NodeBase
 
         return false;
     }
+
+    #endregion
+
+    #region reference raw
+
+    protected bool SetReferencesRaw(List<ReferenceTarget> targets, List<ReferenceTarget> storage)
+    {
+        if (storage.SequenceEqual(targets))
+            return false;
+        
+        storage.Clear();
+        storage.AddRange(targets);
+        return true;
+    }
+
+    protected bool AddReferencesRaw(ReferenceTarget target, List<ReferenceTarget> storage)
+    {
+        if (target is null)
+            return false;
+        
+        storage.Add(target);
+        return true;
+    }
+
+    protected bool InsertReferencesRaw(Index index, ReferenceTarget target, List<ReferenceTarget> storage)
+    {
+        if (target is null || !IsInRange(index, storage))
+            return false;
+        
+        storage.Insert(index, target);
+        return true;
+    }
+
+    protected bool RemoveReferencesRaw(ReferenceTarget target, List<ReferenceTarget> storage)
+    {
+        if (target is null)
+            return false;
+        
+        var index = storage.FindIndex(r =>
+        {
+            if (target.Target is not null)
+                return Equals(target.Target, r.Target);
+
+            if (target.TargetId is not null)
+                return Equals(target.TargetId, r.TargetId);
+
+            return Equals(target.ResolveInfo, r.ResolveInfo);
+        });
+        if (index < 0)
+            return false;
+
+        storage.RemoveAt(index);
+        return true;
+    }
+
+    #endregion
 
     /// <summary>
     /// Sets <paramref name="child">child's</paramref> parent to <paramref name="parent"/>.
@@ -495,28 +552,6 @@ public abstract partial class NodeBase
             if (partitionProducer != null && remover != null)
                 remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
         }
-    }
-
-    protected bool Remove(ReferenceTarget target, List<ReferenceTarget> storage)
-    {
-        if (target is null)
-            return false;
-
-        var index = storage.FindIndex(r =>
-        {
-            if (target.Target is not null)
-                return Equals(target.Target, r.Target);
-
-            if (target.TargetId is not null)
-                return Equals(target.TargetId, r.TargetId);
-
-            return Equals(target.ResolveInfo, r.ResolveInfo);
-        });
-        if (index < 0)
-            return false;
-
-        storage.RemoveAt(index);
-        return true;
     }
 
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
