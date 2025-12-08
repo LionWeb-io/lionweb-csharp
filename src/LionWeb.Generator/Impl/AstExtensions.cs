@@ -239,7 +239,7 @@ public static partial class AstExtensions
     {
         var result = InvocationExpression(
             GenericName(Identifier(name))
-                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(type)))
+                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(type)))
         );
 
         if (arguments.Length != 0)
@@ -294,7 +294,7 @@ public static partial class AstExtensions
     public static BinaryExpressionSyntax Or(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.LogicalOrExpression, left, right);
 
-    /// <returns><c>&&</c></returns>
+    /// <returns><c>&amp;&amp;</c></returns>
     public static BinaryExpressionSyntax And(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.LogicalAndExpression, left, right);
 

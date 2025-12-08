@@ -15,6 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
@@ -75,25 +76,6 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
     protected ExpressionStatementSyntax EmitterNotifyCall() =>
         ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("emitter"), IdentifierName("Notify"))));
 
-    protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment, bool isAddedNodeSingle = false) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", isAddedNodeSingle ? IdentifierName("[safeNode]") : IdentifierName("safeNodes"), 
-                    MetaProperty(containment))
-            ])
-        ));
-
-    protected ExpressionStatementSyntax RequiredAddRangeCall(Containment containment, bool isAddedNodeSingle = false) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", isAddedNodeSingle ? IdentifierName("[safeNode]") : IdentifierName("safeNodes"),
-                    MetaProperty(containment)
-                )
-            ])
-        ));
-    
     protected ExpressionSyntax FeatureSetRaw(Feature feature) =>
         IdentifierName(FeatureSet(feature) + "Raw");
 }

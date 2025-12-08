@@ -15,6 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
@@ -41,7 +42,7 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
             ),
             ReturnStatement(This())
         ];
-        if (IsReferenceType(property))
+        if (IsReferenceType())
             setterBody.Insert(0, AsureNotNullCall());
 
         var prop = SingleRequiredFeatureProperty(AsType(property.GetFeatureType()));
@@ -52,7 +53,7 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
             prop,
             TryGet()
         }.Concat(setter);
-        if (IsReferenceType(property))
+        if (IsReferenceType())
             members = members.Select(member => member.Xdoc(XdocThrowsIfSetToNull()));
 
         return new List<MemberDeclarationSyntax>
@@ -94,7 +95,7 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
             ])
         );
 
-    private bool IsReferenceType(Property property) =>
+    private bool IsReferenceType() =>
         !(_builtIns.Boolean.EqualsIdentity(property.Type) ||
           _builtIns.Integer.EqualsIdentity(property.Type));
 }

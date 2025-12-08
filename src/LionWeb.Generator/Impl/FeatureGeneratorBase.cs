@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
 using Core.M2;
 using Core.M3;
-using Core.Notification;
 using Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -78,13 +78,13 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
 
-    public IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
     [
         AbstractSingleRequiredFeatureProperty(writeable: writeable),
         AbstractRequiredFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
-    public IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
     [
         AbstractSingleOptionalFeatureProperty(),
         AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
@@ -306,41 +306,39 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
         return result;
     }
 
-    protected MethodDeclarationSyntax FeatureSetterRaw(TypeSyntax paramType)
-    {
-        return Method(FeatureSetRaw(feature).ToString(), AsType(typeof(bool)), [
+    protected MethodDeclarationSyntax FeatureSetterRaw(TypeSyntax paramType) =>
+        Method(FeatureSetRaw(feature).ToString(), AsType(typeof(bool)), [
                 Param("value", NullableType(paramType))
             ])
             .WithBody(AsStatements([
                 IfStatement(
                     EqualsSign(IdentifierName("value"), FeatureField(feature)),
                     ReturnStatement(False())
-                    ),
+                ),
                 AssignFeatureField(),
                 ReturnStatement(True())
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
-    }
 
     protected IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
         XdocKeyed(ffeature)
             .Concat(XdocRemarks(ffeature));
 
-    private IEnumerable<XmlNodeSyntax> XdocRemarks(Feature feature)
+    private IEnumerable<XmlNodeSyntax> XdocRemarks(Feature ffeature)
     {
         var builder = new StringBuilder();
-        builder.Append(feature.Optional ? "Optional " : "Required ");
-        if (feature is Link l)
+        builder.Append(ffeature.Optional ? "Optional " : "Required ");
+        if (ffeature is Link l)
         {
             builder.Append(l.Multiple ? "Multiple " : "Single ");
         }
 
-        builder.Append(feature switch
+        builder.Append(ffeature switch
         {
             Property => "Property",
             Containment => "Containment",
             Reference => "Reference",
-            _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
+            _ => throw new ArgumentException($"unsupported feature: {ffeature}", nameof(ffeature))
         });
         return XdocLine(builder.ToString(), "remarks");
     }

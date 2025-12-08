@@ -37,7 +37,7 @@ public static partial class AstExtensions
     }
 
     /// Prepends <paramref name="xdocs"/> before <paramref name="member">member's</paramref> attributes.
-    public static T AppendXdoc<T>(this T member, SyntaxList<AttributeListSyntax> attributeLists,
+    private static T AppendXdoc<T>(this T member, SyntaxList<AttributeListSyntax> attributeLists,
         IEnumerable<XmlNodeSyntax> xdocs) where T : MemberDeclarationSyntax
     {
         var firstAttributeList = attributeLists.First();

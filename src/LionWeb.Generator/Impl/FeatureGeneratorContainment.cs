@@ -15,6 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
@@ -81,9 +82,8 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
             ])
         );
 
-    private MethodDeclarationSyntax SingleContainmentSetterRaw(bool writeable = false)
-    {
-        return Method(FeatureSetRaw(containment).ToString(), AsType(typeof(bool)), [
+    private MethodDeclarationSyntax SingleContainmentSetterRaw(bool writeable = false) =>
+        Method(FeatureSetRaw(containment).ToString(), AsType(typeof(bool)), [
                 Param("value", NullableType(AsType(containment.GetFeatureType(), writeable: writeable)))
             ])
             .WithBody(AsStatements([
@@ -97,7 +97,6 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
                 ReturnStatement(True())
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
-    }
 
     public IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment() =>
         new List<MemberDeclarationSyntax>
@@ -142,7 +141,7 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
                     ]),
                     ReturnStatement(This())
                 ], writeable: true)
-                .Select(i => XdocRequiredInserter(i))
+                .Select(XdocRequiredInserter)
         ).Concat(
             LinkRemover([
                     SafeNodesVariable(),
@@ -248,7 +247,7 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
                             NotEquals(MemberAccess(FeatureField(containment), IdentifierName("Count")), 0.AsLiteral()),
                             EqualsSign(
                                 ElementAccessExpression(FeatureField(containment))
-                                    .WithArgumentList(BracketedArgumentList(SingletonSeparatedList<ArgumentSyntax>(
+                                    .WithArgumentList(BracketedArgumentList(SingletonSeparatedList(
                                         Argument(PrefixUnaryExpression(SyntaxKind.IndexExpression, 1.AsLiteral()))
                                     ))),
                                 IdentifierName("value")
@@ -376,17 +375,6 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
             MetaProperty(containment),
             CallGeneric("ContainmentRemover", AsType(containment.Type, writeable: true),
                 MetaProperty(containment))
-        ));
-
-    private ExpressionStatementSyntax InsertRangeCall() =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("InsertRange")),
-            AsArguments([
-                IdentifierName("index"),
-                Call("SetSelfParent", IdentifierName("safeNodes"),
-                    MetaProperty(containment)
-                )
-            ])
         ));
 
     private FieldDeclarationSyntax MultipleContainmentField() =>
