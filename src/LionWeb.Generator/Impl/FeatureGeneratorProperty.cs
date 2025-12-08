@@ -36,10 +36,7 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
         [
             PropertyEmitterVariable(),
             EmitterCollectOldDataCall(),
-            IfStatement(
-                InvocationExpression(FeatureSetRaw(property), AsArguments([IdentifierName("value")])),
-                EmitterNotifyCall()
-            ),
+            EmitterNotifyCallIfRaw(FeatureSetRaw(property)),
             ReturnStatement(This())
         ];
         if (IsReferenceType())
@@ -75,10 +72,7 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
                 OptionalFeatureSetter([
                     PropertyEmitterVariable(),
                     EmitterCollectOldDataCall(),
-                    IfStatement(
-                        InvocationExpression(FeatureSetRaw(property), AsArguments([IdentifierName("value")])),
-                        EmitterNotifyCall()
-                    ),
+                    EmitterNotifyCallIfRaw(FeatureSetRaw(property)),
                     ReturnStatement(This())
                 ])
             );

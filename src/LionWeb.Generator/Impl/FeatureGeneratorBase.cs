@@ -383,4 +383,10 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
 
     protected string FeatureTryGetParam() =>
         _names.FeatureParam(feature);
+
+    protected IfStatementSyntax EmitterNotifyCallIfRaw(ExpressionSyntax rawMethod) =>
+        IfStatement(
+            InvocationExpression(rawMethod, AsArguments([IdentifierName("value")])),
+            EmitterNotifyCall()
+        );
 }

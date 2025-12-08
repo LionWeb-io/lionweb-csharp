@@ -203,7 +203,7 @@ public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link,
     protected ForEachStatementSyntax LoopOverSafeNodes(IEnumerable<StatementSyntax> loopBody) =>
         ForEachStatement(
             type: IdentifierName("var"),
-            identifier: Identifier("safeNode"),
+            identifier: Identifier("value"),
             expression: IdentifierName("safeNodes"),
             statement: Block(loopBody));
 }

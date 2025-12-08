@@ -47,10 +47,7 @@ public class FeatureGeneratorContainment(
                 AsureNotNullCall(),
                 SingleContainmentEmitterVariable(),
                 EmitterCollectOldDataCall(),
-                IfStatement(
-                    InvocationExpression(FeatureSetRaw(containment), AsArguments([IdentifierName("value")])),
-                    EmitterNotifyCall()
-                ),
+                EmitterNotifyCallIfRaw(FeatureSetRaw(containment)),
                 ReturnStatement(This())
             ], true)
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
@@ -68,10 +65,7 @@ public class FeatureGeneratorContainment(
                 OptionalFeatureSetter([
                     SingleContainmentEmitterVariable(),
                     EmitterCollectOldDataCall(),
-                    IfStatement(
-                        InvocationExpression(FeatureSetRaw(containment), AsArguments([IdentifierName("value")])),
-                        EmitterNotifyCall()
-                    ),
+                    EmitterNotifyCallIfRaw(FeatureSetRaw(containment)),
                     ReturnStatement(This())
                 ], true));
 
@@ -120,10 +114,7 @@ public class FeatureGeneratorContainment(
                     LoopOverSafeNodes([
                         AddMultipleContainmentEmitterVariable(Null()),
                         EmitterCollectOldDataCall(),
-                        IfStatement(
-                            InvocationExpression(LinkAddRaw(containment), AsArguments([IdentifierName("safeNode")])),
-                            EmitterNotifyCall()
-                        )
+                        EmitterNotifyCallIfRaw(LinkAddRaw(containment)),
                     ]),
                     ReturnStatement(This())
                 ], writeable: true)
@@ -141,7 +132,7 @@ public class FeatureGeneratorContainment(
                             InvocationExpression(LinkInsertRaw(containment),
                                 AsArguments([
                                     PostfixUnaryExpression(SyntaxKind.PostIncrementExpression, IdentifierName("index")),
-                                    IdentifierName("safeNode")
+                                    IdentifierName("value")
                                 ])),
                             EmitterNotifyCall()
                         )
@@ -180,10 +171,7 @@ public class FeatureGeneratorContainment(
                 LoopOverSafeNodes([
                     AddMultipleContainmentEmitterVariable(Null()),
                     EmitterCollectOldDataCall(),
-                    IfStatement(
-                        InvocationExpression(LinkAddRaw(containment), AsArguments([IdentifierName("safeNode")])),
-                        EmitterNotifyCall()
-                    )
+                    EmitterNotifyCallIfRaw(LinkAddRaw(containment)),
                 ]),
                 ReturnStatement(This())
             ], writeable: true)
@@ -201,7 +189,7 @@ public class FeatureGeneratorContainment(
                         InvocationExpression(LinkInsertRaw(containment),
                             AsArguments([
                                 PostfixUnaryExpression(SyntaxKind.PostIncrementExpression, IdentifierName("index")),
-                                IdentifierName("safeNode")
+                                IdentifierName("value")
                             ])),
                         EmitterNotifyCall()
                     )
@@ -266,7 +254,7 @@ public class FeatureGeneratorContainment(
             NewCall([
                 MetaProperty(containment),
                 This(),
-                IdentifierName("safeNode"),
+                IdentifierName("value"),
                 FeatureField(containment),
                 index
             ])
@@ -278,9 +266,6 @@ public class FeatureGeneratorContainment(
             IdentifierName("safeNodes"),
             FeatureField(containment)
         ));
-
-    private ExpressionStatementSyntax SetParentNullCall() =>
-        ExpressionStatement(Call("SetParentNull", FeatureField(containment)));
 
     private ExpressionStatementSyntax RequiredRemoveSelfParentCall() =>
         ExpressionStatement(Call("RemoveSelfParent",

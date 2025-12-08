@@ -78,10 +78,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                     )),
                     ReferenceEmitterVariable(),
                     EmitterCollectOldDataCall(),
-                    IfStatement(
-                        InvocationExpression(FeatureSetRaw(reference), AsArguments([IdentifierName("value")])),
-                        EmitterNotifyCall()
-                    ),
+                    EmitterNotifyCallIfRaw(FeatureSetRaw(reference)),
                     ReturnStatement(This())
                 ]),
                 FeatureSetterRaw(AsType(typeof(ReferenceTarget)))
@@ -163,10 +160,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                     )),
                     ReferenceEmitterVariable(),
                     EmitterCollectOldDataCall(),
-                    IfStatement(
-                        InvocationExpression(FeatureSetRaw(reference), AsArguments([IdentifierName("value")])),
-                        EmitterNotifyCall()
-                    ),
+                    EmitterNotifyCallIfRaw(FeatureSetRaw(reference)),
                     ReturnStatement(This())
                 ]),
                 FeatureSetterRaw(AsType(typeof(ReferenceTarget)))
@@ -241,10 +235,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                         AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference),
                             IdentifierName("Count"))),
                         EmitterCollectOldDataCall(),
-                        IfStatement(
-                            InvocationExpression(LinkAddRaw(reference), AsArguments([IdentifierName("safeNode")])),
-                            EmitterNotifyCall()
-                        )
+                        EmitterNotifyCallIfRaw(LinkAddRaw(reference)),
                     ]),
                     ReturnStatement(This())
                 ])
@@ -262,7 +253,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                             InvocationExpression(LinkInsertRaw(reference),
                                 AsArguments([
                                     PostfixUnaryExpression(SyntaxKind.PostIncrementExpression, IdentifierName("index")),
-                                    IdentifierName("safeNode")
+                                    IdentifierName("value")
                                 ])),
                             EmitterNotifyCall()
                         )
@@ -331,7 +322,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
             NewCall([
                 MetaProperty(reference),
                 This(),
-                IdentifierName("safeNode"),
+                IdentifierName("value"),
                 index
             ])
         );
@@ -379,10 +370,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                         AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference),
                             IdentifierName("Count"))),
                         EmitterCollectOldDataCall(),
-                        IfStatement(
-                            InvocationExpression(LinkAddRaw(reference), AsArguments([IdentifierName("safeNode")])),
-                            EmitterNotifyCall()
-                        )
+                        EmitterNotifyCallIfRaw(LinkAddRaw(reference))
                     ]),
                     ReturnStatement(This())
                 ])
@@ -399,7 +387,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                             InvocationExpression(LinkInsertRaw(reference),
                                 AsArguments([
                                     PostfixUnaryExpression(SyntaxKind.PostIncrementExpression, IdentifierName("index")),
-                                    IdentifierName("safeNode")
+                                    IdentifierName("value")
                                 ])),
                             EmitterNotifyCall()
                         )
