@@ -26,6 +26,191 @@ using System.Diagnostics.CodeAnalysis;
 
 public abstract partial class NodeBase
 {
+    #region Parent handling
+
+    /// <inheritdoc />
+    void IWritableNode<INode>.SetParent(INode? parent) =>
+        _parent = parent;
+
+    /// <inheritdoc />
+    bool IWritableNode<INode>.DetachChild(INode child) =>
+        DetachChild(child);
+
+    /// <inheritdoc cref="IWritableNode.DetachChild"/>
+    protected virtual bool DetachChild(INode child) =>
+        _annotations.Remove(child);
+
+    /// <summary>
+    /// Unsets <paramref name="child">child's</paramref> parent, if applicable. 
+    /// Does <i>not</i> update parent's containments.
+    /// </summary>
+    /// <param name="child">Node to unset parent of.</param>
+    protected void SetParentNull(INode? child)
+    {
+        if (child != null)
+            SetParentInternal(child, null);
+    }
+    
+    /// <summary>
+    /// <see cref="DetachChildInternal">Detaches</see> <paramref name="child"/> from its current parent,
+    /// and adds it to <c>this</c> node's containments.
+    /// Does <i>not</i> update parent's containments.
+    /// </summary>
+    /// <param name="child">Node to become a child of <c>this</c> node.</param>
+    protected void AttachChild(IReadableNode? child)
+    {
+        if (child == null)
+            return;
+
+        DetachChildInternal((INode)child);
+        SetParentInternal((INode)child, this);
+    }
+
+    /// <summary>
+    /// Sets <paramref name="child">child's</paramref> parent to <paramref name="parent"/>.
+    /// For some visibility reason, we cannot call <c>child.SetParent(parent)</c> directly at all places.
+    /// Does <i>not</i> update parent's containments.
+    /// </summary>
+    /// <param name="child">Child to set new parent of.</param>
+    /// <param name="parent">New parent to <paramref name="child"/>.</param>
+    /// <seealso cref="IWritableNode.SetParent"/>
+    protected void SetParentInternal(INode child, INode? parent) =>
+        child.SetParent(parent);
+
+    /// <summary>
+    /// Detaches <paramref name="child"/> from its parent, if applicable.
+    /// Updates old parent's containments.
+    /// </summary>
+    /// <param name="child">Child to detach from its parent.</param>
+    /// <seealso cref="IWritableNode.DetachChild"/>
+    protected void DetachChildInternal(INode child)
+    {
+        var parent = child.GetParent();
+        if (parent != null)
+            parent.DetachChild(child);
+    }
+
+    /// <summary>
+    /// Removes all members of <paramref name="list"/> from their old parent, and sets <c>this</c> node as their new parent.
+    /// Updates old parents' containments.
+    /// Does <i>not</i> update new parent's (aka <c>this</c>) containments.
+    /// </summary>
+    /// <param name="list">Nodes that should have <c>this</c> node as parent.</param>
+    /// <param name="link">Origin of <paramref name="list"/>.</param>
+    /// <typeparam name="T">Type of members of <paramref name="list"/>.</typeparam>
+    /// <returns><paramref name="list"/> as new list.</returns>
+    /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
+    protected List<T> SetSelfParent<T>([NotNull] List<T>? list, Link? link) where T : IReadableNode
+    {
+        AssureNotNull(list, link);
+        AssureNotNullMembers(list, link);
+
+        return list.Select(n =>
+        {
+            if (n is INode iNode)
+            {
+                DetachChildInternal(iNode);
+                SetParentInternal(iNode, this);
+            }
+
+            return n;
+        }).ToList();
+    }
+
+    /// <summary>
+    /// Removes <paramref name="node"/> from <paramref name="storage"/>, and sets its parent to <c>null</c>.
+    /// Does <i>not</i> update old parent's containment.
+    /// </summary>
+    /// <param name="node">Node to remove from <paramref name="storage"/>.</param>
+    /// <param name="storage">Storage potentially containing <paramref name="node"/>.</param>
+    /// <param name="link">Origin of <paramref name="storage"/>.</param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
+    /// <returns><c>true</c> if <paramref name="node"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
+    /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
+    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, INotificationId? notificationId = null)
+        where T : class, INode =>
+        RemoveSelfParent(AsList<T>(node, link), storage, link, notificationId: notificationId);
+
+    /// <summary>
+    /// Removes all members of <paramref name="list"/> from <paramref name="storage"/>, and sets their parent to <c>null</c>.
+    /// Does <i>not</i> update old parents' containments.
+    /// </summary>
+    /// <param name="list">Nodes to remove from <paramref name="storage"/>.</param>
+    /// <param name="storage">Storage potentially containing members of <paramref name="list"/>.</param>
+    /// <param name="link">Origin of <paramref name="storage"/>.</param>
+    /// <param name="remover">
+    ///     Optional Action to call for each removed element of <paramref name="list"/>.
+    ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
+    /// </param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
+    /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
+    /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link,
+        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover = null,
+        INotificationId? notificationId = null)
+        where T : IReadableNode
+    {
+        AssureNotNull(list, link);
+        AssureNotNullMembers(list, link);
+
+        var partitionProducer = GetPartitionNotificationProducer();
+
+        bool result = false;
+        foreach (T node in list)
+        {
+            var index = storage.IndexOf(node);
+            if (index < 0)
+                continue;
+
+            storage.RemoveAt(index);
+            result = true;
+            if (node is INode iNode)
+                SetParentInternal(iNode, null);
+            if (partitionProducer != null && remover != null)
+                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Returns <paramref name="storage"/> as non-empty read-only list.
+    /// </summary>
+    /// <param name="storage">list to return.</param>
+    /// <param name="link">Origin of <paramref name="storage"/>.</param>
+    /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
+    /// <returns>Non-empty, read-only view of <paramref name="storage"/>.</returns>
+    /// <exception cref="UnsetFeatureException">If <paramref name="storage"/> is empty.</exception>
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T> storage, Link link) where T : IReadableNode =>
+        storage.Count != 0
+            ? storage.AsReadOnly()
+            : throw new UnsetFeatureException(link);
+
+    /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(IReadOnlyList<T> storage, Link link) where T : IReadableNode =>
+        storage.Count != 0
+            ? storage
+            : throw new UnsetFeatureException(link);
+
+    /// <summary>
+    /// Assures <paramref name="index"/> is in range of <paramref name="storage"/>.
+    /// We need to check this independently of <see cref="List{T}.InsertRange"/>
+    /// to assure we're throwing the correct exception in case multiple exceptions might occur.
+    /// </summary>
+    /// <param name="index">Index to check for.</param>
+    /// <param name="storage">List to check for.</param>
+    /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
+    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is in out of range of <paramref name="storage"/>.</exception>
+    protected void AssureInRange<T>(Index index, IList<T> storage)
+    {
+        if (!IsInRange(index, storage))
+            throw new ArgumentOutOfRangeException(nameof(index), index, null);
+    }
+
     /// <summary>
     /// Assures <paramref name="value"/> is not <c>null</c>.
     /// </summary>
@@ -115,21 +300,6 @@ public abstract partial class NodeBase
         AssureNotNullMembers(safeNodes, link);
     }
 
-    /// <summary>
-    /// Assures <paramref name="index"/> is in range of <paramref name="storage"/>.
-    /// We need to check this independently of <see cref="List{T}.InsertRange"/>
-    /// to assure we're throwing the correct exception in case multiple exceptions might occur.
-    /// </summary>
-    /// <param name="index">Index to check for.</param>
-    /// <param name="storage">List to check for.</param>
-    /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
-    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is in out of range of <paramref name="storage"/>.</exception>
-    protected void AssureInRange<T>(Index index, IList<T> storage)
-    {
-        if (!IsInRange(index, storage))
-            throw new ArgumentOutOfRangeException(nameof(index), index, null);
-    }
-
     protected bool IsInRange<T>(Index index, IList<T> storage) =>
         (uint)index <= (uint)storage.Count;
 
@@ -197,207 +367,6 @@ public abstract partial class NodeBase
     }
 
     /// <summary>
-    /// Unsets <paramref name="child">child's</paramref> parent, if applicable. 
-    /// Does <i>not</i> update parent's containments.
-    /// </summary>
-    /// <param name="child">Node to unset parent of.</param>
-    protected void SetParentNull(INode? child)
-    {
-        if (child != null)
-            SetParentInternal(child, null);
-    }
-
-    /// <summary>
-    /// <see cref="DetachChildInternal">Detaches</see> <paramref name="child"/> from its current parent,
-    /// and adds it to <c>this</c> node's containments.
-    /// Does <i>not</i> update parent's containments.
-    /// </summary>
-    /// <param name="child">Node to become a child of <c>this</c> node.</param>
-    protected void AttachChild(IReadableNode? child)
-    {
-        if (child == null)
-            return;
-
-        DetachChildInternal((INode)child);
-        SetParentInternal((INode)child, this);
-    }
-
-    #region child raw api
-
-    protected bool ExchangeChildRaw(IReadableNode? newValue, IReadableNode? storage)
-    {
-        if (newValue == storage)
-            return false;
-
-        SetParentNull((INode?)storage);
-        AttachChild(newValue);
-        return true;
-    }
-
-    protected bool ExchangeChildrenRaw<T>(List<T> newValue, List<T> storage) where T : IWritableNode
-    {
-        if (storage.SequenceEqual(newValue))
-            return false;
-
-        RemoveSelfParentRaw(storage);
-        storage.Clear();
-        storage.AddRange(SetSelfParentRaw(newValue));
-        return true;
-    }
-
-    private void RemoveSelfParentRaw<T>(List<T> storage) where T : IReadableNode
-    {
-        foreach (T node in storage)
-        {
-            SetParentInternal((INode)node, null);
-        }
-    }
-
-    private List<T> SetSelfParentRaw<T>(List<T> list) where T : IReadableNode
-    {
-        foreach (T n in list)
-        {
-            DetachChildInternal((INode)n);
-            SetParentInternal((INode)n, this);
-        }
-
-        return list;
-    }
-
-    protected bool AddChildRaw<T>(T? newValue, List<T> storage) where T : class, IWritableNode
-    {
-        if (newValue is null || storage.Count != 0 && storage[^1] == newValue)
-            return false;
-
-        AttachChild(newValue);
-        storage.Add(newValue);
-        return true;
-    }
-
-    protected bool InsertChildRaw<T>(Index index, T? newValue, List<T> storage) where T : class, IWritableNode
-    {
-        if (newValue is null || !IsInRange(index, storage) || storage.Count > index && storage[index] == newValue)
-            return false;
-
-        AttachChild(newValue);
-        storage.Insert(index, newValue);
-        return true;
-    }
-
-    protected bool RemoveChildRaw<T>(T? valueToRemove, List<T> current) where T : class, IWritableNode
-    {
-        if (valueToRemove is null)
-            return false;
-
-        if (current.Remove(valueToRemove))
-        {
-            SetParentNull((INode)valueToRemove);
-            return true;
-        }
-
-        return false;
-    }
-
-    #endregion
-
-    #region reference raw
-
-    protected bool SetReferencesRaw(List<ReferenceTarget> targets, List<ReferenceTarget> storage)
-    {
-        if (storage.SequenceEqual(targets))
-            return false;
-        
-        storage.Clear();
-        storage.AddRange(targets);
-        return true;
-    }
-
-    protected bool AddReferencesRaw(ReferenceTarget target, List<ReferenceTarget> storage)
-    {
-        if (target is null)
-            return false;
-        
-        storage.Add(target);
-        return true;
-    }
-
-    protected bool InsertReferencesRaw(Index index, ReferenceTarget target, List<ReferenceTarget> storage)
-    {
-        if (target is null || !IsInRange(index, storage))
-            return false;
-        
-        storage.Insert(index, target);
-        return true;
-    }
-
-    protected bool RemoveReferencesRaw(ReferenceTarget target, List<ReferenceTarget> storage)
-    {
-        if (target is null)
-            return false;
-        
-        var index = storage.FindIndex(r =>
-        {
-            if (target.Target is not null)
-                return Equals(target.Target, r.Target);
-
-            if (target.TargetId is not null)
-                return Equals(target.TargetId, r.TargetId);
-
-            return Equals(target.ResolveInfo, r.ResolveInfo);
-        });
-        if (index < 0)
-            return false;
-
-        storage.RemoveAt(index);
-        return true;
-    }
-
-    #endregion
-
-    /// <summary>
-    /// Sets <paramref name="child">child's</paramref> parent to <paramref name="parent"/>.
-    /// For some visibility reason, we cannot call <c>child.SetParent(parent)</c> directly at all places.
-    /// Does <i>not</i> update parent's containments.
-    /// </summary>
-    /// <param name="child">Child to set new parent of.</param>
-    /// <param name="parent">New parent to <paramref name="child"/>.</param>
-    /// <seealso cref="IWritableNode.SetParent"/>
-    protected void SetParentInternal(INode child, INode? parent) =>
-        child.SetParent(parent);
-
-    /// <summary>
-    /// Detaches <paramref name="child"/> from its parent, if applicable.
-    /// Updates old parent's containments.
-    /// </summary>
-    /// <param name="child">Child to detach from its parent.</param>
-    /// <seealso cref="IWritableNode.DetachChild"/>
-    protected void DetachChildInternal(INode child)
-    {
-        var parent = child.GetParent();
-        if (parent != null)
-            parent.DetachChild(child);
-    }
-
-    /// <summary>
-    /// Returns <paramref name="storage"/> as non-empty read-only list.
-    /// </summary>
-    /// <param name="storage">list to return.</param>
-    /// <param name="link">Origin of <paramref name="storage"/>.</param>
-    /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
-    /// <returns>Non-empty, read-only view of <paramref name="storage"/>.</returns>
-    /// <exception cref="UnsetFeatureException">If <paramref name="storage"/> is empty.</exception>
-    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T> storage, Link link) where T : IReadableNode =>
-        storage.Count != 0
-            ? storage.AsReadOnly()
-            : throw new UnsetFeatureException(link);
-
-    /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(IReadOnlyList<T> storage, Link link) where T : IReadableNode =>
-        storage.Count != 0
-            ? storage
-            : throw new UnsetFeatureException(link);
-
-    /// <summary>
     /// Returns singleton list of <paramref name="node"/>.
     /// </summary>
     /// <param name="node">Node to return in a singleton list.</param>
@@ -411,91 +380,6 @@ public abstract partial class NodeBase
             throw new InvalidValueException(link, node);
 
         return [t];
-    }
-
-    /// <summary>
-    /// Removes all members of <paramref name="list"/> from their old parent, and sets <c>this</c> node as their new parent.
-    /// Updates old parents' containments.
-    /// Does <i>not</i> update new parent's (aka <c>this</c>) containments.
-    /// </summary>
-    /// <param name="list">Nodes that should have <c>this</c> node as parent.</param>
-    /// <param name="link">Origin of <paramref name="list"/>.</param>
-    /// <typeparam name="T">Type of members of <paramref name="list"/>.</typeparam>
-    /// <returns><paramref name="list"/> as new list.</returns>
-    /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected List<T> SetSelfParent<T>([NotNull] List<T>? list, Link? link) where T : IReadableNode
-    {
-        AssureNotNull(list, link);
-        AssureNotNullMembers(list, link);
-
-        return list.Select(n =>
-        {
-            if (n is INode iNode)
-            {
-                DetachChildInternal(iNode);
-                SetParentInternal(iNode, this);
-            }
-
-            return n;
-        }).ToList();
-    }
-
-    /// <summary>
-    /// Removes <paramref name="node"/> from <paramref name="storage"/>, and sets its parent to <c>null</c>.
-    /// Does <i>not</i> update old parent's containment.
-    /// </summary>
-    /// <param name="node">Node to remove from <paramref name="storage"/>.</param>
-    /// <param name="storage">Storage potentially containing <paramref name="node"/>.</param>
-    /// <param name="link">Origin of <paramref name="storage"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
-    /// <returns><c>true</c> if <paramref name="node"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
-    /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
-    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, INotificationId? notificationId = null)
-        where T : class, INode =>
-        RemoveSelfParent(AsList<T>(node, link), storage, link, notificationId: notificationId);
-
-    /// <summary>
-    /// Removes all members of <paramref name="list"/> from <paramref name="storage"/>, and sets their parent to <c>null</c>.
-    /// Does <i>not</i> update old parents' containments.
-    /// </summary>
-    /// <param name="list">Nodes to remove from <paramref name="storage"/>.</param>
-    /// <param name="storage">Storage potentially containing members of <paramref name="list"/>.</param>
-    /// <param name="link">Origin of <paramref name="storage"/>.</param>
-    /// <param name="remover">
-    ///     Optional Action to call for each removed element of <paramref name="list"/>.
-    ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
-    /// </param>
-    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
-    /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
-    /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link,
-        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover = null,
-        INotificationId? notificationId = null)
-        where T : IReadableNode
-    {
-        AssureNotNull(list, link);
-        AssureNotNullMembers(list, link);
-
-        var partitionProducer = GetPartitionNotificationProducer();
-
-        bool result = false;
-        foreach (T node in list)
-        {
-            var index = storage.IndexOf(node);
-            if (index < 0)
-                continue;
-
-            storage.RemoveAt(index);
-            result = true;
-            if (node is INode iNode)
-                SetParentInternal(iNode, null);
-            if (partitionProducer != null && remover != null)
-                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
-        }
-
-        return result;
     }
 
     /// <summary>
