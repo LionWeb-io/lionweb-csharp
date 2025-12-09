@@ -157,7 +157,7 @@ public class KeysMigrationTests
     [TestMethod]
     public async Task Sdt()
     {
-        var input = new SDTConcept("c") { Decimal = new Decimal(3, 5) };
+        var input = new SDTConcept("c") { Decimal = new Decimal() {Frac = 3, Int = 5} };
 
         var output = new MemoryStream();
         var result = await Migrate([input],
@@ -173,7 +173,7 @@ public class KeysMigrationTests
     [TestMethod]
     public async Task Field()
     {
-        var input = new SDTConcept("c") { Decimal = new Decimal(3, 5) };
+        var input = new SDTConcept("c") { Decimal = new Decimal() {Frac = 3, Int = 5} };
 
         var output = new MemoryStream();
         var result = await Migrate([input],
@@ -191,7 +191,7 @@ public class KeysMigrationTests
     [TestMethod]
     public async Task FieldWithEnum()
     {
-        var input = new SDTConcept("c") { Amount = new Amount(Currency.GBP, true, new Decimal(3, 5)) };
+        var input = new SDTConcept("c") { Amount = new Amount{Currency = Currency.GBP, Digital = true, Value = new Decimal() {Frac = 3, Int = 5}} };
 
         var output = new MemoryStream();
         var result = await Migrate([input],

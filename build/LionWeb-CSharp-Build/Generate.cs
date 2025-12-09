@@ -128,7 +128,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         )
     );
 
-    var generationPath = "../../test/LionWeb.Core.Test/Languages/Generated";
+    var generationPath = "../../test/LionWeb.Core.Test.Languages/Generated";
     Directory.CreateDirectory(generationPath);
 
     foreach (var name in names)
