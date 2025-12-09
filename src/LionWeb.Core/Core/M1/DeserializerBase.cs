@@ -163,10 +163,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             return;
 
         var single = containment is Containment { Multiple: false };
-        try
-        {
-            node.SetRaw(containment, single && children.Count == 1 ? children[0] : children);
-        } catch (InvalidValueException)
+        if (!node.SetRaw(containment, single && children.Count == 1 ? children[0] : children))
         {
             List<TChild>? replacement = _handler.InvalidLinkValue(children, containment, node);
             if (replacement != null)
@@ -343,12 +340,11 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             return;
 
         var single = reference is Reference { Multiple: false };
-        try
+        if (!node.SetRaw(reference, single && targets.Count == 1 ? targets[0] : targets))
         {
-            node.SetRaw(reference, single && targets.Count == 1 ? targets[0] : targets);
-        } catch (InvalidValueException)
-        {
-            List<T>? replacement = _handler.InvalidLinkValue(M2Extensions.AsNodes<T>(targets.Select(r => r.Target).Where(t => t is not null), reference).ToList(), reference, node);
+            List<T>? replacement = _handler.InvalidLinkValue(
+                M2Extensions.AsNodes<T>(targets.Select(r => r.Target).Where(t => t is not null), reference).ToList(),
+                reference, node);
             if (replacement != null)
                 node.SetRaw(reference, single ? replacement.FirstOrDefault() : replacement);
         }
