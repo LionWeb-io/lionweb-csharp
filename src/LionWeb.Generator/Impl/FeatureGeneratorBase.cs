@@ -153,17 +153,6 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
             MetaProperty(feature)
         ));
 
-    protected static LocalDeclarationStatementSyntax SafeNodesVariable(ExpressionSyntax init) =>
-        Variable("safeNodes", Var(), init);
-
-    protected static ConditionalAccessExpressionSyntax OptionalNodesToList() =>
-        ConditionalAccessExpression(IdentifierName("nodes"),
-            InvocationExpression(MemberBindingExpression(IdentifierName("ToList")))
-        );
-
-    protected ExpressionStatementSyntax AttachChildCall() =>
-        ExpressionStatement(Call("AttachChild", IdentifierName("value")));
-
     protected ExpressionStatementSyntax AssignFeatureField() =>
         Assignment(FeatureField(feature).ToString(), IdentifierName("value"));
 

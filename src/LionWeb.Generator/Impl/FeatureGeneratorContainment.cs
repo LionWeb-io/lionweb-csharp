@@ -21,7 +21,6 @@ namespace LionWeb.Generator.Impl;
 using Core;
 using Core.M2;
 using Core.M3;
-using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -63,19 +62,6 @@ public class FeatureGeneratorContainment(
                     ExpressionStatement(CallGeneric("SetOptionalSingleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
                     ReturnStatement(This())
                 ], true));
-
-    private LocalDeclarationStatementSyntax SingleContainmentEmitterVariable() =>
-        Variable(
-            "emitter",
-            AsType(typeof(ContainmentSingleNotificationEmitter<>),
-                AsType(containment.GetFeatureType(), writeable: true)),
-            NewCall([
-                MetaProperty(containment),
-                This(),
-                IdentifierName("value"),
-                FeatureField(containment)
-            ])
-        );
 
     private MethodDeclarationSyntax SingleContainmentSetterRaw(bool writeable = false) =>
         Method(FeatureSetRaw(containment).ToString(), AsType(typeof(bool)), [
@@ -185,51 +171,6 @@ public class FeatureGeneratorContainment(
                 Call("RemoveChildRaw", IdentifierName("value"), FeatureField(containment))
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
-
-    private IfStatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes() =>
-        IfStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),
-            AsArguments([IdentifierName("safeNodes")])
-        ), ReturnStatement(This()));
-
-    private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index) =>
-        Variable(
-            "emitter",
-            AsType(typeof(ContainmentAddMultipleNotificationEmitter<>),
-                AsType(containment.GetFeatureType(), writeable: true)),
-            NewCall([
-                MetaProperty(containment),
-                This(),
-                IdentifierName("value"),
-                FeatureField(containment),
-                index
-            ])
-        );
-
-    private ExpressionStatementSyntax AssureNoSelfMoveCall() =>
-        ExpressionStatement(Call("AssureNoSelfMove",
-            IdentifierName("index"),
-            IdentifierName("safeNodes"),
-            FeatureField(containment)
-        ));
-
-    private ExpressionStatementSyntax RequiredRemoveSelfParentCall() =>
-        ExpressionStatement(Call("RemoveSelfParent",
-            IdentifierName("safeNodes"),
-            FeatureField(containment),
-            MetaProperty(containment),
-            CallGeneric("ContainmentRemover", AsType(containment.Type, writeable: true),
-                MetaProperty(containment))
-        ));
-
-    private ExpressionStatementSyntax OptionalRemoveSelfParentCall() =>
-        ExpressionStatement(Call("RemoveSelfParent",
-            OptionalNodesToList(),
-            FeatureField(containment),
-            MetaProperty(containment),
-            CallGeneric("ContainmentRemover", AsType(containment.Type, writeable: true),
-                MetaProperty(containment))
-        ));
 
     private FieldDeclarationSyntax MultipleContainmentField() =>
         Field(FeatureField(containment).ToString(),

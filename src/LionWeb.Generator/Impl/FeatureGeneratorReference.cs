@@ -350,33 +350,6 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
             ))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
-    private ExpressionStatementSyntax AssureNotNullMembersCall() =>
-        ExpressionStatement(Call("AssureNotNullMembers",
-            IdentifierName("safeNodes"),
-            MetaProperty(reference)
-        ));
-
-    private ExpressionStatementSyntax SimpleAddRangeCall() =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
-            AsArguments([IdentifierName("safeNodes")])
-        ));
-
-    private ExpressionStatementSyntax SimpleRemoveAllCall() =>
-        ExpressionStatement(Call(
-            "RemoveAll",
-            IdentifierName("safeNodes"),
-            FeatureField(reference),
-            CallGeneric("ReferenceRemover", AsType(reference.Type), MetaProperty(reference))
-        ));
-
-    private ExpressionStatementSyntax SimpleInsertRangeCall() =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(reference), IdentifierName("InsertRange")),
-            AsArguments(
-                [IdentifierName("index"), IdentifierName("safeNodes")])
-        ));
-
     private FieldDeclarationSyntax MultipleReferenceField() =>
         Field(FeatureField(reference).ToString(),
                 AsType(typeof(List<>),
@@ -441,30 +414,4 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
     private InvocationExpressionSyntax ReferenceTargetNullableTargetsCall() =>
         CallGeneric("ReferenceTargetNullableTargets",
             AsType(reference.GetFeatureType()), FeatureField(reference), MetaProperty(reference));
-
-    private LocalDeclarationStatementSyntax SafeNodesVariableReference() =>
-        SafeNodesVariable(
-            ConditionalAccessExpression(
-                IdentifierName("nodes"),
-                InvocationExpression(
-                    MemberAccess(
-                        InvocationExpression(
-                                MemberBindingExpression(
-                                    IdentifierName("Select")
-                                )
-                            )
-                            .WithArgumentList(
-                                AsArguments([
-                                    MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        IdentifierName("ReferenceTarget"),
-                                        IdentifierName("FromNode")
-                                    )
-                                ])
-                            ),
-                        IdentifierName("ToList")
-                    )
-                )
-            )
-        );
 }

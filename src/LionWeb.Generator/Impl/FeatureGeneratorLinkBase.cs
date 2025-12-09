@@ -61,26 +61,6 @@ public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link,
     private IEnumerable<XmlNodeSyntax> XdocThrowsFeatureNodesEmpty() =>
         XdocThrows($"If both {FeatureProperty(link)} and nodes are empty", AsType(typeof(InvalidValueException)));
 
-    protected ExpressionStatementSyntax AssureNotClearingCall() =>
-        ExpressionStatement(Call("AssureNotClearing",
-            IdentifierName("safeNodes"),
-            FeatureField(link),
-            MetaProperty(link)
-        ));
-
-    protected ExpressionStatementSyntax AssureNonEmptyCall() =>
-        ExpressionStatement(Call("AssureNonEmpty",
-            IdentifierName("safeNodes"),
-            FeatureField(link),
-            MetaProperty(link)
-        ));
-
-    protected ExpressionStatementSyntax AssureInRangeCall() =>
-        ExpressionStatement(Call("AssureInRange",
-            IdentifierName("index"),
-            FeatureField(link)
-        ));
-
     protected InvocationExpressionSyntax AsReadOnlyCall() =>
         InvocationExpression(MemberAccess(FeatureField(link),
             IdentifierName("AsReadOnly")));
@@ -196,14 +176,4 @@ public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link,
 
     private ExpressionSyntax LinkRemove() =>
         LinkRemove(link);
-
-    protected LocalDeclarationStatementSyntax SafeNodesVariable() => 
-        SafeNodesVariable(OptionalNodesToList());
-
-    protected ForEachStatementSyntax LoopOverSafeNodes(IEnumerable<StatementSyntax> loopBody) =>
-        ForEachStatement(
-            type: IdentifierName("var"),
-            identifier: Identifier("value"),
-            expression: IdentifierName("safeNodes"),
-            statement: Block(loopBody));
 }
