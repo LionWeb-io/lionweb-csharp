@@ -3,6 +3,7 @@
 using Core;
 using Core.Test.Languages.Generated.V2023_1.MultiInheritLang;
 using Core.Test.Languages.Generated.V2023_1.TestLanguage;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 
 [TestClass]
@@ -22,13 +23,21 @@ public class GeneratedCSharpSyntaxNodesTests
         };
 
         generator.Generate();
-        
         var cSharpSyntaxNodes = generator.CSharpSyntaxNodes;
-        
+
         Assert.HasCount(3, cSharpSyntaxNodes.OfType<ClassSyntaxNode>());
-        Assert.IsNotNull(cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept)));
-        Assert.IsNotNull(cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept)));
-        Assert.IsNotNull(cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation)));
+
+        var linkTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept));
+        Assert.IsInstanceOfType<ClassSyntaxNode>(linkTestConceptSyntaxNode);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((linkTestConceptSyntaxNode as ClassSyntaxNode)?.ClassDeclarationSyntax);
+
+        var dataTypeTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept));
+        Assert.IsInstanceOfType<ClassSyntaxNode>(dataTypeTestConceptSyntaxNode);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((dataTypeTestConceptSyntaxNode as ClassSyntaxNode)?.ClassDeclarationSyntax);
+
+        var testAnnotationSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation));
+        Assert.IsInstanceOfType<ClassSyntaxNode>(testAnnotationSyntaxNode);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((testAnnotationSyntaxNode as ClassSyntaxNode)?.ClassDeclarationSyntax);
     }
     
     [TestMethod]
@@ -45,11 +54,13 @@ public class GeneratedCSharpSyntaxNodesTests
         };
 
         generator.Generate();
-        
         var cSharpSyntaxNodes = generator.CSharpSyntaxNodes;
         
         Assert.HasCount(1, cSharpSyntaxNodes.OfType<InterfaceSyntaxNode>());
-        Assert.IsNotNull(cSharpSyntaxNodes.Select(node => node.Classifier.Name == nameof(multiInheritLangLanguage.BaseIface)).First());
-        Assert.IsNotNull(cSharpSyntaxNodes.OfType<InterfaceSyntaxNode>().First().InterfaceDeclarationSyntax);
+
+        Assert.IsInstanceOfType<InterfaceSyntaxNode>(cSharpSyntaxNodes.First(node =>
+            node.Classifier.Name == nameof(multiInheritLangLanguage.BaseIface)) as InterfaceSyntaxNode);
+        
+        Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(cSharpSyntaxNodes.OfType<InterfaceSyntaxNode>().First().InterfaceDeclarationSyntax);
     }
 }
