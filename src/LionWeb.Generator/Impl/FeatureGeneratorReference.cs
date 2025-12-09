@@ -71,14 +71,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                     .Xdoc(XdocThrowsIfSetToNull()),
                 TryGet(ReferenceTargetNullableTargetCall(), tryGetReturn),
                 SingleReferenceSetter([
-                    ExpressionStatement(CallGeneric("AssureNotNullInstance",
-                        AsType(reference.GetFeatureType()),
-                        IdentifierName("value"),
-                        MetaProperty(reference)
-                    )),
-                    ReferenceEmitterVariable(),
-                    EmitterCollectOldDataCall(),
-                    EmitterNotifyCallIfRaw(FeatureSetRaw(reference)),
+                    ExpressionStatement(CallGeneric("SetRequiredSingleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
                     ReturnStatement(This())
                 ]),
                 FeatureSetterRaw(AsType(typeof(ReferenceTarget)))
@@ -153,14 +146,7 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
                 SingleOptionalFeatureProperty(getter),
                 TryGet(ReferenceTargetNullableTargetCall(), tryGetReturn),
                 SingleReferenceSetter([
-                    ExpressionStatement(CallGeneric("AssureNullableInstance",
-                        AsType(reference.GetFeatureType()),
-                        IdentifierName("value"),
-                        MetaProperty(reference)
-                    )),
-                    ReferenceEmitterVariable(),
-                    EmitterCollectOldDataCall(),
-                    EmitterNotifyCallIfRaw(FeatureSetRaw(reference)),
+                    ExpressionStatement(CallGeneric("SetOptionalSingleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
                     ReturnStatement(This())
                 ]),
                 FeatureSetterRaw(AsType(typeof(ReferenceTarget)))
@@ -228,50 +214,19 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
             ReferenceRemoverRaw()
         }.Concat(
             LinkAdder([
-                    SafeNodesVariableReference(),
-                    AssureNotNullCall(reference),
-                    AssureNonEmptyCall(),
-                    LoopOverSafeNodes([
-                        AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference),
-                            IdentifierName("Count"))),
-                        EmitterCollectOldDataCall(),
-                        EmitterNotifyCallIfRaw(LinkAddRaw(reference)),
-                    ]),
+                    ExpressionStatement(CallGeneric("AddRequiredMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkAddRaw(reference))),
                     ReturnStatement(This())
                 ])
                 .Select(XdocRequiredAdder)
         ).Concat(
             LinkInserter([
-                    AssureInRangeCall(),
-                    SafeNodesVariableReference(),
-                    AssureNotNullCall(reference),
-                    AssureNonEmptyCall(),
-                    LoopOverSafeNodes([
-                        AddMultipleReferenceEmitterVariable(IdentifierName("index")),
-                        EmitterCollectOldDataCall(),
-                        IfStatement(
-                            InvocationExpression(LinkInsertRaw(reference),
-                                AsArguments([
-                                    PostfixUnaryExpression(SyntaxKind.PostIncrementExpression, IdentifierName("index")),
-                                    IdentifierName("value")
-                                ])),
-                            EmitterNotifyCall()
-                        )
-                    ]),
+                    ExpressionStatement(CallGeneric("InsertRequiredMultipleReference", AsType(reference.Type), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkInsertRaw(reference))),
                     ReturnStatement(This())
                 ])
                 .Select(XdocRequiredInserter)
         ).Concat(
             LinkRemover([
-                    SafeNodesVariable(),
-                    AssureNotNullCall(reference),
-                    AssureNonEmptyCall(),
-                    ExpressionStatement(Call("AssureNotClearing",
-                        IdentifierName("safeNodes"),
-                        ReferenceTargetNullableTargetsCall(),
-                        MetaProperty(reference)
-                    )),
-                    SimpleRemoveAllCall(),
+                    ExpressionStatement(CallGeneric("RemoveRequiredMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkRemoveRaw(reference))),
                     ReturnStatement(This())
                 ])
                 .Select(XdocRequiredRemover)
@@ -363,43 +318,17 @@ public class FeatureGeneratorReference(Classifier classifier, Reference referenc
             }
             .Concat(
                 LinkAdder([
-                    SafeNodesVariableReference(),
-                    AssureNotNullCall(reference),
-                    AssureNotNullMembersCall(),
-                    LoopOverSafeNodes([
-                        AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference),
-                            IdentifierName("Count"))),
-                        EmitterCollectOldDataCall(),
-                        EmitterNotifyCallIfRaw(LinkAddRaw(reference))
-                    ]),
+                    ExpressionStatement(CallGeneric("AddOptionalMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkAddRaw(reference))),
                     ReturnStatement(This())
                 ])
             ).Concat(
                 LinkInserter([
-                    AssureInRangeCall(),
-                    SafeNodesVariableReference(),
-                    AssureNotNullCall(reference),
-                    AssureNotNullMembersCall(),
-                    LoopOverSafeNodes([
-                        AddMultipleReferenceEmitterVariable(IdentifierName("index")),
-                        EmitterCollectOldDataCall(),
-                        IfStatement(
-                            InvocationExpression(LinkInsertRaw(reference),
-                                AsArguments([
-                                    PostfixUnaryExpression(SyntaxKind.PostIncrementExpression, IdentifierName("index")),
-                                    IdentifierName("value")
-                                ])),
-                            EmitterNotifyCall()
-                        )
-                    ]),
+                    ExpressionStatement(CallGeneric("InsertOptionalMultipleReference", AsType(reference.Type), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkInsertRaw(reference))),
                     ReturnStatement(This())
                 ])
             ).Concat(
                 LinkRemover([
-                    SafeNodesVariable(),
-                    AssureNotNullCall(reference),
-                    AssureNotNullMembersCall(),
-                    SimpleRemoveAllCall(),
+                    ExpressionStatement(CallGeneric("RemoveOptionalMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkRemoveRaw(reference))),
                     ReturnStatement(This())
                 ])
             );

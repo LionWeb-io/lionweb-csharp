@@ -363,4 +363,202 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     /// <returns>This node's <see cref="IPartitionNotificationProducer"/>, if available.</returns>
     protected virtual IPartitionNotificationProducer? GetPartitionNotificationProducer() =>
         this.GetPartition()?.GetNotificationProducer();
+
+    protected void AddOptionalMultipleContainment<T>(IEnumerable<T> nodes, Containment containment, List<T> storage,
+        Func<T, bool> adder) where T : INode
+    {
+        var safeNodes = nodes?.ToList();
+        AssureNotNull(safeNodes, containment);
+        AssureNotNullMembers(safeNodes, containment);
+        if (storage.SequenceEqual(safeNodes))
+            return;
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, null);
+            emitter.CollectOldData();
+            if (adder(value))
+                emitter.Notify();
+        }
+    }
+
+    protected void InsertOptionalMultipleContainment<T>(int index, IEnumerable<T> nodes, Containment containment,List<T> storage, 
+        Func<int, T?, bool> inserter) where T : INode
+    {
+        AssureInRange(index, storage);
+        var safeNodes = nodes?.ToList();
+        AssureNotNull(safeNodes, containment);
+        AssureNoSelfMove(index, safeNodes, storage);
+        AssureNotNullMembers(safeNodes, containment);
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, index);
+            emitter.CollectOldData();
+            if (inserter(index++, value))
+                emitter.Notify();
+        }
+    }
+
+    protected void RemoveOptionalMultipleContainment<T>(IEnumerable<T>? nodes, Containment containment,
+        List<T> storage, Func<T?, bool> remover) where T : INode
+    {
+        RemoveSelfParent(nodes?.ToList(), storage, containment, ContainmentRemover<T>(containment));
+    }
+
+    protected void AddRequiredMultipleContainment<T>(IEnumerable<T>? nodes, Containment containment, List<T> storage, Func<T, bool> adder) where T : INode
+    {
+        var safeNodes = nodes?.ToList();
+        AssureNonEmpty(safeNodes, storage, containment);
+        if (storage.SequenceEqual(safeNodes))
+            return;
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, null);
+            emitter.CollectOldData();
+            if (adder(value))
+                emitter.Notify();
+        }
+    }
+
+    protected void InsertRequiredMultipleContainment<T>(int index, IEnumerable<T>? nodes, Containment containment, List<T> storage,
+        Func<int, T, bool> inserter) where T : INode
+    {
+        AssureInRange(index, storage);
+        var safeNodes = nodes?.ToList();
+        AssureNonEmpty(safeNodes, storage, containment);
+        AssureNoSelfMove(index, safeNodes, storage);
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, index);
+            emitter.CollectOldData();
+            if (inserter(index++, value))
+                emitter.Notify();
+        }
+    }
+    
+    protected void RemoveRequiredMultipleContainment<T>(IEnumerable<T>? nodes, Containment containment,
+        List<T> storage, Func<T?, bool> remover) where T : INode
+    {
+        var safeNodes = nodes?.ToList();
+        AssureNotNull(safeNodes, containment);
+        AssureNotClearing(safeNodes, storage, containment);
+        RemoveSelfParent(safeNodes, storage, containment, ContainmentRemover<T>(containment));
+    }
+
+    protected void SetRequiredSingleContainment<T>(T value, Containment containment, T? storage,
+        Func<T?, bool> setter) where T : INode
+    {
+        AssureNotNull(value, containment);
+        ContainmentSingleNotificationEmitter<T> emitter = new(containment, this, value, storage);
+        emitter.CollectOldData();
+        if (setter(value))
+            emitter.Notify();
+    }
+
+    protected void SetOptionalSingleContainment<T>(T? value, Containment containment, T? storage,
+        Func<T?, bool> setter) where T : INode
+    {
+        ContainmentSingleNotificationEmitter<T> emitter = new(containment, this, value, storage);
+        emitter.CollectOldData();
+        if (setter(value))
+            emitter.Notify();
+    }
+
+    protected void SetOptionalSingleReference<T>(ReferenceTarget? value, Reference reference, ReferenceTarget? storage,
+        Func<ReferenceTarget?, bool> setter) where T : IReadableNode
+    {
+        AssureNullableInstance<T>(value, reference);
+        ReferenceSingleNotificationEmitter<T> emitter = new(reference, this, value, storage);
+        emitter.CollectOldData();
+        if (setter(value))
+            emitter.Notify();
+    }
+
+    protected void AddOptionalMultipleReference<T>(IEnumerable<T>? nodes, Reference reference, List<ReferenceTarget> storage, Func<ReferenceTarget, bool> adder) where T : IReadableNode
+    {
+        var safeNodes = nodes?.Select(node => ReferenceTarget.FromNode(node)).ToList();
+        AssureNotNull(safeNodes, reference);
+        AssureNotNullMembers(safeNodes, reference);
+        foreach (var value in safeNodes)
+        {
+            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, storage.Count);
+            emitter.CollectOldData();
+            if (adder(value))
+                emitter.Notify();
+        }
+    }
+
+    protected void InsertOptionalMultipleReference<T>(int index, IEnumerable<T>? nodes, Reference reference, List<ReferenceTarget> storage,
+        Func<int, ReferenceTarget, bool> inserter) where T : IReadableNode
+    {
+        AssureInRange(index, storage);
+        var safeNodes = nodes?.Select(node => ReferenceTarget.FromNode(node)).ToList();
+        AssureNotNull(safeNodes, reference);
+        AssureNotNullMembers(safeNodes, reference);
+        foreach (var value in safeNodes)
+        {
+            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, index);
+            emitter.CollectOldData();
+            if (inserter(index++, value))
+                emitter.Notify();
+        }
+    }
+    
+    protected void RemoveOptionalMultipleReference<T>(IEnumerable<T>? nodes, Reference reference,
+        List<ReferenceTarget> storage, Func<ReferenceTarget, bool> remover) where T : IReadableNode
+    {
+        var safeNodes = nodes?.ToList();
+        AssureNotNull(safeNodes, reference);
+        AssureNotNullMembers(safeNodes, reference);
+        RemoveAll(safeNodes, storage, ReferenceRemover<T>(reference));
+    }
+
+    protected void SetRequiredSingleReference<T>(ReferenceTarget? value, Reference reference, ReferenceTarget? storage,
+        Func<ReferenceTarget?, bool> setter) where T : IReadableNode
+    {
+        AssureNotNullInstance<T>(value, reference);
+        ReferenceSingleNotificationEmitter<T> emitter = new(reference, this, value, storage);
+        emitter.CollectOldData();
+        if (setter(value))
+            emitter.Notify();
+    }
+
+    protected void AddRequiredMultipleReference<T>(IEnumerable<T> nodes, Reference reference, List<ReferenceTarget> storage, Func<ReferenceTarget, bool> adder) where T : IReadableNode
+    {
+        var safeNodes = nodes?.Select(node => ReferenceTarget.FromNode(node)).ToList();
+        AssureNotNull(safeNodes, reference);
+        AssureNonEmpty(safeNodes, storage, reference);
+        foreach (var value in safeNodes)
+        {
+            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, storage.Count);
+            emitter.CollectOldData();
+            if (adder(value))
+                emitter.Notify();
+        }
+    }
+
+    protected void InsertRequiredMultipleReference<T>(int index, IEnumerable<T> nodes, Reference reference, List<ReferenceTarget> storage,
+        Func<int, ReferenceTarget, bool> inserter) where T : IReadableNode
+    {
+        AssureInRange(index, storage);
+        var safeNodes = nodes?.Select(node => ReferenceTarget.FromNode(node)).ToList();
+        AssureNotNull(safeNodes, reference);
+        AssureNonEmpty(safeNodes, storage, reference);
+        foreach (var value in safeNodes)
+        {
+            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, index);
+            emitter.CollectOldData();
+            if (inserter(index++, value))
+                emitter.Notify();
+        }
+    }
+    
+    protected void RemoveRequiredMultipleReference<T>(IEnumerable<T>? nodes, Reference reference,
+        List<ReferenceTarget> storage, Func<ReferenceTarget, bool> remover) where T : IReadableNode
+    {
+        var safeNodes = nodes?.ToList();
+        AssureNotNull(safeNodes, reference);
+        AssureNonEmpty(safeNodes, storage, reference);
+        AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<T>(storage, reference), reference);
+        RemoveAll(safeNodes, storage, ReferenceRemover<T>(reference));
+    }
 }
