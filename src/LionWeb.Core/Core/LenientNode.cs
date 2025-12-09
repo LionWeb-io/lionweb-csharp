@@ -209,19 +209,54 @@ public class LenientNode : NodeBase, INode
     }
 
     protected internal override bool TryGetPropertyRaw(Property property, out object? value) =>
-        base.TryGetPropertyRaw(property, out value);
+        TryGetRaw(property, out value);
 
-    protected internal override bool TryGetContainmentRaw(Containment containment, out IReadableNode? node) =>
-        base.TryGetContainmentRaw(containment, out node);
+    protected internal override bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
+    {
+        if (TryGetRaw(containment, out var v) && v is null or IReadableNode)
+        {
+            node = (IReadableNode?)v;
+            return true;
+        }
 
-    protected internal override bool TryGetContainmentsRaw(Containment containment,
-        out IReadOnlyList<IReadableNode> nodes) => base.TryGetContainmentsRaw(containment, out nodes);
+        node = null;
+        return false;
+    }
 
-    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target) =>
-        base.TryGetReferenceRaw(reference, out target);
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (TryGetRaw(containment, out var v) && v is IReadOnlyList<IReadableNode> l)
+        {
+            nodes = l;
+            return true;
+        }
 
-    protected internal override bool TryGetReferencesRaw(Reference reference,
-        out IReadOnlyList<IReferenceTarget> targets) => base.TryGetReferencesRaw(reference, out targets);
+        nodes = null;
+        return false;
+    }
+
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)    {
+        if (TryGetRaw(reference, out var v) && v is null or IReferenceTarget)
+        {
+            target = (IReferenceTarget?)v;
+            return true;
+        }
+
+        target = null;
+        return false;
+    }
+
+
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)    {
+        if (TryGetRaw(reference, out var v) && v is IReadOnlyList<IReferenceTarget> l)
+        {
+            targets = l;
+            return true;
+        }
+
+        targets = null;
+        return false;
+    }
 
     /// <summary>
     /// <see cref="IWritableNode.Set"/> never fails, it accepts any feature and feature value that makes sense in LW context.
@@ -463,6 +498,16 @@ public class LenientNode : NodeBase, INode
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
     }
 
+    /// <inheritdoc cref="IWritableNodeRaw.AddAnnotationsRaw"/>
+    protected internal override bool AddAnnotationsRaw(IWritableNode annotation)
+    {
+        var node = (INode)annotation;
+        AttachChild(node);
+
+        _annotations.Add(node);
+        return true;
+    }
+
     /// <inheritdoc />
     public override void InsertAnnotations(Index index, IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
@@ -470,7 +515,7 @@ public class LenientNode : NodeBase, INode
         var safeAnnotations = annotations?.ToList();
         _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
     }
-
+    
     /// <inheritdoc />
     public override bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null, null);

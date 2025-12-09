@@ -24,6 +24,9 @@ public abstract class DynamicLanguageEntity : DynamicIKeyed, LanguageEntity
     protected DynamicLanguageEntity(NodeId id, LionWebVersions lionWebVersion, DynamicLanguage? language)
         : base(id, lionWebVersion)
     {
-        _parent = language;
+        if (language is null)
+            return;
+
+        language.AddEntitiesRaw(this);
     }
 }

@@ -126,7 +126,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         AddAnnotationsRaw(annotation);
 
     /// <inheritdoc cref="IWritableNodeRaw.AddAnnotationsRaw"/>
-    protected internal bool AddAnnotationsRaw(IWritableNode annotation)
+    protected internal virtual bool AddAnnotationsRaw(IWritableNode annotation)
     {
         if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
