@@ -66,7 +66,12 @@ public class ClassifierGenerator(
                 }
 
             case Interface i:
-                return ClassifierInterface(i);
+                {
+                    var interfaceDeclarationSyntax = ClassifierInterface(i);
+                    cSharpSyntaxNodes.Add(new InterfaceSyntaxNode(i, interfaceDeclarationSyntax));
+                    return interfaceDeclarationSyntax;
+                }
+                
             default:
                 throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier));
         }

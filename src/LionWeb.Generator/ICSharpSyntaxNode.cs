@@ -25,11 +25,25 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 /// </summary>
 public interface ICSharpSyntaxNode
 {
+    Classifier Classifier { get; }
 }
 
 /// <summary>
-/// Record for holding <see cref="ClassDeclarationSyntax"/> of <see cref="Concept"/> and <see cref="Annotation"/> type of classifiers.
+/// Record for holding <see cref="ClassDeclarationSyntax"/> of <see cref="Concept"/> and <see cref="Annotation"/> type of classifier.
 /// </summary>
 public record ClassSyntaxNode(
-    Classifier Classifier,
-    ClassDeclarationSyntax ClassDeclarationSyntax) : ICSharpSyntaxNode;
+    Classifier ClassifierType,
+    ClassDeclarationSyntax ClassDeclarationSyntax) : ICSharpSyntaxNode
+{
+    public Classifier Classifier => ClassifierType;
+};
+
+/// <summary>
+/// Record for holding <see cref="InterfaceDeclarationSyntax"/> of <see cref="Interface"/> type of classifier.
+/// </summary>
+public record InterfaceSyntaxNode(
+    Classifier ClassifierType,
+    InterfaceDeclarationSyntax InterfaceDeclarationSyntax) : ICSharpSyntaxNode
+{
+    public Classifier Classifier => ClassifierType;
+};
