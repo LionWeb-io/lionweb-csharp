@@ -79,11 +79,12 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                 case not null when old.Parent == DestinationParent && old.Containment == Containment:
                     if (old.Index < _newIndex)
                         _newIndex--;
-                    if (old.Index != _newIndex)
-                    {
-                        ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added, DestinationParent,
-                            old.Containment, old.Index, GetNotificationId()));
-                    }
+                    if (old.Index == _newIndex)
+                        break;
+                    
+                    ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added,
+                        DestinationParent,
+                        old.Containment, old.Index, GetNotificationId()));
 
                     break;
 

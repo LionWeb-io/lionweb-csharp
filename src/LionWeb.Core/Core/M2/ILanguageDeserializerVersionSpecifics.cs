@@ -186,13 +186,13 @@ internal abstract class ContainmentsInstallerBase(
         switch (_node)
         {
             case DynamicClassifier classifier:
-                classifier.AddFeatures(Lookup<Feature>(LionCore.Classifier_features));
+                classifier.SetFeaturesRaw(Lookup<DynamicFeature>(LionCore.Classifier_features).ToList());
                 return;
             case DynamicEnumeration enumeration:
-                enumeration.AddLiterals(Lookup<EnumerationLiteral>(LionCore.Enumeration_literals));
+                enumeration.SetLiteralsRaw(Lookup<DynamicEnumerationLiteral>(LionCore.Enumeration_literals).ToList());
                 return;
             case DynamicLanguage language:
-                language.AddEntities(Lookup<LanguageEntity>(LionCore.Language_entities));
+                language.SetEntitiesRaw(Lookup<DynamicLanguageEntity>(LionCore.Language_entities).ToList());
                 return;
             case DynamicEnumerationLiteral or DynamicPrimitiveType or DynamicFeature:
                 return;

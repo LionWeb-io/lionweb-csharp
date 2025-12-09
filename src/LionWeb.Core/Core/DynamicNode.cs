@@ -151,7 +151,7 @@ public class DynamicNode : NodeBase
     /// <inheritdoc />
     protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
     {
-        if (_settings.TryGetValue(reference, out var value) && value is null or IReadableNode)
+        if (_settings.TryGetValue(reference, out var value) && value is null or IReferenceTarget)
         {
             target = (IReferenceTarget?)value;
             return true;

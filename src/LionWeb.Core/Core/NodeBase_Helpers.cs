@@ -257,11 +257,8 @@ public abstract partial class NodeBase
     {
         foreach (T n in list)
         {
-            if (n.GetParent() != this)
-            {
-                DetachChildInternal((INode)n);
-                SetParentInternal((INode)n, this);
-            }
+            DetachChildInternal((INode)n);
+            SetParentInternal((INode)n, this);
         }
 
         return list;
