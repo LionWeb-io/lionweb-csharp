@@ -61,6 +61,21 @@ public abstract class ClassifierBase<TLanguage>(NodeId id, TLanguage parent)
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+        
+        if (_m3.Classifier_features.EqualsIdentity(containment) && ((Classifier)this).TryGetFeatures(out var features))
+        {
+            nodes = features;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<Feature> Features => FeaturesLazy.Value;
 
     /// <inheritdoc cref="Features"/>

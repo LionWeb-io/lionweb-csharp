@@ -71,6 +71,21 @@ public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, Struct
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+        
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment) && ((StructuredDataType)this).TryGetFields(out var fields))
+        {
+            nodes = fields;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<Field> Fields => FieldsLazy.Value;
 
     /// <inheritdoc cref="Fields"/>

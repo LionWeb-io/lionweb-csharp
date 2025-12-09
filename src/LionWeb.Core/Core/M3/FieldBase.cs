@@ -71,6 +71,21 @@ public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+        
+        if (_m3.Field_type.EqualsIdentity(reference) && ((Field)this).TryGetType(out var type))
+        {
+            target = ReferenceTarget.FromNode(type);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     public required Datatype Type { get; init; }
 
     /// <inheritdoc />
