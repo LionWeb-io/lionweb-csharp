@@ -45,8 +45,8 @@ public abstract partial class NodeBase
             
             case (Reference { Multiple: true } f, IEnumerable<IReferenceTarget> v):
                 return TryGetReferencesRaw(f, out var deletedTargets)
-                       && deletedTargets.All(d => RemoveReferencesRaw(f, (ReferenceTarget)d))
-                       && v.All(a => AddReferencesRaw(f, (ReferenceTarget)a));
+                       && deletedTargets.ToList().All(d => RemoveReferencesRaw(f, (ReferenceTarget)d))
+                       && v.ToList().All(a => AddReferencesRaw(f, (ReferenceTarget)a));
             
             default:
                 return false;

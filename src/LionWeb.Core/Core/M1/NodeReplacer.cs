@@ -47,9 +47,12 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
         else
             ReplaceContainment();
 
+        Success = true;
         return replacement;
     }
 
+    public bool Success { get; private set; } = false;
+    
     protected virtual void InitFields()
     {
         _containment = _parent.GetContainmentOf(self)!;

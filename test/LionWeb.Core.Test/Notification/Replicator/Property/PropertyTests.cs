@@ -49,14 +49,6 @@ public class PropertyTests : ReplicatorTestsBase
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
-    /// <summary>
-    /// TODO:
-    /// This one is open to debate whether it's a bug:
-    /// If we get a notification that would not be possible in our implementation, do we want to execute it?
-    /// In general the answer is yes, because otherwise our model is out-of-sync.
-    /// In this specific case, we had a slight chance to get away with it,
-    /// as messing with properties has little side effects.
-    /// </summary>
     [TestMethod]
     public void PropertyDeleted_required_single_containment()
     {
@@ -75,10 +67,12 @@ public class PropertyTests : ReplicatorTestsBase
         var notification = new PropertyDeletedNotification(coord, TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, x, 
             new NumericNotificationId("propertyDeletedNotification", 0));
 
-        Assert.ThrowsExactly<InvalidValueException>(() =>
+        CreatePartitionReplicator(clonedPartition, notification);
+        
+        var expected = new TestPartition("a")
         {
-            CreatePartitionReplicator(clonedPartition, notification);
-        });
-
+            Data = new DataTypeTestConcept("coord")
+        };
+        AssertEquals([expected], [clonedPartition]);
     }
 }
