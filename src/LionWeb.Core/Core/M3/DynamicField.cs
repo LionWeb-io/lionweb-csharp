@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M3;
 
 using Notification;
+using Utilities;
 
 /// <inheritdoc cref="Field"/>
 public class DynamicField : DynamicIKeyed, Field
@@ -31,7 +32,7 @@ public class DynamicField : DynamicIKeyed, Field
     public DynamicField(NodeId id, LionWebVersions lionWebVersion, DynamicStructuredDataType? structuredDataType)
         : base(id, lionWebVersion)
     {
-        structuredDataType?.AddFields([this]);
+        structuredDataType?.AddFieldsRaw(this);
         _parent = structuredDataType;
     }
 
@@ -67,6 +68,36 @@ public class DynamicField : DynamicIKeyed, Field
         if (_m3.Field_type == feature)
         {
             result = Type;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+        
+        if (_m3.Field_type.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(_type);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetReferenceRaw(Reference reference, ReferenceTarget? target)
+    {
+        if (base.SetReferenceRaw(reference, target))
+            return true;
+        
+        if (_m3.Field_type.EqualsIdentity(reference) && target?.Target is Datatype type)
+        {
+            _type = type;
             return true;
         }
 

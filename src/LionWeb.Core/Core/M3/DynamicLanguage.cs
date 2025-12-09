@@ -20,8 +20,10 @@ namespace LionWeb.Core.M3;
 using M2;
 using Notification;
 using Notification.Partition;
+using Notification.Partition.Emitter;
 using Notification.Pipe;
 using System.Collections;
+using System.Collections.Immutable;
 using Utilities;
 
 /// <inheritdoc cref="Language"/>
@@ -46,22 +48,53 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
         return version != null;
     }
 
-    private readonly List<LanguageEntity> _entities = [];
+    private readonly List<DynamicLanguageEntity> _entities = [];
 
     /// <inheritdoc />
     public IReadOnlyList<LanguageEntity> Entities => _entities.AsReadOnly();
 
     /// <inheritdoc cref="Entities"/>
-    public void AddEntities(IEnumerable<LanguageEntity> entities) =>
-        _entities.AddRange(SetSelfParent(entities?.ToList(), _m3.Language_entities));
-  
+    public void AddEntities(IEnumerable<DynamicLanguageEntity> entities)
+    {
+        var safeNodes = entities?.ToList();
+        AssureNotNull(safeNodes, _m3.Language_entities);
+        AssureNotNullMembers(safeNodes, _m3.Language_entities);
+        if (_entities.SequenceEqual(safeNodes))
+            return;
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<DynamicLanguageEntity> emitter = new(_m3.Language_entities, this, value, _entities, null);
+            emitter.CollectOldData();
+            if (AddEntitiesRaw(value))
+                emitter.Notify();
+        }
+    }
+
     /// <inheritdoc cref="Entities"/>
-    public void InsertEntities(Index index, IEnumerable<LanguageEntity> entities) =>
-        _entities.InsertRange(index, SetSelfParent(entities?.ToList(), _m3.Language_entities));
-    
+    public void InsertEntities(Index index, IEnumerable<DynamicLanguageEntity> entities)
+    {
+        AssureInRange(index, _entities);
+        var safeNodes = entities?.ToList();
+        AssureNotNull(safeNodes, _m3.Language_entities);
+        AssureNoSelfMove(index, safeNodes, _entities);
+        AssureNotNullMembers(safeNodes, _m3.Language_entities);
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<DynamicLanguageEntity> emitter = new(_m3.Language_entities, this, value, _entities, index);
+            emitter.CollectOldData();
+            if (InsertEntitiesRaw(index++, value))
+                emitter.Notify();
+        }
+    }
+
     /// <inheritdoc cref="Entities"/>
-    public void RemoveEntities(IEnumerable<LanguageEntity> entities) =>
+    public void RemoveEntities(IEnumerable<DynamicLanguageEntity> entities) =>
         RemoveSelfParent(entities?.ToList(), _entities, _m3.Language_entities);
+    
+    protected internal bool SetEntitiesRaw(List<DynamicLanguageEntity> nodes) => ExchangeChildrenRaw(nodes, _entities);
+    protected internal bool AddEntitiesRaw(DynamicLanguageEntity? value) => AddChildRaw(value, _entities);
+    private bool InsertEntitiesRaw(int index, DynamicLanguageEntity? value) => InsertChildRaw(index, value, _entities);
+    private bool RemoveEntitiesRaw(DynamicLanguageEntity? value) => RemoveChildRaw(value, _entities);
     
     private readonly List<Language> _dependsOn = [];
 
@@ -113,7 +146,7 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         var containment = GetContainmentOf(child);
         if (containment == _m3.Language_entities)
-            return _entities.Remove((LanguageEntity)child);
+            return _entities.Remove((DynamicLanguageEntity)child);
 
         return false;
     }
@@ -167,6 +200,153 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_m3.Language_version.EqualsIdentity(property))
+        {
+            value = _version;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {  
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+
+        if (_m3.Language_entities.EqualsIdentity(containment))
+        {
+            nodes = _entities;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+
+        if (_m3.Language_dependsOn.EqualsIdentity(reference))
+        {
+            targets = _dependsOn.Select(ReferenceTarget.FromNode).ToImmutableList();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetPropertyRaw(Property property, object? value)
+    {
+        if (base.SetPropertyRaw(property, value))
+            return true;
+        
+        if (_m3.Language_version.EqualsIdentity(property) && value is null or string)
+        {
+            _version = (string?)value;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.AddContainmentsRaw(containment, node))
+            return true;
+        
+        if (_m3.Language_entities.EqualsIdentity(containment) && node is DynamicLanguageEntity entity)
+        {
+            return AddEntitiesRaw(entity);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (base.AddReferencesRaw(reference, target))
+            return true;
+        
+        if (_m3.Language_dependsOn.EqualsIdentity(reference)&& target.Target is Language language)
+        {
+            _dependsOn.Add(language);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node)
+    {
+        if (base.InsertContainmentsRaw(containment, index, node))
+            return true;
+        
+        if (_m3.Language_entities.EqualsIdentity(containment) && node is DynamicLanguageEntity entity)
+        {
+            return InsertEntitiesRaw(index, entity);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target)
+    {
+        if (base.InsertReferencesRaw(reference, index, target))
+            return true;
+        
+        if (_m3.Language_dependsOn.EqualsIdentity(reference)&& target.Target is Language language)
+        {
+            _dependsOn.Insert(index, language);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.RemoveContainmentsRaw(containment, node))
+            return true;
+        
+        if (_m3.Language_entities.EqualsIdentity(containment) && node is DynamicLanguageEntity entity)
+        {
+            return RemoveEntitiesRaw(entity);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (base.RemoveReferencesRaw(reference, target))
+            return true;
+        
+        if (_m3.Language_dependsOn.EqualsIdentity(reference)&& target.Target is Language language)
+        {
+            return _dependsOn.Remove(language);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         var result = base.SetInternal(feature, value);
@@ -191,7 +371,7 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
             {
                 case IEnumerable e:
                     RemoveSelfParent(_entities?.ToList(), _entities, _m3.Language_entities);
-                    AddEntities(e.OfType<LanguageEntity>().ToArray());
+                    AddEntities(e.OfType<DynamicLanguageEntity>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);
@@ -222,7 +402,7 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         if (_m3.Language_entities.EqualsIdentity(link))
         {
-            AddEntities(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
+            AddEntities(_m3.Language_entities.AsNodes<DynamicLanguageEntity>(nodes).ToList());
             return true;
         }
 
@@ -243,7 +423,7 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         if (_m3.Language_entities.EqualsIdentity(link))
         {
-            InsertEntities(index, _m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
+            InsertEntities(index, _m3.Language_entities.AsNodes<DynamicLanguageEntity>(nodes).ToList());
             return true;
         }
         
@@ -264,7 +444,7 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
         
         if (_m3.Language_entities.EqualsIdentity(link))
         {
-            RemoveEntities(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
+            RemoveEntities(_m3.Language_entities.AsNodes<DynamicLanguageEntity>(nodes).ToList());
             return true;
         }
         

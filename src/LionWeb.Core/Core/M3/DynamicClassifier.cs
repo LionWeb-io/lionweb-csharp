@@ -18,21 +18,41 @@
 namespace LionWeb.Core.M3;
 
 using Notification;
+using Notification.Partition.Emitter;
 using System.Collections;
+using Utilities;
 
 /// <inheritdoc cref="Classifier"/>
 public abstract class DynamicClassifier(NodeId id, LionWebVersions lionWebVersion, DynamicLanguage? language)
     : DynamicLanguageEntity(id, lionWebVersion, language), Classifier
 {
-    private readonly List<Feature> _features = [];
+    private readonly List<DynamicFeature> _features = [];
 
     /// <inheritdoc />
     public IReadOnlyList<Feature> Features => _features.AsReadOnly();
 
     /// <inheritdoc cref="Features"/>
-    public void AddFeatures(IEnumerable<Feature> features) =>
-        _features.AddRange(SetSelfParent(features?.ToList(), _m3.Classifier_features));
+    public void AddFeatures(IEnumerable<DynamicFeature> features)
+    {
+        var safeNodes = features?.ToList();
+        AssureNotNull(safeNodes, _m3.Classifier_features);
+        AssureNotNullMembers(safeNodes, _m3.Classifier_features);
+        if (_features.SequenceEqual(safeNodes))
+            return;
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<DynamicFeature> emitter = new(_m3.Classifier_features, this, value, _features, null);
+            emitter.CollectOldData();
+            if (AddFeaturesRaw(value))
+                emitter.Notify();
+        }
+    }
 
+    protected internal bool SetFeaturesRaw(List<DynamicFeature> nodes) => ExchangeChildrenRaw(nodes, _features);
+    protected internal bool AddFeaturesRaw(DynamicFeature? value) => AddChildRaw(value, _features);
+    private bool InsertFeaturesRaw(int index, DynamicFeature? value) => InsertChildRaw(index, value, _features);
+    private bool RemoveFeaturesRaw(DynamicFeature? value) => RemoveChildRaw(value, _features);
+    
     /// <inheritdoc />
     protected override bool DetachChild(INode child)
     {
@@ -43,7 +63,7 @@ public abstract class DynamicClassifier(NodeId id, LionWebVersions lionWebVersio
 
         var c = GetContainmentOf(child);
         if (c == _m3.Classifier_features)
-            return _features.Remove((Feature)child);
+            return _features.Remove((DynamicFeature)child);
 
         return false;
     }
@@ -83,6 +103,63 @@ public abstract class DynamicClassifier(NodeId id, LionWebVersions lionWebVersio
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+        
+        if (_m3.Classifier_features.EqualsIdentity(containment))
+        {
+            nodes = _features;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.AddContainmentsRaw(containment, node))
+            return true;
+        
+        if (_m3.Classifier_features.EqualsIdentity(containment)&& node is DynamicFeature feature)
+        {
+            return AddFeaturesRaw(feature);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node)
+    {
+        if (base.InsertContainmentsRaw(containment, index, node))
+            return true;
+        
+        if (_m3.Classifier_features.EqualsIdentity(containment)&& node is DynamicFeature feature)
+        {
+            return InsertFeaturesRaw(index, feature);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.RemoveContainmentsRaw(containment, node))
+            return true;
+        
+        if (_m3.Classifier_features.EqualsIdentity(containment)&& node is DynamicFeature feature)
+        {
+            return RemoveFeaturesRaw(feature);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         var result = base.SetInternal(feature, value);
@@ -97,7 +174,7 @@ public abstract class DynamicClassifier(NodeId id, LionWebVersions lionWebVersio
             {
                 case IEnumerable e:
                     RemoveSelfParent(_features?.ToList(), _features, _m3.Classifier_features);
-                    AddFeatures(e.OfType<Feature>().ToArray());
+                    AddFeatures(e.OfType<DynamicFeature>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);

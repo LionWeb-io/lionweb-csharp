@@ -18,7 +18,9 @@
 namespace LionWeb.Core.M3;
 
 using Notification;
+using Notification.Partition.Emitter;
 using System.Collections;
+using Utilities;
 
 /// <inheritdoc cref="StructuredDataType"/>
 public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion, DynamicLanguage? language)
@@ -27,14 +29,32 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     /// <inheritdoc />
     protected override ILionCoreLanguageWithStructuredDataType _m3 => (ILionCoreLanguageWithStructuredDataType)base._m3;
 
-    private readonly List<Field> _fields = [];
+    private readonly List<DynamicField> _fields = [];
 
     /// <inheritdoc />
     public IReadOnlyList<Field> Fields => _fields.AsReadOnly();
 
     /// <inheritdoc cref="Fields"/>
-    public void AddFields(IEnumerable<Field> fields) =>
-        _fields.AddRange(SetSelfParent(fields?.ToList(), _m3.StructuredDataType_fields));
+    public void AddFields(IEnumerable<DynamicField> fields)
+    {
+        var safeNodes = fields?.ToList();
+        AssureNotNull(safeNodes, _m3.StructuredDataType_fields);
+        AssureNotNullMembers(safeNodes, _m3.StructuredDataType_fields);
+        if (_fields.SequenceEqual(safeNodes))
+            return;
+        foreach (var value in safeNodes)
+        {
+            ContainmentAddMultipleNotificationEmitter<DynamicField> emitter = new(_m3.StructuredDataType_fields, this, value, _fields, null);
+            emitter.CollectOldData();
+            if (AddFieldsRaw(value))
+                emitter.Notify();
+        }
+    }
+
+    protected internal bool SetFieldsRaw(List<DynamicField> nodes) => ExchangeChildrenRaw(nodes, _fields);
+    protected internal bool AddFieldsRaw(DynamicField? value) => AddChildRaw(value, _fields);
+    private bool InsertFieldsRaw(int index, DynamicField? value) => InsertChildRaw(index, value, _fields);
+    private bool RemoveFieldsRaw(DynamicField? value) => RemoveChildRaw(value, _fields);
 
     /// <inheritdoc />
     protected override bool DetachChild(INode child)
@@ -46,7 +66,7 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
 
         var c = GetContainmentOf(child);
         if (c == _m3.StructuredDataType_fields)
-            return _fields.Remove((Field)child);
+            return _fields.Remove((DynamicField)child);
 
         return false;
     }
@@ -89,6 +109,63 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+        
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment))
+        {
+            nodes = _fields;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.AddContainmentsRaw(containment, node))
+            return true;
+        
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment)&& node is DynamicField field)
+        {
+            return AddFieldsRaw(field);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node)
+    {
+        if (base.InsertContainmentsRaw(containment, index, node))
+            return true;
+        
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment)&& node is DynamicField field)
+        {
+            return InsertFieldsRaw(index, field);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.RemoveContainmentsRaw(containment, node))
+            return true;
+        
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment)&& node is DynamicField field)
+        {
+            return RemoveFieldsRaw(field);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         var result = base.SetInternal(feature, value);
@@ -103,7 +180,7 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
             {
                 case IEnumerable e:
                     RemoveSelfParent(_fields?.ToList(), _fields, _m3.StructuredDataType_fields);
-                    AddFields(e.OfType<Field>().ToArray());
+                    AddFields(e.OfType<DynamicField>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);

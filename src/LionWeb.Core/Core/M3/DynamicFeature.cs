@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M3;
 
 using Notification;
+using Utilities;
 
 /// <inheritdoc cref="Feature"/>
 public abstract class DynamicFeature : DynamicIKeyed, Feature
@@ -51,6 +52,36 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
             return true;
         }
 
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_m3.Feature_optional.EqualsIdentity(property))
+        {
+            value = Optional;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetPropertyRaw(Property property, object? value)
+    {
+        if (base.SetPropertyRaw(property, value))
+            return true;
+        
+        if (_m3.Feature_optional.EqualsIdentity(property) && value is bool optional)
+        {
+            Optional = optional;
+            return true;
+        }
+        
         return false;
     }
 

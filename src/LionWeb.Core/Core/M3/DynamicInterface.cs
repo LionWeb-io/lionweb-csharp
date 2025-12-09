@@ -19,6 +19,8 @@ namespace LionWeb.Core.M3;
 
 using Notification;
 using System.Collections;
+using System.Collections.Immutable;
+using Utilities;
 
 /// <inheritdoc cref="Interface"/>
 public class DynamicInterface(NodeId id, LionWebVersions lionWebVersion, DynamicLanguage? language)
@@ -51,6 +53,65 @@ public class DynamicInterface(NodeId id, LionWebVersions lionWebVersion, Dynamic
         {
             result = Extends;
             return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+        
+        if (_m3.Interface_extends.EqualsIdentity(reference))
+        {
+            targets = _extends.Select(ReferenceTarget.FromNode).ToImmutableList();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (base.AddReferencesRaw(reference, target))
+            return true;
+        
+        if (_m3.Interface_extends.EqualsIdentity(reference)&& target.Target is Interface t)
+        {
+            _extends.Add(t);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target)
+    {
+        if (base.InsertReferencesRaw(reference, index, target))
+            return true;
+        
+        if (_m3.Interface_extends.EqualsIdentity(reference)&& target.Target is Interface t)
+        {
+            _extends.Insert(index, t);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (base.RemoveReferencesRaw(reference, target))
+            return true;
+        
+        if (_m3.Interface_extends.EqualsIdentity(reference)&& target.Target is Interface t)
+        {
+            return _extends.Remove(t);
         }
 
         return false;
