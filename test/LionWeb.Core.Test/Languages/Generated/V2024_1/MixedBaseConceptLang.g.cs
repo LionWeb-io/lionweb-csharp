@@ -190,11 +190,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BaseConcept SetCont(INode value)
 	{
-		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
-		ContainmentSingleNotificationEmitter<INode> emitter = new(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont, this, value, _cont);
-		emitter.CollectOldData();
-		if (SetContRaw(value))
-			emitter.Notify();
+		SetRequiredSingleContainment<INode>(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont, _cont, SetContRaw);
 		return this;
 	}
 
@@ -253,11 +249,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	private BaseConcept SetRef(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<IReadableNode>(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
-		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref);
-		emitter.CollectOldData();
-		if (SetRefRaw(value))
-			emitter.Notify();
+		SetRequiredSingleReference<IReadableNode>(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, _ref, SetRefRaw);
 		return this;
 	}
 

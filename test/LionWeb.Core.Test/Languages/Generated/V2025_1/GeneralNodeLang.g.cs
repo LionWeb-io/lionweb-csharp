@@ -142,18 +142,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If both MultipleContainment and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleContainment(IEnumerable<INode> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
-		if (_multipleContainment.SequenceEqual(safeNodes))
-			return this;
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, value, _multipleContainment, null);
-			emitter.CollectOldData();
-			if (AddMultipleContainmentRaw(value))
-				emitter.Notify();
-		}
-
+		AddRequiredMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, _multipleContainment, AddMultipleContainmentRaw);
 		return this;
 	}
 
@@ -162,18 +151,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultipleContainment.Count</exception>
         public GeneralNodeConcept InsertMultipleContainment(int index, IEnumerable<INode> nodes)
 	{
-		AssureInRange(index, _multipleContainment);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
-		AssureNoSelfMove(index, safeNodes, _multipleContainment);
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, this, value, _multipleContainment, index);
-			emitter.CollectOldData();
-			if (InsertMultipleContainmentRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertRequiredMultipleContainment<INode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, _multipleContainment, InsertMultipleContainmentRaw);
 		return this;
 	}
 
@@ -181,10 +159,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If MultipleContainment would be empty</exception>
         public GeneralNodeConcept RemoveMultipleContainment(IEnumerable<INode> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
-		AssureNotClearing(safeNodes, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
-		RemoveSelfParent(safeNodes, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment));
+		RemoveRequiredMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, _multipleContainment, RemoveMultipleContainmentRaw);
 		return this;
 	}
 
@@ -208,45 +183,21 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	/// <remarks>Optional Multiple Containment</remarks>
         public GeneralNodeConcept AddMultipleOptionalContainment(IEnumerable<INode> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
-		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
-		if (_multipleOptionalContainment.SequenceEqual(safeNodes))
-			return this;
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, value, _multipleOptionalContainment, null);
-			emitter.CollectOldData();
-			if (AddMultipleOptionalContainmentRaw(value))
-				emitter.Notify();
-		}
-
+		AddOptionalMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, _multipleOptionalContainment, AddMultipleOptionalContainmentRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public GeneralNodeConcept InsertMultipleOptionalContainment(int index, IEnumerable<INode> nodes)
 	{
-		AssureInRange(index, _multipleOptionalContainment);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
-		AssureNoSelfMove(index, safeNodes, _multipleOptionalContainment);
-		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, this, value, _multipleOptionalContainment, index);
-			emitter.CollectOldData();
-			if (InsertMultipleOptionalContainmentRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertOptionalMultipleContainment<INode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, _multipleOptionalContainment, InsertMultipleOptionalContainmentRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public GeneralNodeConcept RemoveMultipleOptionalContainment(IEnumerable<INode> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _multipleOptionalContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment));
+		RemoveOptionalMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, _multipleOptionalContainment, RemoveMultipleOptionalContainmentRaw);
 		return this;
 	}
 
@@ -265,45 +216,21 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept AddMultipleOptionalRef(IEnumerable<IReadableNode> nodes)
 	{
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, value, _multipleOptionalRef.Count);
-			emitter.CollectOldData();
-			if (AddMultipleOptionalRefRaw(value))
-				emitter.Notify();
-		}
-
+		AddOptionalMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, _multipleOptionalRef, AddMultipleOptionalRefRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept InsertMultipleOptionalRef(int index, IEnumerable<IReadableNode> nodes)
 	{
-		AssureInRange(index, _multipleOptionalRef);
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, this, value, index);
-			emitter.CollectOldData();
-			if (InsertMultipleOptionalRefRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertOptionalMultipleReference<IReadableNode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, _multipleOptionalRef, InsertMultipleOptionalRefRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept RemoveMultipleOptionalRef(IEnumerable<IReadableNode> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		AssureNotNullMembers(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef);
-		RemoveAll(safeNodes, _multipleOptionalRef, ReferenceRemover<IReadableNode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef));
+		RemoveOptionalMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, _multipleOptionalRef, RemoveMultipleOptionalRefRaw);
 		return this;
 	}
 
@@ -324,17 +251,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If both MultipleRef and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleRef(IEnumerable<IReadableNode> nodes)
 	{
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, value, _multipleRef.Count);
-			emitter.CollectOldData();
-			if (AddMultipleRefRaw(value))
-				emitter.Notify();
-		}
-
+		AddRequiredMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, _multipleRef, AddMultipleRefRaw);
 		return this;
 	}
 
@@ -343,18 +260,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultipleRef.Count</exception>
         public GeneralNodeConcept InsertMultipleRef(int index, IEnumerable<IReadableNode> nodes)
 	{
-		AssureInRange(index, _multipleRef);
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, this, value, index);
-			emitter.CollectOldData();
-			if (InsertMultipleRefRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertRequiredMultipleReference<IReadableNode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, _multipleRef, InsertMultipleRefRaw);
 		return this;
 	}
 
@@ -362,11 +268,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If MultipleRef would be empty</exception>
         public GeneralNodeConcept RemoveMultipleRef(IEnumerable<IReadableNode> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		AssureNonEmpty(safeNodes, _multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<IReadableNode>(_multipleRef, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef);
-		RemoveAll(safeNodes, _multipleRef, ReferenceRemover<IReadableNode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef));
+		RemoveRequiredMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, _multipleRef, RemoveMultipleRefRaw);
 		return this;
 	}
 
@@ -397,11 +299,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public GeneralNodeConcept SetSingleContainment(INode value)
 	{
-		AssureNotNull(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleContainment);
-		ContainmentSingleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleContainment, this, value, _singleContainment);
-		emitter.CollectOldData();
-		if (SetSingleContainmentRaw(value))
-			emitter.Notify();
+		SetRequiredSingleContainment<INode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleContainment, _singleContainment, SetSingleContainmentRaw);
 		return this;
 	}
 
@@ -429,10 +327,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Containment</remarks>
         public GeneralNodeConcept SetSingleOptionalContainment(INode? value)
 	{
-		ContainmentSingleNotificationEmitter<INode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalContainment, this, value, _singleOptionalContainment);
-		emitter.CollectOldData();
-		if (SetSingleOptionalContainmentRaw(value))
-			emitter.Notify();
+		SetOptionalSingleContainment<INode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalContainment, _singleOptionalContainment, SetSingleOptionalContainmentRaw);
 		return this;
 	}
 
@@ -451,11 +346,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private GeneralNodeConcept SetSingleOptionalRef(ReferenceTarget? value)
 	{
-		AssureNullableInstance<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef);
-		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef, this, value, _singleOptionalRef);
-		emitter.CollectOldData();
-		if (SetSingleOptionalRefRaw(value))
-			emitter.Notify();
+		SetOptionalSingleReference<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalRef, _singleOptionalRef, SetSingleOptionalRefRaw);
 		return this;
 	}
 
@@ -490,11 +381,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private GeneralNodeConcept SetSingleRef(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef);
-		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef, this, value, _singleRef);
-		emitter.CollectOldData();
-		if (SetSingleRefRaw(value))
-			emitter.Notify();
+		SetRequiredSingleReference<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleRef, _singleRef, SetSingleRefRaw);
 		return this;
 	}
 

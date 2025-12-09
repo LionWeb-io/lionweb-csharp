@@ -359,11 +359,7 @@ public partial class @record : AnnotationInstanceBase, @interface
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public @record SetDouble(@interface value)
 	{
-		AssureNotNull(value, ClassLanguage.Instance.record_double);
-		ContainmentSingleNotificationEmitter<@interface> emitter = new(ClassLanguage.Instance.record_double, this, value, _double);
-		emitter.CollectOldData();
-		if (SetDoubleRaw(value))
-			emitter.Notify();
+		SetRequiredSingleContainment<@interface>(value, ClassLanguage.Instance.record_double, _double, SetDoubleRaw);
 		return this;
 	}
 
@@ -563,11 +559,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 
 	private @struct SetRef(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<@record>(value, ClassLanguage.Instance.struct_ref);
-		ReferenceSingleNotificationEmitter<@record> emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref);
-		emitter.CollectOldData();
-		if (SetRefRaw(value))
-			emitter.Notify();
+		SetRequiredSingleReference<@record>(value, ClassLanguage.Instance.struct_ref, _ref, SetRefRaw);
 		return this;
 	}
 

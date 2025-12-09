@@ -114,18 +114,7 @@ public partial class Container : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
         public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		if (_libraries.SequenceEqual(safeNodes))
-			return this;
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, value, _libraries, null);
-			emitter.CollectOldData();
-			if (AddLibrariesRaw(value))
-				emitter.Notify();
-		}
-
+		AddRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(nodes, MultiLanguage.Instance.Container_libraries, _libraries, AddLibrariesRaw);
 		return this;
 	}
 
@@ -134,18 +123,7 @@ public partial class Container : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Libraries.Count</exception>
         public Container InsertLibraries(int index, IEnumerable<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> nodes)
 	{
-		AssureInRange(index, _libraries);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		AssureNoSelfMove(index, safeNodes, _libraries);
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, value, _libraries, index);
-			emitter.CollectOldData();
-			if (InsertLibrariesRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(index, nodes, MultiLanguage.Instance.Container_libraries, _libraries, InsertLibrariesRaw);
 		return this;
 	}
 
@@ -153,10 +131,7 @@ public partial class Container : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If Libraries would be empty</exception>
         public Container RemoveLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, MultiLanguage.Instance.Container_libraries);
-		AssureNotClearing(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		RemoveSelfParent(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries, ContainmentRemover<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(MultiLanguage.Instance.Container_libraries));
+		RemoveRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(nodes, MultiLanguage.Instance.Container_libraries, _libraries, RemoveLibrariesRaw);
 		return this;
 	}
 

@@ -195,11 +195,7 @@ public partial class Book : ConceptInstanceBase
 
 	private Book SetAuthor(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<Writer>(value, LibraryLanguage.Instance.Book_author);
-		ReferenceSingleNotificationEmitter<Writer> emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author);
-		emitter.CollectOldData();
-		if (SetAuthorRaw(value))
-			emitter.Notify();
+		SetRequiredSingleReference<Writer>(value, LibraryLanguage.Instance.Book_author, _author, SetAuthorRaw);
 		return this;
 	}
 
@@ -624,18 +620,7 @@ public partial class Library : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
         public Library AddBooks(IEnumerable<Book> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		if (_books.SequenceEqual(safeNodes))
-			return this;
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, value, _books, null);
-			emitter.CollectOldData();
-			if (AddBooksRaw(value))
-				emitter.Notify();
-		}
-
+		AddRequiredMultipleContainment<Book>(nodes, LibraryLanguage.Instance.Library_books, _books, AddBooksRaw);
 		return this;
 	}
 
@@ -644,18 +629,7 @@ public partial class Library : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
         public Library InsertBooks(int index, IEnumerable<Book> nodes)
 	{
-		AssureInRange(index, _books);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		AssureNoSelfMove(index, safeNodes, _books);
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, value, _books, index);
-			emitter.CollectOldData();
-			if (InsertBooksRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertRequiredMultipleContainment<Book>(index, nodes, LibraryLanguage.Instance.Library_books, _books, InsertBooksRaw);
 		return this;
 	}
 
@@ -663,10 +637,7 @@ public partial class Library : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If Books would be empty</exception>
         public Library RemoveBooks(IEnumerable<Book> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
-		AssureNotClearing(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		RemoveSelfParent(safeNodes, _books, LibraryLanguage.Instance.Library_books, ContainmentRemover<Book>(LibraryLanguage.Instance.Library_books));
+		RemoveRequiredMultipleContainment<Book>(nodes, LibraryLanguage.Instance.Library_books, _books, RemoveBooksRaw);
 		return this;
 	}
 

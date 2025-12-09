@@ -9,7 +9,6 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Notification;
-using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
@@ -139,11 +138,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public AbstractConcept SetIfaceContainment(INode value)
 	{
-		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
-		ContainmentSingleNotificationEmitter<INode> emitter = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment);
-		emitter.CollectOldData();
-		if (SetIfaceContainmentRaw(value))
-			emitter.Notify();
+		SetRequiredSingleContainment<INode>(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, _ifaceContainment, SetIfaceContainmentRaw);
 		return this;
 	}
 

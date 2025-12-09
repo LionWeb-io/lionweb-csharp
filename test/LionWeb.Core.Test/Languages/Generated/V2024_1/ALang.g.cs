@@ -9,7 +9,6 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Notification;
-using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
@@ -134,11 +133,7 @@ public partial class AConcept : ConceptInstanceBase
 
 	private AConcept SetBRef(ReferenceTarget? value)
 	{
-		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept>(value, ALangLanguage.Instance.AConcept_BRef);
-		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept> emitter = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef);
-		emitter.CollectOldData();
-		if (SetBRefRaw(value))
-			emitter.Notify();
+		SetOptionalSingleReference<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept>(value, ALangLanguage.Instance.AConcept_BRef, _bRef, SetBRefRaw);
 		return this;
 	}
 

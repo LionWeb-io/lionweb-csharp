@@ -159,11 +159,7 @@ public partial class BConcept : ConceptInstanceBase
 
 	private BConcept SetARef(ReferenceTarget? value)
 	{
-		AssureNullableInstance<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(value, BLangLanguage.Instance.BConcept_ARef);
-		ReferenceSingleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept> emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef);
-		emitter.CollectOldData();
-		if (SetARefRaw(value))
-			emitter.Notify();
+		SetOptionalSingleReference<LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept>(value, BLangLanguage.Instance.BConcept_ARef, _aRef, SetARefRaw);
 		return this;
 	}
 

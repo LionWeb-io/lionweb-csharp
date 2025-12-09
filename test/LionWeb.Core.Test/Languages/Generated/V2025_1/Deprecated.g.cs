@@ -200,19 +200,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete]
 	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		if (_deprChild.SequenceEqual(safeNodes))
-			return this;
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, value, _deprChild, null);
-			emitter.CollectOldData();
-			if (AddDeprChildRaw(value))
-				emitter.Notify();
-		}
-
+		AddOptionalMultipleContainment<DeprIface>(nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild, _deprChild, AddDeprChildRaw);
 		return this;
 	}
 
@@ -220,19 +208,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete]
 	public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes)
 	{
-		AssureInRange(index, _deprChild);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		AssureNoSelfMove(index, safeNodes, _deprChild);
-		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, value, _deprChild, index);
-			emitter.CollectOldData();
-			if (InsertDeprChildRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertOptionalMultipleContainment<DeprIface>(index, nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild, _deprChild, InsertDeprChildRaw);
 		return this;
 	}
 
@@ -240,7 +216,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete]
 	public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild, ContainmentRemover<DeprIface>(DeprecatedLanguage.Instance.DeprConcept_deprChild));
+		RemoveOptionalMultipleContainment<DeprIface>(nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild, _deprChild, RemoveDeprChildRaw);
 		return this;
 	}
 
@@ -297,11 +273,7 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	private DeprConcept SetDeprRef(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<DeprAnnotation>(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
-		ReferenceSingleNotificationEmitter<DeprAnnotation> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef);
-		emitter.CollectOldData();
-		if (SetDeprRefRaw(value))
-			emitter.Notify();
+		SetRequiredSingleReference<DeprAnnotation>(value, DeprecatedLanguage.Instance.DeprConcept_deprRef, _deprRef, SetDeprRefRaw);
 		return this;
 	}
 

@@ -178,11 +178,7 @@ public partial class MYConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public MYConcept SetMYContainment(INode value)
 	{
-		AssureNotNull(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment);
-		ContainmentSingleNotificationEmitter<INode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment, this, value, _mYContainment);
-		emitter.CollectOldData();
-		if (SetMYContainmentRaw(value))
-			emitter.Notify();
+		SetRequiredSingleContainment<INode>(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment, _mYContainment, SetMYContainmentRaw);
 		return this;
 	}
 
@@ -239,11 +235,7 @@ public partial class MYConcept : ConceptInstanceBase
 
 	private MYConcept SetMYReference(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<IReadableNode>(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference);
-		ReferenceSingleNotificationEmitter<IReadableNode> emitter = new(MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, this, value, _mYReference);
-		emitter.CollectOldData();
-		if (SetMYReferenceRaw(value))
-			emitter.Notify();
+		SetRequiredSingleReference<IReadableNode>(value, MYUpperCaseLangLanguage.Instance.MYConcept_MYReference, _mYReference, SetMYReferenceRaw);
 		return this;
 	}
 

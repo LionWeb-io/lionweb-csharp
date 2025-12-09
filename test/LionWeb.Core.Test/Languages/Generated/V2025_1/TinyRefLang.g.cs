@@ -151,17 +151,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
         public MyConcept AddMultivaluedRef(IEnumerable<INamed> nodes)
 	{
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, value, _multivaluedRef.Count);
-			emitter.CollectOldData();
-			if (AddMultivaluedRefRaw(value))
-				emitter.Notify();
-		}
-
+		AddRequiredMultipleReference<INamed>(nodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, _multivaluedRef, AddMultivaluedRefRaw);
 		return this;
 	}
 
@@ -170,18 +160,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultivaluedRef.Count</exception>
         public MyConcept InsertMultivaluedRef(int index, IEnumerable<INamed> nodes)
 	{
-		AssureInRange(index, _multivaluedRef);
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, value, index);
-			emitter.CollectOldData();
-			if (InsertMultivaluedRefRaw(index++, value))
-				emitter.Notify();
-		}
-
+		InsertRequiredMultipleReference<INamed>(index, nodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, _multivaluedRef, InsertMultivaluedRefRaw);
 		return this;
 	}
 
@@ -189,11 +168,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If MultivaluedRef would be empty</exception>
         public MyConcept RemoveMultivaluedRef(IEnumerable<INamed> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<INamed>(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef), TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		RemoveAll(safeNodes, _multivaluedRef, ReferenceRemover<INamed>(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef));
+		RemoveRequiredMultipleReference<INamed>(nodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, _multivaluedRef, RemoveMultivaluedRefRaw);
 		return this;
 	}
 
@@ -214,11 +189,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	private MyConcept SetSingularRef(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<INamed>(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
-		ReferenceSingleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_singularRef, this, value, _singularRef);
-		emitter.CollectOldData();
-		if (SetSingularRefRaw(value))
-			emitter.Notify();
+		SetRequiredSingleReference<INamed>(value, TinyRefLangLanguage.Instance.MyConcept_singularRef, _singularRef, SetSingularRefRaw);
 		return this;
 	}
 
