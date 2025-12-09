@@ -18,6 +18,7 @@
 namespace LionWeb.Generator;
 
 using Core;
+using Core.M3;
 using Impl;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -27,6 +28,23 @@ using Microsoft.CodeAnalysis.Formatting;
 using Names;
 using System.Collections.Immutable;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+
+
+/*public enum CSharpLanguageConstructKind
+{
+    GeneratedClass,
+    LanguageConstructorInitialization,
+    LanguageField,
+    LanguageProperty,
+    FactoryInterfaceMethod,
+    FactoryImplementationMethod
+}*/
+
+public interface IGeneratedCSharpSyntaxNode { }
+
+public record ClassSyntaxNode(
+    Classifier Classifier,
+    ClassDeclarationSyntax ClassDeclarationSyntax): IGeneratedCSharpSyntaxNode; 
 
 /// Public API for LionWeb C# generator.
 /// Creates one file containing
@@ -42,6 +60,8 @@ public class GeneratorFacade
 {
     private CompilationUnitSyntax? _compilationUnit = null;
 
+    private List<IGeneratedCSharpSyntaxNode> _generatedCSharpSyntaxNodes = [];
+    
     /// Generates the compilation unit for the input language.
     public CompilationUnitSyntax Generate()
     {
@@ -53,6 +73,8 @@ public class GeneratorFacade
 
         return _compilationUnit;
     }
+    
+    public List<IGeneratedCSharpSyntaxNode> GeneratedCSharpSyntaxNodes => _generatedCSharpSyntaxNodes;
 
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }
