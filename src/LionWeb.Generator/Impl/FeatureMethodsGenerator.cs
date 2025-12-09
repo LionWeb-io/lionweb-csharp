@@ -148,8 +148,7 @@ public class FeatureMethodsGenerator(
                     Param("result", resultType)
                         .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
                 ])
-                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                    SyntaxKind.OverrideKeyword))
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
                 .WithBody(AsStatements(new List<StatementSyntax>
                     {
                         IfStatement(ParseExpression($"base.{methodName}(feature, out result)"), ReturnTrue())
@@ -428,8 +427,7 @@ public class FeatureMethodsGenerator(
                     Param("index", AsType(typeof(int))),
                     Param("value", resultType)
                 ])
-                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                    SyntaxKind.OverrideKeyword))
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
                 .WithBody(AsStatements(new List<StatementSyntax>
                     {
                         IfStatement(ParseExpression($"base.{methodName}(feature, index, value)"),
@@ -476,8 +474,7 @@ public class FeatureMethodsGenerator(
                     Param("feature", AsType(typeof(T))),
                     Param("value", resultType)
                 ])
-                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword,
-                    SyntaxKind.OverrideKeyword))
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
                 .WithBody(AsStatements(new List<StatementSyntax>
                     {
                         IfStatement(ParseExpression($"base.{methodName}(feature, value)"),
