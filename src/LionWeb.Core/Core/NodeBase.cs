@@ -69,12 +69,12 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
             if (AddAnnotationsRaw(safeAnnotation))
                 emitter.Notify();
         }
-
     }
 
     bool IWritableNodeRaw.AddAnnotationsRaw(IWritableNode annotation) =>
         AddAnnotationsRaw(annotation);
 
+    /// <inheritdoc cref="IWritableNodeRaw.AddAnnotationsRaw"/>
     protected internal bool AddAnnotationsRaw(IWritableNode annotation)
     {
         if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
@@ -106,6 +106,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IWritableNode annotation) =>
         InsertAnnotationsRaw(index, annotation);
 
+    /// <inheritdoc cref="IWritableNodeRaw.InsertAnnotationsRaw"/>
     protected internal bool InsertAnnotationsRaw(Index index, IWritableNode annotation)
     {
         if (!IsInRange(index, _annotations) || annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
@@ -127,6 +128,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     bool IWritableNodeRaw.RemoveAnnotationsRaw(IWritableNode annotation) =>
         RemoveAnnotationsRaw(annotation);
 
+    /// <inheritdoc cref="IWritableNodeRaw.RemoveAnnotationsRaw"/>
     protected internal bool RemoveAnnotationsRaw(IWritableNode annotation)
     {
         if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
@@ -186,7 +188,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
             throw new InvalidValueException(feature, value);
         var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
         AssureAnnotations(safeNodes);
-        AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
+        AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations);
         notification.CollectOldData();
         RemoveSelfParent(_annotations.ToList(), _annotations, null);
         _annotations.AddRange(SetSelfParent(safeNodes, null));
@@ -199,6 +201,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     bool IWritableNodeRaw.SetRaw(Feature feature, object? value) =>
         SetRaw(feature, value);
 
+    /// <inheritdoc cref="IWritableNodeRaw.SetRaw"/>
     protected internal virtual bool SetRaw(Feature feature, object? value)
     {
         switch (feature, value)
@@ -230,18 +233,21 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     bool IWritableNodeRaw.SetPropertyRaw(Property property, object? value) =>
         SetPropertyRaw(property, value);
 
+    /// <inheritdoc cref="IWritableNodeRaw.SetPropertyRaw"/>
     protected internal virtual bool SetPropertyRaw(Property property, object? value) =>
         false;
 
     bool IWritableNodeRaw.SetContainmentRaw(Containment containment, IWritableNode? node) =>
         SetContainmentRaw(containment, node);
 
+    /// <inheritdoc cref="IWritableNodeRaw.SetContainmentRaw"/>
     protected internal virtual bool SetContainmentRaw(Containment containment, IWritableNode? node) =>
         false;
 
     bool IWritableNodeRaw.SetReferenceRaw(Reference reference, ReferenceTarget? targets) =>
         SetReferenceRaw(reference, targets);
 
+    /// <inheritdoc cref="IWritableNodeRaw.SetReferenceRaw"/>
     protected internal virtual bool SetReferenceRaw(Reference reference, ReferenceTarget? target) =>
         false;
 
@@ -269,12 +275,14 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     bool IWritableNodeRaw.AddContainmentsRaw(Containment containment, IWritableNode node) =>
         AddContainmentsRaw(containment, node);
 
+    /// <inheritdoc cref="IWritableNodeRaw.AddContainmentsRaw"/>
     protected internal virtual bool AddContainmentsRaw(Containment containment, IWritableNode node) =>
         false;
 
     bool IWritableNodeRaw.AddReferencesRaw(Reference reference, ReferenceTarget target) =>
         AddReferencesRaw(reference, target);
 
+    /// <inheritdoc cref="IWritableNodeRaw.AddReferencesRaw"/>
     protected internal virtual bool AddReferencesRaw(Reference reference, ReferenceTarget target) =>
         false;
 
@@ -302,12 +310,14 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     bool IWritableNodeRaw.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) =>
         InsertContainmentsRaw(containment, index, node);
 
+    /// <inheritdoc cref="IWritableNodeRaw.InsertContainmentsRaw"/>
     protected internal virtual bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) =>
         false;
 
     bool IWritableNodeRaw.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) =>
         InsertReferencesRaw(reference, index, target);
 
+    /// <inheritdoc cref="IWritableNodeRaw.InsertReferencesRaw"/>
     protected internal virtual bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) =>
         false;
 
@@ -320,7 +330,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         throw new UnknownFeatureException(GetClassifier(), link);
     }
 
-    /// <inheritdoc cref="Insert"/>
+    /// <inheritdoc cref="Remove"/>
     protected virtual bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
     {
         if (link == null)
@@ -335,12 +345,14 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     bool IWritableNodeRaw.RemoveContainmentsRaw(Containment containment, IWritableNode node) =>
         RemoveContainmentsRaw(containment, node);
 
+    /// <inheritdoc cref="IWritableNodeRaw.RemoveContainmentsRaw"/>
     protected internal virtual bool RemoveContainmentsRaw(Containment containment, IWritableNode node) =>
         false;
 
     bool IWritableNodeRaw.RemoveReferencesRaw(Reference reference, ReferenceTarget target) =>
         RemoveReferencesRaw(reference, target);
 
+    /// <inheritdoc cref="IWritableNodeRaw.RemoveReferencesRaw"/>
     protected internal virtual bool RemoveReferencesRaw(Reference reference, ReferenceTarget target) =>
         false;
 

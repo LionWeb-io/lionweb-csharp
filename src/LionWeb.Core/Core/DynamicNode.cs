@@ -118,6 +118,65 @@ public class DynamicNode : NodeBase
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value) =>
+        _settings.TryGetValue(property, out value);
+
+    /// <inheritdoc />
+    protected internal override bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
+    {
+        if (_settings.TryGetValue(containment, out var value) && value is null or IReadableNode)
+        {
+            node = (IReadableNode?)value;
+            return true;
+        }
+
+        node = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (_settings.TryGetValue(containment, out var value) && value is IReadOnlyList<IReadableNode> v)
+        {
+            nodes = v;
+            return true;
+        }
+
+        nodes = null;
+        return false;
+    }
+
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (_settings.TryGetValue(reference, out var value) && value is null or IReadableNode)
+        {
+            target = (IReferenceTarget?)value;
+            return true;
+        }
+
+        target = null;
+        return false;
+    }
+
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (_settings.TryGetValue(reference, out var value) && value is IReadOnlyList<IReferenceTarget> v)
+        {
+            targets = v;
+            return true;
+        }
+
+        targets = null;
+        return false;
+    }
+
+
+    /// <inheritdoc />
     protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         if (base.SetInternal(feature, value))
@@ -160,6 +219,16 @@ public class DynamicNode : NodeBase
         return true;
     }
 
+    /// <inheritdoc />
+    protected internal override bool SetPropertyRaw(Property property, object? value)
+    {
+        if (value is null)
+            return _settings.Remove(property);
+
+        _settings[property] = value;
+        return true;
+    }
+
     private IDynamicNodeVersionSpecifics VersionSpecifics => new Lazy<IDynamicNodeVersionSpecifics>(() =>
         IDynamicNodeVersionSpecifics.Create(GetClassifier().GetLanguage().LionWebVersion)).Value;
 
@@ -194,6 +263,76 @@ public class DynamicNode : NodeBase
         }
     }
 
+    /// <inheritdoc />
+    protected internal override bool SetReferenceRaw(Reference reference, ReferenceTarget? target)
+    {
+        if (target is null)
+            return _settings.Remove(reference);
+
+        _settings[reference] = target;
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (_settings.TryGetValue(reference, out var value))
+        {
+            if (value is List<ReferenceTarget> l)
+            {
+                l.Add(target);
+                return true;
+            }
+
+            return false;
+        }
+
+        _settings[reference] = new List<ReferenceTarget>{target};
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target)
+    {
+        if (_settings.TryGetValue(reference, out var value))
+        {
+            if (value is List<ReferenceTarget> l && l.Count > index)
+            {
+                l.Insert(index, target);
+                return true;
+            }
+
+            return false;
+        }
+
+        if (index == 0)
+        {
+            _settings[reference] = new List<ReferenceTarget>{target};
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (
+            _settings.TryGetValue(reference, out var value)
+            && value is List<ReferenceTarget> l
+            && l.Remove(target))
+        {
+            if (l.Count == 0)
+            {
+                _settings.Remove(reference);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     private bool SetContainment(Containment containment, object? value)
     {
         switch (containment, value)
@@ -211,16 +350,11 @@ public class DynamicNode : NodeBase
                 return true;
 
             case ({ Multiple: false }, INode n):
-                if (_settings.TryGetValue(containment, out var oldVal) && oldVal is INode oldNode)
-                    SetParentInternal(oldNode, null);
-
-                DetachChildInternal(n);
-                SetParentInternal(n, this);
-                _settings[containment] = value;
+                SetContainmentRaw(containment, n);
                 return true;
 
             case ({ Multiple: false, Optional: true }, null):
-                _settings.Remove(containment);
+                SetContainmentRaw(containment, null);
                 return true;
 
             case ({ Optional: false }, null):
@@ -230,6 +364,104 @@ public class DynamicNode : NodeBase
                 throw new InvalidValueException(containment, value);
         }
     }
+
+    /// <inheritdoc />
+    protected internal override bool SetContainmentRaw(Containment containment, IWritableNode? node)
+    {
+        if (_settings.TryGetValue(containment, out var oldVal) && oldVal is INode oldNode)
+        {
+            SetParentInternal(oldNode, null);
+            
+            if (node is null)
+            {
+                return _settings.Remove(containment);
+            }
+        }
+
+        if (node is null)
+            return false;
+
+        DetachChildInternal((INode)node);
+        SetParentInternal((INode)node, this);
+        _settings[containment] = node;
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (_settings.TryGetValue(containment, out var value))
+        {
+            if (value is List<INode> l)
+            {
+                l.Add((INode)node);
+                DetachChildInternal((INode)node);
+                SetParentInternal((INode)node, this);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        DetachChildInternal((INode)node);
+        SetParentInternal((INode)node, this);
+
+        _settings[containment] = new List<INode> { (INode)node };
+        return true;
+    }
+
+
+    /// <inheritdoc />
+    protected internal override bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node)
+    {
+        if (_settings.TryGetValue(containment, out var value))
+        {
+            if (value is List<INode> l && l.Count > index)
+            {
+                l.Insert(index, (INode)node);
+                DetachChildInternal((INode)node);
+                SetParentInternal((INode)node, this);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        if (index == 0)
+        {
+            DetachChildInternal((INode)node);
+            SetParentInternal((INode)node, this);
+
+            _settings[containment] = new List<INode>{(INode)node};
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (
+            _settings.TryGetValue(containment, out var value)
+            && value is List<INode> l
+            && l.Remove((INode)containment))
+        {
+            DetachChildInternal((INode)node);
+            
+            if (l.Count == 0)
+            {
+                _settings.Remove(containment);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
 
     private static void AssureOptionalCount(object value, List<INode> enumerable, Link link)
     {
