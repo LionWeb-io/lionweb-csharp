@@ -147,12 +147,6 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
 
-    protected ExpressionStatementSyntax AsureNotNullCall() =>
-        ExpressionStatement(Call("AssureNotNull",
-            IdentifierName("value"),
-            MetaProperty(feature)
-        ));
-
     protected ExpressionStatementSyntax AssignFeatureField() =>
         Assignment(FeatureField(feature).ToString(), IdentifierName("value"));
 
@@ -372,10 +366,4 @@ public abstract class FeatureGeneratorBase(Classifier classifier, Feature featur
 
     protected string FeatureTryGetParam() =>
         _names.FeatureParam(feature);
-
-    protected IfStatementSyntax EmitterNotifyCallIfRaw(ExpressionSyntax rawMethod) =>
-        IfStatement(
-            InvocationExpression(rawMethod, AsArguments([IdentifierName("value")])),
-            EmitterNotifyCall()
-        );
 }

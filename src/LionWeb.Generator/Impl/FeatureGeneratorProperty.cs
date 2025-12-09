@@ -21,7 +21,6 @@ namespace LionWeb.Generator.Impl;
 using Core;
 using Core.M2;
 using Core.M3;
-using Core.Notification.Partition.Emitter;
 using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -32,24 +31,18 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredProperty()
     {
-        List<StatementSyntax> setterBody =
-        [
-            PropertyEmitterVariable(),
-            EmitterCollectOldDataCall(),
-            EmitterNotifyCallIfRaw(FeatureSetRaw(property)),
-            ReturnStatement(This())
-        ];
-        if (IsReferenceType())
-            setterBody.Insert(0, AsureNotNullCall());
-
-        var prop = SingleRequiredFeatureProperty(AsType(property.GetFeatureType()));
-        var setter = RequiredFeatureSetter(setterBody);
+        var setterName = IsReferenceType()
+            ? "SetRequiredReferenceTypeProperty"
+            : "SetRequiredValueTypeProperty";
 
         var members = new List<MemberDeclarationSyntax>
         {
-            prop,
+            SingleRequiredFeatureProperty(AsType(property.GetFeatureType())),
             TryGet()
-        }.Concat(setter);
+        }.Concat(RequiredFeatureSetter([
+            ExpressionStatement(CallGeneric(setterName, AsType(property.Type), IdentifierName("value"), MetaProperty(property), FeatureField(property), FeatureSetRaw(property))),
+            ReturnStatement(This())
+        ]));
         if (IsReferenceType())
             members = members.Select(member => member.Xdoc(XdocThrowsIfSetToNull()));
 
@@ -60,8 +53,13 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
         }.Concat(members);
     }
 
-    public IEnumerable<MemberDeclarationSyntax> OptionalProperty() =>
-        new List<MemberDeclarationSyntax>
+    public IEnumerable<MemberDeclarationSyntax> OptionalProperty()
+    {
+        var setterName = IsReferenceType()
+            ? "SetOptionalReferenceTypeProperty"
+            : "SetOptionalValueTypeProperty";
+
+        return new List<MemberDeclarationSyntax>
             {
                 SingleFeatureField(),
                 SingleOptionalFeatureProperty(),
@@ -70,26 +68,17 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
             }
             .Concat(
                 OptionalFeatureSetter([
-                    PropertyEmitterVariable(),
-                    EmitterCollectOldDataCall(),
-                    EmitterNotifyCallIfRaw(FeatureSetRaw(property)),
+                    ExpressionStatement(CallGeneric(setterName, AsType(property.Type), IdentifierName("value"),
+                        MetaProperty(property), FeatureField(property), FeatureSetRaw(property))),
                     ReturnStatement(This())
                 ])
             );
-
-    private LocalDeclarationStatementSyntax PropertyEmitterVariable() =>
-        Variable(
-            "emitter",
-            AsType(typeof(PropertyNotificationEmitter)),
-            NewCall([
-                MetaProperty(property),
-                This(),
-                IdentifierName("value"),
-                FeatureField(property)
-            ])
-        );
+    }
 
     private bool IsReferenceType() =>
-        !(_builtIns.Boolean.EqualsIdentity(property.Type) ||
-          _builtIns.Integer.EqualsIdentity(property.Type));
+        !(_builtIns.Boolean.EqualsIdentity(property.Type)
+          || _builtIns.Integer.EqualsIdentity(property.Type)
+          || property.Type is Enumeration
+          || property.Type is StructuredDataType
+            );
 }
