@@ -28,8 +28,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
-        <ProjectReference Include="..\..\src\LionWeb.Generator.MpsSpecific\LionWeb.Generator.MpsSpecific.csproj" />
         <ProjectReference Include="..\..\src\LionWeb.Generator\LionWeb.Generator.csproj" />
+        <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj" />
     </ItemGroup>
     
 </Project>
