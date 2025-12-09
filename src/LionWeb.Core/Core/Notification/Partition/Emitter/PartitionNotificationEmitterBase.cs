@@ -35,16 +35,10 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly INotifiableNode DestinationParent;
 
-    /// The notification ID associated with the notification emitter
-    private readonly INotificationId? _notificationId;
-
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by notification emitters</param>
-    protected PartitionNotificationEmitterBase(INotifiableNode destinationParent,
-        INotificationId? notificationId = null)
+    protected PartitionNotificationEmitterBase(INotifiableNode destinationParent)
     {
         DestinationParent = destinationParent;
-        _notificationId = notificationId;
         DestinationPartition = destinationParent.GetPartition();
         _partitionProducer = DestinationPartition?.GetNotificationProducer();
     }
@@ -65,7 +59,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _notificationId ?? _partitionProducer.CreateNotificationId();
+    protected INotificationId GetNotificationId() => _partitionProducer.CreateNotificationId();
     
     protected void ProduceNotification(INotification notification) =>
         _partitionProducer?.ProduceNotification(notification);

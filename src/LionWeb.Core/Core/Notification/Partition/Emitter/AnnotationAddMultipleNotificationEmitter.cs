@@ -27,30 +27,22 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
     private Index _newIndex;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>.</param>
-    /// <param name="addedValues">Newly added values.</param>
+    /// <param name="addedValue">Newly added value.</param>
     /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
-    /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <see cref="Annotation"/>s.</param>
+    public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
+        IWritableNode addedValue,
+        List<INode> existingValues, Index? startIndex = null) : base(destinationParent, [addedValue])
+    {
+        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
+    }
+
     [Obsolete]
     public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? addedValues,
-        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues, notificationId)
+        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues)
     {
         _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
-    }
-
-    [Obsolete]
-    public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
-        List<IWritableNode>? addedValues,
-        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues, notificationId)
-    {
-        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
-    }
-
-    public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
-        IWritableNode addedValue,
-        List<INode> existingValues, Index? startIndex = null) : this(destinationParent, [addedValue], existingValues, startIndex, null)
-    {
     }
 
     /// <inheritdoc />

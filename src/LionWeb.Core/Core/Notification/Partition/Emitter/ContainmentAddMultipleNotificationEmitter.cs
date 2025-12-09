@@ -27,23 +27,6 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
-    /// <param name="addedValues">Newly added values.</param>
-    /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
-    /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    [Obsolete]
-    public ContainmentAddMultipleNotificationEmitter(Containment containment,
-        INotifiableNode destinationParent,
-        List<T>? addedValues,
-        List<T> existingValues,
-        Index? startIndex = null,
-        INotificationId? notificationId = null) : base(containment, destinationParent, addedValues, notificationId)
-    {
-        _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
-    }
-    
-    /// <param name="containment">Represented <see cref="Containment"/>.</param>
-    /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="addedValue">Newly added value.</param>
     /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <paramref name="containment"/>.</param>
@@ -51,10 +34,21 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
         INotifiableNode destinationParent,
         T addedValue,
         List<T> existingValues,
-        Index? startIndex = null) : this(containment, destinationParent, [addedValue], existingValues, startIndex, null)
+        Index? startIndex = null) : this(containment, destinationParent, [addedValue], existingValues, startIndex)
     {
     }
 
+    [Obsolete]
+    public ContainmentAddMultipleNotificationEmitter(Containment containment,
+        INotifiableNode destinationParent,
+        List<T>? addedValues,
+        List<T> existingValues,
+        Index? startIndex = null,
+        INotificationId? notificationId = null) : base(containment, destinationParent, addedValues)
+    {
+        _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
+    }
+    
     /// <inheritdoc />
     public override void Notify()
     {

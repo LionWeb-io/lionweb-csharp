@@ -30,16 +30,21 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
     /// <param name="destinationParent"> Owner of the represented <paramref name="reference"/>.</param>
     /// <param name="safeNodes">Newly added values.</param>
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<ReferenceTarget> safeNodes, IList<ReferenceTarget> storage,
-        INotificationId? notificationId = null) :
-        base(reference, destinationParent, safeNodes, notificationId)
+    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<ReferenceTarget> safeNodes, IList<ReferenceTarget> storage) :
+        base(reference, destinationParent, safeNodes)
     {
         if (!IsActive())
             return;
 
         var listComparer = IListComparer.CreateForReferenceTarget(storage, safeNodes);
         _changes = listComparer.Compare();
+    }
+
+    [Obsolete]
+    public ReferenceSetNotificationEmitter(Reference reference, INotifiableNode destinationParent,
+        List<ReferenceTarget> safeNodes, IList<ReferenceTarget> storage, INotificationId? notificationId = null) :
+        this(reference, destinationParent, safeNodes, storage)
+    {
     }
 
     /// <inheritdoc />
