@@ -18,7 +18,6 @@
 namespace LionWeb.Core.M3;
 
 using Notification;
-using Notification.Partition.Emitter;
 using System.Collections;
 using Utilities;
 
@@ -32,25 +31,21 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
     public IReadOnlyList<EnumerationLiteral> Literals => _literals.AsReadOnly();
 
     /// <inheritdoc cref="Literals"/>
-    public void AddLiterals(IEnumerable<DynamicEnumerationLiteral> literals)
-    {
-        var safeNodes = literals?.ToList();
-        AssureNotNull(safeNodes, _m3.Enumeration_literals);
-        AssureNotNullMembers(safeNodes, _m3.Enumeration_literals);
-        if (_literals.SequenceEqual(safeNodes))
-            return;
-        foreach (var value in safeNodes)
-        {
-            ContainmentAddMultipleNotificationEmitter<DynamicEnumerationLiteral> emitter = new(_m3.Enumeration_literals, this, value, _literals, null);
-            emitter.CollectOldData();
-            if (AddLiteralsRaw(value))
-                emitter.Notify();
-        }
-    }
+    public void AddLiterals(IEnumerable<DynamicEnumerationLiteral> literals) =>
+        AddOptionalMultipleContainment(literals, _m3.Enumeration_literals, _literals, AddLiteralsRaw);
 
-    protected internal bool SetLiteralsRaw(List<DynamicEnumerationLiteral> nodes) => ExchangeChildrenRaw(nodes, _literals);
+    /// <inheritdoc cref="Literals"/>
+    protected internal bool SetLiteralsRaw(List<DynamicEnumerationLiteral> nodes) =>
+        ExchangeChildrenRaw(nodes, _literals);
+
+    /// <inheritdoc cref="Literals"/>
     protected internal bool AddLiteralsRaw(DynamicEnumerationLiteral? value) => AddChildRaw(value, _literals);
-    private bool InsertLiteralsRaw(int index, DynamicEnumerationLiteral? value) => InsertChildRaw(index, value, _literals);
+
+    /// <inheritdoc cref="Literals"/>
+    private bool InsertLiteralsRaw(int index, DynamicEnumerationLiteral? value) =>
+        InsertChildRaw(index, value, _literals);
+
+    /// <inheritdoc cref="Literals"/>
     private bool RemoveLiteralsRaw(DynamicEnumerationLiteral? value) => RemoveChildRaw(value, _literals);
 
 
@@ -107,11 +102,12 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
     }
 
     /// <inheritdoc />
-    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    protected internal override bool TryGetContainmentsRaw(Containment containment,
+        out IReadOnlyList<IReadableNode> nodes)
     {
         if (base.TryGetContainmentsRaw(containment, out nodes))
             return true;
-        
+
         if (_m3.Enumeration_literals.EqualsIdentity(containment))
         {
             nodes = _literals;
@@ -120,13 +116,14 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
 
         return false;
     }
+
     /// <inheritdoc />
     protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
     {
         if (base.AddContainmentsRaw(containment, node))
             return true;
-        
-        if (_m3.Enumeration_literals.EqualsIdentity(containment)&& node is DynamicEnumerationLiteral literal)
+
+        if (_m3.Enumeration_literals.EqualsIdentity(containment) && node is DynamicEnumerationLiteral literal)
         {
             return AddLiteralsRaw(literal);
         }
@@ -139,8 +136,8 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
     {
         if (base.InsertContainmentsRaw(containment, index, node))
             return true;
-        
-        if (_m3.Enumeration_literals.EqualsIdentity(containment)&& node is DynamicEnumerationLiteral literal)
+
+        if (_m3.Enumeration_literals.EqualsIdentity(containment) && node is DynamicEnumerationLiteral literal)
         {
             return InsertLiteralsRaw(index, literal);
         }
@@ -153,8 +150,8 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
     {
         if (base.RemoveContainmentsRaw(containment, node))
             return true;
-        
-        if (_m3.Enumeration_literals.EqualsIdentity(containment)&& node is DynamicEnumerationLiteral literal)
+
+        if (_m3.Enumeration_literals.EqualsIdentity(containment) && node is DynamicEnumerationLiteral literal)
         {
             return RemoveLiteralsRaw(literal);
         }

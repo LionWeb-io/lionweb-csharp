@@ -18,7 +18,6 @@
 namespace LionWeb.Core.M3;
 
 using Notification;
-using Notification.Partition.Emitter;
 using System.Collections;
 using Utilities;
 
@@ -35,25 +34,19 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     public IReadOnlyList<Field> Fields => _fields.AsReadOnly();
 
     /// <inheritdoc cref="Fields"/>
-    public void AddFields(IEnumerable<DynamicField> fields)
-    {
-        var safeNodes = fields?.ToList();
-        AssureNotNull(safeNodes, _m3.StructuredDataType_fields);
-        AssureNotNullMembers(safeNodes, _m3.StructuredDataType_fields);
-        if (_fields.SequenceEqual(safeNodes))
-            return;
-        foreach (var value in safeNodes)
-        {
-            ContainmentAddMultipleNotificationEmitter<DynamicField> emitter = new(_m3.StructuredDataType_fields, this, value, _fields, null);
-            emitter.CollectOldData();
-            if (AddFieldsRaw(value))
-                emitter.Notify();
-        }
-    }
+    public void AddFields(IEnumerable<DynamicField> fields) =>
+        AddOptionalMultipleContainment(fields, _m3.StructuredDataType_fields, _fields, AddFieldsRaw);
 
+    /// <inheritdoc cref="Fields"/>
     protected internal bool SetFieldsRaw(List<DynamicField> nodes) => ExchangeChildrenRaw(nodes, _fields);
+
+    /// <inheritdoc cref="Fields"/>
     protected internal bool AddFieldsRaw(DynamicField? value) => AddChildRaw(value, _fields);
+
+    /// <inheritdoc cref="Fields"/>
     private bool InsertFieldsRaw(int index, DynamicField? value) => InsertChildRaw(index, value, _fields);
+
+    /// <inheritdoc cref="Fields"/>
     private bool RemoveFieldsRaw(DynamicField? value) => RemoveChildRaw(value, _fields);
 
     /// <inheritdoc />
@@ -109,11 +102,12 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     }
 
     /// <inheritdoc />
-    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    protected internal override bool TryGetContainmentsRaw(Containment containment,
+        out IReadOnlyList<IReadableNode> nodes)
     {
         if (base.TryGetContainmentsRaw(containment, out nodes))
             return true;
-        
+
         if (_m3.StructuredDataType_fields.EqualsIdentity(containment))
         {
             nodes = _fields;
@@ -128,8 +122,8 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     {
         if (base.AddContainmentsRaw(containment, node))
             return true;
-        
-        if (_m3.StructuredDataType_fields.EqualsIdentity(containment)&& node is DynamicField field)
+
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment) && node is DynamicField field)
         {
             return AddFieldsRaw(field);
         }
@@ -142,8 +136,8 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     {
         if (base.InsertContainmentsRaw(containment, index, node))
             return true;
-        
-        if (_m3.StructuredDataType_fields.EqualsIdentity(containment)&& node is DynamicField field)
+
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment) && node is DynamicField field)
         {
             return InsertFieldsRaw(index, field);
         }
@@ -156,8 +150,8 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     {
         if (base.RemoveContainmentsRaw(containment, node))
             return true;
-        
-        if (_m3.StructuredDataType_fields.EqualsIdentity(containment)&& node is DynamicField field)
+
+        if (_m3.StructuredDataType_fields.EqualsIdentity(containment) && node is DynamicField field)
         {
             return RemoveFieldsRaw(field);
         }
