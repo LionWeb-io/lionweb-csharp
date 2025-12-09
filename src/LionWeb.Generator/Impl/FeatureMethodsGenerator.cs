@@ -21,7 +21,6 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Notification;
-using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -312,63 +311,25 @@ public class FeatureMethodsGenerator(
 
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
-        SafeNodesVar(containment, writeable: true),
-        SetContainmentEmitterVariable(containment),
-        EmitterCollectOldDataCall(),
-        IfStatement(
-            InvocationExpression(FeatureSetRaw(containment), AsArguments([IdentifierName("safeNodes")])),
-            EmitterNotifyCall()
-        ),
+        ExpressionStatement(CallGeneric("SetOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment) =>
     [
-        SafeNodesVar(containment, writeable: true),
-        AssureNonEmptyCall(containment),
-        SetContainmentEmitterVariable(containment),
-        EmitterCollectOldDataCall(),
-        IfStatement(
-            InvocationExpression(FeatureSetRaw(containment), AsArguments([IdentifierName("safeNodes")])),
-            EmitterNotifyCall()
-        ),
+        ExpressionStatement(CallGeneric("SetRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiOptionalReference(Reference reference) =>
     [
-        SafeNodesVarReference(reference),
-        AssureNotNullCall(reference),
-        AssureNotNullMembersCall(reference),
-        SetReferenceEmitterVariable(reference),
-        EmitterCollectOldDataCall(),
-        IfStatement(
-            InvocationExpression(FeatureSetRaw(reference), AsArguments([IdentifierName("safeNodes")])),
-            EmitterNotifyCall()
-        ),
+        ExpressionStatement(CallGeneric("SetOptionalMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
         ReturnTrue()
     ];
 
-    private LocalDeclarationStatementSyntax SafeNodesVarReference(Reference reference) =>
-        Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(InvocationExpression(
-                MemberAccess(MetaProperty(reference),
-                    Generic("AsReferenceTargets", AsType(reference.Type, true))
-                ),
-                AsArguments([IdentifierName("value")])
-            ), IdentifierName("ToList")))
-        );
-
     private List<StatementSyntax> GenSetInternalMultiRequiredReference(Reference reference) =>
     [
-        SafeNodesVarReference(reference),
-        AssureNonEmptyCall(reference),
-        SetReferenceEmitterVariable(reference),
-        EmitterCollectOldDataCall(),
-        IfStatement(
-            InvocationExpression(FeatureSetRaw(reference), AsArguments([IdentifierName("safeNodes")])),
-            EmitterNotifyCall()
-        ),
+        ExpressionStatement(CallGeneric("SetRequiredMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
         ReturnTrue()
     ];
 
@@ -528,30 +489,6 @@ public class FeatureMethodsGenerator(
     
     #endregion
 
-    private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
-        Variable(
-            "emitter",
-            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable: true)),
-            NewCall([
-                MetaProperty(containment),
-                This(),
-                IdentifierName("safeNodes"),
-                FeatureField(containment)
-            ])
-        );
-
-    private LocalDeclarationStatementSyntax SetReferenceEmitterVariable(Reference reference) =>
-        Variable(
-            "emitter",
-            AsType(typeof(ReferenceSetNotificationEmitter<>), AsType(reference.GetFeatureType())),
-            NewCall([
-                MetaProperty(reference),
-                This(),
-                IdentifierName("safeNodes"),
-                FeatureField(reference)
-            ])
-        );
-
     private BinaryPatternSyntax NullOrTypePattern(Feature feature, bool writeable = false) =>
         BinaryPattern(
             SyntaxKind.OrPattern,
@@ -572,14 +509,6 @@ public class FeatureMethodsGenerator(
         ThrowStatement(
             NewCall([IdentifierName("feature"), IdentifierName("value")], AsType(typeof(InvalidValueException)))
         );
-
-    private LocalDeclarationStatementSyntax SafeNodesVar(Link link, bool writeable = false) =>
-        Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
-        );
-
-    private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
-        ExpressionStatement(Call("AssureNonEmpty", IdentifierName("safeNodes"), MetaProperty(link)));
 
     private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) =>
         CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)),
