@@ -8,7 +8,7 @@ using Names;
 public class GeneratedCSharpSyntaxNodesTests
 {
     [TestMethod]
-    public void CSharpSyntaxNodesFromLanguage()
+    public void CSharpSyntaxNodes_of_concept_and_annotation()
     { 
         LionWebVersions lionWebVersion = LionWebVersions.v2023_1;
         var testLanguage = new TestLanguageLanguage("testLanguage");
@@ -21,10 +21,13 @@ public class GeneratedCSharpSyntaxNodesTests
         };
 
         generator.Generate();
-        var generatedCSharpSyntaxNodes = generator.CSharpSyntaxNodes;
         
-        Assert.HasCount(3, generatedCSharpSyntaxNodes);
+        var cSharpSyntaxNodes = generator.CSharpSyntaxNodes;
         
+        Assert.HasCount(3, cSharpSyntaxNodes);
+        Assert.IsNotNull(cSharpSyntaxNodes.First(node => ((ClassSyntaxNode)node).Classifier.Name == nameof(LinkTestConcept)));
+        Assert.IsNotNull(cSharpSyntaxNodes.First(node => ((ClassSyntaxNode)node).Classifier.Name == nameof(DataTypeTestConcept)));
+        Assert.IsNotNull(cSharpSyntaxNodes.First(node => ((ClassSyntaxNode)node).Classifier.Name == nameof(TestAnnotation)));
     }
     
 }
