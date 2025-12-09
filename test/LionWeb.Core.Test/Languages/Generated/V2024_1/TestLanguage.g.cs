@@ -813,14 +813,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	/// <remarks>Optional Single Containment</remarks>
         public LinkTestConcept SetContainment_0_1(LinkTestConcept? value)
 	{
-		ContainmentSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, this, value, _containment_0_1);
-		emitter.CollectOldData();
-		if (SetContainment_0_1Raw(value))
-			emitter.Notify();
-		return this;
+        SetOptionalSingleContainment(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, _containment_0_1, SetContainment_0_1Raw);
+        return this;
 	}
 
-	private bool SetContainment_0_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, _containment_0_n);
+    private bool SetContainment_0_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, _containment_0_n);
 	private bool AddContainment_0_nRaw(LinkTestConcept? value) => AddChildRaw(value, _containment_0_n);
 	private bool InsertContainment_0_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, _containment_0_n);
 	private bool RemoveContainment_0_nRaw(LinkTestConcept? value) => RemoveChildRaw(value, _containment_0_n);
@@ -839,46 +836,22 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public LinkTestConcept AddContainment_0_n(IEnumerable<LinkTestConcept> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
-		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
-		if (_containment_0_n.SequenceEqual(safeNodes))
-			return this;
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, value, _containment_0_n, null);
-			emitter.CollectOldData();
-			if (AddContainment_0_nRaw(value))
-				emitter.Notify();
-		}
-
+        {
+            AddOptionalMultipleContainment(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, _containment_0_n, AddContainment_0_nRaw);
 		return this;
 	}
 
-	/// <remarks>Optional Multiple Containment</remarks>
+        /// <remarks>Optional Multiple Containment</remarks>
         public LinkTestConcept InsertContainment_0_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		AssureInRange(index, _containment_0_n);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
-		AssureNoSelfMove(index, safeNodes, _containment_0_n);
-		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, value, _containment_0_n, index);
-			emitter.CollectOldData();
-			if (InsertContainment_0_nRaw(index++, value))
-				emitter.Notify();
-		}
-
-		return this;
+        InsertOptionalMultipleContainment(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n,_containment_0_n,  InsertContainment_0_nRaw);
+        return this;
 	}
 
-	/// <remarks>Optional Multiple Containment</remarks>
+    /// <remarks>Optional Multiple Containment</remarks>
         public LinkTestConcept RemoveContainment_0_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
+        RemoveOptionalMultipleContainment<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, _containment_0_n, RemoveContainment_0_nRaw);
 		return this;
 	}
 
@@ -909,15 +882,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public LinkTestConcept SetContainment_1(LinkTestConcept value)
 	{
-		AssureNotNull(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_1);
-		ContainmentSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, this, value, _containment_1);
-		emitter.CollectOldData();
-		if (SetContainment_1Raw(value))
-			emitter.Notify();
-		return this;
+        SetRequiredSingleContainment(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_1, _containment_1, SetContainment_1Raw);
+        return this;
 	}
 
-	private bool SetContainment_1_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, _containment_1_n);
+    private bool SetContainment_1_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, _containment_1_n);
 	private bool AddContainment_1_nRaw(LinkTestConcept? value) => AddChildRaw(value, _containment_1_n);
 	private bool InsertContainment_1_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, _containment_1_n);
 	private bool RemoveContainment_1_nRaw(LinkTestConcept? value) => RemoveChildRaw(value, _containment_1_n);
@@ -939,49 +908,24 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If both Containment_1_n and nodes are empty</exception>
         public LinkTestConcept AddContainment_1_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
-		if (_containment_1_n.SequenceEqual(safeNodes))
-			return this;
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, value, _containment_1_n, null);
-			emitter.CollectOldData();
-			if (AddContainment_1_nRaw(value))
-				emitter.Notify();
-		}
-
-		return this;
+        AddRequiredMultipleContainment(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, _containment_1_n, AddContainment_1_nRaw);
+        return this;
 	}
 
-	/// <remarks>Required Multiple Containment</remarks>
+    /// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Containment_1_n and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Containment_1_n.Count</exception>
         public LinkTestConcept InsertContainment_1_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		AssureInRange(index, _containment_1_n);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
-		AssureNoSelfMove(index, safeNodes, _containment_1_n);
-		foreach (var value in safeNodes)
-		{
-			ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, value, _containment_1_n, index);
-			emitter.CollectOldData();
-			if (InsertContainment_1_nRaw(index++, value))
-				emitter.Notify();
-		}
-
-		return this;
+        InsertRequiredMultipleContainment(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, _containment_1_n, InsertContainment_1_nRaw);
+        return this;
 	}
 
-	/// <remarks>Required Multiple Containment</remarks>
+    /// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If Containment_1_n would be empty</exception>
         public LinkTestConcept RemoveContainment_1_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
-		AssureNotClearing(safeNodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
-		RemoveSelfParent(safeNodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
+        RemoveRequiredMultipleContainment(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, _containment_1_n, RemoveContainment_1_nRaw);
 		return this;
 	}
 
@@ -1000,15 +944,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 	private LinkTestConcept SetReference_0_1(ReferenceTarget? value)
 	{
-		AssureNullableInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
-		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1);
-		emitter.CollectOldData();
-		if (SetReference_0_1Raw(value))
-			emitter.Notify();
-		return this;
+        SetOptionalSingleReference<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, _reference_0_1, SetReference_0_1Raw);
+        return this;
 	}
 
-	private bool SetReference_0_1Raw(ReferenceTarget? value)
+    private bool SetReference_0_1Raw(ReferenceTarget? value)
 	{
 		if (value == _reference_0_1)
 			return false;
@@ -1037,45 +977,21 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	/// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept AddReference_0_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, value, _reference_0_n.Count);
-			emitter.CollectOldData();
-			if (AddReference_0_nRaw(value))
-				emitter.Notify();
-		}
-
-		return this;
+        AddOptionalMultipleReference(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, _reference_0_n, AddReference_0_nRaw);
+        return this;
 	}
 
-	/// <remarks>Optional Multiple Reference</remarks>
+    /// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept InsertReference_0_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		AssureInRange(index, _reference_0_n);
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, value, index);
-			emitter.CollectOldData();
-			if (InsertReference_0_nRaw(index++, value))
-				emitter.Notify();
-		}
-
-		return this;
+        InsertOptionalMultipleReference(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, _reference_0_n, InsertReference_0_nRaw);
+        return this;
 	}
 
-	/// <remarks>Optional Multiple Reference</remarks>
+    /// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept RemoveReference_0_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		RemoveAll(safeNodes, _reference_0_n, ReferenceRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n));
+        RemoveOptionalMultipleReference(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, _reference_0_n, RemoveReference_0_nRaw);
 		return this;
 	}
 
@@ -1096,15 +1012,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 	private LinkTestConcept SetReference_1(ReferenceTarget? value)
 	{
-		AssureNotNullInstance<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
-		ReferenceSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1);
-		emitter.CollectOldData();
-		if (SetReference_1Raw(value))
-			emitter.Notify();
-		return this;
+        SetRequiredSingleReference<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1, _reference_1, SetReference_1Raw);
+        return this;
 	}
 
-	private bool SetReference_1Raw(ReferenceTarget? value)
+    private bool SetReference_1Raw(ReferenceTarget? value)
 	{
 		if (value == _reference_1)
 			return false;
@@ -1136,49 +1048,25 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If both Reference_1_n and nodes are empty</exception>
         public LinkTestConcept AddReference_1_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, value, _reference_1_n.Count);
-			emitter.CollectOldData();
-			if (AddReference_1_nRaw(value))
-				emitter.Notify();
-		}
-
-		return this;
+		AddRequiredMultipleReference(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, _reference_1_n, AddReference_1_nRaw);
+        return this;
 	}
 
-	/// <remarks>Required Multiple Reference</remarks>
+    /// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Reference_1_n and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Reference_1_n.Count</exception>
         public LinkTestConcept InsertReference_1_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		AssureInRange(index, _reference_1_n);
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		foreach (var value in safeNodes)
-		{
-			ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, value, index);
-			emitter.CollectOldData();
-			if (InsertReference_1_nRaw(index++, value))
-				emitter.Notify();
-		}
-
-		return this;
+        InsertRequiredMultipleReference(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, _reference_1_n, InsertReference_1_nRaw);
+        return this;
 	}
 
-	/// <remarks>Required Multiple Reference</remarks>
+    /// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If Reference_1_n would be empty</exception>
         public LinkTestConcept RemoveReference_1_n(IEnumerable<LinkTestConcept> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		AssureNotClearing(safeNodes, ReferenceTargetNullableTargets<LinkTestConcept>(_reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n), TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		RemoveAll(safeNodes, _reference_1_n, ReferenceRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n));
+        {
+            RemoveRequiredMultipleReference(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n,
+                _reference_1_n, RemoveReference_1_nRaw);
 		return this;
 	}
 
