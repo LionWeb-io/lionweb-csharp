@@ -118,11 +118,11 @@ public partial class Container : ConceptInstanceBase
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		if (_libraries.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNode, _libraries, null);
+			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, value, _libraries, null);
 			emitter.CollectOldData();
-			if (AddLibrariesRaw(safeNode))
+			if (AddLibrariesRaw(value))
 				emitter.Notify();
 		}
 
@@ -138,11 +138,11 @@ public partial class Container : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		AssureNoSelfMove(index, safeNodes, _libraries);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNode, _libraries, index);
+			ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, value, _libraries, index);
 			emitter.CollectOldData();
-			if (InsertLibrariesRaw(index++, safeNode))
+			if (InsertLibrariesRaw(index++, value))
 				emitter.Notify();
 		}
 

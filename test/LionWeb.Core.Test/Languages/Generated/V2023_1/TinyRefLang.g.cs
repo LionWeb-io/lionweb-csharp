@@ -154,11 +154,11 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNode, _multivaluedRef.Count);
+			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, value, _multivaluedRef.Count);
 			emitter.CollectOldData();
-			if (AddMultivaluedRefRaw(safeNode))
+			if (AddMultivaluedRefRaw(value))
 				emitter.Notify();
 		}
 
@@ -174,11 +174,11 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNode, index);
+			ReferenceAddMultipleNotificationEmitter<INamed> emitter = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, value, index);
 			emitter.CollectOldData();
-			if (InsertMultivaluedRefRaw(index++, safeNode))
+			if (InsertMultivaluedRefRaw(index++, value))
 				emitter.Notify();
 		}
 

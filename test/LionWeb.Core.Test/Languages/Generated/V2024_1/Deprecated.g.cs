@@ -205,11 +205,11 @@ public partial class DeprConcept : ConceptInstanceBase
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		if (_deprChild.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNode, _deprChild, null);
+			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, value, _deprChild, null);
 			emitter.CollectOldData();
-			if (AddDeprChildRaw(safeNode))
+			if (AddDeprChildRaw(value))
 				emitter.Notify();
 		}
 
@@ -225,11 +225,11 @@ public partial class DeprConcept : ConceptInstanceBase
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNoSelfMove(index, safeNodes, _deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNode, _deprChild, index);
+			ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, value, _deprChild, index);
 			emitter.CollectOldData();
-			if (InsertDeprChildRaw(index++, safeNode))
+			if (InsertDeprChildRaw(index++, value))
 				emitter.Notify();
 		}
 

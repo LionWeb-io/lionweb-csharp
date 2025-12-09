@@ -356,11 +356,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		if (_altGroups.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNode, _altGroups, null);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, value, _altGroups, null);
 			emitter.CollectOldData();
-			if (AddAltGroupsRaw(safeNode))
+			if (AddAltGroupsRaw(value))
 				emitter.Notify();
 		}
 
@@ -375,11 +375,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNoSelfMove(index, safeNodes, _altGroups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNode, _altGroups, index);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, value, _altGroups, index);
 			emitter.CollectOldData();
-			if (InsertAltGroupsRaw(index++, safeNode))
+			if (InsertAltGroupsRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -449,11 +449,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		if (_groups.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNode, _groups, null);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, value, _groups, null);
 			emitter.CollectOldData();
-			if (AddGroupsRaw(safeNode))
+			if (AddGroupsRaw(value))
 				emitter.Notify();
 		}
 
@@ -468,11 +468,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNoSelfMove(index, safeNodes, _groups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNode, _groups, index);
+			ContainmentAddMultipleNotificationEmitter<MaterialGroup> emitter = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, value, _groups, index);
 			emitter.CollectOldData();
-			if (InsertGroupsRaw(index++, safeNode))
+			if (InsertGroupsRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -504,11 +504,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNode, _materials.Count);
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, value, _materials.Count);
 			emitter.CollectOldData();
-			if (AddMaterialsRaw(safeNode))
+			if (AddMaterialsRaw(value))
 				emitter.Notify();
 		}
 
@@ -522,11 +522,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNode, index);
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, value, index);
 			emitter.CollectOldData();
-			if (InsertMaterialsRaw(index++, safeNode))
+			if (InsertMaterialsRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -1119,11 +1119,11 @@ public partial class CompositeShape : Shape
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		if (_disabledParts.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNode, _disabledParts, null);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, value, _disabledParts, null);
 			emitter.CollectOldData();
-			if (AddDisabledPartsRaw(safeNode))
+			if (AddDisabledPartsRaw(value))
 				emitter.Notify();
 		}
 
@@ -1139,11 +1139,11 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNoSelfMove(index, safeNodes, _disabledParts);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNode, _disabledParts, index);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, value, _disabledParts, index);
 			emitter.CollectOldData();
-			if (InsertDisabledPartsRaw(index++, safeNode))
+			if (InsertDisabledPartsRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -1222,11 +1222,11 @@ public partial class CompositeShape : Shape
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		if (_parts.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNode, _parts, null);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, value, _parts, null);
 			emitter.CollectOldData();
-			if (AddPartsRaw(safeNode))
+			if (AddPartsRaw(value))
 				emitter.Notify();
 		}
 
@@ -1242,11 +1242,11 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNoSelfMove(index, safeNodes, _parts);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNode, _parts, index);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.CompositeShape_parts, this, value, _parts, index);
 			emitter.CollectOldData();
-			if (InsertPartsRaw(index++, safeNode))
+			if (InsertPartsRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -1973,11 +1973,11 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		if (_shapes.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNode, _shapes, null);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, value, _shapes, null);
 			emitter.CollectOldData();
-			if (AddShapesRaw(safeNode))
+			if (AddShapesRaw(value))
 				emitter.Notify();
 		}
 
@@ -1992,11 +1992,11 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNoSelfMove(index, safeNodes, _shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNode, _shapes, index);
+			ContainmentAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.Geometry_shapes, this, value, _shapes, index);
 			emitter.CollectOldData();
-			if (InsertShapesRaw(index++, safeNode))
+			if (InsertShapesRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -2502,11 +2502,11 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNode, _materials.Count);
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, value, _materials.Count);
 			emitter.CollectOldData();
-			if (AddMaterialsRaw(safeNode))
+			if (AddMaterialsRaw(value))
 				emitter.Notify();
 		}
 
@@ -2522,11 +2522,11 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNode, index);
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.MaterialGroup_materials, this, value, index);
 			emitter.CollectOldData();
-			if (InsertMaterialsRaw(index++, safeNode))
+			if (InsertMaterialsRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -3260,11 +3260,11 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNode, _shapes.Count);
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, value, _shapes.Count);
 			emitter.CollectOldData();
-			if (AddShapesRaw(safeNode))
+			if (AddShapesRaw(value))
 				emitter.Notify();
 		}
 
@@ -3278,11 +3278,11 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNode, index);
+			ReferenceAddMultipleNotificationEmitter<IShape> emitter = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, value, index);
 			emitter.CollectOldData();
-			if (InsertShapesRaw(index++, safeNode))
+			if (InsertShapesRaw(index++, value))
 				emitter.Notify();
 		}
 
@@ -3503,11 +3503,11 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		if (_fixpoints.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNode, _fixpoints, null);
+			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, value, _fixpoints, null);
 			emitter.CollectOldData();
-			if (AddFixpointsRaw(safeNode))
+			if (AddFixpointsRaw(value))
 				emitter.Notify();
 		}
 
@@ -3523,11 +3523,11 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNoSelfMove(index, safeNodes, _fixpoints);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNode, _fixpoints, index);
+			ContainmentAddMultipleNotificationEmitter<Coord> emitter = new(ShapesLanguage.Instance.IShape_fixpoints, this, value, _fixpoints, index);
 			emitter.CollectOldData();
-			if (InsertFixpointsRaw(index++, safeNode))
+			if (InsertFixpointsRaw(index++, value))
 				emitter.Notify();
 		}
 

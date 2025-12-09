@@ -628,11 +628,11 @@ public partial class Library : ConceptInstanceBase
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		if (_books.SequenceEqual(safeNodes))
 			return this;
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNode, _books, null);
+			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, value, _books, null);
 			emitter.CollectOldData();
-			if (AddBooksRaw(safeNode))
+			if (AddBooksRaw(value))
 				emitter.Notify();
 		}
 
@@ -648,11 +648,11 @@ public partial class Library : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		AssureNoSelfMove(index, safeNodes, _books);
-		foreach (var safeNode in safeNodes)
+		foreach (var value in safeNodes)
 		{
-			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNode, _books, index);
+			ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, value, _books, index);
 			emitter.CollectOldData();
-			if (InsertBooksRaw(index++, safeNode))
+			if (InsertBooksRaw(index++, value))
 				emitter.Notify();
 		}
 
