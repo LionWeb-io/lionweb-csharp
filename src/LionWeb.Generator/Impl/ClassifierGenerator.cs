@@ -38,12 +38,12 @@ using static AstExtensions;
 /// <seealso cref="FeatureMethodsGenerator"/>
 /// <seealso cref="ContainmentMethodsGenerator"/>
 /// <seealso cref="FeatureGeneratorBase"/>
-public class ClassifierGenerator(
+internal class ClassifierGenerator(
     Classifier classifier,
     INames names,
     LionWebVersions lionWebVersion,
     GeneratorConfig config,
-    IList<ICSharpSyntaxNode> cSharpSyntaxNodes)
+    CSharpSyntaxNodeContainer cSharpSyntaxNodeContainer)
     : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion, config)
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
@@ -54,21 +54,21 @@ public class ClassifierGenerator(
             case Annotation a:
                 {
                     var classDeclarationSyntax = ClassifierAnnotation(a);
-                    cSharpSyntaxNodes.Add(new ClassSyntaxNode(a, classDeclarationSyntax));
+                    cSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(a, classDeclarationSyntax));
                     return classDeclarationSyntax;
                 }
 
             case Concept c:
                 {
                     var classDeclarationSyntax = ClassifierConcept(c);
-                    cSharpSyntaxNodes.Add(new ClassSyntaxNode(c, classDeclarationSyntax));
+                    cSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(c, classDeclarationSyntax));
                     return classDeclarationSyntax;
                 }
 
             case Interface i:
                 {
                     var interfaceDeclarationSyntax = ClassifierInterface(i);
-                    cSharpSyntaxNodes.Add(new InterfaceSyntaxNode(i, interfaceDeclarationSyntax));
+                    cSharpSyntaxNodeContainer.Add(new InterfaceSyntaxNode(i, interfaceDeclarationSyntax));
                     return interfaceDeclarationSyntax;
                 }
                 

@@ -21,9 +21,9 @@ using Core.M3;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 /// <summary>
-/// Represents an interface for generated C# syntax nodes.
+/// Interface for holding LionWeb's <see cref="Classifier"/>s and their corresponding generated C# syntax nodes.
 /// </summary>
-public interface ICSharpSyntaxNode
+public interface ISyntaxNodeDataHolder
 {
     Classifier Classifier { get; }
 }
@@ -33,7 +33,7 @@ public interface ICSharpSyntaxNode
 /// </summary>
 public record ClassSyntaxNode(
     Classifier ClassifierType,
-    ClassDeclarationSyntax ClassDeclarationSyntax) : ICSharpSyntaxNode
+    ClassDeclarationSyntax ClassDeclarationSyntax) : ISyntaxNodeDataHolder
 {
     public Classifier Classifier => ClassifierType;
 };
@@ -43,7 +43,7 @@ public record ClassSyntaxNode(
 /// </summary>
 public record InterfaceSyntaxNode(
     Classifier ClassifierType,
-    InterfaceDeclarationSyntax InterfaceDeclarationSyntax) : ICSharpSyntaxNode
+    InterfaceDeclarationSyntax InterfaceDeclarationSyntax) : ISyntaxNodeDataHolder
 {
     public Classifier Classifier => ClassifierType;
 };

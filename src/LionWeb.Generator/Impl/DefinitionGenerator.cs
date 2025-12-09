@@ -30,8 +30,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 // use https://roslynquoter.azurewebsites.net/ to learn how to build C# ASTs
 
-public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config, 
-    IList<ICSharpSyntaxNode> cSharpSyntaxNodes)
+internal class DefinitionGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config, 
+    CSharpSyntaxNodeContainer cSharpSyntaxNodeContainer)
     : GeneratorBase(names, lionWebVersion, config)
 {
     private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
@@ -53,7 +53,7 @@ public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion, G
                                 }
                                 .Concat(new FactoryGenerator(_names, _lionWebVersion, _config).FactoryTypes())
                                 .Concat(Classifiers.Select(c =>
-                                    new ClassifierGenerator(c, _names, _lionWebVersion, _config, cSharpSyntaxNodes).ClassifierType()))
+                                    new ClassifierGenerator(c, _names, _lionWebVersion, _config, cSharpSyntaxNodeContainer).ClassifierType()))
                                 .Concat(Enumerations.Select(e =>
                                     new EnumGenerator(e, _names, _lionWebVersion, _config).EnumType()))
                                 .Concat(StructuredDataTypes.Select(s =>
