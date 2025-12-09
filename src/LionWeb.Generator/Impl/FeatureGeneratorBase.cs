@@ -43,7 +43,7 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public abstract class FeatureGeneratorBase(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
     : ClassifierGeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="FeatureGeneratorBase"/>

@@ -23,7 +23,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 /// Convenience functions for Roslyn AST
-public static class AstExtensions
+internal static class AstExtensions
 {
     /// <paramref name="value"/> as Roslyn literal.
     public static LiteralExpressionSyntax AsLiteral(this string value) =>

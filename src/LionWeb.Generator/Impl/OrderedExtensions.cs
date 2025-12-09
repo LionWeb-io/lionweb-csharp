@@ -20,7 +20,7 @@ namespace LionWeb.Generator.Impl;
 using Core.M2;
 using Core.M3;
 
-public static class OrderedExtensions
+internal static class OrderedExtensions
 {
     private const string _separator = ".";
 

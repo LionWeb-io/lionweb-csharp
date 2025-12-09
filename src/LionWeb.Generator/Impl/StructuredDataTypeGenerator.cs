@@ -28,7 +28,7 @@ using static AstExtensions;
 /// <summary>
 /// Generates StructuredDataType readonly record structs.
 /// </summary>
-public class StructuredDataTypeGenerator(
+internal class StructuredDataTypeGenerator(
     StructuredDataType sdt,
     INames names,
     LionWebVersions lionWebVersion,

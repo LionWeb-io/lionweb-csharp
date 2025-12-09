@@ -27,7 +27,7 @@ using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public class FeatureGeneratorContainment(Classifier classifier, Containment containment, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, containment, names, lionWebVersion, config)
+internal class FeatureGeneratorContainment(Classifier classifier, Containment containment, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, containment, names, lionWebVersion, config)
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment() =>
         new List<MemberDeclarationSyntax>

@@ -27,7 +27,7 @@ using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public class FeatureGeneratorProperty(Classifier classifier, Property property, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, property, names, lionWebVersion, config)
+internal class FeatureGeneratorProperty(Classifier classifier, Property property, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, property, names, lionWebVersion, config)
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredProperty()
     {

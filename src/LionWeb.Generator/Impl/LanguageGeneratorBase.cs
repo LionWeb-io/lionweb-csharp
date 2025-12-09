@@ -27,7 +27,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 /// <summary>
 /// Common base class for all generators for the language class.
 /// </summary>
-public abstract class LanguageGeneratorBase : GeneratorBase
+internal abstract class LanguageGeneratorBase : GeneratorBase
 {
     /// <inheritdoc cref="LanguageGeneratorBase"/>
     protected LanguageGeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)

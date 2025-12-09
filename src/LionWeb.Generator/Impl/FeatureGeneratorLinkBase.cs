@@ -26,7 +26,7 @@ using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, link, names, lionWebVersion, config)
+internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, link, names, lionWebVersion, config)
 {
     public IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(bool writeable) =>
     [

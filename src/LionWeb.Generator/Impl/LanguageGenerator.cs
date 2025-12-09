@@ -48,7 +48,7 @@ using Property = Core.M3.Property;
 /// - EnumerationLiteral properties
 /// </summary>
 /// <seealso cref="LanguageConstructorGenerator"/>
-public class LanguageGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+internal class LanguageGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
     : LanguageGeneratorBase(names, lionWebVersion, config)
 {
     private IdentifierNameSyntax FactoryInterfaceType => _names.FactoryInterfaceType;

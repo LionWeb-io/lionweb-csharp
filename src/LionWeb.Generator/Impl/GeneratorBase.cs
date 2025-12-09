@@ -29,7 +29,7 @@ using static AstExtensions;
 /// <summary>
 /// Common base class for all generators.
 /// </summary>
-public abstract class GeneratorBase
+internal abstract class GeneratorBase
 {
     /// <inheritdoc cref="INames"/>
     protected readonly INames _names;
