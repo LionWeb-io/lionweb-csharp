@@ -58,7 +58,7 @@ public class GeneratorFacade
     }
 
     /// <summary>
-    /// Represents a list of generated C# syntax nodes with their corresponding <see cref="Classifier"/>.
+    /// Returns a list of generated C# syntax nodes with their corresponding <see cref="Classifier"/>.
     /// </summary>
     public List<ICSharpSyntaxNode> CSharpSyntaxNodes => _cSharpSyntaxNodes;
 
