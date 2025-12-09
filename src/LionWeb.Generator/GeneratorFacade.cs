@@ -29,23 +29,6 @@ using Names;
 using System.Collections.Immutable;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-
-/*public enum CSharpLanguageConstructKind
-{
-    GeneratedClass,
-    LanguageConstructorInitialization,
-    LanguageField,
-    LanguageProperty,
-    FactoryInterfaceMethod,
-    FactoryImplementationMethod
-}*/
-
-public interface IGeneratedCSharpSyntaxNode { }
-
-public record ClassSyntaxNode(
-    Classifier Classifier,
-    ClassDeclarationSyntax ClassDeclarationSyntax): IGeneratedCSharpSyntaxNode; 
-
 /// Public API for LionWeb C# generator.
 /// Creates one file containing
 /// <ul>
@@ -60,21 +43,24 @@ public class GeneratorFacade
 {
     private CompilationUnitSyntax? _compilationUnit = null;
 
-    private List<IGeneratedCSharpSyntaxNode> _generatedCSharpSyntaxNodes = [];
+    private readonly List<ICSharpSyntaxNode> _cSharpSyntaxNodes = [];
     
     /// Generates the compilation unit for the input language.
     public CompilationUnitSyntax Generate()
     {
         if (_compilationUnit == null)
         {
-            var generator = new DefinitionGenerator(Names, LionWebVersion, Config);
+            var generator = new DefinitionGenerator(Names, LionWebVersion, Config, _cSharpSyntaxNodes);
             _compilationUnit = generator.DefinitionFile();
         }
 
         return _compilationUnit;
     }
-    
-    public List<IGeneratedCSharpSyntaxNode> GeneratedCSharpSyntaxNodes => _generatedCSharpSyntaxNodes;
+
+    /// <summary>
+    /// Represents a list of generated C# syntax nodes with their corresponding <see cref="Classifier"/>.
+    /// </summary>
+    public List<ICSharpSyntaxNode> CSharpSyntaxNodes => _cSharpSyntaxNodes;
 
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }

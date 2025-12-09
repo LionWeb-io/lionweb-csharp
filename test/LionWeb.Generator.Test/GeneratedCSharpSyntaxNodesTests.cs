@@ -24,10 +24,10 @@ public class GeneratedCSharpSyntaxNodesTests
             
         };
 
-        var compilationUnit = generator.Generate();
-        var languageConstructSyntaxes = generator.GeneratedCSharpSyntaxNodes;
+        generator.Generate();
+        var generatedCSharpSyntaxNodes = generator.CSharpSyntaxNodes;
         
-        Assert.IsEmpty(languageConstructSyntaxes);
+        Assert.HasCount(3, generatedCSharpSyntaxNodes);
     }
 
     DynamicLanguage[] DeserializeExternalLanguage(LionWebVersions lionWebVersion, string name,

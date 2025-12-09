@@ -42,18 +42,35 @@ public class ClassifierGenerator(
     Classifier classifier,
     INames names,
     LionWebVersions lionWebVersion,
-    GeneratorConfig config)
+    GeneratorConfig config,
+    IList<ICSharpSyntaxNode> cSharpSyntaxNodes)
     : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion, config)
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
-    public TypeDeclarationSyntax ClassifierType() =>
-        classifier switch
+    public TypeDeclarationSyntax ClassifierType()
+    {
+        switch (classifier)
         {
-            Annotation a => ClassifierAnnotation(a),
-            Concept c => ClassifierConcept(c),
-            Interface i => ClassifierInterface(i),
-            _ => throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier))
-        };
+            case Annotation a:
+                {
+                    var classDeclarationSyntax = ClassifierAnnotation(a);
+                    cSharpSyntaxNodes.Add(new ClassSyntaxNode(a, classDeclarationSyntax));
+                    return classDeclarationSyntax;
+                }
+
+            case Concept c:
+                {
+                    var classDeclarationSyntax = ClassifierConcept(c);
+                    cSharpSyntaxNodes.Add(new ClassSyntaxNode(c, classDeclarationSyntax));
+                    return classDeclarationSyntax;
+                }
+
+            case Interface i:
+                return ClassifierInterface(i);
+            default:
+                throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier));
+        }
+    }
 
     private ClassDeclarationSyntax ClassifierAnnotation(Annotation annotation)
     {
