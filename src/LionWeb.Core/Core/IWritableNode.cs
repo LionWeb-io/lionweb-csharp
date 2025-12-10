@@ -161,7 +161,7 @@ public interface IWritableNode : IReadableNode
     /// <summary>
     /// Removes <paramref name="annotation"/> from <c>this</c> node.
     /// </summary>
-    /// <param name="annotation">Annotation to renmove from <c>this</c> node.</param>
+    /// <param name="annotation">Annotation to remove from <c>this</c> node.</param>
     /// <returns>
     /// <c>true</c> if <paramref name="annotation"/> has been removed and that changed the node
     /// (i.e. <paramref name="annotation"/> was an annotation of <c>this</c>);

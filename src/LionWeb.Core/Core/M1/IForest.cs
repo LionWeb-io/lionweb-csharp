@@ -24,6 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// A collection of model trees, represented by each trees' <see cref="IPartitionInstance">partition</see> (aka root node).
+/// <seealso cref="LionWeb.Core.M1.Raw.IForestRawExtensions"/>
 public interface IForest
 {
     /// Contains all known partitions.
@@ -45,17 +46,56 @@ public interface IForest
 
     /// <c>this</c> forest's notification producer, if any.
     protected internal IForestNotificationProducer? GetNotificationProducer();
-}
 
-public interface IForestRaw : IForest
-{
+    #region raw api
+
+    /// <summary>
+    /// Tries to get the partition with <paramref name="nodeId"/> from <c>this</c> forest.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if partition <paramref name="nodeId"/> is known to <c>this</c> forest;
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <seealso cref="IForest.TryGetPartition"/>
     protected internal bool TryGetPartitionRaw(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition);
+
+    /// <summary>
+    /// Adds <paramref name="partition"/> to <c>this</c> forest.
+    /// </summary>
+    /// <param name="partition">Partition to add to <c>this</c> forest.</param>
+    /// <returns>
+    /// <c>true</c> if <paramref name="partition"/> has been added and that changed the forest
+    /// (i.e. <paramref name="partition"/> is a valid partition for <c>this</c> and not yet the last partition in <c>this</c>);
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <remarks>
+    /// Does <i>not</i> trigger a notification, but subscribes <c>this</c> forest to <paramref name="partition"/>
+    /// (i.e. future events on <paramref name="partition"/> will be forwarded to <c>this</c>).
+    /// </remarks>
+    /// <seealso cref="IForest.AddPartitions"/>
     protected internal bool AddPartitionRaw(IPartitionInstance partition);
+
+    /// <summary>
+    /// Removes <paramref name="partition"/> from <c>this</c> forest.
+    /// </summary>
+    /// <param name="partition">Partition to remove from <c>this</c> forest.</param>
+    /// <returns>
+    /// <c>true</c> if <paramref name="partition"/> has been removed and that changed the forest
+    /// (i.e. <paramref name="partition"/> was a partition in <c>this</c>);
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <remarks>
+    /// Does <i>not</i> trigger a notification, but unsubscribes <c>this</c> forest from <paramref name="partition"/>
+    /// (i.e. future events on <paramref name="partition"/> will not be forwarded to <c>this</c>).
+    /// </remarks>
+    /// <seealso cref="IForest.RemovePartitions"/>
     protected internal bool RemovePartitionRaw(IPartitionInstance partition);
+
+    #endregion
 }
 
 /// <inheritdoc />
-public class Forest : IForestRaw
+public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
     private readonly IForestNotificationProducer _notificationProducer;
@@ -81,7 +121,7 @@ public class Forest : IForestRaw
         return partition is not null;
     }
 
-    bool IForestRaw.TryGetPartitionRaw(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition) =>
+    bool IForest.TryGetPartitionRaw(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition) =>
         TryGetPartition(nodeId, out partition);
 
     /// <inheritdoc />
@@ -96,9 +136,10 @@ public class Forest : IForestRaw
         }
     }
 
-    bool IForestRaw.AddPartitionRaw(IPartitionInstance partition) =>
+    bool IForest.AddPartitionRaw(IPartitionInstance partition) =>
         AddPartitionRaw(partition);
 
+    /// <inheritdoc cref="IForest.AddPartitionRaw" />
     protected internal bool AddPartitionRaw(IPartitionInstance partition)
     {
         if (!_partitions.Add(partition))
@@ -132,9 +173,10 @@ public class Forest : IForestRaw
         }
     }
 
-    bool IForestRaw.RemovePartitionRaw(IPartitionInstance partition) =>
+    bool IForest.RemovePartitionRaw(IPartitionInstance partition) =>
         RemovePartitionRaw(partition);
 
+    /// <inheritdoc cref="IForest.RemovePartitionRaw" />
     protected internal bool RemovePartitionRaw(IPartitionInstance partition)
     {
         if (!_partitions.Remove(partition))
@@ -210,8 +252,16 @@ public class Forest : IForestRaw
 
 public static class ForestExtensions
 {
+    /// <summary>
+    /// Enumerates all partitions of <paramref name="forest"/>, and all their direct and indirect children.
+    /// Optionally includes directly and indirectly contained annotations.
+    /// </summary>
+    /// <param name="forest">Forest to find descendants of.</param>
+    /// <param name="includeAnnotations">If true, the result includes directly and indirectly contained annotations.</param>
+    /// <returns>All directly and indirectly contained nodes of <paramref name="forest"/>.</returns>
+    /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
     public static IEnumerable<IReadableNode> Descendants(this IForest forest, bool includeAnnotations = true) =>
         forest
             .Partitions
-            .SelectMany(p => M1Extensions.Descendants(p, true, includeAnnotations));
+            .SelectMany(p => M1Extensions.Descendants<IReadableNode>(p, true, includeAnnotations));
 }

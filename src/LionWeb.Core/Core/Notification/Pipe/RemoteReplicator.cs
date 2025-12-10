@@ -31,14 +31,14 @@ using System.Diagnostics;
 /// </para>
 public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 {
-    private readonly IForestRaw? _localForest;
+    private readonly IForest? _localForest;
 
     protected readonly IdFilteringNotificationFilter Filter;
 
     private readonly SharedNodeMap _sharedNodeMap;
 
     public RemoteReplicator(
-        IForestRaw? localForest,
+        IForest? localForest,
         IdFilteringNotificationFilter filter,
         SharedNodeMap sharedNodeMap,
         object? sender) : base(sender)
