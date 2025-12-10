@@ -42,9 +42,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var originalPartition = new LinkTestConcept("originalPartition")
+        var originalPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = existingParent
+            Links = [existingParent]
         };
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
@@ -59,18 +59,18 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         // That's what makes the ChildAddedNotification "invalid".
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
-            originalPartition.Containment_1 = replacement;
+            originalPartition.AddLinks([replacement]);
         });
         
         // Assert
         // changes applied to original partition
-        // (node api maintains tree shape: moves existingChild from Containment_0_1 to Containment_1)
-        Assert.AreSame(replacement, originalPartition.Containment_1);
+        // (node api maintains tree shape: moves existingChild from Links[0].Containment_0_1 to Containment_1)
+        Assert.AreSame(replacement, originalPartition.Links[1]);
         Assert.IsNull(existingParent.Containment_0_1);
         
         // change has not replicated to the clone
-        Assert.IsFalse(clonedPartition.TryGetContainment_1(out LinkTestConcept? _));
-        Assert.AreEqual("existingChild", clonedPartition.Containment_0_1!.Containment_0_1!.GetId());
+        Assert.HasCount(1, clonedPartition.Links);
+        Assert.AreEqual("existingChild", clonedPartition.Links[0]!.Containment_0_1!.GetId());
     }
     
     [TestMethod]
@@ -84,9 +84,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var originalPartition = new LinkTestConcept("originalPartition")
+        var originalPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = existingParent
+            Links = [existingParent]
         };
 
         var originalForest = new Forest();
@@ -103,17 +103,17 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
-            originalPartition.Containment_1 = replacement;
+            existingParent.ReplaceWith(replacement);
         });
         
         // Assert
         // changes applied to original partition
-        Assert.AreSame(replacement, originalPartition.Containment_1);
+        Assert.AreSame(replacement, originalPartition.Links[0]);
         Assert.IsNull(existingParent.Containment_0_1);
         
         // change has not replicated to the clone
-        Assert.IsFalse(clonedPartition.TryGetContainment_1(out LinkTestConcept? _));
-        Assert.AreEqual("existingChild", clonedPartition.Containment_0_1!.Containment_0_1!.GetId());
+        Assert.IsFalse(clonedPartition.TryGetLinks(out var _));
+        Assert.AreEqual("existingChild", clonedPartition.Links[0]!.Containment_0_1!.GetId());
     }
     
     [TestMethod]
@@ -127,9 +127,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var originalPartition = new LinkTestConcept("originalPartition")
+        var originalPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = existingParent
+            Links = [existingParent]
         };
 
         var originalForest = new Forest();
@@ -149,7 +149,7 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         existingParent.Containment_0_1 = null;
 
         // add removed existing child back to partition
-        originalPartition.Containment_1 = replacement;
+        existingParent.ReplaceWith(replacement);
         
         // Assert 
         AssertEquals(clonedForest.Partitions, originalForest.Partitions);
@@ -170,12 +170,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var otherPartition = new LinkTestConcept("otherPartition")
+        var otherPartition = new TestPartition("otherPartition")
         {
-            Containment_0_1 = existingParent
+            Links = [existingParent]
         };
 
-        var changedPartition = new LinkTestConcept("changedPartition");
+        var changedPartition = new TestPartition("changedPartition");
 
         var originalForest = new Forest();
         originalForest.AddPartitions([otherPartition, changedPartition]);
@@ -190,16 +190,16 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         // Act
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
-            changedPartition.Containment_1 = replacement;
+            changedPartition.AddLinks([replacement]);
         });
         
         // Assert
         // changes applied to original partition
-        Assert.AreSame(replacement, changedPartition.Containment_1);
+        Assert.AreSame(replacement, changedPartition.Links[0]);
         Assert.IsNull(existingParent.Containment_0_1);
         
         // change has not replicated to the clone
-        Assert.IsFalse(((LinkTestConcept)clonedForest.Partitions.ToList()[1]).TryGetContainment_1(out LinkTestConcept? _));
+        Assert.IsFalse(((TestPartition)clonedForest.Partitions.ToList()[1]).TryGetLinks(out var _));
     }
 
     /// <summary>
@@ -217,12 +217,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var otherPartition = new LinkTestConcept("otherPartition")
+        var otherPartition = new TestPartition("otherPartition")
         {
-            Containment_0_1 = existingParent
+            Links = [existingParent]
         };
 
-        var changedPartition = new LinkTestConcept("changedPartition");
+        var changedPartition = new TestPartition("changedPartition");
 
         var originalForest = new Forest();
         originalForest.AddPartitions([changedPartition]);
@@ -235,7 +235,7 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         };
         
         // Act
-        changedPartition.Containment_1 = replacement;
+        changedPartition.AddLinks([replacement]);
         
         // Assert
         AssertEquals(clonedForest.Partitions, originalForest.Partitions);
@@ -259,9 +259,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var originalPartition = new LinkTestConcept("originalPartition")
+        var originalPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = replaced
+            Links = [replaced]
         };
         
         var clonedPartition = CreateDeltaReplicator(originalPartition);
@@ -293,9 +293,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var originalPartition = new LinkTestConcept("originalPartition")
+        var originalPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = replaced
+            Links = [replaced]
         };
         
         var originalForest = new Forest();
@@ -331,12 +331,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var otherPartition = new LinkTestConcept("originalPartition")
+        var otherPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = replaced
+            Links = [replaced]
         };
         
-        var changedPartition = new LinkTestConcept("changedPartition");
+        var changedPartition = new TestPartition("changedPartition");
         
         var originalForest = new Forest();
         originalForest.AddPartitions([otherPartition, changedPartition]);
@@ -370,12 +370,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
             Containment_0_1 = existingChild 
         };
         
-        var otherPartition = new LinkTestConcept("originalPartition")
+        var otherPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = replaced
+            Links = [replaced]
         };
         
-        var changedPartition = new LinkTestConcept("changedPartition");
+        var changedPartition = new TestPartition("changedPartition");
         
         var originalForest = new Forest();
         originalForest.AddPartitions([changedPartition]);
@@ -412,10 +412,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         child0.AddAnnotations([existingParentAnnotation]);
 
         var child1 = new LinkTestConcept("child1");
-        var originalPartition = new LinkTestConcept("originalPartition")
+        var originalPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = child0,
-            Containment_1 = child1
+            Links = [child0, child1]
         };
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
@@ -431,15 +430,15 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         
         // Assert
         // changes applied to original partition
-        Assert.HasCount(1,originalPartition.Containment_0_1.GetAnnotations());
-        Assert.AreEqual("existingParentAnnotation", originalPartition.Containment_0_1.GetAnnotations()[0].GetId());
-        Assert.HasCount(1, originalPartition.Containment_1.GetAnnotations());
-        Assert.HasCount(1, originalPartition.Containment_1.GetAnnotations()[0].GetAnnotations());
-        Assert.AreEqual("existingChildAnnotation", originalPartition.Containment_1.GetAnnotations()[0].GetAnnotations()[0].GetId());
+        Assert.HasCount(1,originalPartition.Links[0].GetAnnotations());
+        Assert.AreEqual("existingParentAnnotation", originalPartition.Links[0].GetAnnotations()[0].GetId());
+        Assert.HasCount(1, originalPartition.Links[1].GetAnnotations());
+        Assert.HasCount(1, originalPartition.Links[1].GetAnnotations()[0].GetAnnotations());
+        Assert.AreEqual("existingChildAnnotation", originalPartition.Links[1].GetAnnotations()[0].GetAnnotations()[0].GetId());
         
         // change has not replicated to the clone
-        Assert.HasCount(1,clonedPartition.Containment_0_1!.GetAnnotations());
-        Assert.IsEmpty(clonedPartition.Containment_1.GetAnnotations());
+        Assert.HasCount(1,clonedPartition.Links[0]!.GetAnnotations());
+        Assert.IsEmpty(clonedPartition.Links[1].GetAnnotations());
     }
 
     
@@ -455,9 +454,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         var child = new LinkTestConcept("child");
         child.AddAnnotations([existingParentAnnotation]);
         
-        var originalPartition = new LinkTestConcept("originalPartition")
+        var originalPartition = new TestPartition("originalPartition")
         {
-            Containment_0_1 = child
+            Links = [child]
         };
         
         var newParentAnnotation = new TestAnnotation("newAnnotation");
@@ -479,7 +478,7 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
     public void AddExistingPartition()
     {
         // Arrange
-        var partition = new LinkTestConcept("partition");
+        var partition = new TestPartition("partition");
         
         var originalForest = new Forest();
         

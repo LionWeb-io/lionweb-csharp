@@ -134,35 +134,6 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
     }
     
-    private HashSet<NodeId> CollectNodeIdsOfAllDescendantsOf(IReadableNode node) =>
-        M1Extensions
-            .Descendants(node, true, true)
-            .Select(n => n.GetId())
-            .ToHashSet();
-
-    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> replacedNodes)
-    {
-        HashSet<NodeId> newNodes = CollectNodeIdsOfAllDescendantsOf(node: newNodeNotification.NewNode);
-
-        var hasIntersection = _sharedNodeMap.NodeIds.ToHashSet().Overlaps(newNodes);
-
-        if (!hasIntersection)
-        {
-            return;
-        }
-
-        var remainingNodes = _sharedNodeMap.NodeIds
-            .Intersect(newNodes)
-            .ExceptBy(replacedNodes, s => s)
-            .ToList();
-
-        if (remainingNodes.Count != 0)
-        {
-            throw new InvalidNotificationException(newNodeNotification,
-                $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
-        }
-    }
-    
     #region Partitions
 
     private void OnRemoteNewPartition(PartitionAddedNotification n)
@@ -554,6 +525,34 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 when localParent.TryGetContainmentRaw(containment, out var node) && node is not null:
                 CheckMatchingNodeId(messagePrefix, notification, candidate, node, index, messageSuffix);
                 break;
+        }
+    }
+    private static HashSet<NodeId> CollectNodeIdsOfAllDescendantsOf(IReadableNode node) =>
+        M1Extensions
+            .Descendants(node, true, true)
+            .Select(n => n.GetId())
+            .ToHashSet();
+
+    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> replacedNodes)
+    {
+        HashSet<NodeId> newNodes = CollectNodeIdsOfAllDescendantsOf(node: newNodeNotification.NewNode);
+
+        var hasIntersection = _sharedNodeMap.NodeIds.ToHashSet().Overlaps(newNodes);
+
+        if (!hasIntersection)
+        {
+            return;
+        }
+
+        var remainingNodes = _sharedNodeMap.NodeIds
+            .Intersect(newNodes)
+            .ExceptBy(replacedNodes, s => s)
+            .ToList();
+
+        if (remainingNodes.Count != 0)
+        {
+            throw new InvalidNotificationException(newNodeNotification,
+                $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
         }
     }
 }
