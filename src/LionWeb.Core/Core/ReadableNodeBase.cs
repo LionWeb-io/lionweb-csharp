@@ -26,7 +26,7 @@ using Utilities;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
 [DebuggerDisplay("{GetType().Name}[{GetId()}]")]
-public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReadableNode
+public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
     protected virtual IBuiltInsLanguage _builtIns =>
@@ -91,10 +91,10 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
         _annotations.Cast<IReadableNode>().ToImmutableList();
 
     /// <inheritdoc/>
-    bool IReadableNodeRaw.TryGetPropertyRaw(Property property, out object? value) =>
+    bool IReadableNode.TryGetPropertyRaw(Property property, out object? value) =>
         TryGetPropertyRaw(property, out value);
 
-    /// <inheritdoc cref="IReadableNodeRaw.TryGetPropertyRaw"/>
+    /// <inheritdoc cref="IReadableNode.TryGetPropertyRaw"/>
     protected internal virtual bool TryGetPropertyRaw(Property property, out object? value)
     {
         value = null;
@@ -102,10 +102,10 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     }
 
     /// <inheritdoc/>
-    bool IReadableNodeRaw.TryGetContainmentRaw(Containment containment, out IReadableNode? node) =>
+    bool IReadableNode.TryGetContainmentRaw(Containment containment, out IReadableNode? node) =>
         TryGetContainmentRaw(containment, out node);
 
-    /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentRaw"/>
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentRaw"/>
     protected internal virtual bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
     {
         node = null;
@@ -113,10 +113,10 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     }
 
     /// <inheritdoc />
-    bool IReadableNodeRaw.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes) =>
+    bool IReadableNode.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes) =>
         TryGetContainmentsRaw(containment, out nodes);
 
-    /// <inheritdoc cref="IReadableNodeRaw.TryGetContainmentsRaw"/>
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentsRaw"/>
     protected internal virtual bool TryGetContainmentsRaw(Containment containment,
         out IReadOnlyList<IReadableNode> nodes)
     {
@@ -125,10 +125,10 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     }
 
     /// <inheritdoc/>
-    bool IReadableNodeRaw.TryGetReferenceRaw(Reference reference, out IReferenceTarget? target) =>
+    bool IReadableNode.TryGetReferenceRaw(Reference reference, out IReferenceTarget? target) =>
         TryGetReferenceRaw(reference, out target);
 
-    /// <inheritdoc cref="IReadableNodeRaw.TryGetReferenceRaw"/>
+    /// <inheritdoc cref="IReadableNode.TryGetReferenceRaw"/>
     protected internal virtual bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
     {
         target = null;
@@ -136,10 +136,10 @@ public abstract class ReadableNodeBase<T> : IReadableNodeRaw<T> where T : IReada
     }
 
     /// <inheritdoc />
-    bool IReadableNodeRaw.TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets) =>
+    bool IReadableNode.TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets) =>
         TryGetReferencesRaw(reference, out targets);
 
-    /// <inheritdoc cref="IReadableNodeRaw.TryGetReferencesRaw"/>
+    /// <inheritdoc cref="IReadableNode.TryGetReferencesRaw"/>
     protected internal virtual bool TryGetReferencesRaw(Reference reference,
         out IReadOnlyList<IReferenceTarget> targets)
     {

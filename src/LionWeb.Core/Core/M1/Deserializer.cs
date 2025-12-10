@@ -27,14 +27,14 @@ using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, Resolv
 /// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="IWritableNode"/>s that are root nodes.
 /// An instance is parametrized with a collection of <see cref="Language"/> definitions with a corresponding <see cref="INodeFactory"/>.
 /// </summary>
-public partial class Deserializer : DeserializerBase<IWritableNodeRaw, IDeserializerHandler>
+public partial class Deserializer : DeserializerBase<IWritableNode, IDeserializerHandler>
 {
     /// Some design principles of this class:
     /// 
     /// * Don't throw any exception directly. Rather, delegate to <see cref="IDeserializerHandler"/>.
     ///   Rationale: This way, a handler can decide to ignore the bad situation and continue deserializing the rest of the input chunk.
     /// 
-    /// * Don't make any assumptions on feature validity. Rather, call <see cref="IWritableNodeRaw.SetRaw"/>, let it decide, and react on exceptions.
+    /// * Don't make any assumptions on feature validity. Rather, call <see cref="IWritableNode.Set"/>, let it decide, and react on exceptions.
     ///   Rationale: Different implementations might accept different levels of "broken" nodes. 
     private readonly Dictionary<ICompressedId, List<CompressedContainment>> _containmentsByOwnerId = new();
 

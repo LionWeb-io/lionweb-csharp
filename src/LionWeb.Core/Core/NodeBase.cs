@@ -122,10 +122,10 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    bool IWritableNodeRaw.AddAnnotationsRaw(IWritableNode annotation) =>
+    bool IWritableNode.AddAnnotationsRaw(IWritableNode annotation) =>
         AddAnnotationsRaw(annotation);
 
-    /// <inheritdoc cref="IWritableNodeRaw.AddAnnotationsRaw"/>
+    /// <inheritdoc cref="IWritableNode.AddAnnotationsRaw"/>
     protected internal virtual bool AddAnnotationsRaw(IWritableNode annotation)
     {
         if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
@@ -154,10 +154,10 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IWritableNode annotation) =>
+    bool IWritableNode.InsertAnnotationsRaw(Index index, IWritableNode annotation) =>
         InsertAnnotationsRaw(index, annotation);
 
-    /// <inheritdoc cref="IWritableNodeRaw.InsertAnnotationsRaw"/>
+    /// <inheritdoc cref="IWritableNode.InsertAnnotationsRaw"/>
     protected internal bool InsertAnnotationsRaw(Index index, IWritableNode annotation)
     {
         if (!IsInRange(index, _annotations) || annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
@@ -174,10 +174,10 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     public virtual bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
 
-    bool IWritableNodeRaw.RemoveAnnotationsRaw(IWritableNode annotation) =>
+    bool IWritableNode.RemoveAnnotationsRaw(IWritableNode annotation) =>
         RemoveAnnotationsRaw(annotation);
 
-    /// <inheritdoc cref="IWritableNodeRaw.RemoveAnnotationsRaw"/>
+    /// <inheritdoc cref="IWritableNode.RemoveAnnotationsRaw"/>
     protected internal bool RemoveAnnotationsRaw(IWritableNode annotation)
     {
         if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))

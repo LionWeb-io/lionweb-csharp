@@ -198,9 +198,10 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetRaw(Feature feature, out object? value) =>
+    bool IReadableNode.TryGetRaw(Feature feature, out object? value) =>
         TryGetRaw(feature, out value);
     
+    /// <inheritdoc cref="IReadableNode.TryGetRaw"/>
     protected bool TryGetRaw(Feature feature, out object? value)
     {
         var result = _featureValues.Find(f => feature.EqualsIdentity(f.feature));
@@ -208,9 +209,11 @@ public class LenientNode : NodeBase, INode
         return result != default;
     }
 
+    /// <inheritdoc cref="IReadableNode.TryGetPropertyRaw"/>
     protected internal override bool TryGetPropertyRaw(Property property, out object? value) =>
         TryGetRaw(property, out value);
 
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentRaw"/>
     protected internal override bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
     {
         if (TryGetRaw(containment, out var v) && v is null or IReadableNode)
@@ -223,6 +226,7 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentsRaw"/>
     protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
     {
         if (TryGetRaw(containment, out var v) && v is IReadOnlyList<IReadableNode> l)
@@ -235,6 +239,7 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
+    /// <inheritdoc cref="IReadableNode.TryGetReferenceRaw"/>
     protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)    {
         if (TryGetRaw(reference, out var v) && v is null or IReferenceTarget)
         {
@@ -247,6 +252,7 @@ public class LenientNode : NodeBase, INode
     }
 
 
+    /// <inheritdoc cref="IReadableNode.TryGetReferencesRaw"/>
     protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)    {
         if (TryGetRaw(reference, out var v) && v is IReadOnlyList<IReferenceTarget> l)
         {
@@ -278,6 +284,7 @@ public class LenientNode : NodeBase, INode
         return SetRaw(feature, value);
     }
 
+    /// <inheritdoc cref="IWritableNode.SetRaw"/>
     protected internal override bool SetRaw(Feature feature, object? value)
     {
         var oldValue = TryGetFeature(feature, out var old) ? old : null;
@@ -498,7 +505,7 @@ public class LenientNode : NodeBase, INode
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
     }
 
-    /// <inheritdoc cref="IWritableNodeRaw.AddAnnotationsRaw"/>
+    /// <inheritdoc cref="IWritableNode.AddAnnotationsRaw"/>
     protected internal override bool AddAnnotationsRaw(IWritableNode annotation)
     {
         var node = (INode)annotation;

@@ -126,10 +126,9 @@ public class Serializer : ISerializer
     {
         Classifier classifier = ExtractClassifier(node);
 
-        var nodeRaw = (IReadableNodeRaw)node;
         var featureValues = node
             .CollectAllSetFeatures()
-            .ToDictionary(f => f, feature => nodeRaw.TryGetRaw(feature, out var r) ? r : null);
+            .ToDictionary(f => f, feature => node.TryGetRaw(feature, out var r) ? r : null);
 
         Dictionary<Feature, object?> properties = CollectProperties(featureValues);
         RemoveFromFeatureValues(properties.Keys);

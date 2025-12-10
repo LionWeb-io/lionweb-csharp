@@ -146,7 +146,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNodeRaw node, Feature containment)
+    protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNode node, Feature containment)
     {
         List<IWritableNode> children = compressedChildrenIds
             .Select<ICompressedId, IWritableNode?>(childId => FindChild(node, containment, childId))
@@ -156,7 +156,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         SetContainment(children, node, containment);
     }
 
-    private void SetContainment<TChild>(List<TChild> children, IWritableNodeRaw node, Feature containment)
+    private void SetContainment<TChild>(List<TChild> children, IWritableNode node, Feature containment)
         where TChild : class, IReadableNode
     {
         if (children.Count == 0)
@@ -292,7 +292,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     {
         T node = _deserializedNodesById[nodeId];
 
-        if (node is not IWritableNodeRaw writable)
+        if (node is not IWritableNode writable)
         {
             _handler.InvalidReference(node);
             return;
@@ -337,7 +337,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    private void SetReference(List<IReferenceTarget> targets, IWritableNodeRaw node, Feature reference)
+    private void SetReference(List<IReferenceTarget> targets, IWritableNode node, Feature reference)
     {
         if (targets.Count == 0)
             return;

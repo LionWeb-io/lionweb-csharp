@@ -176,7 +176,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
 
     private void SetProperty(IPropertyNotification n, object? value)
     {
-        var success = ((IWritableNodeRaw)n.ContextNode).SetPropertyRaw(n.Property, value);
+        var success = n.ContextNode.SetPropertyRaw(n.Property, value);
         ProduceNotification(n, success);
     }
 
@@ -187,16 +187,16 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteChildAdded(ChildAddedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = MoveChild((IWritableNodeRaw)n.Parent, n.Containment, n.Index, n.NewChild);
+            var success = MoveChild(n.Parent, n.Containment, n.Index, n.NewChild);
             ProduceNotification(n, success);
         });
 
     private void OnRemoteChildDeleted(ChildDeletedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            CheckMatchingNodeId("Deleted node", n, (IReadableNodeRaw)n.Parent, n.DeletedChild, n.Containment, n.Index);
+            CheckMatchingNodeId("Deleted node", n, n.Parent, n.DeletedChild, n.Containment, n.Index);
 
-            var localParent = (IWritableNodeRaw)n.Parent;
+            var localParent = n.Parent;
 
             bool success = n.Containment.Multiple switch
             {
@@ -210,7 +210,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteChildReplaced(ChildReplacedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            CheckMatchingNodeId("Replaced node", n, (IReadableNodeRaw)n.Parent, n.ReplacedChild, n.Containment, n.Index);
+            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.Index);
 
             var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.NewChild);
 
@@ -220,7 +220,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = MoveChild((IWritableNodeRaw)n.NewParent, n.NewContainment, n.NewIndex, n.MovedChild);
+            var success = MoveChild(n.NewParent, n.NewContainment, n.NewIndex, n.MovedChild);
             ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
         });
 
@@ -228,7 +228,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
         ChildMovedAndReplacedFromOtherContainmentNotification n) => SuppressNotificationForwarding(
         n, () =>
         {
-            CheckMatchingNodeId("Replaced node", n, (IReadableNodeRaw)n.NewParent, n.ReplacedChild, n.NewContainment, n.NewIndex);
+            CheckMatchingNodeId("Replaced node", n, n.NewParent, n.ReplacedChild, n.NewContainment, n.NewIndex);
             var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.MovedChild);
             ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
         });
@@ -237,7 +237,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
         ChildMovedAndReplacedFromOtherContainmentInSameParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            CheckMatchingNodeId("Replaced node", n, (IReadableNodeRaw)n.Parent, n.ReplacedChild, n.NewContainment, n.NewIndex);
+            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.NewContainment, n.NewIndex);
             var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.MovedChild);
             ProduceNotification(n, success);
         });
@@ -246,14 +246,14 @@ public class RemoteReplicatorRaw : RemoteReplicator
         ChildMovedFromOtherContainmentInSameParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = MoveChild((IWritableNodeRaw)n.Parent, n.NewContainment, n.NewIndex, n.MovedChild);
+            var success = MoveChild(n.Parent, n.NewContainment, n.NewIndex, n.MovedChild);
             ProduceNotification(n, success);
         });
 
     private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = MoveChild((IWritableNodeRaw)n.Parent, n.Containment, n.NewIndex, n.MovedChild);
+            var success = MoveChild(n.Parent, n.Containment, n.NewIndex, n.MovedChild);
             ProduceNotification(n, success);
         });
 
@@ -261,12 +261,12 @@ public class RemoteReplicatorRaw : RemoteReplicator
         ChildMovedAndReplacedInSameContainmentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            CheckMatchingNodeId("Replaced node", n, (IReadableNodeRaw)n.Parent, n.ReplacedChild, n.Containment, n.NewIndex);
+            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.NewIndex);
             var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.MovedChild);
             ProduceNotification(n, success);
         });
 
-    private static bool MoveChild(IWritableNodeRaw localNewParent, Containment newContainment, Index newIndex,
+    private static bool MoveChild(IWritableNode localNewParent, Containment newContainment, Index newIndex,
         IWritableNode movedChild)
     {
         bool success = newContainment.Multiple switch
@@ -291,7 +291,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteAnnotationAdded(AnnotationAddedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ((IWritableNodeRaw)n.Parent).InsertAnnotationsRaw(n.Index, n.NewAnnotation);
+            var success = n.Parent.InsertAnnotationsRaw(n.Index, n.NewAnnotation);
             ProduceNotification(n, success);
         });
 
@@ -300,7 +300,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
         {
             CheckMatchingNodeId("Deleted annotation", n, n.DeletedAnnotation, n.Parent.GetAnnotations(), n.Index);
             
-            var success = ((IWritableNodeRaw)n.Parent).RemoveAnnotationsRaw(n.DeletedAnnotation);
+            var success = n.Parent.RemoveAnnotationsRaw(n.DeletedAnnotation);
             ProduceNotification(n, success);
         });
 
@@ -316,7 +316,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ((IWritableNodeRaw)n.NewParent).InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
+            var success = n.NewParent.InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
             ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
         });
 
@@ -332,7 +332,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ((IWritableNodeRaw)n.Parent).InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
+            var success = n.Parent.InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
             ProduceNotification(n, success);
         });
 
@@ -352,7 +352,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteReferenceAdded(ReferenceAddedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            IWritableNodeRaw localNewParent = (IWritableNodeRaw)n.Parent;
+            IWritableNode localNewParent = n.Parent;
             var success = n.Reference.Multiple switch
             {
                 true => localNewParent.InsertReferencesRaw(n.Reference, n.Index, (ReferenceTarget)n.NewTarget),
@@ -365,7 +365,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteReferenceDeleted(ReferenceDeletedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var localParent = (IWritableNodeRaw)n.Parent;
+            var localParent = n.Parent;
 
             bool success = n.Reference.Multiple switch
             {
@@ -379,13 +379,13 @@ public class RemoteReplicatorRaw : RemoteReplicator
     private void OnRemoteReferenceChanged(ReferenceChangedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ReplaceReference((IWritableNodeRaw)n.Parent, n.OldTarget, n.Reference, n.Index, n.NewTarget);
+            var success = ReplaceReference(n.Parent, n.OldTarget, n.Reference, n.Index, n.NewTarget);
             ProduceNotification(n, success);
         });
 
     private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification n)
     {
-        IWritableNodeRaw localNewParent = (IWritableNodeRaw)n.Parent;
+        IWritableNode localNewParent = n.Parent;
         var success = n.Reference.Multiple switch
         {
             true => localNewParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.Target)
@@ -395,7 +395,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
         ProduceNotification(n, success);
     }
 
-    private static bool ReplaceReference(IWritableNodeRaw localParent, IReferenceTarget replacedTarget,
+    private static bool ReplaceReference(IWritableNode localParent, IReferenceTarget replacedTarget,
         Reference reference,
         Index index, IReferenceTarget newTarget)
     {
@@ -482,7 +482,7 @@ public class RemoteReplicatorRaw : RemoteReplicator
             $"{messagePrefix} node with id {candidateNodeId} does not match with actual node with id {actualNodeId} at index {index}{messageSuffix}");
     }
 
-    private static void CheckMatchingNodeId(string messagePrefix, INotification notification, IReadableNodeRaw localParent,
+    private static void CheckMatchingNodeId(string messagePrefix, INotification notification, IReadableNode localParent,
         IWritableNode candidate, Containment containment, Index index)
     {
         var messageSuffix = $"in containment {containment}";

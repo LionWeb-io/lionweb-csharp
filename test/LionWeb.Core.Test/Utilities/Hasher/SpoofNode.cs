@@ -72,61 +72,61 @@ class SpoofNode(string id) : IShape
     public string Uuid { get => null; set { } }
     public IShape SetUuid(string value) => this;
 
-    IReadOnlyList<IReadableNode> IReadableNodeRaw.GetAnnotationsRaw() => [];
+    IReadOnlyList<IReadableNode> IReadableNode.GetAnnotationsRaw() => [];
 
-    bool IReadableNodeRaw.TryGetPropertyRaw(Property property, out object? value)
+    bool IReadableNode.TryGetPropertyRaw(Property property, out object? value)
     {
         value = null;
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetContainmentRaw(Containment containment, out IReadableNode? node)
+    bool IReadableNode.TryGetContainmentRaw(Containment containment, out IReadableNode? node)
     {
         node = null;
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    bool IReadableNode.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
     {
         nodes = [];
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    bool IReadableNode.TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
     {
         target = null;
         return false;
     }
 
-    bool IReadableNodeRaw.TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    bool IReadableNode.TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
     {
         targets = [];
         return false;
     }
 
-    bool IWritableNodeRaw.AddAnnotationsRaw(IWritableNode annotationInstances) => false;
+    bool IWritableNode.AddAnnotationsRaw(IWritableNode annotationInstances) => false;
 
-    bool IWritableNodeRaw.InsertAnnotationsRaw(Index index, IWritableNode annotationInstances) => false;
+    bool IWritableNode.InsertAnnotationsRaw(Index index, IWritableNode annotationInstances) => false;
 
-    bool IWritableNodeRaw.RemoveAnnotationsRaw(IWritableNode annotationInstances) => false;
+    bool IWritableNode.RemoveAnnotationsRaw(IWritableNode annotationInstances) => false;
 
     public bool SetRaw(Feature feature, object? value) => false;
 
-    bool IWritableNodeRaw.SetPropertyRaw(Property property, object? value) => false;
+    bool IWritableNode.SetPropertyRaw(Property property, object? value) => false;
 
-    bool IWritableNodeRaw.SetContainmentRaw(Containment containment, IWritableNode? node) => false;
+    bool IWritableNode.SetContainmentRaw(Containment containment, IWritableNode? node) => false;
 
-    bool IWritableNodeRaw.AddContainmentsRaw(Containment containment, IWritableNode node) => false;
+    bool IWritableNode.AddContainmentsRaw(Containment containment, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) => false;
+    bool IWritableNode.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.RemoveContainmentsRaw(Containment containment, IWritableNode node) => false;
+    bool IWritableNode.RemoveContainmentsRaw(Containment containment, IWritableNode node) => false;
 
-    bool IWritableNodeRaw.SetReferenceRaw(Reference reference, ReferenceTarget? targets) => false;
+    bool IWritableNode.SetReferenceRaw(Reference reference, ReferenceTarget? targets) => false;
 
-    bool IWritableNodeRaw.AddReferencesRaw(Reference reference, ReferenceTarget target) => false;
+    bool IWritableNode.AddReferencesRaw(Reference reference, ReferenceTarget target) => false;
 
-    bool IWritableNodeRaw.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) => false;
+    bool IWritableNode.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) => false;
 
-    bool IWritableNodeRaw.RemoveReferencesRaw(Reference reference, ReferenceTarget target) => false;
+    bool IWritableNode.RemoveReferencesRaw(Reference reference, ReferenceTarget target) => false;
 }

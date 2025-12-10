@@ -18,4 +18,4 @@
 namespace LionWeb.Core;
 
 /// Every model node is an instance of <see cref="INode"/>.
-public interface INode : INotifiableNode<INode>, IWritableNodeRaw<INode>;
+public interface INode : INotifiableNode<INode>;

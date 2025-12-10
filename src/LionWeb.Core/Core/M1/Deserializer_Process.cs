@@ -45,7 +45,7 @@ public partial class Deserializer
         RegisterAnnotations(serializedNode, compressedId);
     }
 
-    private void DeserializeProperties(SerializedNode serializedNode, IWritableNodeRaw node)
+    private void DeserializeProperties(SerializedNode serializedNode, IWritableNode node)
     {
         foreach (var serializedProperty in serializedNode.Properties)
         {

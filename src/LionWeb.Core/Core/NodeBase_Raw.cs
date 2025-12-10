@@ -21,10 +21,10 @@ using M3;
 
 public abstract partial class NodeBase
 {
-    bool IWritableNodeRaw.SetRaw(Feature feature, object? value) =>
+    bool IWritableNode.SetRaw(Feature feature, object? value) =>
         SetRaw(feature, value);
 
-    /// <inheritdoc cref="IWritableNodeRaw.SetRaw"/>
+    /// <inheritdoc cref="IWritableNode.SetRaw"/>
     protected internal virtual bool SetRaw(Feature feature, object? value)
     {
         switch (feature, value)
@@ -53,66 +53,66 @@ public abstract partial class NodeBase
         }
     }
 
-    bool IWritableNodeRaw.SetPropertyRaw(Property property, object? value) =>
+    bool IWritableNode.SetPropertyRaw(Property property, object? value) =>
         SetPropertyRaw(property, value);
 
-    /// <inheritdoc cref="IWritableNodeRaw.SetPropertyRaw"/>
+    /// <inheritdoc cref="IWritableNode.SetPropertyRaw"/>
     protected internal virtual bool SetPropertyRaw(Property property, object? value) =>
         false;
 
-    bool IWritableNodeRaw.SetContainmentRaw(Containment containment, IWritableNode? node) =>
+    bool IWritableNode.SetContainmentRaw(Containment containment, IWritableNode? node) =>
         SetContainmentRaw(containment, node);
 
-    /// <inheritdoc cref="IWritableNodeRaw.SetContainmentRaw"/>
+    /// <inheritdoc cref="IWritableNode.SetContainmentRaw"/>
     protected internal virtual bool SetContainmentRaw(Containment containment, IWritableNode? node) =>
         false;
 
-    bool IWritableNodeRaw.SetReferenceRaw(Reference reference, ReferenceTarget? targets) =>
+    bool IWritableNode.SetReferenceRaw(Reference reference, ReferenceTarget? targets) =>
         SetReferenceRaw(reference, targets);
 
-    /// <inheritdoc cref="IWritableNodeRaw.SetReferenceRaw"/>
+    /// <inheritdoc cref="IWritableNode.SetReferenceRaw"/>
     protected internal virtual bool SetReferenceRaw(Reference reference, ReferenceTarget? target) =>
         false;
 
-    bool IWritableNodeRaw.AddContainmentsRaw(Containment containment, IWritableNode node) =>
+    bool IWritableNode.AddContainmentsRaw(Containment containment, IWritableNode node) =>
         AddContainmentsRaw(containment, node);
 
-    /// <inheritdoc cref="IWritableNodeRaw.AddContainmentsRaw"/>
+    /// <inheritdoc cref="IWritableNode.AddContainmentsRaw"/>
     protected internal virtual bool AddContainmentsRaw(Containment containment, IWritableNode node) =>
         false;
 
-    bool IWritableNodeRaw.AddReferencesRaw(Reference reference, ReferenceTarget target) =>
+    bool IWritableNode.AddReferencesRaw(Reference reference, ReferenceTarget target) =>
         AddReferencesRaw(reference, target);
 
-    /// <inheritdoc cref="IWritableNodeRaw.AddReferencesRaw"/>
+    /// <inheritdoc cref="IWritableNode.AddReferencesRaw"/>
     protected internal virtual bool AddReferencesRaw(Reference reference, ReferenceTarget target) =>
         false;
 
-    bool IWritableNodeRaw.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) =>
+    bool IWritableNode.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) =>
         InsertContainmentsRaw(containment, index, node);
 
-    /// <inheritdoc cref="IWritableNodeRaw.InsertContainmentsRaw"/>
+    /// <inheritdoc cref="IWritableNode.InsertContainmentsRaw"/>
     protected internal virtual bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) =>
         false;
 
-    bool IWritableNodeRaw.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) =>
+    bool IWritableNode.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) =>
         InsertReferencesRaw(reference, index, target);
 
-    /// <inheritdoc cref="IWritableNodeRaw.InsertReferencesRaw"/>
+    /// <inheritdoc cref="IWritableNode.InsertReferencesRaw"/>
     protected internal virtual bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) =>
         false;
 
-    bool IWritableNodeRaw.RemoveContainmentsRaw(Containment containment, IWritableNode node) =>
+    bool IWritableNode.RemoveContainmentsRaw(Containment containment, IWritableNode node) =>
         RemoveContainmentsRaw(containment, node);
 
-    /// <inheritdoc cref="IWritableNodeRaw.RemoveContainmentsRaw"/>
+    /// <inheritdoc cref="IWritableNode.RemoveContainmentsRaw"/>
     protected internal virtual bool RemoveContainmentsRaw(Containment containment, IWritableNode node) =>
         false;
 
-    bool IWritableNodeRaw.RemoveReferencesRaw(Reference reference, ReferenceTarget target) =>
+    bool IWritableNode.RemoveReferencesRaw(Reference reference, ReferenceTarget target) =>
         RemoveReferencesRaw(reference, target);
 
-    /// <inheritdoc cref="IWritableNodeRaw.RemoveReferencesRaw"/>
+    /// <inheritdoc cref="IWritableNode.RemoveReferencesRaw"/>
     protected internal virtual bool RemoveReferencesRaw(Reference reference, ReferenceTarget target) =>
         false;
     
