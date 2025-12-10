@@ -50,21 +50,21 @@ internal class ClassifierGenerator(Classifier classifier, GeneratorInputParamete
             case Annotation a:
                 {
                     var classDeclarationSyntax = ClassifierAnnotation(a);
-                    _generatorInputParameters.CSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(a, classDeclarationSyntax));
+                    _generatorInputParameters.CSharpSyntaxDataContainer.Add(new ClassSyntax(a, classDeclarationSyntax));
                     return classDeclarationSyntax;
                 }
 
             case Concept c:
                 {
                     var classDeclarationSyntax = ClassifierConcept(c);
-                    _generatorInputParameters.CSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(c, classDeclarationSyntax));
+                    _generatorInputParameters.CSharpSyntaxDataContainer.Add(new ClassSyntax(c, classDeclarationSyntax));
                     return classDeclarationSyntax;
                 }
 
             case Interface i:
                 {
                     var interfaceDeclarationSyntax = ClassifierInterface(i);
-                    _generatorInputParameters.CSharpSyntaxNodeContainer.Add(new InterfaceSyntaxNode(i, interfaceDeclarationSyntax));
+                    _generatorInputParameters.CSharpSyntaxDataContainer.Add(new InterfaceSyntax(i, interfaceDeclarationSyntax));
                     return interfaceDeclarationSyntax;
                 }
                 

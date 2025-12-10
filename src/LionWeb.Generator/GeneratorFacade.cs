@@ -44,7 +44,7 @@ public class GeneratorFacade
 {
     private CompilationUnitSyntax? _compilationUnit = null;
 
-    private readonly CSharpSyntaxNodeContainer _cSharpSyntaxNodeContainer = new();
+    private readonly CSharpSyntaxDataContainer _cSharpSyntaxDataContainer = new();
     
     /// Generates the compilation unit for the input language.
     public CompilationUnitSyntax Generate()
@@ -56,7 +56,7 @@ public class GeneratorFacade
                 Names = Names,
                 LionWebVersion = LionWebVersion,
                 Config = Config,
-                CSharpSyntaxNodeContainer = _cSharpSyntaxNodeContainer
+                CSharpSyntaxDataContainer = _cSharpSyntaxDataContainer
             };
 
             var generator = new DefinitionGenerator(generatorInputParameters);
@@ -69,7 +69,7 @@ public class GeneratorFacade
     /// <summary>
     /// Returns a list of generated C# syntax nodes with their corresponding <see cref="Classifier"/>.
     /// </summary>
-    public List<ISyntaxNodeDataHolder> CSharpSyntaxNodes => _cSharpSyntaxNodeContainer.CSharpSyntaxNodes;
+    public List<ICSharpSyntaxData> CSharpSyntaxData => _cSharpSyntaxDataContainer.CSharpSyntaxData;
 
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }

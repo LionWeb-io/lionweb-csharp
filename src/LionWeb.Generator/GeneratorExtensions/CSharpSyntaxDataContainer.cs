@@ -17,12 +17,12 @@
 
 namespace LionWeb.Generator.GeneratorExtensions;
 
-internal class CSharpSyntaxNodeContainer
+internal class CSharpSyntaxDataContainer
 {
-    private readonly List<ISyntaxNodeDataHolder> _cSharpSyntaxNodes = [];
+    private readonly List<ICSharpSyntaxData> _cSharpSyntaxData = [];
 
-    internal List<ISyntaxNodeDataHolder> CSharpSyntaxNodes => _cSharpSyntaxNodes;
+    internal List<ICSharpSyntaxData> CSharpSyntaxData => _cSharpSyntaxData;
     
-    internal void Add(ISyntaxNodeDataHolder icSharpSyntaxNodeDataHolder) => 
-        _cSharpSyntaxNodes.Add(icSharpSyntaxNodeDataHolder);
+    internal void Add(ICSharpSyntaxData icSharpSyntaxData) => 
+        _cSharpSyntaxData.Add(icSharpSyntaxData);
 }

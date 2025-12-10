@@ -20,25 +20,24 @@ public class GeneratedCSharpSyntaxNodesTests
         {
             Names = new Names(testLanguage, "TestLanguage"),
             LionWebVersion = lionWebVersion
-            
         };
 
         generator.Generate();
-        var cSharpSyntaxNodes = generator.CSharpSyntaxNodes;
+        var cSharpSyntaxNodes = generator.CSharpSyntaxData;
 
-        Assert.HasCount(3, cSharpSyntaxNodes.OfType<ClassSyntaxNode>());
+        Assert.HasCount(3, cSharpSyntaxNodes.OfType<ClassSyntax>());
 
         var linkTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept));
-        Assert.IsInstanceOfType<ClassSyntaxNode>(linkTestConceptSyntaxNode);
-        Assert.IsInstanceOfType<ClassDeclarationSyntax>((linkTestConceptSyntaxNode as ClassSyntaxNode)?.ClassDeclarationSyntax);
+        Assert.IsInstanceOfType<ClassSyntax>(linkTestConceptSyntaxNode);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((linkTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
 
         var dataTypeTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept));
-        Assert.IsInstanceOfType<ClassSyntaxNode>(dataTypeTestConceptSyntaxNode);
-        Assert.IsInstanceOfType<ClassDeclarationSyntax>((dataTypeTestConceptSyntaxNode as ClassSyntaxNode)?.ClassDeclarationSyntax);
+        Assert.IsInstanceOfType<ClassSyntax>(dataTypeTestConceptSyntaxNode);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((dataTypeTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
 
         var testAnnotationSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation));
-        Assert.IsInstanceOfType<ClassSyntaxNode>(testAnnotationSyntaxNode);
-        Assert.IsInstanceOfType<ClassDeclarationSyntax>((testAnnotationSyntaxNode as ClassSyntaxNode)?.ClassDeclarationSyntax);
+        Assert.IsInstanceOfType<ClassSyntax>(testAnnotationSyntaxNode);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((testAnnotationSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
     }
     
     [TestMethod]
@@ -55,13 +54,11 @@ public class GeneratedCSharpSyntaxNodesTests
         };
 
         generator.Generate();
-        var cSharpSyntaxNodes = generator.CSharpSyntaxNodes;
+        var cSharpSyntaxNodes = generator.CSharpSyntaxData;
         
-        Assert.HasCount(1, cSharpSyntaxNodes.OfType<InterfaceSyntaxNode>());
-
-        Assert.IsInstanceOfType<InterfaceSyntaxNode>(cSharpSyntaxNodes.First(node =>
-            node.Classifier.Name == nameof(multiInheritLangLanguage.BaseIface)) as InterfaceSyntaxNode);
-        
-        Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(cSharpSyntaxNodes.OfType<InterfaceSyntaxNode>().First().InterfaceDeclarationSyntax);
+        Assert.HasCount(1, cSharpSyntaxNodes.OfType<InterfaceSyntax>());
+        Assert.IsInstanceOfType<InterfaceSyntax>(cSharpSyntaxNodes.First(node =>
+            node.Classifier.Name == nameof(multiInheritLangLanguage.BaseIface)) as InterfaceSyntax);
+        Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(cSharpSyntaxNodes.OfType<InterfaceSyntax>().First().InterfaceDeclarationSyntax);
     }
 }
