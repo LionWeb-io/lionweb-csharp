@@ -23,21 +23,21 @@ public class GeneratedCSharpSyntaxNodesTests
         };
 
         generator.Generate();
-        var cSharpSyntaxNodes = generator.CSharpSyntaxData;
+        var correlationData = generator.ClassifierToSyntaxCorrelationData;
 
-        Assert.HasCount(3, cSharpSyntaxNodes.OfType<ClassSyntax>());
+        Assert.HasCount(3, correlationData.OfType<ClassSyntax>());
 
-        var linkTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept));
+        var linkTestConceptSyntaxNode = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept));
         Assert.IsInstanceOfType<ClassSyntax>(linkTestConceptSyntaxNode);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>((linkTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
         Assert.AreEqual(nameof(testLanguage.LinkTestConcept), (linkTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
 
-        var dataTypeTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept));
+        var dataTypeTestConceptSyntaxNode = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept));
         Assert.IsInstanceOfType<ClassSyntax>(dataTypeTestConceptSyntaxNode);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>((dataTypeTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
         Assert.AreEqual(nameof(testLanguage.DataTypeTestConcept), (dataTypeTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
 
-        var testAnnotationSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation));
+        var testAnnotationSyntaxNode = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation));
         Assert.IsInstanceOfType<ClassSyntax>(testAnnotationSyntaxNode);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>((testAnnotationSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
         Assert.AreEqual(nameof(testLanguage.TestAnnotation), (testAnnotationSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
@@ -56,12 +56,12 @@ public class GeneratedCSharpSyntaxNodesTests
         };
 
         generator.Generate();
-        var cSharpSyntaxNodes = generator.CSharpSyntaxData;
+        var correlationData = generator.ClassifierToSyntaxCorrelationData;
         
-        Assert.HasCount(1, cSharpSyntaxNodes.OfType<InterfaceSyntax>());
-        Assert.IsInstanceOfType<InterfaceSyntax>(cSharpSyntaxNodes.First(node =>
+        Assert.HasCount(1, correlationData.OfType<InterfaceSyntax>());
+        Assert.IsInstanceOfType<InterfaceSyntax>(correlationData.First(node =>
             node.Classifier.Name == nameof(multiInheritLangLanguage.BaseIface)) as InterfaceSyntax);
-        Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(cSharpSyntaxNodes.OfType<InterfaceSyntax>().First().InterfaceDeclarationSyntax);
-        Assert.AreEqual(nameof(multiInheritLangLanguage.BaseIface), cSharpSyntaxNodes.OfType<InterfaceSyntax>().First().InterfaceDeclarationSyntax.Identifier.ToString());
+        Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(correlationData.OfType<InterfaceSyntax>().First().InterfaceDeclarationSyntax);
+        Assert.AreEqual(nameof(multiInheritLangLanguage.BaseIface), correlationData.OfType<InterfaceSyntax>().First().InterfaceDeclarationSyntax.Identifier.ToString());
     }
 }

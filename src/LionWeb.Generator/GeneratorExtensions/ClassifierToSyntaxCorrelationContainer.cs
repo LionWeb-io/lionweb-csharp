@@ -17,12 +17,21 @@
 
 namespace LionWeb.Generator.GeneratorExtensions;
 
-internal class CSharpSyntaxDataContainer
-{
-    private readonly List<ICSharpSyntaxData> _data = [];
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal List<ICSharpSyntaxData> Data => _data;
+internal class ClassifierToSyntaxCorrelationContainer
+{
+    internal List<IClassifierToSyntaxCorrelator> CorrelationData { get; } = [];
+
+    internal TypeDeclarationSyntax Record(ClassSyntax correlationData)
+    {
+        CorrelationData.Add(correlationData);
+        return correlationData.ClassDeclarationSyntax;
+    }
     
-    internal void Add(ICSharpSyntaxData icSharpSyntaxData) => 
-        _data.Add(icSharpSyntaxData);
+    internal TypeDeclarationSyntax Record(InterfaceSyntax correlationData)
+    {
+        CorrelationData.Add(correlationData);
+        return correlationData.InterfaceDeclarationSyntax;
+    }
 }

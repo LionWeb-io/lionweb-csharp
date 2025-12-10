@@ -43,35 +43,17 @@ internal class ClassifierGenerator(Classifier classifier, GeneratorInputParamete
     : ClassifierGeneratorBase(generatorInputParameters with { Names = new UniqueFeatureNames(generatorInputParameters.Names) })
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
-    public TypeDeclarationSyntax ClassifierType()
-    {
-        switch (classifier)
+    public TypeDeclarationSyntax ClassifierType() =>
+        classifier switch
         {
-            case Annotation a:
-                {
-                    var classDeclarationSyntax = ClassifierAnnotation(a);
-                    _generatorInputParameters.CSharpSyntaxDataContainer.Add(new ClassSyntax(a, classDeclarationSyntax));
-                    return classDeclarationSyntax;
-                }
-
-            case Concept c:
-                {
-                    var classDeclarationSyntax = ClassifierConcept(c);
-                    _generatorInputParameters.CSharpSyntaxDataContainer.Add(new ClassSyntax(c, classDeclarationSyntax));
-                    return classDeclarationSyntax;
-                }
-
-            case Interface i:
-                {
-                    var interfaceDeclarationSyntax = ClassifierInterface(i);
-                    _generatorInputParameters.CSharpSyntaxDataContainer.Add(new InterfaceSyntax(i, interfaceDeclarationSyntax));
-                    return interfaceDeclarationSyntax;
-                }
-                
-            default:
-                throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier));
-        }
-    }
+            Annotation a => _generatorInputParameters.ClassifierToSyntaxCorrelationContainer.Record(
+                correlationData: new ClassSyntax(a, ClassifierAnnotation(a))),
+            Concept c => _generatorInputParameters.ClassifierToSyntaxCorrelationContainer.Record(
+                correlationData: new ClassSyntax(c, ClassifierConcept(c))),
+            Interface i => _generatorInputParameters.ClassifierToSyntaxCorrelationContainer.Record(
+                correlationData: new InterfaceSyntax(i, ClassifierInterface(i))),
+            _ => throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier))
+        };
 
     private ClassDeclarationSyntax ClassifierAnnotation(Annotation annotation)
     {
