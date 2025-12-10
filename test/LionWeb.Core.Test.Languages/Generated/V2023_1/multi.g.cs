@@ -168,9 +168,9 @@ public partial class Container : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature))
 		{

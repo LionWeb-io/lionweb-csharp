@@ -301,9 +301,9 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.ConceptDescription_conceptAlias.EqualsIdentity(feature))
 		{
@@ -473,9 +473,9 @@ public partial class Deprecated : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.Deprecated_build.EqualsIdentity(feature))
 		{
@@ -642,9 +642,9 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature))
 		{
@@ -821,9 +821,9 @@ public partial class ShortDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.ShortDescription_description.EqualsIdentity(feature))
 		{
@@ -929,9 +929,9 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{

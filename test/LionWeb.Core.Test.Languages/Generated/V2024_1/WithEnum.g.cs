@@ -168,9 +168,9 @@ public partial class EnumHolder : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (WithEnumLanguage.Instance.EnumHolder_enumValue.EqualsIdentity(feature))
 		{

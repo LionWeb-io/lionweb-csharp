@@ -241,9 +241,9 @@ public partial class @out : @struct
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (ClassLanguage.Instance.out_default.EqualsIdentity(feature))
 		{
@@ -400,9 +400,9 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{
@@ -607,9 +607,9 @@ public partial class @struct : ConceptInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{

@@ -432,9 +432,9 @@ public partial class SDTConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SDTLangLanguage.Instance.SDTConcept_A.EqualsIdentity(feature))
 		{

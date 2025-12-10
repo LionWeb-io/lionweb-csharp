@@ -176,9 +176,9 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment.EqualsIdentity(feature))
 		{

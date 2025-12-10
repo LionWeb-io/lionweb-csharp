@@ -576,9 +576,9 @@ public partial class DataTypeTestConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (NullableReferencesTestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1.EqualsIdentity(feature))
 		{
@@ -1203,9 +1203,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -1641,9 +1641,9 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -1858,9 +1858,9 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{

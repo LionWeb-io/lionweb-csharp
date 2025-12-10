@@ -361,9 +361,9 @@ public partial class DeprConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{

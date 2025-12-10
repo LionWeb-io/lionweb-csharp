@@ -379,9 +379,9 @@ public partial class Book : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
 		{
@@ -543,9 +543,9 @@ public partial class GuideBookWriter : Writer
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (LibraryLanguage.Instance.GuideBookWriter_countries.EqualsIdentity(feature))
 		{
@@ -711,9 +711,9 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
 		{
@@ -920,9 +920,9 @@ public partial class SpecialistBookWriter : Writer
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (LibraryLanguage.Instance.SpecialistBookWriter_subject.EqualsIdentity(feature))
 		{
@@ -1026,9 +1026,9 @@ public partial class Writer : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature))
 		{

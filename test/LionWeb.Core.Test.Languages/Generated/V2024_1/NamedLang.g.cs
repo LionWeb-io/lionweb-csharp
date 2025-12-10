@@ -243,9 +243,9 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -351,9 +351,9 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -459,9 +459,9 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -583,9 +583,9 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -691,9 +691,9 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
