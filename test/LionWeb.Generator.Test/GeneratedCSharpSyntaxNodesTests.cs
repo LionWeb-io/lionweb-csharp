@@ -30,14 +30,17 @@ public class GeneratedCSharpSyntaxNodesTests
         var linkTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept));
         Assert.IsInstanceOfType<ClassSyntax>(linkTestConceptSyntaxNode);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>((linkTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
+        Assert.AreEqual(nameof(testLanguage.LinkTestConcept), (linkTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
 
         var dataTypeTestConceptSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept));
         Assert.IsInstanceOfType<ClassSyntax>(dataTypeTestConceptSyntaxNode);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>((dataTypeTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
+        Assert.AreEqual(nameof(testLanguage.DataTypeTestConcept), (dataTypeTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
 
         var testAnnotationSyntaxNode = cSharpSyntaxNodes.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation));
         Assert.IsInstanceOfType<ClassSyntax>(testAnnotationSyntaxNode);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>((testAnnotationSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
+        Assert.AreEqual(nameof(testLanguage.TestAnnotation), (testAnnotationSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
     }
     
     [TestMethod]
@@ -50,7 +53,6 @@ public class GeneratedCSharpSyntaxNodesTests
         {
             Names = new Names(multiInheritLangLanguage, "MultiInheritLangLanguage"),
             LionWebVersion = lionWebVersion
-            
         };
 
         generator.Generate();
@@ -60,5 +62,6 @@ public class GeneratedCSharpSyntaxNodesTests
         Assert.IsInstanceOfType<InterfaceSyntax>(cSharpSyntaxNodes.First(node =>
             node.Classifier.Name == nameof(multiInheritLangLanguage.BaseIface)) as InterfaceSyntax);
         Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(cSharpSyntaxNodes.OfType<InterfaceSyntax>().First().InterfaceDeclarationSyntax);
+        Assert.AreEqual(nameof(multiInheritLangLanguage.BaseIface), cSharpSyntaxNodes.OfType<InterfaceSyntax>().First().InterfaceDeclarationSyntax.Identifier.ToString());
     }
 }
