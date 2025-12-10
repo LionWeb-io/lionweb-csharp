@@ -131,7 +131,30 @@ public class ShapesMigrationTests
         Assert.IsTrue(result);
         Assert.AreEqual(1, resultNodes.Count);
         Assert.AreEqual("v2", resultNodes.First().GetClassifier().GetLanguage().Version);
-        Assert.AreEqual(input.AsString(), resultNodes.OfType<INode>().First().AsString());
+        Assert.AreEqual("""
+                        Circle (id: c) {
+                            name = "my circle"
+                            uuid = "abc"
+                            r = 5
+                            shapeDocs:
+                                Documentation (id: doc) {
+                                    technical = True
+                                }
+                            center:
+                                Coord (id: cent) {
+                                    x = 1
+                                    y = 2
+                                    z = 3
+                                }
+                            fixpoints:
+                                Coord (id: fp0) {
+                                    x = 1
+                                }
+                                Coord (id: fp1) {
+                                    y = 2
+                                }
+                        }
+                        """, resultNodes.OfType<INode>().First().AsString());
     }
 
     private class ShapesMigrationV2(DynamicLanguage destinationLang) : MigrationBase<DynamicLanguage>(
