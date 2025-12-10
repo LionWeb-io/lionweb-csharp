@@ -65,7 +65,7 @@ public class NotificationToDeltaEventMapper
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
-            _ => throw new NotImplementedException(notification.GetType().Name)
+            _ => throw new ArgumentException($"{nameof(NotificationToDeltaEventMapper)} does not support {notification.GetType().Name}!")
         };
 
     #region Partitions

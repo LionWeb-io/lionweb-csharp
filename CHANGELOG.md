@@ -8,6 +8,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ## [0.4.0] - tbd
 ### Added
+* Added the following check for a new node received via a delta event: If a delta event adds a new node, the node itself and its sub nodes have to be new (not present in the model) according to delta specification. If this is not the case, we warn the user by throwing an invalid notification exception. For the replacement logic, we allow replacing if a new node is a both existing and to be replaced node, we allow this because after replacement model is valid.  
 * Moved `WebSocketServer` and `WebSocketClient` to separate project in core repo for reuse.
 * Added generic add/insert/remove node api for multiple `link` (references and containments) features.
 * Added `UnresolvedReferencesManager` to heal unresolved references once the target becomes available.

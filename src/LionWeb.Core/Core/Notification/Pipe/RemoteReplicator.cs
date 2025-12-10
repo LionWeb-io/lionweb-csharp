@@ -35,13 +35,17 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     protected readonly IdFilteringNotificationFilter Filter;
 
+    private readonly SharedNodeMap _sharedNodeMap;
+
     public RemoteReplicator(
         IForestRaw? localForest,
         IdFilteringNotificationFilter filter,
+        SharedNodeMap sharedNodeMap,
         object? sender) : base(sender)
     {
         _localForest = localForest;
         Filter = filter;
+        _sharedNodeMap = sharedNodeMap;
     }
 
     /// <inheritdoc />
@@ -129,10 +133,42 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
     }
+    
+    private HashSet<NodeId> CollectNodeIdsOfAllDescendantsOf(IReadableNode node) =>
+        M1Extensions
+            .Descendants(node, true, true)
+            .Select(n => n.GetId())
+            .ToHashSet();
 
+    private void CheckIfNewNodeContainsExistingNodes(INewNodeNotification newNodeNotification, HashSet<NodeId> replacedNodes)
+    {
+        HashSet<NodeId> newNodes = CollectNodeIdsOfAllDescendantsOf(node: newNodeNotification.NewNode);
+
+        var hasIntersection = _sharedNodeMap.NodeIds.ToHashSet().Overlaps(newNodes);
+
+        if (!hasIntersection)
+        {
+            return;
+        }
+
+        var remainingNodes = _sharedNodeMap.NodeIds
+            .Intersect(newNodes)
+            .ExceptBy(replacedNodes, s => s)
+            .ToList();
+
+        if (remainingNodes.Count != 0)
+        {
+            throw new InvalidNotificationException(newNodeNotification,
+                $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
+        }
+    }
+    
     #region Partitions
 
-    private void OnRemoteNewPartition(PartitionAddedNotification n) =>
+    private void OnRemoteNewPartition(PartitionAddedNotification n)
+    {
+        CheckIfNewNodeContainsExistingNodes(n, []);
+        
         SuppressNotificationForwarding(n, () =>
         {
             if (_localForest is null)
@@ -141,6 +177,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             if (_localForest.AddPartitionRaw(n.NewPartition))
                 _localForest.GetNotificationProducer()?.ProduceNotification(n);
         });
+    }
 
     private void OnRemotePartitionDeleted(PartitionDeletedNotification n) =>
         SuppressNotificationForwarding(n, () =>
@@ -184,12 +221,16 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Children
 
-    private void OnRemoteChildAdded(ChildAddedNotification n) =>
+    private void OnRemoteChildAdded(ChildAddedNotification n)
+    {
+        CheckIfNewNodeContainsExistingNodes(n, []);
+        
         SuppressNotificationForwarding(n, () =>
         {
             var success = MoveChild(n.Parent, n.Containment, n.Index, n.NewChild);
             ProduceNotification(n, success);
         });
+    }
 
     private void OnRemoteChildDeleted(ChildDeletedNotification n) =>
         SuppressNotificationForwarding(n, () =>
@@ -207,7 +248,12 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             ProduceNotification(n, success);
         });
 
-    private void OnRemoteChildReplaced(ChildReplacedNotification n) =>
+    private void OnRemoteChildReplaced(ChildReplacedNotification n)
+    {
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: n.ReplacedChild);
+        
+        CheckIfNewNodeContainsExistingNodes(n, replacedNodes);
+        
         SuppressNotificationForwarding(n, () =>
         {
             CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.Index);
@@ -216,6 +262,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
             ProduceNotification(n, success);
         });
+    }
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification n) =>
         SuppressNotificationForwarding(n, () =>
@@ -288,12 +335,16 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(AnnotationAddedNotification n) =>
+    private void OnRemoteAnnotationAdded(AnnotationAddedNotification n)
+    {
+        CheckIfNewNodeContainsExistingNodes(n, []);
+        
         SuppressNotificationForwarding(n, () =>
         {
             var success = n.Parent.InsertAnnotationsRaw(n.Index, n.NewAnnotation);
             ProduceNotification(n, success);
         });
+    }
 
     private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification n) =>
         SuppressNotificationForwarding(n, () =>
@@ -304,7 +355,12 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             ProduceNotification(n, success);
         });
 
-    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification n) =>
+    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification n)
+    {
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: n.ReplacedAnnotation);
+        
+        CheckIfNewNodeContainsExistingNodes(n, replacedNodes);
+        
         SuppressNotificationForwarding(n, () =>
         {
             CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation,
@@ -312,6 +368,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             var success = ReplaceChildOrAnnotation(n.ReplacedAnnotation, n.NewAnnotation);
             ProduceNotification(n, success);
         });
+    }
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
@@ -420,7 +477,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         try
         {
             action();
-        } finally
+        }
+        finally
         {
             Filter.UnregisterNotificationId(notificationId);
         }

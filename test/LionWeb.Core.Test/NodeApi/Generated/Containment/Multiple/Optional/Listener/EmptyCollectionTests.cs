@@ -22,62 +22,62 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
 [TestClass]
-public class EmptyCollectionTests
+public class EmptyCollectionTests: NotificationTestsBase
 {
     [TestMethod]
     public void EmptyArray()
     {
         var parent = new Geometry("g");
-        var values = new IShape[0];
+        var values = Array.Empty<IShape>();
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         parent.AddShapes(values);
 
-        Assert.AreEqual(0, notifications);
+        Assert.AreEqual(0, notificationObserver.Count);
     }
 
     [TestMethod]
     public void EmptyArray_Reflective()
     {
         var parent = new Geometry("g");
-        var values = new IShape[0];
+        var values = Array.Empty<IShape>();
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
-        Assert.AreEqual(0, notifications);
+        Assert.AreEqual(0, notificationObserver.Count);
     }
 
     [TestMethod]
     public void Insert_EmptyArray()
     {
         var parent = new Geometry("g");
-        var values = new IShape[0];
+        var values = Array.Empty<IShape>();
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         parent.InsertShapes(0, values);
 
-        Assert.AreEqual(0, notifications);
+        Assert.AreEqual(0, notificationObserver.Count);
     }
 
     [TestMethod]
     public void Remove_EmptyArray()
     {
         var parent = new Geometry("g");
-        var values = new IShape[0];
+        var values = Array.Empty<IShape>();
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(0, notifications);
+        Assert.AreEqual(0, notificationObserver.Count);
     }
 
     [TestMethod]
@@ -88,18 +88,16 @@ public class EmptyCollectionTests
         parent.AddShapes([circle]);
         var values = new List<Coord>();
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(circle, args.DeletedChild);
-        });
+        var notificationObserver = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
-        Assert.AreEqual(1, notifications);
+        var childDeletedNotification = (ChildDeletedNotification)notificationObserver.Notifications[0];
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.AreSame(parent, childDeletedNotification.Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, childDeletedNotification.Containment);
+        Assert.AreEqual(0, childDeletedNotification.Index);
+        Assert.AreSame(circle, childDeletedNotification.DeletedChild);
     }
 }
