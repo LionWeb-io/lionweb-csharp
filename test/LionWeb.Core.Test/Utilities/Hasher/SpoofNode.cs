@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.Utilities.Hasher;
 
-using Core.Notification;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M3;
 using System.Diagnostics.CodeAnalysis;
@@ -43,7 +42,7 @@ class SpoofNode(string id) : IShape
 
     public void DetachFromParent() { }
 
-    public void Set(Feature feature, object? value, INotificationId? notificationId = null) { }
+    public void Set(Feature feature, object? value) { }
     public void Add(Link? link, IEnumerable<IReadableNode> nodes) {}
 
     public void Insert(Link? link, int index, IEnumerable<IReadableNode> nodes) {}
@@ -56,11 +55,11 @@ class SpoofNode(string id) : IShape
 
     public Containment? GetContainmentOf(INode child) => null;
 
-    public void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) { }
+    public void AddAnnotations(IEnumerable<INode> annotations) { }
 
-    public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations, INotificationId? notificationId = null) { }
+    public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations) { }
 
-    public bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) => false;
+    public bool RemoveAnnotations(IEnumerable<INode> annotations) => false;
 
     public IReadOnlyList<Coord> Fixpoints { get => []; init { } }
     public IShape AddFixpoints(IEnumerable<Coord> nodes) => this;

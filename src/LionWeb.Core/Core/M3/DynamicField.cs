@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
 using Utilities;
 
 /// <inheritdoc cref="Field"/>
@@ -105,7 +104,7 @@ public class DynamicField : DynamicIKeyed, Field
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)

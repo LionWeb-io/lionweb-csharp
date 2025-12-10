@@ -79,16 +79,31 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         GetInternal(feature, out value);
 
     /// <inheritdoc />
-    public void Set(Feature feature, object? value, INotificationId? notificationId = null)
+    [Obsolete("Use Set(feature, object?) instead")]
+    public void Set(Feature feature, object? value, INotificationId? notificationId) =>
+        Set(feature, value);
+
+    /// <inheritdoc />
+    public void Set(Feature feature, object? value)
     {
-        if (SetInternal(feature, value, notificationId))
+        if (SetInternal(feature, value))
+            return;
+        if (SetInternal(feature, value, null))
             return;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
 
     /// <inheritdoc cref="IWritableNode.Set"/>
-    protected virtual bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    [Obsolete("Use SetInternal(Feature, object?) instead")]
+    protected virtual bool SetInternal(Feature? feature, object? value, INotificationId? notificationId) =>
+        SetInternalAnnotation(feature, value);
+
+    /// <inheritdoc cref="IWritableNode.Set"/>
+    protected virtual bool SetInternal(Feature? feature, object? value) =>
+            SetInternalAnnotation(feature, value);
+
+    private bool SetInternalAnnotation(Feature? feature, object? value)
     {
         if (feature != null)
             return false;
@@ -109,7 +124,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     #region Annotations
 
     /// <inheritdoc />
-    public virtual void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null)
+    public virtual void AddAnnotations(IEnumerable<INode> annotations)
     {
         var safeAnnotations = AssureAnnotations(annotations?.ToList());
         int index = Math.Max(_annotations.Count - 1, 0);
@@ -139,8 +154,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations,
-        INotificationId? notificationId = null)
+    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = AssureAnnotations(annotations?.ToList());
@@ -171,8 +185,8 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
+    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations) =>
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover);
 
     bool IWritableNode.RemoveAnnotationsRaw(IWritableNode annotation) =>
         RemoveAnnotationsRaw(annotation);

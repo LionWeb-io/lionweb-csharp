@@ -174,16 +174,13 @@ public class FeatureMethodsGenerator(
         TypeSyntax type = AsType(typeof(INotificationId));
         return Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
-                Param("value", NullableType(AsType(typeof(object)))),
-                Parameter(Identifier("notificationId"))
-                    .WithType(NullableType(type))
-                    .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression)))
+                Param("value", NullableType(AsType(typeof(object))))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.SetInternal(feature, value, notificationId)"),
+                    IfStatement(ParseExpression("base.SetInternal(feature, value)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).Select(GenSetInternal))

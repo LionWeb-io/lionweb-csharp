@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
 using System.Collections;
 using Utilities;
 
@@ -154,7 +153,7 @@ public abstract class DynamicClassifier(NodeId id, LionWebVersions lionWebVersio
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)

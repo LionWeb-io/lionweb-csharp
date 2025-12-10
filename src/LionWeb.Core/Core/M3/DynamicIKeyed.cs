@@ -18,7 +18,6 @@
 namespace LionWeb.Core.M3;
 
 using M2;
-using Notification;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -127,7 +126,7 @@ public abstract class DynamicIKeyed(NodeId id, LionWebVersions lionWebVersion) :
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         if (_builtIns.INamed_name == feature)
         {

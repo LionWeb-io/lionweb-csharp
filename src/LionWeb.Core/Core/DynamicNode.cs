@@ -19,9 +19,8 @@ namespace LionWeb.Core;
 
 using M2;
 using M3;
-using Notification;
-using Notification.Pipe;
 using Notification.Partition;
+using Notification.Pipe;
 using System.Collections;
 using Utilities;
 
@@ -175,9 +174,8 @@ public class DynamicNode : NodeBase
         return false;
     }
 
-
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         if (base.SetInternal(feature, value))
             return true;

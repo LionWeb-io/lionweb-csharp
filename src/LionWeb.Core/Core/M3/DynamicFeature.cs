@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
 using Utilities;
 
 /// <inheritdoc cref="Feature"/>
@@ -86,7 +85,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)

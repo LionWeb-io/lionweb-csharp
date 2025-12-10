@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
 using System.Collections;
 using System.Collections.Immutable;
 using Utilities;
@@ -220,7 +219,7 @@ public class DynamicConcept(NodeId id, LionWebVersions lionWebVersion, DynamicLa
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)
