@@ -17,6 +17,7 @@ This repository contains an implementation of (select parts of) the [LionWeb](ht
 * [`build/LionWeb-CSharp-Build`]: a .NET console application that generates various source files in the `-Test` project
 * [`test/LionWeb.Core.Benchmark`]: Benchmarks for different aspects of LionWeb C#
 * [`test/LionWeb.Core.Test`]: unit tests for `LionWeb.Core`
+* [`test/LionWeb.Core.Test.Languages`]: Generated languages to be used in tests.
 * [`test/LionWeb.Generator.Cli.Test`]: unit tests for `LionWeb.Generator.Cli`
 * [`test/LionWeb.Protocol.Delta.Test`]: unit tests for `LionWeb.Protocol.Delta`
 
