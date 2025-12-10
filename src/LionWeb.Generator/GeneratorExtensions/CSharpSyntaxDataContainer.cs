@@ -19,10 +19,10 @@ namespace LionWeb.Generator.GeneratorExtensions;
 
 internal class CSharpSyntaxDataContainer
 {
-    private readonly List<ICSharpSyntaxData> _cSharpSyntaxData = [];
+    private readonly List<ICSharpSyntaxData> _data = [];
 
-    internal List<ICSharpSyntaxData> CSharpSyntaxData => _cSharpSyntaxData;
+    internal List<ICSharpSyntaxData> Data => _data;
     
     internal void Add(ICSharpSyntaxData icSharpSyntaxData) => 
-        _cSharpSyntaxData.Add(icSharpSyntaxData);
+        _data.Add(icSharpSyntaxData);
 }

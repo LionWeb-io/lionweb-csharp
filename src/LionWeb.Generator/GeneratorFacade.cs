@@ -69,7 +69,7 @@ public class GeneratorFacade
     /// <summary>
     /// Returns a list of generated C# syntax nodes with their corresponding <see cref="Classifier"/>.
     /// </summary>
-    public List<ICSharpSyntaxData> CSharpSyntaxData => _cSharpSyntaxDataContainer.CSharpSyntaxData;
+    public List<ICSharpSyntaxData> CSharpSyntaxData => _cSharpSyntaxDataContainer.Data;
 
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }
