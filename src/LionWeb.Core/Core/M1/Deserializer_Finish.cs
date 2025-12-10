@@ -87,10 +87,7 @@ public partial class Deserializer
             .Where(c => c != null)
             .ToList()!;
 
-        foreach (var annotation in annotations)
-        {
-            node.AddAnnotationsRaw(annotation);
-        }
+        node.AddAnnotations(annotations);
     }
 
     private IWritableNode? FindAnnotation(IWritableNode node, ICompressedId annotationId)

@@ -63,7 +63,7 @@ public partial class Deserializer
             if (convertedValue == null)
                 continue;
 
-            node.SetRaw(property, convertedValue);
+            node.Set(property, convertedValue);
         }
     }
 

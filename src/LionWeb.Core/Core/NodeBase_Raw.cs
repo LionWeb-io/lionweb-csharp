@@ -40,8 +40,8 @@ public abstract partial class NodeBase
             
             case (Containment { Multiple: true } f, IEnumerable<IWritableNode> v):
                 return TryGetContainmentsRaw(f, out var deletedChildren)
-                       && ((IReadOnlyList<IWritableNode>)deletedChildren).All(d => RemoveContainmentsRaw(f, d))
-                       && v.All(a => AddContainmentsRaw(f, a));
+                       && ((IReadOnlyList<IWritableNode>)deletedChildren).ToList().All(d => RemoveContainmentsRaw(f, d))
+                       && v.ToList().All(a => AddContainmentsRaw(f, a));
             
             case (Reference { Multiple: true } f, IEnumerable<IReferenceTarget> v):
                 return TryGetReferencesRaw(f, out var deletedTargets)
