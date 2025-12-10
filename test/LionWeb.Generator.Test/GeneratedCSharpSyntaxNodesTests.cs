@@ -3,6 +3,7 @@
 using Core;
 using Core.Test.Languages.Generated.V2023_1.MultiInheritLang;
 using Core.Test.Languages.Generated.V2023_1.TestLanguage;
+using GeneratorExtensions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 
