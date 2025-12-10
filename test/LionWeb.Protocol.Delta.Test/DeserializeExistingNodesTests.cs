@@ -103,16 +103,16 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
-            existingParent.ReplaceWith(replacement);
+            originalPartition.AddLinks([replacement]);
         });
         
         // Assert
         // changes applied to original partition
-        Assert.AreSame(replacement, originalPartition.Links[0]);
+        Assert.AreSame(replacement, originalPartition.Links[1]);
         Assert.IsNull(existingParent.Containment_0_1);
         
         // change has not replicated to the clone
-        Assert.IsFalse(clonedPartition.TryGetLinks(out var _));
+        Assert.HasCount(1, clonedPartition.Links);
         Assert.AreEqual("existingChild", clonedPartition.Links[0]!.Containment_0_1!.GetId());
     }
     
