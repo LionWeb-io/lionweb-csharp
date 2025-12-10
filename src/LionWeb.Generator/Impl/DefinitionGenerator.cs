@@ -19,20 +19,17 @@
 
 namespace LionWeb.Generator.Impl;
 
-using Core;
 using Core.M3;
 using Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 // use https://roslynquoter.azurewebsites.net/ to learn how to build C# ASTs
 
-internal class DefinitionGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config, 
-    CSharpSyntaxNodeContainer cSharpSyntaxNodeContainer)
-    : GeneratorBase(names, lionWebVersion, config)
+internal class DefinitionGenerator(GeneratorInputParameters generatorInputParameters)
+    : GeneratorBase(generatorInputParameters)
 {
     private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
 
@@ -49,15 +46,12 @@ internal class DefinitionGenerator(INames names, LionWebVersions lionWebVersion,
                         .WithMembers(List(
                             new List<MemberDeclarationSyntax>
                                 {
-                                    new LanguageGenerator(_names, _lionWebVersion, _config).LanguageClass()
+                                    new LanguageGenerator(_generatorInputParameters).LanguageClass()
                                 }
-                                .Concat(new FactoryGenerator(_names, _lionWebVersion, _config).FactoryTypes())
-                                .Concat(Classifiers.Select(c =>
-                                    new ClassifierGenerator(c, _names, _lionWebVersion, _config, cSharpSyntaxNodeContainer).ClassifierType()))
-                                .Concat(Enumerations.Select(e =>
-                                    new EnumGenerator(e, _names, _lionWebVersion, _config).EnumType()))
-                                .Concat(StructuredDataTypes.Select(s =>
-                                    new StructuredDataTypeGenerator(s, _names, _lionWebVersion, _config).SdtType()))
+                                .Concat(new FactoryGenerator(_generatorInputParameters).FactoryTypes())
+                                .Concat(Classifiers.Select(c => new ClassifierGenerator(c, _generatorInputParameters).ClassifierType()))
+                                .Concat(Enumerations.Select(e => new EnumGenerator(e, _generatorInputParameters).EnumType()))
+                                .Concat(StructuredDataTypes.Select(s => new StructuredDataTypeGenerator(s, _generatorInputParameters).SdtType()))
                         ))
                         .WithUsings(List(CollectUsings()))
                 ])

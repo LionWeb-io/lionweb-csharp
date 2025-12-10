@@ -21,7 +21,6 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 using Property = Core.M3.Property;
@@ -29,8 +28,8 @@ using Property = Core.M3.Property;
 /// <summary>
 /// Generates constructor of Language class.
 /// </summary>
-internal class LanguageConstructorGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-    : LanguageGeneratorBase(names, lionWebVersion, config)
+internal class LanguageConstructorGenerator(GeneratorInputParameters generatorInputParameters)
+    : LanguageGeneratorBase(generatorInputParameters)
 {
     /// <inheritdoc cref="LanguageConstructorGenerator"/>
     public ConstructorDeclarationSyntax GenConstructor() =>

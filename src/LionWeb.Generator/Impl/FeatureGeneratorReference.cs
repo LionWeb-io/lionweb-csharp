@@ -24,11 +24,11 @@ using Core.Notification;
 using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-internal class FeatureGeneratorReference(Classifier classifier, Reference reference, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, reference, names, lionWebVersion, config)
+internal class FeatureGeneratorReference(Classifier classifier, Reference reference, GeneratorInputParameters generatorInputParameters) 
+    : FeatureGeneratorLinkBase(classifier, reference, generatorInputParameters)
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredSingleReference()
     {
@@ -36,7 +36,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
         ExpressionSyntax getter;
         ExpressionSyntax setter;
         ExpressionSyntax tryGetReturn;
-        switch (config.UnresolvedReferenceHandling)
+        switch (_config.UnresolvedReferenceHandling)
         {
             case UnresolvedReferenceHandling.Throw:
                 returnType = AsType(reference.GetFeatureType());
@@ -60,8 +60,8 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling),
-                    config.UnresolvedReferenceHandling.ToString());
+                throw new ArgumentOutOfRangeException(nameof(_config.UnresolvedReferenceHandling),
+                    _config.UnresolvedReferenceHandling.ToString());
         }
 
         return new List<MemberDeclarationSyntax>
@@ -130,7 +130,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
     {
         ExpressionSyntax getter;
         ExpressionSyntax tryGetReturn;
-        switch (config.UnresolvedReferenceHandling)
+        switch (_config.UnresolvedReferenceHandling)
         {
             case UnresolvedReferenceHandling.Throw:
                 getter = ReferenceTargetNonNullTargetCall();
@@ -143,7 +143,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(config.UnresolvedReferenceHandling.ToString());
+                throw new ArgumentOutOfRangeException(_config.UnresolvedReferenceHandling.ToString());
         }
 
         return new List<MemberDeclarationSyntax>
@@ -195,7 +195,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
     {
         string getterMethod;
         MethodDeclarationSyntax tryGet;
-        switch (config.UnresolvedReferenceHandling)
+        switch (_config.UnresolvedReferenceHandling)
         {
             case UnresolvedReferenceHandling.ReturnAsNull:
                 getterMethod = "GetRequiredNullableReferences";
@@ -211,8 +211,8 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling),
-                    config.UnresolvedReferenceHandling.ToString());
+                throw new ArgumentOutOfRangeException(nameof(_config.UnresolvedReferenceHandling),
+                    _config.UnresolvedReferenceHandling.ToString());
         }
 
         return new List<MemberDeclarationSyntax>
@@ -279,7 +279,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
     {
         InvocationExpressionSyntax getter;
         MethodDeclarationSyntax tryGet;
-        switch (config.UnresolvedReferenceHandling)
+        switch (_config.UnresolvedReferenceHandling)
         {
             case UnresolvedReferenceHandling.ReturnAsNull:
                 getter = ReferenceTargetNullableTargetsCall();
@@ -295,8 +295,8 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling),
-                    config.UnresolvedReferenceHandling.ToString());
+                throw new ArgumentOutOfRangeException(nameof(_config.UnresolvedReferenceHandling),
+                    _config.UnresolvedReferenceHandling.ToString());
         }
 
         return new List<MemberDeclarationSyntax> { MultipleReferenceField(), MultipleReferenceProperty(getter), tryGet }
@@ -390,7 +390,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
         TypeSyntax returnType;
         InvocationExpressionSyntax initer;
 
-        switch (config.UnresolvedReferenceHandling)
+        switch (_config.UnresolvedReferenceHandling)
         {
             case UnresolvedReferenceHandling.ReturnAsNull:
                 returnType = NullableType(AsType(reference.Type));
@@ -412,7 +412,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(config.UnresolvedReferenceHandling), config.UnresolvedReferenceHandling.ToString());
+                throw new ArgumentOutOfRangeException(nameof(_config.UnresolvedReferenceHandling), _config.UnresolvedReferenceHandling.ToString());
         }
 
         return PropertyDeclaration(AsType(typeof(IReadOnlyList<>), returnType),

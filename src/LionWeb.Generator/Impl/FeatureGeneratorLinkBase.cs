@@ -22,11 +22,11 @@ using Core.M3;
 using Core.Notification;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, link, names, lionWebVersion, config)
+internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link link, GeneratorInputParameters generatorInputParameters) 
+    : FeatureGeneratorBase(classifier, link, generatorInputParameters)
 {
     public IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(bool writeable) =>
     [

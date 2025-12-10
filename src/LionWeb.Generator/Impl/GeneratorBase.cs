@@ -39,15 +39,18 @@ internal abstract class GeneratorBase
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
+    protected readonly GeneratorInputParameters _generatorInputParameters;
+    
     /// <inheritdoc cref="GeneratorBase"/>
-    protected GeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    protected GeneratorBase(GeneratorInputParameters generatorInputParameters)
     {
-        lionWebVersion.AssureCompatible(names.Language.LionWebVersion);
-        _names = names;
-        _lionWebVersion = lionWebVersion;
-        _config = config;
-        _m3 = lionWebVersion.LionCore;
-        _builtIns = lionWebVersion.BuiltIns;
+        generatorInputParameters.LionWebVersion.AssureCompatible(generatorInputParameters.Names.Language.LionWebVersion);
+        _generatorInputParameters = generatorInputParameters;
+        _names = _generatorInputParameters.Names;
+        _lionWebVersion = _generatorInputParameters.LionWebVersion;
+        _config = _generatorInputParameters.Config;
+        _m3 = _generatorInputParameters.LionWebVersion.LionCore;
+        _builtIns = _generatorInputParameters.LionWebVersion.BuiltIns;
     }
 
     /// <inheritdoc cref="INames.Language"/>

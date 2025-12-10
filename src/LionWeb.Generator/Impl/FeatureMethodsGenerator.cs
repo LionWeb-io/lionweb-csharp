@@ -24,7 +24,6 @@ using Core.Notification;
 using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 using Property = Core.M3.Property;
@@ -39,8 +38,8 @@ using Property = Core.M3.Property;
 /// - RemoveInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-internal class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-    : ClassifierGeneratorBase(names, lionWebVersion, config)
+internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputParameters generatorInputParameters)
+    : ClassifierGeneratorBase(generatorInputParameters)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> FeatureMethods()

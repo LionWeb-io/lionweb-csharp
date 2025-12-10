@@ -17,17 +17,16 @@
 
 namespace LionWeb.Generator.Impl;
 
-using Core;
 using Core.M2;
 using Core.M3;
 using Core.Notification.Partition.Emitter;
 using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-internal class FeatureGeneratorProperty(Classifier classifier, Property property, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorBase(classifier, property, names, lionWebVersion, config)
+internal class FeatureGeneratorProperty(Classifier classifier, Property property, GeneratorInputParameters generatorInputParameters)
+    : FeatureGeneratorBase(classifier, property, generatorInputParameters)
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredProperty()
     {

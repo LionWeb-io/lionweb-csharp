@@ -19,6 +19,7 @@ namespace LionWeb.Generator;
 
 using Core;
 using Core.M3;
+using GeneratorExtensions;
 using Impl;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -50,7 +51,15 @@ public class GeneratorFacade
     {
         if (_compilationUnit == null)
         {
-            var generator = new DefinitionGenerator(Names, LionWebVersion, Config, _cSharpSyntaxNodeContainer);
+            var generatorInputParameters = new GeneratorInputParameters
+            {
+                Names = Names,
+                LionWebVersion = LionWebVersion,
+                Config = Config,
+                CSharpSyntaxNodeContainer = _cSharpSyntaxNodeContainer
+            };
+
+            var generator = new DefinitionGenerator(generatorInputParameters);
             _compilationUnit = generator.DefinitionFile();
         }
 

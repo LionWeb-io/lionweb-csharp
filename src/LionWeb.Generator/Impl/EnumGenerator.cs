@@ -17,19 +17,17 @@
 
 namespace LionWeb.Generator.Impl;
 
-using Core;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
 /// <summary>
 /// Generates Enumeration enums.
 /// </summary>
-internal class EnumGenerator(Enumeration enumeration, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-    : GeneratorBase(names, lionWebVersion, config)
+internal class EnumGenerator(Enumeration enumeration, GeneratorInputParameters generatorInputParameters)
+    : GeneratorBase(generatorInputParameters)
 {
     /// <inheritdoc cref="EnumGenerator"/>
     public EnumDeclarationSyntax EnumType() =>

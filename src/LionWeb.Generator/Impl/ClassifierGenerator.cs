@@ -23,6 +23,7 @@ using Core.M3;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
 using Core.Utilities;
+using GeneratorExtensions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -38,13 +39,8 @@ using static AstExtensions;
 /// <seealso cref="FeatureMethodsGenerator"/>
 /// <seealso cref="ContainmentMethodsGenerator"/>
 /// <seealso cref="FeatureGeneratorBase"/>
-internal class ClassifierGenerator(
-    Classifier classifier,
-    INames names,
-    LionWebVersions lionWebVersion,
-    GeneratorConfig config,
-    CSharpSyntaxNodeContainer cSharpSyntaxNodeContainer)
-    : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion, config)
+internal class ClassifierGenerator(Classifier classifier, GeneratorInputParameters generatorInputParameters)
+    : ClassifierGeneratorBase(generatorInputParameters with { Names = new UniqueFeatureNames(generatorInputParameters.Names) })
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
     public TypeDeclarationSyntax ClassifierType()
@@ -54,21 +50,21 @@ internal class ClassifierGenerator(
             case Annotation a:
                 {
                     var classDeclarationSyntax = ClassifierAnnotation(a);
-                    cSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(a, classDeclarationSyntax));
+                    _generatorInputParameters.CSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(a, classDeclarationSyntax));
                     return classDeclarationSyntax;
                 }
 
             case Concept c:
                 {
                     var classDeclarationSyntax = ClassifierConcept(c);
-                    cSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(c, classDeclarationSyntax));
+                    _generatorInputParameters.CSharpSyntaxNodeContainer.Add(new ClassSyntaxNode(c, classDeclarationSyntax));
                     return classDeclarationSyntax;
                 }
 
             case Interface i:
                 {
                     var interfaceDeclarationSyntax = ClassifierInterface(i);
-                    cSharpSyntaxNodeContainer.Add(new InterfaceSyntaxNode(i, interfaceDeclarationSyntax));
+                    _generatorInputParameters.CSharpSyntaxNodeContainer.Add(new InterfaceSyntaxNode(i, interfaceDeclarationSyntax));
                     return interfaceDeclarationSyntax;
                 }
                 
@@ -167,11 +163,11 @@ internal class ClassifierGenerator(
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
                 FeaturesToImplement(classifier)
-                    .SelectMany(f => FeatureGeneratorBase.Members(classifier, f, _names, _lionWebVersion, _config))
+                    .SelectMany(f => FeatureGeneratorBase.Members(classifier, f, _generatorInputParameters))
                     .Append(GenConstructor(additionalConstructorStatements ?? []))
                     .Concat(additionalMembers)
-                    .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion, _config).FeatureMethods())
-                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion, _config).ContainmentMethods())
+                    .Concat(new FeatureMethodsGenerator(classifier, _generatorInputParameters).FeatureMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _generatorInputParameters).ContainmentMethods())
             ))
             .Xdoc(XdocDefault());
     }
@@ -228,7 +224,7 @@ internal class ClassifierGenerator(
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
-                FeatureGeneratorBase.AbstractMembers(classifier, f, _names, _lionWebVersion, _config))))
+                FeatureGeneratorBase.AbstractMembers(classifier, f, _generatorInputParameters))))
             .Xdoc(XdocDefault());
     }
 
