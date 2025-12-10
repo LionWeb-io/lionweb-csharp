@@ -25,6 +25,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 /// </summary>
 public interface ICSharpSyntaxData
 {
+    /// <inheritdoc cref="Classifier"/>
     Classifier Classifier { get; }
 }
 
@@ -35,8 +36,9 @@ public record ClassSyntax(
     Classifier ClassifierType,
     ClassDeclarationSyntax ClassDeclarationSyntax) : ICSharpSyntaxData
 {
+    /// <inheritdoc />
     public Classifier Classifier => ClassifierType;
-};
+}
 
 /// <summary>
 /// Record for holding <see cref="InterfaceDeclarationSyntax"/> of <see cref="Interface"/> type of classifier.
@@ -45,5 +47,6 @@ public record InterfaceSyntax(
     Classifier ClassifierType,
     InterfaceDeclarationSyntax InterfaceDeclarationSyntax) : ICSharpSyntaxData
 {
+    /// <inheritdoc />
     public Classifier Classifier => ClassifierType;
-};
+}
