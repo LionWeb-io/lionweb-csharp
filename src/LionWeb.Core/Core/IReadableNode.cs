@@ -66,7 +66,7 @@ public interface IReadableNode
     /// If <paramref name="feature"/> is _multiple_: <c>true</c> if <paramref name="feature"/> is not empty on <c>this</c>; <c>false</c> otherwise.
     /// </returns>
     /// <seealso cref="Get"/>
-    /// <see cref="CollectAllSetFeatures"/>
+    /// <seealso cref="CollectAllSetFeatures"/>
     public bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 }
 
