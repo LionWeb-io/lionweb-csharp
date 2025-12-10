@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Generator;
+namespace LionWeb.Generator.GeneratorExtensions;
 
 internal class CSharpSyntaxNodeContainer
 {
