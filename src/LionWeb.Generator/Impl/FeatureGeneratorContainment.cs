@@ -15,19 +15,24 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
 using Core.M2;
 using Core.M3;
-using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public class FeatureGeneratorContainment(Classifier classifier, Containment containment, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, containment, names, lionWebVersion, config)
+public class FeatureGeneratorContainment(
+    Classifier classifier,
+    Containment containment,
+    INames names,
+    LionWebVersions lionWebVersion,
+    GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, containment, names, lionWebVersion, config)
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment() =>
         new List<MemberDeclarationSyntax>
@@ -35,15 +40,10 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
             SingleFeatureField(true),
             SingleRequiredFeatureProperty(AsType(containment.GetFeatureType(), writeable: true))
                 .Xdoc(XdocThrowsIfSetToNull()),
-            TryGet(writeable: true)
+            TryGet(writeable: true),
+            SingleContainmentSetterRaw(writeable: true)
         }.Concat(RequiredFeatureSetter([
-                AsureNotNullCall(),
-                SingleContainmentEmitterVariable(),
-                EmitterCollectOldDataCall(),
-                SetParentNullCall(),
-                AttachChildCall(),
-                AssignFeatureField(),
-                EmitterNotifyCall(),
+                ExpressionStatement(CallGeneric("SetRequiredSingleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
                 ReturnStatement(This())
             ], true)
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
@@ -54,68 +54,54 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
             {
                 SingleFeatureField(true),
                 SingleOptionalFeatureProperty(writeable: true),
-                TryGet(writeable: true)
+                TryGet(writeable: true),
+                SingleContainmentSetterRaw(writeable: true)
             }
             .Concat(
                 OptionalFeatureSetter([
-                    SingleContainmentEmitterVariable(),
-                    EmitterCollectOldDataCall(),
-                    SetParentNullCall(),
-                    AttachChildCall(),
-                    AssignFeatureField(),
-                    EmitterNotifyCall(),
+                    ExpressionStatement(CallGeneric("SetOptionalSingleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
                     ReturnStatement(This())
                 ], true));
 
-    private LocalDeclarationStatementSyntax SingleContainmentEmitterVariable() =>
-        Variable(
-            "emitter",
-            AsType(typeof(ContainmentSingleNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable: true)),
-            NewCall([
-                MetaProperty(containment), This(), IdentifierName("value"),
-                FeatureField(containment), IdentifierName("notificationId")
+    private MethodDeclarationSyntax SingleContainmentSetterRaw(bool writeable = false) =>
+        Method(FeatureSetRaw(containment).ToString(), AsType(typeof(bool)), [
+                Param("value", NullableType(AsType(containment.GetFeatureType(), writeable: writeable)))
             ])
-        );
+            .WithBody(AsStatements([
+                IfStatement(Not(Call("ExchangeChildRaw", IdentifierName("value"), FeatureField(containment))),
+                    ReturnStatement(False())
+                ),
+                AssignFeatureField(),
+                ReturnStatement(True())
+            ]))
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
     public IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment() =>
         new List<MemberDeclarationSyntax>
         {
+            MultiContainmentSetterRaw(),
+            ContainmentAdderRaw(),
+            ContainmentInserterRaw(),
+            ContainmentRemoverRaw(),
             MultipleContainmentField(),
             MultipleContainmentProperty(AsNonEmptyReadOnlyCall())
                 .Xdoc(XdocRequiredMultipleLink()),
-            TryGetMultiple(InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly"))))
+            TryGetMultiple(InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly")))),
         }.Concat(
             LinkAdder([
-                    SafeNodesVariable(),
-                    AssureNonEmptyCall(),
-                    ReturnIfAddedNodesAreEqualToExistingNodes(),
-                    LoopOverSafeNodes([
-                        AddMultipleContainmentEmitterVariable(Null(), true),
-                        EmitterCollectOldDataCall(),
-                        RequiredAddRangeCall(containment, true),
-                        EmitterNotifyCall()]),
+                    ExpressionStatement(CallGeneric("AddRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkAddRaw(containment))),
                     ReturnStatement(This())
                 ], writeable: true)
                 .Select(XdocRequiredAdder)
         ).Concat(
             LinkInserter([
-                    AssureInRangeCall(),
-                    SafeNodesVariable(),
-                    AssureNonEmptyCall(),
-                    AssureNoSelfMoveCall(),
-                    AddMultipleContainmentEmitterVariable(IdentifierName("index")),
-                    EmitterCollectOldDataCall(),
-                    InsertRangeCall(),
-                    EmitterNotifyCall(),
+                    ExpressionStatement(CallGeneric("InsertRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkInsertRaw(containment))),
                     ReturnStatement(This())
                 ], writeable: true)
-                .Select(i => XdocRequiredInserter(i))
+                .Select(XdocRequiredInserter)
         ).Concat(
             LinkRemover([
-                    SafeNodesVariable(),
-                    AssureNotNullCall(containment),
-                    AssureNotClearingCall(),
-                    RequiredRemoveSelfParentCall(),
+                    ExpressionStatement(CallGeneric("RemoveRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkRemoveRaw(containment))),
                     ReturnStatement(This())
                 ], writeable: true)
                 .Select(XdocRequiredRemover)
@@ -124,104 +110,67 @@ public class FeatureGeneratorContainment(Classifier classifier, Containment cont
     public IEnumerable<MemberDeclarationSyntax> OptionalMultiContainment() =>
         new List<MemberDeclarationSyntax>
         {
+            MultiContainmentSetterRaw(),
+            ContainmentAdderRaw(),
+            ContainmentInserterRaw(),
+            ContainmentRemoverRaw(),
             MultipleContainmentField(),
             MultipleContainmentProperty(AsReadOnlyCall()),
-            TryGetMultiple(InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly"))))
+            TryGetMultiple(
+                InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly")))),
         }.Concat(
             LinkAdder([
-                SafeNodesVariable(),
-                AssureNotNullCall(containment),
-                AssureNotNullMembersCall(containment),
-                ReturnIfAddedNodesAreEqualToExistingNodes(),
-                LoopOverSafeNodes([
-                    AddMultipleContainmentEmitterVariable(Null(), true),
-                    EmitterCollectOldDataCall(),
-                    OptionalAddRangeCall(containment, true),
-                    EmitterNotifyCall()]),
+                ExpressionStatement(CallGeneric("AddOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkAddRaw(containment))),
                 ReturnStatement(This())
             ], writeable: true)
         ).Concat(
             LinkInserter([
-                AssureInRangeCall(),
-                SafeNodesVariable(),
-                AssureNotNullCall(containment),
-                AssureNoSelfMoveCall(),
-                AssureNotNullMembersCall(containment),
-                AddMultipleContainmentEmitterVariable(IdentifierName("index")),
-                EmitterCollectOldDataCall(),
-                InsertRangeCall(),
-                EmitterNotifyCall(),
+                ExpressionStatement(CallGeneric("InsertOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkInsertRaw(containment))),
                 ReturnStatement(This())
             ], writeable: true)
         ).Concat(
             LinkRemover([
-                OptionalRemoveSelfParentCall(),
+                ExpressionStatement(CallGeneric("RemoveOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkRemoveRaw(containment))),
                 ReturnStatement(This())
             ], writeable: true)
         );
 
-    private ForEachStatementSyntax LoopOverSafeNodes(IEnumerable<StatementSyntax> loopBody) => 
-        ForEachStatement(
-            type: IdentifierName("var"),
-            identifier: Identifier("safeNode"),
-            expression: IdentifierName("safeNodes"),
-            statement: Block(loopBody));
-    
-    private IfStatementSyntax ReturnIfAddedNodesAreEqualToExistingNodes() =>
-        IfStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("SequenceEqual")),
-            AsArguments([IdentifierName("safeNodes")])
-        ), ReturnStatement(This()));
+    private MethodDeclarationSyntax MultiContainmentSetterRaw() =>
+        Method(FeatureSetRaw(containment).ToString(), AsType(typeof(bool)),
+                [
+                    Param("nodes", AsType(typeof(List<>), AsType(containment.GetFeatureType(), writeable: true)))
+                ],
+                Call("ExchangeChildrenRaw", IdentifierName("nodes"), FeatureField(containment))
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index, bool isAddedNodeSingle = false) =>
-        Variable(
-            "emitter",
-            AsType(typeof(ContainmentAddMultipleNotificationEmitter<>),
-                AsType(containment.GetFeatureType(), writeable: true)),
-            NewCall([
-                MetaProperty(containment), This(), isAddedNodeSingle ? IdentifierName("[safeNode]"): IdentifierName("safeNodes"),
-                FeatureField(containment), index, IdentifierName("notificationId")
-            ])
-        );
+    private MemberDeclarationSyntax ContainmentAdderRaw() =>
+        Method(LinkAddRaw(containment).ToString(), AsType(typeof(bool)),
+                [
+                    Param("value", NullableType(AsType(containment.Type, writeable: true)))
+                ],
+                Call("AddChildRaw", IdentifierName("value"), FeatureField(containment))
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private ExpressionStatementSyntax AssureNoSelfMoveCall() =>
-        ExpressionStatement(Call("AssureNoSelfMove",
-            IdentifierName("index"),
-            IdentifierName("safeNodes"),
-            FeatureField(containment)
-        ));
+    private MemberDeclarationSyntax ContainmentInserterRaw() =>
+        Method(LinkInsertRaw(containment).ToString(), AsType(typeof(bool)),
+                [
+                    Param("index", AsType(typeof(int))),
+                    Param("value", NullableType(AsType(containment.Type, writeable: true)))
+                ],
+                Call("InsertChildRaw", IdentifierName("index"), IdentifierName("value"), FeatureField(containment))
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private ExpressionStatementSyntax SetParentNullCall() =>
-        ExpressionStatement(Call("SetParentNull", FeatureField(containment)));
-
-    private ExpressionStatementSyntax RequiredRemoveSelfParentCall() =>
-        ExpressionStatement(Call("RemoveSelfParent",
-            IdentifierName("safeNodes"),
-            FeatureField(containment),
-            MetaProperty(containment),
-            CallGeneric("ContainmentRemover", AsType(containment.Type, writeable: true),
-                MetaProperty(containment))
-        ));
-
-    private ExpressionStatementSyntax OptionalRemoveSelfParentCall() =>
-        ExpressionStatement(Call("RemoveSelfParent",
-            OptionalNodesToList(),
-            FeatureField(containment),
-            MetaProperty(containment),
-            CallGeneric("ContainmentRemover", AsType(containment.Type, writeable: true),
-                MetaProperty(containment))
-        ));
-
-    private ExpressionStatementSyntax InsertRangeCall() =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("InsertRange")),
-            AsArguments([
-                IdentifierName("index"),
-                Call("SetSelfParent", IdentifierName("safeNodes"),
-                    MetaProperty(containment)
-                )
-            ])
-        ));
+    private MemberDeclarationSyntax ContainmentRemoverRaw() =>
+        Method(LinkRemoveRaw(containment).ToString(), AsType(typeof(bool)),
+                [
+                    Param("value", NullableType(AsType(containment.Type, writeable: true)))
+                ],
+                Call("RemoveChildRaw", IdentifierName("value"), FeatureField(containment))
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
     private FieldDeclarationSyntax MultipleContainmentField() =>
         Field(FeatureField(containment).ToString(),

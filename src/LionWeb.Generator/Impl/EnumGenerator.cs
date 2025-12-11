@@ -47,4 +47,9 @@ public class EnumGenerator(Enumeration enumeration, INames names, LionWebVersion
         EnumMember(literal.Name)
             .WithAttributeLists(AsAttributes([MetaPointerAttribute(literal)]))
             .Xdoc(XdocKeyed(literal));
+    
+    /// <returns><c>name</c></returns>
+    private static EnumMemberDeclarationSyntax EnumMember(string name) =>
+        EnumMemberDeclaration(Identifier(name.PrefixKeyword()));
+
 }

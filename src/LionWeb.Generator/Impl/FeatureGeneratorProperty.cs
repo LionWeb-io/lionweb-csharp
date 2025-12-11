@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
 using Core.M2;
 using Core.M3;
-using Core.Notification.Partition.Emitter;
 using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -31,55 +31,54 @@ public class FeatureGeneratorProperty(Classifier classifier, Property property, 
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredProperty()
     {
-        List<StatementSyntax> setterBody =
-        [
-            PropertyEmitterVariable(),
-            EmitterCollectOldDataCall(),
-            AssignFeatureField(),
-            EmitterNotifyCall(),
+        var setterName = IsReferenceType()
+            ? "SetRequiredReferenceTypeProperty"
+            : "SetRequiredValueTypeProperty";
+
+        var members = new List<MemberDeclarationSyntax>
+        {
+            SingleRequiredFeatureProperty(AsType(property.GetFeatureType())),
+            TryGet()
+        }.Concat(RequiredFeatureSetter([
+            ExpressionStatement(CallGeneric(setterName, AsType(property.Type), IdentifierName("value"), MetaProperty(property), FeatureField(property), FeatureSetRaw(property))),
             ReturnStatement(This())
-        ];
-        if (IsReferenceType(property))
-            setterBody.Insert(0, AsureNotNullCall());
-
-        var prop = SingleRequiredFeatureProperty(AsType(property.GetFeatureType()));
-        var setter = RequiredFeatureSetter(setterBody);
-
-        var members = new List<MemberDeclarationSyntax> { prop, TryGet() }.Concat(setter);
-        if (IsReferenceType(property))
+        ]));
+        if (IsReferenceType())
             members = members.Select(member => member.Xdoc(XdocThrowsIfSetToNull()));
 
-        return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
+        return new List<MemberDeclarationSyntax>
+        {
+            SingleFeatureField(),
+            FeatureSetterRaw(AsType(property.Type))
+        }.Concat(members);
     }
 
-    public IEnumerable<MemberDeclarationSyntax> OptionalProperty() =>
-        new List<MemberDeclarationSyntax>
+    public IEnumerable<MemberDeclarationSyntax> OptionalProperty()
+    {
+        var setterName = IsReferenceType()
+            ? "SetOptionalReferenceTypeProperty"
+            : "SetOptionalValueTypeProperty";
+
+        return new List<MemberDeclarationSyntax>
             {
                 SingleFeatureField(),
                 SingleOptionalFeatureProperty(),
-                TryGet()
+                TryGet(),
+                FeatureSetterRaw(AsType(property.Type))
             }
             .Concat(
                 OptionalFeatureSetter([
-                    PropertyEmitterVariable(),
-                    EmitterCollectOldDataCall(),
-                    AssignFeatureField(),
-                    EmitterNotifyCall(),
+                    ExpressionStatement(CallGeneric(setterName, AsType(property.Type), IdentifierName("value"),
+                        MetaProperty(property), FeatureField(property), FeatureSetRaw(property))),
                     ReturnStatement(This())
                 ])
             );
+    }
 
-    private LocalDeclarationStatementSyntax PropertyEmitterVariable() =>
-        Variable(
-            "emitter",
-            AsType(typeof(PropertyNotificationEmitter)),
-            NewCall([
-                MetaProperty(property), This(), IdentifierName("value"),
-                FeatureField(property), IdentifierName("notificationId")
-            ])
-        );
-
-    private bool IsReferenceType(Property property) =>
-        !(_builtIns.Boolean.EqualsIdentity(property.Type) ||
-          _builtIns.Integer.EqualsIdentity(property.Type));
+    private bool IsReferenceType() =>
+        !(_builtIns.Boolean.EqualsIdentity(property.Type)
+          || _builtIns.Integer.EqualsIdentity(property.Type)
+          || property.Type is Enumeration
+          || property.Type is StructuredDataType
+            );
 }
