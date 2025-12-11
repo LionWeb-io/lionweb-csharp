@@ -133,6 +133,17 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"Skip deserializing node with id '{id}' because dependentLanguages contains node with same id");
 }
 
+/// <summary>
+/// Keeps unresolved reference targets as-is, i.e. stores their resolveInfo and/or targetId.
+/// </summary>
+public class DeserializerKeepUnresolvedReferencesHandler : DeserializerExceptionHandler
+{
+    /// <inheritdoc />
+    public override IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target, Feature reference,
+        IReadableNode parent) =>
+        target;
+}
+
 /// Something went wrong during serialization.
 public class SerializerException(string? message) : LionWebExceptionBase(message);
 

@@ -162,7 +162,7 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
         oldClassifier.ReplaceWith(newClassifier);
 
         newClassifier.AddAnnotations(oldClassifier.GetAnnotations());
-        newClassifier.AddFeatures(oldClassifier.Features);
+        newClassifier.AddFeatures(oldClassifier.Features.Cast<DynamicFeature>());
 
         var lenientAnnotationInstance = ((LenientNode)annotation);
         lenientAnnotationInstance.SetClassifier(newClassifier);
