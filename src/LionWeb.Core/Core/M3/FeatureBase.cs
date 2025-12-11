@@ -50,14 +50,29 @@ public abstract class FeatureBase<TLanguage> : IKeyedBase<TLanguage>, Feature wh
     {
         if (base.TryGet(feature, out value))
             return true;
-
+    
         if (_m3.Feature_optional.EqualsIdentity(feature) && ((Feature)this).TryGetOptional(out var optional))
         {
             value = optional;
             return true;
         }
-
+    
         value = null;
+        return false;
+    }
+    
+    /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_m3.Feature_optional.EqualsIdentity(property) && ((Feature)this).TryGetOptional(out var optional))
+        {
+            value = optional;
+            return true;
+        }
+        
         return false;
     }
 

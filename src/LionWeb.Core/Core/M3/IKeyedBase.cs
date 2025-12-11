@@ -64,19 +64,31 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     /// <inheritdoc />
     public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
     {
-        if (_builtIns.INamed_name.EqualsIdentity(feature) && TryGetName(out var name))
+        if (feature is Property p)
+            return TryGetPropertyRaw(p, out value);
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_builtIns.INamed_name.EqualsIdentity(property) && TryGetName(out var name))
         {
             value = name;
             return true;
         }
 
-        if (_m3.IKeyed_key.EqualsIdentity(feature) && TryGetKey(out var key))
+        if (_m3.IKeyed_key.EqualsIdentity(property) && TryGetKey(out var key))
         {
             value = key;
             return true;
         }
-
-        value = null;
+        
         return false;
     }
 

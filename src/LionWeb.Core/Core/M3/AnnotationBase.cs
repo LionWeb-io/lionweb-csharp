@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M3;
 
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -76,6 +77,42 @@ public class AnnotationBase<TLanguage>(NodeId id, TLanguage parent) : Classifier
         }
 
         value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+
+        if (_m3.Annotation_annotates.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(Annotates);
+            return true;
+        }
+
+        if (_m3.Annotation_extends.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(Extends);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+        
+        if (_m3.Annotation_implements.EqualsIdentity(reference))
+        {
+            targets = Implements.Select(ReferenceTarget.FromNode).ToImmutableList();
+            return true;
+        }
+
         return false;
     }
 
