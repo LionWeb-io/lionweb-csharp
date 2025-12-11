@@ -133,13 +133,9 @@ public class ShapesMigrationTests
         Assert.AreEqual("v2", resultNodes.First().GetClassifier().GetLanguage().Version);
         Assert.AreEqual("""
                         Circle (id: c) {
-                            name = "my circle"
-                            uuid = "abc"
                             r = 5
-                            shapeDocs:
-                                Documentation (id: doc) {
-                                    technical = True
-                                }
+                            uuid = "abc"
+                            name = "my circle"
                             center:
                                 Coord (id: cent) {
                                     x = 1
@@ -152,6 +148,10 @@ public class ShapesMigrationTests
                                 }
                                 Coord (id: fp1) {
                                     y = 2
+                                }
+                            shapeDocs:
+                                Documentation (id: doc) {
+                                    technical = True
                                 }
                         }
                         """, resultNodes.OfType<INode>().First().AsString());

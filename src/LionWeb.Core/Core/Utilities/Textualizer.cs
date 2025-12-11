@@ -48,10 +48,10 @@ public static class Textualizer
         [
             $"{Name(node.GetClassifier())} (id: {node.GetId()}) {{",
             ..Indent([
-                ..node.CollectAllSetFeatures().OfType<Property>().Select(PropertyAsString),
-                ..node.CollectAllSetFeatures().OfType<Reference>().Select(ReferenceAsString),
-                ..node.CollectAllSetFeatures().OfType<Containment>().SelectMany(ContainmentAsStrings),
-                ..node.GetAnnotations().SelectMany(AnnotationContainmentAsStrings)
+                ..node.CollectAllSetFeatures().OfType<Property>().Order<Property>(EqualityExtensions.FeatureComparer).Select(PropertyAsString),
+                ..node.CollectAllSetFeatures().OfType<Reference>().Order<Reference>(EqualityExtensions.FeatureComparer).Select(ReferenceAsString),
+                ..node.CollectAllSetFeatures().OfType<Containment>().Order<Containment>(EqualityExtensions.FeatureComparer).SelectMany(ContainmentAsStrings),
+                ..node.GetAnnotations().Order(new NodeIdComparer<INode>()).SelectMany(AnnotationContainmentAsStrings)
             ]),
             "}"
         ];
