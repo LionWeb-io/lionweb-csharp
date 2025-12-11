@@ -30,6 +30,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
       <ProjectReference Include="..\..\src\LionWeb.Protocol.Delta\LionWeb.Protocol.Delta.csproj" />
+      <ProjectReference Include="..\LionWeb.Core.Test.Languages\LionWeb.Core.Test.Languages.csproj" />
       <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj" />
     </ItemGroup>
 
