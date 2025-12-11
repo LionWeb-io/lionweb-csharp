@@ -29,7 +29,11 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Use `IReferenceTarget` both as return and parameter type of `IDeserializerHandler.UnresolvableReferenceTarget()`.
 ### Removed
 ### Deprecated
-* `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`. 
+* `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`.
+* Remove / obsolete `INotificationId` parameter from regular API
+  Passing notificationIds never worked completely (e.g. if `AddAnnotations()` created multiple notifications, but only one id had been passed).
+  For such functionality, use raw api and deal with notifications from outside.
+
 ### Security
 
 ## [0.3.0] - 2025-10-13

@@ -169,7 +169,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     {
         if (storage?.Target is null)
             return default;
-        
+
         if (storage.Target is not R result)
             throw new InvalidValueException(reference, storage.Target);
 
@@ -200,32 +200,34 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     {
         if (storage is null)
             return default;
-        
+
         if (storage.Target is null)
             throw new UnresolvedReferenceException(GetId(), reference, storage);
-        
+
         if (storage.Target is not R result)
             throw new InvalidValueException(reference, storage.Target);
 
         return result;
     }
-    
+
     protected R? GetRequiredReference<R>(ReferenceTarget? storage, Reference reference) where R : IReadableNode
     {
         if (storage is null)
             throw new UnsetFeatureException(reference);
-        
+
         return ReferenceTargetNullableTarget<R>(storage, reference);
     }
-    
+
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget> storage, Reference reference) where R : IReadableNode =>
+    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget> storage, Reference reference)
+        where R : IReadableNode =>
         storage.Count != 0
             ? ReferenceTargetNullableTargets<R>(storage, reference)
             : throw new UnsetFeatureException(reference);
 
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<R> GetRequiredNonNullReferences<R>(List<ReferenceTarget> storage, Reference reference) where R : IReadableNode =>
+    protected IReadOnlyList<R> GetRequiredNonNullReferences<R>(List<ReferenceTarget> storage, Reference reference)
+        where R : IReadableNode =>
         storage.Count != 0
             ? ReferenceTargetNonNullTargets<R>(storage, reference)
             : throw new UnsetFeatureException(reference);
@@ -245,10 +247,10 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
                 result = false;
                 break;
             }
-                
+
             nodes.Add(target);
         }
-            
+
         targets = result ? nodes.AsReadOnly() : [];
         return result;
     }

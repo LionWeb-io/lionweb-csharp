@@ -37,18 +37,6 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     protected NodeBase(NodeId id) : base(id, null) { }
 
     /// <inheritdoc />
-    void IWritableNode<INode>.SetParent(INode? parent) =>
-        _parent = parent;
-
-    /// <inheritdoc />
-    bool IWritableNode<INode>.DetachChild(INode child) =>
-        DetachChild(child);
-
-    /// <inheritdoc cref="IWritableNode.DetachChild"/>
-    protected virtual bool DetachChild(INode child) =>
-        _annotations.Remove(child);
-
-    /// <inheritdoc />
     public void DetachFromParent()
     {
         if (_parent != null)
@@ -91,30 +79,47 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         GetInternal(feature, out value);
 
     /// <inheritdoc />
-    public void Set(Feature feature, object? value, INotificationId? notificationId = null)
+    [Obsolete("Use Set(feature, object?) instead")]
+    public void Set(Feature feature, object? value, INotificationId? notificationId) =>
+        Set(feature, value);
+
+    /// <inheritdoc />
+    public void Set(Feature feature, object? value)
     {
-        if (SetInternal(feature, value, notificationId))
+        if (SetInternal(feature, value))
+            return;
+        if (SetInternal(feature, value, null))
             return;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
 
     /// <inheritdoc cref="IWritableNode.Set"/>
-    protected virtual bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    [Obsolete("Use SetInternal(Feature, object?) instead")]
+    protected virtual bool SetInternal(Feature? feature, object? value, INotificationId? notificationId) =>
+        SetInternalAnnotation(feature, value);
+
+    /// <inheritdoc cref="IWritableNode.Set"/>
+    protected virtual bool SetInternal(Feature? feature, object? value) =>
+            SetInternalAnnotation(feature, value);
+
+    private bool SetInternalAnnotation(Feature? feature, object? value)
     {
-        if (feature == null)
-        {
-            if (value is not IEnumerable)
-                throw new InvalidValueException(feature, value);
-            var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
-            AssureAnnotations(safeNodes);
-            AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
-            notification.CollectOldData();
-            RemoveSelfParent(_annotations.ToList(), _annotations, null);
-            _annotations.AddRange(SetSelfParent(safeNodes, null));
-            notification.Notify();
-            return true;
-        }
+        if (feature != null)
+            return false;
+
+        if (value is not IEnumerable)
+            throw new InvalidValueException(feature, value);
+        var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
+        AssureAnnotations(safeNodes);
+        AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations);
+        notification.CollectOldData();
+        RemoveSelfParent(_annotations.ToList(), _annotations, null);
+        _annotations.AddRange(SetSelfParent(safeNodes, null));
+        notification.Notify();
+        
+        return true;
+    }
 
     #region Annotations
 
