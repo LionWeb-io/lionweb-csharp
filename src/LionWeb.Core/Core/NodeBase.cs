@@ -59,36 +59,6 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public virtual void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null)
-    {
-        var safeAnnotations = annotations?.ToList();
-        AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
-            startIndex: null, notificationId: notificationId);
-        notification.CollectOldData();
-        _annotations.AddRange(SetSelfParent(safeAnnotations, null));
-        notification.Notify();
-    }
-
-    /// <inheritdoc />
-    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations,
-        INotificationId? notificationId = null)
-    {
-        AssureInRange(index, _annotations);
-        var safeAnnotations = annotations?.ToList();
-        AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
-            startIndex: index, notificationId: notificationId);
-        notification.CollectOldData();
-        _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
-        notification.Notify();
-    }
-
-    /// <inheritdoc />
-    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
-
-    /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() => [];
 
     /// <inheritdoc />
@@ -146,8 +116,88 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
             return true;
         }
 
-        return false;
+    #region Annotations
+
+    /// <inheritdoc />
+    public virtual void AddAnnotations(IEnumerable<INode> annotations)
+    {
+        var safeAnnotations = AssureAnnotations(annotations?.ToList());
+        int index = Math.Max(_annotations.Count - 1, 0);
+        foreach (var safeAnnotation in safeAnnotations)
+        {
+            AnnotationAddMultipleNotificationEmitter emitter = new(this, safeAnnotation, _annotations, index++);
+            emitter.CollectOldData();
+            if (AddAnnotationsRaw(safeAnnotation))
+                emitter.Notify();
+        }
     }
+
+    bool IWritableNode.AddAnnotationsRaw(IWritableNode annotation) =>
+        AddAnnotationsRaw(annotation);
+
+    /// <inheritdoc cref="IWritableNode.AddAnnotationsRaw"/>
+    protected internal virtual bool AddAnnotationsRaw(IWritableNode annotation)
+    {
+        if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
+            return false;
+
+        var node = (INode)annotation;
+        AttachChild(node);
+
+        _annotations.Add(node);
+        return true;
+    }
+
+    /// <inheritdoc />
+    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations)
+    {
+        AssureInRange(index, _annotations);
+        var safeAnnotations = AssureAnnotations(annotations?.ToList());
+        foreach (var safeAnnotation in safeAnnotations)
+        {
+            AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotation, _annotations,
+                startIndex: index);
+            notification.CollectOldData();
+            if (InsertAnnotationsRaw(index++, safeAnnotation))
+                notification.Notify();
+        }
+    }
+
+    bool IWritableNode.InsertAnnotationsRaw(Index index, IWritableNode annotation) =>
+        InsertAnnotationsRaw(index, annotation);
+
+    /// <inheritdoc cref="IWritableNode.InsertAnnotationsRaw"/>
+    protected internal bool InsertAnnotationsRaw(Index index, IWritableNode annotation)
+    {
+        if (!IsInRange(index, _annotations) || annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
+            return false;
+
+        var node = (INode)annotation;
+        AttachChild(node);
+
+        _annotations.Insert(index, node);
+        return true;
+    }
+
+    /// <inheritdoc />
+    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations) =>
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover);
+
+    bool IWritableNode.RemoveAnnotationsRaw(IWritableNode annotation) =>
+        RemoveAnnotationsRaw(annotation);
+
+    /// <inheritdoc cref="IWritableNode.RemoveAnnotationsRaw"/>
+    protected internal bool RemoveAnnotationsRaw(IWritableNode annotation)
+    {
+        if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
+            return false;
+
+        return RemoveSelfParent((INode)annotation, _annotations, null);
+    }
+
+    #endregion
+
+    #region Multiple mutators
 
     /// <inheritdoc />
     public void Add(Link? link, IEnumerable<IReadableNode> nodes)
@@ -200,7 +250,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         throw new UnknownFeatureException(GetClassifier(), link);
     }
 
-    /// <inheritdoc cref="Insert"/>
+    /// <inheritdoc cref="Remove"/>
     protected virtual bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
     {
         if (link == null)
@@ -211,6 +261,8 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
 
         return false;
     }
+
+    #endregion
 
     /// <summary>
     /// Tries to retrieve the <see cref="IPartitionInstance.GetNotificationProducer"/> from this node's <see cref="Concept.Partition"/>.

@@ -34,7 +34,7 @@ public interface IForest
 
     /// Tries to find partition with <see cref="IReadableNode.GetId">node id</see> <paramref name="nodeId"/>.
     bool TryGetPartition(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition);
-    
+
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
     void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
@@ -121,17 +121,32 @@ public class Forest : IForest
         return partition is not null;
     }
 
+    bool IForest.TryGetPartitionRaw(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition) =>
+        TryGetPartition(nodeId, out partition);
+
     /// <inheritdoc />
     public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null)
     {
         foreach (var partition in partitions)
         {
-            if (!_partitions.Add(partition))
+            if (!AddPartitionRaw(partition))
                 continue;
 
             ProducePartitionAddedNotification(notificationId, partition);
-            ConnectToPartition(partition);
         }
+    }
+
+    bool IForest.AddPartitionRaw(IPartitionInstance partition) =>
+        AddPartitionRaw(partition);
+
+    /// <inheritdoc cref="IForest.AddPartitionRaw" />
+    protected internal bool AddPartitionRaw(IPartitionInstance partition)
+    {
+        if (!_partitions.Add(partition))
+            return false;
+
+        ConnectToPartition(partition);
+        return true;
     }
 
     private void ProducePartitionAddedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
@@ -151,13 +166,26 @@ public class Forest : IForest
     {
         foreach (var partition in partitions)
         {
-            if (!_partitions.Remove(partition))
+            if (!RemovePartitionRaw(partition))
                 continue;
 
             ProducePartitionDeletedNotification(notificationId, partition);
-            UnsubscribeFromPartition(partition);
         }
     }
+
+    bool IForest.RemovePartitionRaw(IPartitionInstance partition) =>
+        RemovePartitionRaw(partition);
+
+    /// <inheritdoc cref="IForest.RemovePartitionRaw" />
+    protected internal bool RemovePartitionRaw(IPartitionInstance partition)
+    {
+        if (!_partitions.Remove(partition))
+            return false;
+
+        UnsubscribeFromPartition(partition);
+        return true;
+    }
+
 
     private void ProducePartitionDeletedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
         GetNotificationProducer()?.ProduceNotification(new PartitionDeletedNotification(partition,
@@ -224,8 +252,16 @@ public class Forest : IForest
 
 public static class ForestExtensions
 {
+    /// <summary>
+    /// Enumerates all partitions of <paramref name="forest"/>, and all their direct and indirect children.
+    /// Optionally includes directly and indirectly contained annotations.
+    /// </summary>
+    /// <param name="forest">Forest to find descendants of.</param>
+    /// <param name="includeAnnotations">If true, the result includes directly and indirectly contained annotations.</param>
+    /// <returns>All directly and indirectly contained nodes of <paramref name="forest"/>.</returns>
+    /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
     public static IEnumerable<IReadableNode> Descendants(this IForest forest, bool includeAnnotations = true) =>
         forest
             .Partitions
-            .SelectMany(p => M1Extensions.Descendants(p, true, includeAnnotations));
+            .SelectMany(p => M1Extensions.Descendants<IReadableNode>(p, true, includeAnnotations));
 }
