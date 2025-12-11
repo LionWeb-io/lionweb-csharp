@@ -198,6 +198,72 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
+    bool IReadableNode.TryGetRaw(Feature feature, out object? value) =>
+        TryGetRaw(feature, out value);
+    
+    /// <inheritdoc cref="IReadableNode.TryGetRaw"/>
+    protected bool TryGetRaw(Feature feature, out object? value)
+    {
+        var result = _featureValues.Find(f => feature.EqualsIdentity(f.feature));
+        value = result.value;
+        return result != default;
+    }
+
+    /// <inheritdoc cref="IReadableNode.TryGetPropertyRaw"/>
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value) =>
+        TryGetRaw(property, out value);
+
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentRaw"/>
+    protected internal override bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
+    {
+        if (TryGetRaw(containment, out var v) && v is null or IReadableNode)
+        {
+            node = (IReadableNode?)v;
+            return true;
+        }
+
+        node = null;
+        return false;
+    }
+
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentsRaw"/>
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (TryGetRaw(containment, out var v) && v is IReadOnlyList<IReadableNode> l)
+        {
+            nodes = l;
+            return true;
+        }
+
+        nodes = null;
+        return false;
+    }
+
+    /// <inheritdoc cref="IReadableNode.TryGetReferenceRaw"/>
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)    {
+        if (TryGetRaw(reference, out var v) && v is null or IReferenceTarget)
+        {
+            target = (IReferenceTarget?)v;
+            return true;
+        }
+
+        target = null;
+        return false;
+    }
+
+
+    /// <inheritdoc cref="IReadableNode.TryGetReferencesRaw"/>
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)    {
+        if (TryGetRaw(reference, out var v) && v is IReadOnlyList<IReferenceTarget> l)
+        {
+            targets = l;
+            return true;
+        }
+
+        targets = null;
+        return false;
+    }
+
     /// <summary>
     /// <see cref="IWritableNode.Set"/> never fails, it accepts any feature and feature value that makes sense in LW context.
     /// So nodes, enumerables of nodes, value types. Enumerable of value types doesn't work, and arbitrary objects do not work.
@@ -215,6 +281,12 @@ public class LenientNode : NodeBase, INode
             return true;
         }
 
+        return SetRaw(feature, value);
+    }
+
+    /// <inheritdoc cref="IWritableNode.SetRaw"/>
+    protected internal override bool SetRaw(Feature feature, object? value)
+    {
         var oldValue = TryGetFeature(feature, out var old) ? old : null;
 
         switch (value)
@@ -433,6 +505,16 @@ public class LenientNode : NodeBase, INode
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
     }
 
+    /// <inheritdoc cref="IWritableNode.AddAnnotationsRaw"/>
+    protected internal override bool AddAnnotationsRaw(IWritableNode annotation)
+    {
+        var node = (INode)annotation;
+        AttachChild(node);
+
+        _annotations.Add(node);
+        return true;
+    }
+
     /// <inheritdoc />
     public override void InsertAnnotations(Index index, IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
@@ -449,25 +531,26 @@ public class LenientNode : NodeBase, INode
 
     private bool TryGetFeature(Feature featureToFind, out object? value)
     {
-        var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
-        if (result.value is ReferenceTarget target)
+        if (!TryGetRaw(featureToFind, out var result))
+        {
+            value = null;
+            return false;
+        }
+        
+        if (result is ReferenceTarget target)
         {
             value = target.Target;
             return true;
         }
-        if (result.value is List<ReferenceTarget> referenceTargets)
+        
+        if (result is List<ReferenceTarget> referenceTargets)
         {
             value =  referenceTargets.Select(d => d.Target).Where(t => t is not null).ToList();
             return true;
         }
-        if (result != default)
-        {
-            value = result.value;
-            return true;
-        }
-
-        value = null;
-        return false;
+        
+        value = result;
+        return true;
     }
 
     private bool RemoveFeature(Feature featureToRemove)
