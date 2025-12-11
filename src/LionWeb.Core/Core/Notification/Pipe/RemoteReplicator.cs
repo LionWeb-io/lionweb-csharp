@@ -21,7 +21,6 @@ using Forest;
 using M1;
 using M3;
 using Partition;
-using System.Collections;
 using System.Diagnostics;
 
 /// Replicates <see cref="Receive">received</see> notifications on a <i>local</i> equivalent.
@@ -135,7 +134,400 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
     }
     
-    private HashSet<NodeId> CollectNodeIdsOfAllDescendantsOf(IReadableNode node) =>
+    #region Partitions
+
+    private void OnRemoteNewPartition(PartitionAddedNotification n)
+    {
+        CheckIfNewNodeContainsExistingNodes(n, []);
+        
+        SuppressNotificationForwarding(n, () =>
+        {
+            if (_localForest is null)
+                return;
+
+            if (_localForest.AddPartitionRaw(n.NewPartition))
+                _localForest.GetNotificationProducer()?.ProduceNotification(n);
+        });
+    }
+
+    private void OnRemotePartitionDeleted(PartitionDeletedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            if (_localForest is null)
+                return;
+
+            if (_localForest.RemovePartitionRaw(n.DeletedPartition))
+                _localForest.GetNotificationProducer()?.ProduceNotification(n);
+        });
+
+    #endregion
+
+    #region Properties
+
+    private void OnRemotePropertyAdded(PropertyAddedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            SetProperty(n, n.NewValue);
+        });
+
+    private void OnRemotePropertyDeleted(PropertyDeletedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            SetProperty(n, null);
+        });
+
+    private void OnRemotePropertyChanged(PropertyChangedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            SetProperty(n, n.NewValue);
+        });
+
+    private void SetProperty(IPropertyNotification n, object? value)
+    {
+        var success = n.ContextNode.SetPropertyRaw(n.Property, value);
+        ProduceNotification(n, success);
+    }
+
+    #endregion
+
+    #region Children
+
+    private void OnRemoteChildAdded(ChildAddedNotification n)
+    {
+        CheckIfNewNodeContainsExistingNodes(n, []);
+        
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = MoveChild(n.Parent, n.Containment, n.Index, n.NewChild);
+            ProduceNotification(n, success);
+        });
+    }
+
+    private void OnRemoteChildDeleted(ChildDeletedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Deleted node", n, n.Parent, n.DeletedChild, n.Containment, n.Index);
+
+            var localParent = n.Parent;
+
+            bool success = n.Containment.Multiple switch
+            {
+                true => localParent.RemoveContainmentsRaw(n.Containment, n.DeletedChild),
+                false => localParent.SetContainmentRaw(n.Containment, null)
+            };
+
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteChildReplaced(ChildReplacedNotification n)
+    {
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: n.ReplacedChild);
+        
+        CheckIfNewNodeContainsExistingNodes(n, replacedNodes);
+        
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.Index);
+
+            var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.NewChild);
+
+            ProduceNotification(n, success);
+        });
+    }
+
+    private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = MoveChild(n.NewParent, n.NewContainment, n.NewIndex, n.MovedChild);
+            ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
+        });
+
+    private void OnRemoteChildMovedAndReplacedFromOtherContainment(
+        ChildMovedAndReplacedFromOtherContainmentNotification n) => SuppressNotificationForwarding(
+        n, () =>
+        {
+            CheckMatchingNodeId("Replaced node", n, n.NewParent, n.ReplacedChild, n.NewContainment, n.NewIndex);
+            var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.MovedChild);
+            ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
+        });
+
+    private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(
+        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.NewContainment, n.NewIndex);
+            var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.MovedChild);
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteChildMovedFromOtherContainmentInSameParent(
+        ChildMovedFromOtherContainmentInSameParentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = MoveChild(n.Parent, n.NewContainment, n.NewIndex, n.MovedChild);
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = MoveChild(n.Parent, n.Containment, n.NewIndex, n.MovedChild);
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteChildMovedAndReplacedInSameContainment(
+        ChildMovedAndReplacedInSameContainmentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.NewIndex);
+            var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.MovedChild);
+            ProduceNotification(n, success);
+        });
+
+    private static bool MoveChild(IWritableNode localNewParent, Containment newContainment, Index newIndex,
+        IWritableNode movedChild)
+    {
+        bool success = newContainment.Multiple switch
+        {
+            true => localNewParent.InsertContainmentsRaw(newContainment, newIndex, movedChild),
+            false => localNewParent.SetContainmentRaw(newContainment, movedChild)
+        };
+        return success;
+    }
+
+    #endregion
+
+    private static bool ReplaceChildOrAnnotation(IWritableNode replacedChild, IWritableNode newChild)
+    {
+        var nodeReplacer = new NodeReplacer<INode>((INode)replacedChild, (INode)newChild);
+        nodeReplacer.Replace();
+        return nodeReplacer.Success;
+    }
+
+    #region Annotations
+
+    private void OnRemoteAnnotationAdded(AnnotationAddedNotification n)
+    {
+        CheckIfNewNodeContainsExistingNodes(n, []);
+        
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = n.Parent.InsertAnnotationsRaw(n.Index, n.NewAnnotation);
+            ProduceNotification(n, success);
+        });
+    }
+
+    private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Deleted annotation", n, n.DeletedAnnotation, n.Parent.GetAnnotations(), n.Index);
+            
+            var success = n.Parent.RemoveAnnotationsRaw(n.DeletedAnnotation);
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification n)
+    {
+        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: n.ReplacedAnnotation);
+        
+        CheckIfNewNodeContainsExistingNodes(n, replacedNodes);
+        
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation,
+                n.Parent.GetAnnotations(), n.Index);
+            var success = ReplaceChildOrAnnotation(n.ReplacedAnnotation, n.NewAnnotation);
+            ProduceNotification(n, success);
+        });
+    }
+
+    private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = n.NewParent.InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
+            ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
+        });
+
+    private void OnRemoteAnnotationMovedAndReplacedFromOtherParent(
+        AnnotationMovedAndReplacedFromOtherParentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation, n.NewParent.GetAnnotations(), n.NewIndex);
+            var success = ReplaceChildOrAnnotation(n.ReplacedAnnotation, n.MovedAnnotation);
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = n.Parent.InsertAnnotationsRaw(n.NewIndex, n.MovedAnnotation);
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteAnnotationMovedAndReplacedInSameParent(
+        AnnotationMovedAndReplacedInSameParentNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation, n.Parent.GetAnnotations(), n.NewIndex);
+            var success = ReplaceChildOrAnnotation(n.ReplacedAnnotation, n.MovedAnnotation);
+            ProduceNotification(n, success);
+        });
+
+    #endregion
+
+    #region References
+
+    private void OnRemoteReferenceAdded(ReferenceAddedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            IWritableNode localNewParent = n.Parent;
+            var success = n.Reference.Multiple switch
+            {
+                true => localNewParent.InsertReferencesRaw(n.Reference, n.Index, (ReferenceTarget)n.NewTarget),
+                false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.NewTarget)
+            };
+            ProduceNotification(n, success);
+        });
+
+
+    private void OnRemoteReferenceDeleted(ReferenceDeletedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            var localParent = n.Parent;
+
+            bool success = n.Reference.Multiple switch
+            {
+                true => localParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.DeletedTarget),
+                false => localParent.SetReferenceRaw(n.Reference, null)
+            };
+
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteReferenceChanged(ReferenceChangedNotification n) =>
+        SuppressNotificationForwarding(n, () =>
+        {
+            var success = ReplaceReference(n.Parent, n.OldTarget, n.Reference, n.Index, n.NewTarget);
+            ProduceNotification(n, success);
+        });
+
+    private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification n)
+    {
+        IWritableNode localNewParent = n.Parent;
+        var success = n.Reference.Multiple switch
+        {
+            true => localNewParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.Target)
+                && localNewParent.InsertReferencesRaw(n.Reference, n.NewIndex, (ReferenceTarget)n.Target),
+            false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.Target)
+        };
+        ProduceNotification(n, success);
+    }
+
+    private static bool ReplaceReference(IWritableNode localParent, IReferenceTarget replacedTarget,
+        Reference reference,
+        Index index, IReferenceTarget newTarget)
+    {
+        bool success = reference.Multiple switch
+        {
+            true => localParent.RemoveReferencesRaw(reference, (ReferenceTarget)replacedTarget)
+                    && localParent.InsertReferencesRaw(reference, index, (ReferenceTarget)newTarget),
+
+            false => localParent.SetReferenceRaw(reference, (ReferenceTarget?)newTarget)
+        };
+        return success;
+    }
+
+    #endregion
+
+    /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
+    {
+        var notificationId = notification.NotificationId;
+        Filter.RegisterNotificationId(notificationId);
+
+        try
+        {
+            action();
+        }
+        finally
+        {
+            Filter.UnregisterNotificationId(notificationId);
+        }
+    }
+
+    private static void ProduceNotification(IPartitionNotification notification, bool success)
+    {
+        if (success)
+            notification.ContextNode.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
+    }
+
+    private static void ProduceMoveNotification(INotification notification, bool success, IWritableNode localNewParent,
+        IWritableNode oldParent)
+    {
+        if (!success)
+            return;
+
+        var newPartition = localNewParent.GetPartition();
+        if (newPartition is null)
+            return;
+
+        newPartition.GetNotificationProducer()?.ProduceNotification(notification);
+
+        var oldPartition = oldParent.GetPartition();
+        if (oldPartition is null || ReferenceEquals(newPartition, oldPartition))
+            return;
+
+        oldPartition.GetNotificationProducer()?.ProduceNotification(notification);
+    }
+
+    private static void CheckMatchingNodeId(string messagePrefix, INotification notification, IReadableNode candidate,
+        IReadableNode existingChild, Index index, string? messageSuffix = null)
+    {
+        var candidateNodeId = candidate.GetId();
+
+        if (index != 0)
+            throw new InvalidNotificationException(notification,
+                $"{messagePrefix} with id {candidateNodeId} uses non-zero index {index}{messagePrefix}");
+
+        var actualNodeId = existingChild.GetId();
+
+        if (actualNodeId == candidateNodeId)
+            return;
+
+        throw new InvalidNotificationException(notification,
+            $"{messagePrefix} with id {candidateNodeId} does not match with actual node with id {actualNodeId}{messageSuffix}");
+    }
+
+    private static void CheckMatchingNodeId(string messagePrefix, INotification notification, IWritableNode candidate,
+        IReadOnlyList<IReadableNode> list, Index index, string? messageSuffix = null)
+    {
+        var candidateNodeId = candidate.GetId();
+        var actualNodeId = list[index].GetId();
+
+        if (candidateNodeId == actualNodeId)
+            return;
+
+        throw new InvalidNotificationException(notification,
+            $"{messagePrefix} node with id {candidateNodeId} does not match with actual node with id {actualNodeId} at index {index}{messageSuffix}");
+    }
+
+    private static void CheckMatchingNodeId(string messagePrefix, INotification notification, IReadableNode localParent,
+        IWritableNode candidate, Containment containment, Index index)
+    {
+        var messageSuffix = $"in containment {containment}";
+        switch (containment.Multiple)
+        {
+            case true when localParent.TryGetContainmentsRaw(containment, out var nodes):
+                CheckMatchingNodeId(messagePrefix, notification, candidate, nodes, index, messageSuffix);
+                break;
+
+            case false
+                when localParent.TryGetContainmentRaw(containment, out var node) && node is not null:
+                CheckMatchingNodeId(messagePrefix, notification, candidate, node, index, messageSuffix);
+                break;
+        }
+    }
+    private static HashSet<NodeId> CollectNodeIdsOfAllDescendantsOf(IReadableNode node) =>
         M1Extensions
             .Descendants(node, true, true)
             .Select(n => n.GetId())
@@ -163,624 +555,4 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 $"Trying to add existing node(s) with ids: {string.Join(",", remainingNodes)}");
         }
     }
-    
-    #region Partitions
-
-    private void OnRemoteNewPartition(PartitionAddedNotification notification)
-    {
-        CheckIfNewNodeContainsExistingNodes(notification, []);
-   
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var newPartition = notification.NewPartition;
-            _localForest?.AddPartitions([newPartition], notification.NotificationId);
-        });
-    }
-
-    private void OnRemotePartitionDeleted(PartitionDeletedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localPartition = notification.DeletedPartition;
-            _localForest?.RemovePartitions([localPartition], notification.NotificationId);
-        });
-
-    #endregion
-
-    #region Properties
-
-    private void OnRemotePropertyAdded(PropertyAddedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            Debug.WriteLine(
-                $"Node {notification.Node.PrintIdentity()}: Setting {notification.Property} to {notification.NewValue}");
-            var node = (INotifiableNode)notification.Node;
-            node.Set(notification.Property, notification.NewValue, notification.NotificationId);
-        });
-
-    private void OnRemotePropertyDeleted(PropertyDeletedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var node = (INotifiableNode)notification.Node;
-            node.Set(notification.Property, null, notification.NotificationId);
-        });
-
-    private void OnRemotePropertyChanged(PropertyChangedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var node = (INotifiableNode)notification.Node;
-            node.Set(notification.Property, notification.NewValue, notification.NotificationId);
-        });
-
-    #endregion
-
-    #region Children
-
-    private void OnRemoteChildAdded(ChildAddedNotification notification)
-    {
-        CheckIfNewNodeContainsExistingNodes(notification, []);
-        
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INode)notification.Parent;
-            var newChildNode = (INode)notification.NewChild;
-
-            Debug.WriteLine(
-                $"Parent {localParent.PrintIdentity()}: Adding {newChildNode.PrintIdentity()} to {notification.Containment} at {notification.Index}");
-            var newValue = InsertContainment(localParent, notification.Containment, notification.Index, newChildNode);
-
-            localParent.Set(notification.Containment, newValue, notification.NotificationId);
-        });
-    }
-
-    private void OnRemoteChildDeleted(ChildDeletedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            CheckMatchingNodeIdForDeletedNode(notification);
-            notification.DeletedChild.DetachFromParent();
-            notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
-        });
-
-    private void OnRemoteChildReplaced(ChildReplacedNotification notification)
-    {
-        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: notification.ReplacedChild);
-        
-        CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
-        
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var newChild = (INode)notification.NewChild;
-            var replacedChild = (INode)notification.ReplacedChild;
-
-            CheckMatchingNodeIdForReplacedNode(notification);
-
-            replacedChild.ReplaceWith(newChild);
-        });
-    }
-
-    private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localNewParent = (INode)notification.NewParent;
-            var movedChild = (INode)notification.MovedChild;
-            var newValue = InsertContainment(localNewParent, notification.NewContainment, notification.NewIndex,
-                movedChild);
-
-            localNewParent.Set(notification.NewContainment, newValue, notification.NotificationId);
-        });
-
-    private void OnRemoteChildMovedAndReplacedFromOtherContainment(
-        ChildMovedAndReplacedFromOtherContainmentNotification notification) => SuppressNotificationForwarding(
-        notification, () =>
-        {
-            var movedChild = (INode)notification.MovedChild;
-            var replacedChild = (INode)notification.ReplacedChild;
-
-            CheckMatchingNodeIdForReplacedNode(notification);
-
-            replacedChild.ReplaceWith(movedChild);
-        });
-
-    private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(
-        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var movedChild = (INode)notification.MovedChild;
-            var replacedChild = (INode)notification.ReplacedChild;
-
-            CheckMatchingNodeIdForReplacedNode(notification);
-
-            replacedChild.ReplaceWith(movedChild);
-        });
-
-    private void OnRemoteChildMovedFromOtherContainmentInSameParent(
-        ChildMovedFromOtherContainmentInSameParentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INode)notification.Parent;
-            var newValue = InsertContainment(localParent, notification.NewContainment, notification.NewIndex,
-                (INode)notification.MovedChild);
-
-            localParent.Set(notification.NewContainment, newValue, notification.NotificationId);
-        });
-
-    private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INotifiableNode)notification.Parent;
-            var nodeToInsert = notification.MovedChild;
-            object newValue = nodeToInsert;
-
-            var existingChildren = localParent.Get(notification.Containment);
-            if (existingChildren is IList l)
-            {
-                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.RemoveAt(notification.OldIndex);
-                children.Insert(notification.NewIndex, nodeToInsert);
-                newValue = children;
-            }
-
-            localParent.Set(notification.Containment, newValue, notification.NotificationId);
-        });
-
-    private void OnRemoteChildMovedAndReplacedInSameContainment(
-        ChildMovedAndReplacedInSameContainmentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var movedChild = (INode)notification.MovedChild;
-            var replacedChild = (INode)notification.ReplacedChild;
-
-            CheckMatchingNodeIdForReplacedNode(notification);
-
-            replacedChild.ReplaceWith(movedChild);
-        });
-
-    private static object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
-    {
-        if (localParent.CollectAllSetFeatures().Contains(containment))
-        {
-            var existingChildren = localParent.Get(containment);
-            switch (existingChildren)
-            {
-                case IList l:
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.Insert(index, nodeToInsert);
-                    return children;
-                case IWritableNode _:
-                    return nodeToInsert;
-                default:
-                    // when containment data is corrupted or assigned to an invalid value after its creation 
-                    throw new InvalidValueException(containment, existingChildren);
-            }
-        }
-
-        if (containment.Multiple)
-        {
-            return new List<IWritableNode> { nodeToInsert };
-        }
-
-        return nodeToInsert;
-    }
-
-    #endregion
-
-    #region Annotations
-
-    private void OnRemoteAnnotationAdded(AnnotationAddedNotification notification)
-    {
-        CheckIfNewNodeContainsExistingNodes(notification, []);
-        
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INotifiableNode)notification.Parent;
-            var newAnnotation = (INode)notification.NewAnnotation;
-            localParent.InsertAnnotations(notification.Index, [newAnnotation], notification.NotificationId);
-        });
-    }
-
-    private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            CheckMatchingNodeIdForDeletedNode(notification);
-
-            notification.DeletedAnnotation.DetachFromParent();
-            notification.Parent.GetPartition()?.GetNotificationProducer()?.ProduceNotification(notification);
-        });
-
-    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification)
-    {
-        HashSet<NodeId> replacedNodes = CollectNodeIdsOfAllDescendantsOf(node: notification.ReplacedAnnotation);
-        
-        CheckIfNewNodeContainsExistingNodes(notification, replacedNodes);
-        
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var newAnnotation = (INode)notification.NewAnnotation;
-            var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-
-            CheckMatchingNodeIdForReplacedNode(notification);
-
-            replacedAnnotation.ReplaceWith(newAnnotation);
-        });
-    }
-
-    private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localNewParent = (INotifiableNode)notification.NewParent;
-            var movedAnnotation = notification.MovedAnnotation;
-            localNewParent.InsertAnnotations(notification.NewIndex, [movedAnnotation], notification.NotificationId);
-        });
-
-    private void OnRemoteAnnotationMovedAndReplacedFromOtherParent(
-        AnnotationMovedAndReplacedFromOtherParentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var movedAnnotation = (INode)notification.MovedAnnotation;
-            var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-            
-            CheckMatchingNodeIdForReplacedNode(notification);
-            
-            replacedAnnotation.ReplaceWith(movedAnnotation);
-        });
-
-    private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INotifiableNode)notification.Parent;
-            var movedAnnotation = notification.MovedAnnotation;
-            localParent.InsertAnnotations(notification.NewIndex, [movedAnnotation], notification.NotificationId);
-        });
-
-    private void OnRemoteAnnotationMovedAndReplacedInSameParent(
-        AnnotationMovedAndReplacedInSameParentNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var movedAnnotation = (INode)notification.MovedAnnotation;
-            var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-            
-            CheckMatchingNodeIdForReplacedNode(notification);
-            
-            replacedAnnotation.ReplaceWith(movedAnnotation);
-        });
-
-    #endregion
-
-    #region References
-
-    private void OnRemoteReferenceAdded(ReferenceAddedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INode)notification.Parent;
-            var target = notification.NewTarget.Target;
-            var newValue = InsertReference(localParent, notification.Reference, notification.Index,
-                target);
-
-            localParent.Set(notification.Reference, newValue, notification.NotificationId);
-        });
-
-    private void OnRemoteReferenceDeleted(ReferenceDeletedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INotifiableNode)notification.Parent;
-
-            object? newValue = null;
-            if (notification.Reference.Multiple)
-            {
-                var existingTargets = localParent.Get(notification.Reference);
-                if (existingTargets is IList l)
-                {
-                    var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.RemoveAt(notification.Index);
-                    newValue = targets;
-                }
-            }
-
-            localParent.Set(notification.Reference, newValue, notification.NotificationId);
-        });
-
-    private void OnRemoteReferenceChanged(ReferenceChangedNotification notification) =>
-        SuppressNotificationForwarding(notification, () =>
-        {
-            var localParent = (INotifiableNode)notification.Parent;
-
-            object newValue = notification.NewTarget.Target;
-            if (notification.Reference.Multiple)
-            {
-                var existingTargets = localParent.Get(notification.Reference);
-                if (existingTargets is IList l)
-                {
-                    var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.Insert(notification.Index, (IReadableNode)newValue);
-                    targets.RemoveAt(notification.Index + 1);
-                    newValue = targets;
-                }
-            }
-
-            localParent.Set(notification.Reference, newValue, notification.NotificationId);
-        });
-
-    private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
-    {
-        var localParent = (INotifiableNode)notification.Parent;
-        var target = notification.Target.Target;
-
-        object newValue = target;
-        var reference = notification.Reference;
-        if (localParent.TryGet(reference, out object? existingTargets))
-        {
-            if (existingTargets is IList l)
-            {
-                var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                targets.RemoveAt(notification.OldIndex);
-                targets.Insert(notification.NewIndex, target);
-                newValue = targets;
-            }
-        }
-        else
-        {
-            newValue = new List<IReadableNode>() { target };
-        }
-
-        localParent.Set(reference, newValue);
-    }
-
-    private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
-    {
-        object newValue = target;
-        if (reference.Multiple)
-        {
-            if (localParent.CollectAllSetFeatures().Contains(reference))
-            {
-                var existingTargets = localParent.Get(reference);
-                if (existingTargets is IList l)
-                {
-                    var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.Insert(index, target);
-                    newValue = targets;
-                }
-            }
-            else
-            {
-                newValue = new List<IReadableNode>() { target };
-            }
-        }
-
-        return newValue;
-    }
-
-    #endregion
-
-    /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
-    protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
-    {
-        var notificationId = notification.NotificationId;
-        Filter.RegisterNotificationId(notificationId);
-
-        try
-        {
-            action();
-        }
-        finally
-        {
-            Filter.UnregisterNotificationId(notificationId);
-        }
-    }
-
-    #region CheckMatchingNodeIdForReplacedNode
-
-    private void CheckMatchingNodeIdForReplacedNode(AnnotationMovedAndReplacedFromOtherParentNotification notification)
-    {
-        var localParent = notification.NewParent;
-        var replacedNodeId = notification.ReplacedAnnotation.GetId();
-        var annotations = localParent.GetAnnotations().ToList();
-        var actualNodeId = annotations[notification.NewIndex].GetId();
-
-        if (replacedNodeId != actualNodeId)
-        {
-            throw new InvalidNotificationException(notification,
-                $"Replaced annotation node with id {replacedNodeId} does not match with actual node with id {actualNodeId} " +
-                $"at index {notification.NewIndex}");
-        }
-    }
-    
-    private void CheckMatchingNodeIdForDeletedNode(AnnotationDeletedNotification notification)
-    {
-        var localParent = notification.Parent;
-        var deletedNodeId = notification.DeletedAnnotation.GetId();
-        var annotations = localParent.GetAnnotations().ToList();
-        var actualNodeId = annotations[notification.Index].GetId();
-
-        if (deletedNodeId != actualNodeId)
-        {
-            throw new InvalidNotificationException(notification,
-                $"Deleted annotation node with id {deletedNodeId} does not match with actual node with id {actualNodeId} " +
-                $"at index {notification.Index}");
-        }
-    }
-    
-    private void CheckMatchingNodeIdForReplacedNode(AnnotationMovedAndReplacedInSameParentNotification notification)
-    {
-        var localParent = notification.Parent;
-        var replacedNodeId = notification.ReplacedAnnotation.GetId();
-        var annotations = localParent.GetAnnotations().ToList();
-        var actualNodeId = annotations[notification.NewIndex].GetId();
-
-        if (replacedNodeId != actualNodeId)
-        {
-            throw new InvalidNotificationException(notification,
-                $"Replaced annotation node with id {replacedNodeId} does not match with actual node with id {actualNodeId} " +
-                $"at index {notification.NewIndex}");
-        }
-    }
-    
-    private void CheckMatchingNodeIdForReplacedNode(AnnotationReplacedNotification notification)
-    {
-        var localParent = notification.Parent;
-        var replacedNodeId = notification.ReplacedAnnotation.GetId();
-        var annotations = localParent.GetAnnotations().ToList();
-        var actualNodeId = annotations[notification.Index].GetId();
-
-        if (replacedNodeId != actualNodeId)
-        {
-            throw new InvalidNotificationException(notification,
-                $"Replaced annotation node with id {replacedNodeId} does not match with actual node with id {actualNodeId} " +
-                $"at index {notification.Index}");
-        }
-    }
-
-    private void CheckMatchingNodeIdForDeletedNode(ChildDeletedNotification notification)
-    {
-        var deletedNode = notification.DeletedChild.GetId();
-        var localParent = notification.Parent;
-        if (notification.Containment.Multiple)
-        {
-            var existingChildren = localParent.Get(notification.Containment);
-            if (existingChildren is IList l)
-            {
-                var children = new List<IReadableNode>(l.Cast<IReadableNode>());
-                var actualNodeId = children[notification.Index].GetId();
-                if (deletedNode != actualNodeId)
-                {
-                    throw new InvalidNotificationException(notification,
-                        $"Deleted node with id {deletedNode} does not match with actual node with id {actualNodeId} " +
-                        $"in containment {notification.Containment} at index {notification.Index}");
-                }
-            }
-        }
-        else
-        {
-            var existingChild = localParent.Get(notification.Containment);
-            if (existingChild is IReadableNode node && deletedNode != node.GetId())
-            {
-                throw new InvalidNotificationException(notification,
-                    $"Deleted node with id {deletedNode} does not match with actual node with id {node.GetId()} " +
-                    $"at index {notification.Index}");
-            }
-        }
-    }
-
-    private void CheckMatchingNodeIdForReplacedNode(ChildReplacedNotification notification)
-    {
-        var replacedChildId = notification.ReplacedChild.GetId();
-        var localParent = notification.Parent;
-        if (notification.Containment.Multiple)
-        {
-            var existingChildren = localParent.Get(notification.Containment);
-            if (existingChildren is IList l)
-            {
-                var children = new List<IReadableNode>(l.Cast<IReadableNode>());
-                var actualChildId = children[notification.Index].GetId();
-                if (replacedChildId != actualChildId)
-                {
-                    throw new InvalidNotificationException(notification,
-                        $"Replaced node with id {replacedChildId} does not match with actual node with id {actualChildId} " +
-                        $"in containment {notification.Containment} at index {notification.Index}");
-                }
-            }
-        }
-        else
-        {
-            var existingChild = localParent.Get(notification.Containment);
-            if (existingChild is IReadableNode node && replacedChildId != node.GetId())
-            {
-                throw new InvalidNotificationException(notification,
-                    $"Replaced node with id {replacedChildId} does not match with actual node with id {node.GetId()} " +
-                    $"at index {notification.Index}");
-            }
-        }
-    }
-
-    private void CheckMatchingNodeIdForReplacedNode(ChildMovedAndReplacedFromOtherContainmentNotification notification)
-    {
-        var replacedChildId = notification.ReplacedChild.GetId();
-        var localParent = notification.NewParent;
-        if (notification.NewContainment.Multiple)
-        {
-            var existingChildren = localParent.Get(notification.NewContainment);
-            if (existingChildren is IList l)
-            {
-                var children = new List<IReadableNode>(l.Cast<IReadableNode>());
-                var actualChildId = children[notification.NewIndex].GetId();
-                if (replacedChildId != actualChildId)
-                {
-                    throw new InvalidNotificationException(notification,
-                        $"Replaced node with id {replacedChildId} does not match with actual node with id {actualChildId} " +
-                        $"in containment {notification.NewContainment} at index {notification.NewIndex}");
-                }
-            }
-        }
-        else
-        {
-            var existingChild = localParent.Get(notification.NewContainment);
-            if (existingChild is IReadableNode node && replacedChildId != node.GetId())
-            {
-                throw new InvalidNotificationException(notification,
-                    $"Replaced node with id {replacedChildId} does not match with actual node with id {node.GetId()} " +
-                    $"at index {notification.NewIndex}");
-            }
-        }
-    }
-
-    private void CheckMatchingNodeIdForReplacedNode(ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification)
-    {
-        var replacedChildId = notification.ReplacedChild.GetId();
-        var localParent = notification.Parent;
-        if (notification.NewContainment.Multiple)
-        {
-            var existingChildren = localParent.Get(notification.NewContainment);
-            if (existingChildren is IList l)
-            {
-                var children = new List<IReadableNode>(l.Cast<IReadableNode>());
-                var actualChildId = children[notification.NewIndex].GetId();
-                if (replacedChildId != actualChildId)
-                {
-                    throw new InvalidNotificationException(notification,
-                        $"Replaced node with id {replacedChildId} does not match with actual node with id {actualChildId} " +
-                        $"in containment {notification.NewContainment} at index {notification.NewIndex}");
-                }
-            }
-        }
-        else
-        {
-            var existingChild = localParent.Get(notification.NewContainment);
-            if (existingChild is IReadableNode node && replacedChildId != node.GetId())
-            {
-                throw new InvalidNotificationException(notification,
-                    $"Replaced node with id {replacedChildId} does not match with actual node with id {node.GetId()} " +
-                    $"at index {notification.NewIndex}");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Applicable to only multiple containments
-    /// </summary>
-    private void CheckMatchingNodeIdForReplacedNode(ChildMovedAndReplacedInSameContainmentNotification notification)
-    {
-        var replacedChildId = notification.ReplacedChild.GetId();
-        var localParent = notification.Parent;
-        
-        if (!notification.Containment.Multiple)
-        {
-            return;
-        }
-
-        var existingChildren = localParent.Get(notification.Containment);
-        if (existingChildren is not IList l)
-        {
-            return;
-        }
-
-        var children = new List<IReadableNode>(l.Cast<IReadableNode>());
-        var actualChildId = children[notification.NewIndex].GetId();
-        if (replacedChildId != actualChildId)
-        {
-            throw new InvalidNotificationException(notification,
-                $"Replaced node with id {replacedChildId} does not match with actual node with id {actualChildId} " +
-                $"in containment {notification.Containment} at index {notification.NewIndex}");
-        }
-    }
-
-    #endregion
-
 }
