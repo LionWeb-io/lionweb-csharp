@@ -26,7 +26,7 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
     public DynamicEnumerationLiteral(NodeId id, LionWebVersions lionWebVersion, DynamicEnumeration? enumeration)
         : base(id, lionWebVersion)
     {
-        enumeration?.AddLiterals([this]);
+        enumeration?.AddLiteralsRaw(this);
         _parent = enumeration;
     }
 

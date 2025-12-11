@@ -17,8 +17,9 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
 using System.Collections;
+using System.Collections.Immutable;
+using Utilities;
 
 /// <inheritdoc cref="Annotation"/>
 public class DynamicAnnotation(NodeId id, LionWebVersions lionWebVersion, DynamicLanguage? language)
@@ -84,7 +85,108 @@ public class DynamicAnnotation(NodeId id, LionWebVersions lionWebVersion, Dynami
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+
+        if (_m3.Annotation_annotates.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(Annotates);
+            return true;
+        }
+
+        if (_m3.Annotation_extends.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(Extends);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+        
+        if (_m3.Annotation_implements.EqualsIdentity(reference))
+        {
+            targets = _implements.Select(ReferenceTarget.FromNode).ToImmutableList();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetReferenceRaw(Reference reference, ReferenceTarget? target)
+    {
+        if (base.SetReferenceRaw(reference, target))
+            return true;
+
+        if (_m3.Annotation_annotates.EqualsIdentity(reference) && target?.Target is Classifier annotates)
+        {
+            Annotates = annotates;
+            return true;
+        }
+
+        if (_m3.Annotation_extends.EqualsIdentity(reference) && target?.Target is Annotation extends)
+        {
+            Extends = extends;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (base.AddReferencesRaw(reference, target))
+            return true;
+        
+        if (_m3.Annotation_implements.EqualsIdentity(reference)&& target.Target is Interface t)
+        {
+            _implements.Add(t);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target)
+    {
+        if (base.InsertReferencesRaw(reference, index, target))
+            return true;
+        
+        if (_m3.Annotation_implements.EqualsIdentity(reference)&& target.Target is Interface t)
+        {
+            _implements.Insert(index, t);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveReferencesRaw(Reference reference, ReferenceTarget target)
+    {
+        if (base.RemoveReferencesRaw(reference, target))
+            return true;
+        
+        if (_m3.Annotation_implements.EqualsIdentity(reference)&& target.Target is Interface t)
+        {
+            return _implements.Remove(t);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)

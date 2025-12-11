@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
+using Utilities;
 
 /// <inheritdoc cref="Property"/>
 public class DynamicProperty(NodeId id, LionWebVersions lionWebVersion, DynamicClassifier? classifier)
@@ -64,7 +64,37 @@ public class DynamicProperty(NodeId id, LionWebVersions lionWebVersion, DynamicC
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+        
+        if (_m3.Property_type.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(_type);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetReferenceRaw(Reference reference, ReferenceTarget? target)
+    {
+        if (base.SetReferenceRaw(reference, target))
+            return true;
+        
+        if (_m3.Property_type.EqualsIdentity(reference) && target?.Target is Datatype type)
+        {
+            _type = type;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)
