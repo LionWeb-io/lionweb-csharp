@@ -105,8 +105,8 @@ public class HasherTests
     [TestMethod]
     public void Property_DifferentValue_Sdt()
     {
-        var hashA = new Hasher([new SDTConcept("A") { Decimal = new Decimal(1, 0) }]).Hash();
-        var hashB = new Hasher([new SDTConcept("A") { Decimal = new Decimal(0, 1) }]).Hash();
+        var hashA = new Hasher([new SDTConcept("A") { Decimal = new Decimal() {Frac = 1, Int = 0} }]).Hash();
+        var hashB = new Hasher([new SDTConcept("A") { Decimal = new Decimal() {Frac = 0, Int = 1} }]).Hash();
 
         Assert.AreNotEqual(hashA, hashB);
     }
