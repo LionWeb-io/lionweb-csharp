@@ -24,6 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// A collection of model trees, represented by each trees' <see cref="IPartitionInstance">partition</see> (aka root node).
+/// <seealso cref="LionWeb.Core.M1.Raw.IForestRawExtensions"/>
 public interface IForest
 {
     /// Contains all known partitions.
@@ -44,7 +45,53 @@ public interface IForest
     INotificationSender? GetNotificationSender();
 
     /// <c>this</c> forest's notification producer, if any.
-    protected IForestNotificationProducer? GetNotificationProducer();
+    protected internal IForestNotificationProducer? GetNotificationProducer();
+
+    #region raw api
+
+    /// <summary>
+    /// Tries to get the partition with <paramref name="nodeId"/> from <c>this</c> forest.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if partition <paramref name="nodeId"/> is known to <c>this</c> forest;
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <seealso cref="IForest.TryGetPartition"/>
+    protected internal bool TryGetPartitionRaw(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition);
+
+    /// <summary>
+    /// Adds <paramref name="partition"/> to <c>this</c> forest.
+    /// </summary>
+    /// <param name="partition">Partition to add to <c>this</c> forest.</param>
+    /// <returns>
+    /// <c>true</c> if <paramref name="partition"/> has been added and that changed the forest
+    /// (i.e. <paramref name="partition"/> is a valid partition for <c>this</c> and not yet the last partition in <c>this</c>);
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <remarks>
+    /// Does <i>not</i> trigger a notification, but subscribes <c>this</c> forest to <paramref name="partition"/>
+    /// (i.e. future events on <paramref name="partition"/> will be forwarded to <c>this</c>).
+    /// </remarks>
+    /// <seealso cref="IForest.AddPartitions"/>
+    protected internal bool AddPartitionRaw(IPartitionInstance partition);
+
+    /// <summary>
+    /// Removes <paramref name="partition"/> from <c>this</c> forest.
+    /// </summary>
+    /// <param name="partition">Partition to remove from <c>this</c> forest.</param>
+    /// <returns>
+    /// <c>true</c> if <paramref name="partition"/> has been removed and that changed the forest
+    /// (i.e. <paramref name="partition"/> was a partition in <c>this</c>);
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <remarks>
+    /// Does <i>not</i> trigger a notification, but unsubscribes <c>this</c> forest from <paramref name="partition"/>
+    /// (i.e. future events on <paramref name="partition"/> will not be forwarded to <c>this</c>).
+    /// </remarks>
+    /// <seealso cref="IForest.RemovePartitions"/>
+    protected internal bool RemovePartitionRaw(IPartitionInstance partition);
+
+    #endregion
 }
 
 /// <inheritdoc />
