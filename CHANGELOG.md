@@ -34,6 +34,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Move generated languages to separate project
   Separate project is required because `LionWeb.Core.Test` has access to `LionWeb.Core` internals, and thus sees raw api methods as `protected internal`.
   All regular generated languages see these methods as `protected`.
+* Converted lots of tests to use `TestLanguage` instead of `Shapes`
+  The tests are easier to read that way
 ### Removed
 ### Deprecated
 * `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`.

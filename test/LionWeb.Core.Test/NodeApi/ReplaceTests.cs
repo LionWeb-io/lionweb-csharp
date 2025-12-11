@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi;
 
 using Core.Utilities;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -30,19 +30,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Forward_WithTwoChildren()
     {
-        var replacement = new Line("replacement");
-        var replaced = NewCircle("replaced");
+        var replacement = new LinkTestConcept("replacement");
+        var replaced = NewLtc("replaced");
         
-        var actual = new Geometry("a")
+        var actual = new TestPartition("a")
         {
-            Shapes = [replacement, replaced]
+            Links = [replacement, replaced]
         };
         
         replaced.ReplaceWith(replacement);
         
-        var expected = new Geometry("a")
+        var expected = new TestPartition("a")
         {
-            Shapes = [new Line("replacement")]
+            Links = [new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -51,19 +51,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_WithTwoChildren()
     {
-        var replacement = new Line("replacement");
-        var replaced = NewCircle("replaced");
+        var replacement = new LinkTestConcept("replacement");
+        var replaced = NewLtc("replaced");
         
-        var actual = new Geometry("a")
+        var actual = new TestPartition("a")
         {
-            Shapes = [replaced, replacement]
+            Links = [replaced, replacement]
         };
         
         replaced.ReplaceWith(replacement);
         
-        var expected = new Geometry("a")
+        var expected = new TestPartition("a")
         {
-            Shapes = [new Line("replacement")]
+            Links = [new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -72,19 +72,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Forward_ReplaceLast()
     {
-        var replacement = new Line("replacement");
-        var replaced = NewCircle("child");
+        var replacement = new LinkTestConcept("replacement");
+        var replaced = NewLtc("child");
         
-        var actual = new Geometry("a")
+        var actual = new TestPartition("a")
         {
-            Shapes = [NewCircle("child"), replacement, replaced]
+            Links = [NewLtc("child"), replacement, replaced]
         };
         
         replaced.ReplaceWith(replacement);
         
-        var expected = new Geometry("a")
+        var expected = new TestPartition("a")
         {
-            Shapes = [NewCircle("child"), new Line("replacement")]
+            Links = [NewLtc("child"), new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -94,19 +94,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_ReplaceMiddle()
     {
-        var replacement = new Line("replacement");
-        var replaced = NewCircle("replaced");
+        var replacement = new LinkTestConcept("replacement");
+        var replaced = NewLtc("replaced");
         
-        var actual = new Geometry("a")
+        var actual = new TestPartition("a")
         {
-            Shapes = [NewCircle("child"), replaced, replacement]
+            Links = [NewLtc("child"), replaced, replacement]
         };
         
         replaced.ReplaceWith(replacement);
         
-        var expected = new Geometry("a")
+        var expected = new TestPartition("a")
         {
-            Shapes = [NewCircle("child"), new Line("replacement")]
+            Links = [NewLtc("child"), new LinkTestConcept("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -115,19 +115,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_ReplaceFirst()
     {
-        var replacement = new Line("replacement");
-        var replaced = NewCircle("replaced");
+        var replacement = new LinkTestConcept("replacement");
+        var replaced = NewLtc("replaced");
         
-        var actual = new Geometry("a")
+        var actual = new TestPartition("a")
         {
-            Shapes = [replaced, NewCircle("child"), replacement]
+            Links = [replaced, NewLtc("child"), replacement]
         };
         
         replaced.ReplaceWith(replacement);
         
-        var expected = new Geometry("a")
+        var expected = new TestPartition("a")
         {
-            Shapes = [new Line("replacement"), NewCircle("child")]
+            Links = [new LinkTestConcept("replacement"), NewLtc("child")]
         };
         
         AssertEquals([expected], [actual]);
@@ -136,25 +136,25 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_MoreThanThreeChildren()
     {
-        var replacement = new Line("E");
-        var replaced = NewCircle("B");
+        var replacement = new LinkTestConcept("E");
+        var replaced = NewLtc("B");
         
-        var actual = new Geometry("container")
+        var actual = new TestPartition("container")
         {
-            Shapes = [NewCircle("A"), replaced, NewCircle("C"), NewCircle("D"), replacement, NewCircle("F")]
+            Links = [NewLtc("A"), replaced, NewLtc("C"), NewLtc("D"), replacement, NewLtc("F")]
         };
         
         replaced.ReplaceWith(replacement);
         
-        var expected = new Geometry("container")
+        var expected = new TestPartition("container")
         {
-            Shapes = [NewCircle("A"), new Line("E"), NewCircle("C"), NewCircle("D"), NewCircle("F")]
+            Links = [NewLtc("A"), new LinkTestConcept("E"), NewLtc("C"), NewLtc("D"), NewLtc("F")]
         };
         
         AssertEquals([expected], [actual]);
     }
 
-    private Circle NewCircle(string id) => new(id) { Name = id };
+    private LinkTestConcept NewLtc(string id) => new(id) { Name = id };
 
     private static void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {
@@ -167,56 +167,56 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void Beginning()
     {
-        var circle = new Circle("circ0");
-        var offsetDuplicate = new OffsetDuplicate("off0");
+        var circle = new LinkTestConcept("circ0");
+        var offsetDuplicate = new LinkTestConcept("off0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle,
                 offsetDuplicate
             ]
         };
-        var line = new Line("line");
+        var line = new LinkTestConcept("line");
         circle.ReplaceWith(line);
 
         Assert.AreEqual(geometry, line.GetParent());
         Assert.IsNull(circle.GetParent());
 
-        CollectionAssert.AreEqual(new List<IShape> { line, offsetDuplicate }, geometry.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, offsetDuplicate }, geometry.Links.ToList());
     }
 
     [TestMethod]
     public void Middle()
     {
-        var circle = new Circle("circ0");
-        var offsetDuplicate = new OffsetDuplicate("off0");
-        var composite = new CompositeShape("comp0");
+        var circle = new LinkTestConcept("circ0");
+        var offsetDuplicate = new LinkTestConcept("off0");
+        var composite = new LinkTestConcept("comp0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle,
                 offsetDuplicate,
                 composite
             ]
         };
-        var line = new Line("line");
+        var line = new LinkTestConcept("line");
         offsetDuplicate.ReplaceWith(line);
 
         Assert.AreEqual(geometry, line.GetParent());
         Assert.IsNull(offsetDuplicate.GetParent());
 
-        CollectionAssert.AreEqual(new List<IShape> { circle, line, composite }, geometry.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line, composite }, geometry.Links.ToList());
     }
 
     [TestMethod]
     public void NoParent()
     {
-        var circle = new Circle("circ0");
-        var line = new Line("line");
+        var circle = new LinkTestConcept("circ0");
+        var line = new LinkTestConcept("line");
 
         Assert.ThrowsExactly<TreeShapeException>(() => circle.ReplaceWith(line));
     }
@@ -224,41 +224,41 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void SingleContainment()
     {
-        var coord = new Coord("coord0");
-        var circle = new Circle("circ0") { Center = coord };
+        var coord = new LinkTestConcept("coord0");
+        var circle = new LinkTestConcept("circ0") { Containment_0_1 = coord };
 
-        var newCoord = new Coord("coord1");
+        var newCoord = new LinkTestConcept("coord1");
         coord.ReplaceWith(newCoord);
 
         Assert.AreEqual(circle, newCoord.GetParent());
         Assert.IsNull(coord.GetParent());
-        Assert.AreEqual(newCoord, circle.Center);
+        Assert.AreEqual(newCoord, circle.Containment_0_1);
     }
 
     [TestMethod]
     public void NonFittingType()
     {
-        var circle = new Circle("circ0");
+        var circle = new LinkTestConcept("circ0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle
             ]
         };
-        var coord = new Coord("coord");
+        var coord = new DataTypeTestConcept("coord");
         Assert.ThrowsExactly<InvalidValueException>(() => circle.ReplaceWith(coord));
     }
 
     [TestMethod]
     public void Null()
     {
-        var circle = new Circle("circ0");
+        var circle = new LinkTestConcept("circ0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle
             ]
@@ -273,12 +273,12 @@ public class ReplaceTests_Annotation
     [TestMethod]
     public void Beginning()
     {
-        var doc = new Documentation("circ0");
-        var bom = new BillOfMaterials("off0");
+        var doc = new TestAnnotation("circ0");
+        var bom = new TestAnnotation("off0");
 
-        var shape = new Circle("geom");
+        var shape = new LinkTestConcept("geom");
         shape.AddAnnotations([doc, bom]);
-        var ann = new Documentation("line");
+        var ann = new TestAnnotation("line");
         doc.ReplaceWith(ann);
 
         Assert.AreEqual(shape, ann.GetParent());
@@ -290,13 +290,13 @@ public class ReplaceTests_Annotation
     [TestMethod]
     public void Middle()
     {
-        var doc = new Documentation("circ0");
-        var bom = new BillOfMaterials("off0");
-        var bom2 = new BillOfMaterials("comp0");
+        var doc = new TestAnnotation("circ0");
+        var bom = new TestAnnotation("off0");
+        var bom2 = new TestAnnotation("comp0");
 
-        var shape = new Circle("geom");
+        var shape = new LinkTestConcept("geom");
         shape.AddAnnotations([doc, bom, bom2]);
-        var ann = new Documentation("line");
+        var ann = new TestAnnotation("line");
         bom.ReplaceWith(ann);
 
         Assert.AreEqual(shape, ann.GetParent());
@@ -308,8 +308,8 @@ public class ReplaceTests_Annotation
     [TestMethod]
     public void NoParent()
     {
-        var doc = new Documentation("circ0");
-        var bom = new BillOfMaterials("line");
+        var doc = new TestAnnotation("circ0");
+        var bom = new TestAnnotation("line");
 
         Assert.ThrowsExactly<TreeShapeException>(() => doc.ReplaceWith(bom));
     }
@@ -317,20 +317,20 @@ public class ReplaceTests_Annotation
     [TestMethod]
     public void NonFittingType()
     {
-        var doc = new Documentation("circ0");
+        var doc = new TestAnnotation("circ0");
 
-        var shape = new Line("geom");
+        var shape = new LinkTestConcept("geom");
         shape.AddAnnotations([doc]);
-        var coord = new Coord("coord");
+        var coord = new DataTypeTestConcept("coord");
         Assert.ThrowsExactly<InvalidValueException>(() => doc.ReplaceWith(coord));
     }
 
     [TestMethod]
     public void Null()
     {
-        var doc = new Documentation("circ0");
+        var doc = new TestAnnotation("circ0");
 
-        var shape = new Line("geom");
+        var shape = new LinkTestConcept("geom");
         shape.AddAnnotations([doc]);
         Assert.ThrowsExactly<UnsupportedNodeTypeException>(() => doc.ReplaceWith((INode)null));
     }

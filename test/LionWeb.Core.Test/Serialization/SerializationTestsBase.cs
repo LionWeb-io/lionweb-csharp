@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Serialization;
 
 using Core.Serialization;
 using Core.Utilities;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M3;
 
 public abstract class SerializationTestsBase
@@ -31,7 +31,7 @@ public abstract class SerializationTestsBase
 
     protected SerializationTestsBase()
     {
-        _language = ShapesLanguage.Instance;
+        _language = TestLanguageLanguage.Instance;
     }
 
 
