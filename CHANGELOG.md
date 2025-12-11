@@ -20,6 +20,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   Not in separate interfaces as we expect every `IForest` / `IReadableNode` / `IWritableNode` to also implement raw api.
   Raw api is internal, but _can_ be used externally through opt-in (using `XxxRawExtensions`)
   The multiple mutators (`AddAnnotationsRaw()`, `InsertContainmentsRaw()`, `RemoveReferencesRaw()`, etc.) take only element instead of a list as most use cases work with single elements.
+* Added test to assure changed base classes are compatible with previously generated language
 ### Fixed
 * Bug fix: Introduce check to validate that the deleted node's ID matches the actual node's ID during child deletion notification.
 * Bug fix: Notification emitter now checks whether a moved node is part of partition of not. If the moved node is a floating node – i.e. not part of a partition – and it replaces another node, then `ChildReplacedNotification` is emitted. If there is no replacement, then `ChildAddedNotification` is emitted.
