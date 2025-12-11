@@ -21,8 +21,8 @@ using Client;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
-using Core.Test.Languages.Generated.V2023_1.TestLanguage;
+using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Core.Utilities;
 using Delta.Client;
 using Delta.Repository;
@@ -44,11 +44,11 @@ public abstract class RepositoryTestsBase
     private TestDeltaClientConnector _aConnector;
     private TestDeltaClientConnector _bConnector;
     private readonly List<Language> _languages;
-    private readonly IVersion2023_1 _lionWebVersion;
+    private readonly IVersion2024_1 _lionWebVersion;
 
     public RepositoryTestsBase()
     {
-        _lionWebVersion = LionWebVersions.v2023_1;
+        _lionWebVersion = LionWebVersions.v2024_1;
         _languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance];
 
         _repositoryForest = new Forest();

@@ -316,6 +316,11 @@ public class SerializationTests : SerializationTestsBase
             """{"key-SDTImaginary":{},"key-SDTReal":{"key-SDTFrac":"0","key-SDTInt":"1"}}""",
             serializedNode.Properties.First(p => p.Property.Key == "key-SDTComplexField").Value);
 
+        var serializer = new SerializerBuilder()
+            .WithSerializedEmptyFeatures(false)
+            .WithLionWebVersion(_lionWebVersion)
+            .Build();
+        var actual = serializer.SerializeToChunk([parent, target]);
 
         var nodes = new DeserializerBuilder()
             .WithLanguage(SDTLangLanguage.Instance)
