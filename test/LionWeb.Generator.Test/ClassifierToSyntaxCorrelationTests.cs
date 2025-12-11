@@ -8,10 +8,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 
 [TestClass]
-public class GeneratedCSharpSyntaxNodesTests
+public class ClassifierToSyntaxCorrelationTests
 {
     [TestMethod]
-    public void CSharpSyntaxNodes_of_concept_and_annotation()
+    public void concept_and_annotation_as_classifiers()
     { 
         LionWebVersions lionWebVersion = LionWebVersions.v2023_1;
         var testLanguage = new TestLanguageLanguage("testLanguage");
@@ -27,24 +27,24 @@ public class GeneratedCSharpSyntaxNodesTests
 
         Assert.HasCount(3, correlationData.OfType<ClassSyntax>());
 
-        var linkTestConceptSyntaxNode = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept));
-        Assert.IsInstanceOfType<ClassSyntax>(linkTestConceptSyntaxNode);
-        Assert.IsInstanceOfType<ClassDeclarationSyntax>((linkTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
-        Assert.AreEqual(nameof(testLanguage.LinkTestConcept), (linkTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
+        var linkTestConceptSyntax = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.LinkTestConcept));
+        Assert.IsInstanceOfType<ClassSyntax>(linkTestConceptSyntax);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((linkTestConceptSyntax as ClassSyntax)?.ClassDeclarationSyntax);
+        Assert.AreEqual(nameof(testLanguage.LinkTestConcept), (linkTestConceptSyntax as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
 
-        var dataTypeTestConceptSyntaxNode = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept));
-        Assert.IsInstanceOfType<ClassSyntax>(dataTypeTestConceptSyntaxNode);
-        Assert.IsInstanceOfType<ClassDeclarationSyntax>((dataTypeTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
-        Assert.AreEqual(nameof(testLanguage.DataTypeTestConcept), (dataTypeTestConceptSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
+        var dataTypeTestConceptSyntax = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.DataTypeTestConcept));
+        Assert.IsInstanceOfType<ClassSyntax>(dataTypeTestConceptSyntax);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((dataTypeTestConceptSyntax as ClassSyntax)?.ClassDeclarationSyntax);
+        Assert.AreEqual(nameof(testLanguage.DataTypeTestConcept), (dataTypeTestConceptSyntax as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
 
-        var testAnnotationSyntaxNode = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation));
-        Assert.IsInstanceOfType<ClassSyntax>(testAnnotationSyntaxNode);
-        Assert.IsInstanceOfType<ClassDeclarationSyntax>((testAnnotationSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax);
-        Assert.AreEqual(nameof(testLanguage.TestAnnotation), (testAnnotationSyntaxNode as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
+        var testAnnotationSyntax = correlationData.First(node => node.Classifier.Name == nameof(testLanguage.TestAnnotation));
+        Assert.IsInstanceOfType<ClassSyntax>(testAnnotationSyntax);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>((testAnnotationSyntax as ClassSyntax)?.ClassDeclarationSyntax);
+        Assert.AreEqual(nameof(testLanguage.TestAnnotation), (testAnnotationSyntax as ClassSyntax)?.ClassDeclarationSyntax.Identifier.ToString());
     }
     
     [TestMethod]
-    public void CSharpSyntaxNodes_of_interface()
+    public void interface_as_classifier()
     { 
         LionWebVersions lionWebVersion = LionWebVersions.v2023_1;
         var multiInheritLangLanguage = new MultiInheritLangLanguage("multiInheritLangLanguage");
