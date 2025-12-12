@@ -20,7 +20,6 @@ namespace LionWeb.Protocol.Delta.Test.Pipe;
 using Core.M1;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
-using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Core.Test.Notification;
 
@@ -30,8 +29,8 @@ public class NotificationsTestSerialized : DeltaTestsBase
     [TestMethod]
     public void PropertyAdded()
     {
-        var circle = new Circle("c");
-        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var circle = new LinkTestConcept("c");
+        var originalPartition = new TestPartition("a") { Links = [circle] };
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
         var notificationObserver = new NotificationObserver();
@@ -47,16 +46,16 @@ public class NotificationsTestSerialized : DeltaTestsBase
     [TestMethod]
     public void ChildReplaced_Single_with_same_node_id()
     {
-        var documentation = new Documentation("doc") { Text = "a" };
-        var originalPartition = new Geometry("a") { Documentation = documentation };
+        var documentation = new LinkTestConcept("doc") { Name = "a" };
+        var originalPartition = new TestPartition("a") { Links = [new LinkTestConcept("parent") {Containment_1 = documentation}]};
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        var documentation2 = new Documentation("doc") { Text = "b" };
-        originalPartition.Documentation = documentation2;
+        var documentation2 = new LinkTestConcept("doc") { Name = "b" };
+        originalPartition.Links[0].Containment_1 = documentation2;
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
@@ -66,7 +65,8 @@ public class NotificationsTestSerialized : DeltaTestsBase
     [TestMethod]
     public void ChildAdded_ForwardReference()
     {
-        var originalPartition = new LinkTestConcept("partition");
+        var originalParent = new LinkTestConcept("parent");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
@@ -83,8 +83,8 @@ public class NotificationsTestSerialized : DeltaTestsBase
             Reference_1_n = [referencedChildB, referencedChildB]
         };
 
-        originalPartition.Containment_0_1 = childWithForwardReference;
-        originalPartition.AddContainment_0_n([referencedChildA, referencedChildB]);
+        originalParent.Containment_0_1 = childWithForwardReference;
+        originalParent.AddContainment_0_n([referencedChildA, referencedChildB]);
 
         Assert.AreEqual(3, notificationObserver.Count);
         foreach (var notification in notificationObserver.Notifications)
@@ -98,10 +98,11 @@ public class NotificationsTestSerialized : DeltaTestsBase
     [TestMethod]
     public void ChildReplaced_ForwardReference()
     {
-        var originalPartition = new LinkTestConcept("partition")
+        var originalParent = new LinkTestConcept("parent")
         {
             Containment_1 = new LinkTestConcept("replacedChild")
         };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
 
         var clonedPartition = CreateDeltaReplicator(originalPartition);
 
@@ -114,8 +115,8 @@ public class NotificationsTestSerialized : DeltaTestsBase
             Reference_0_1 = referencedChild
         };
 
-        originalPartition.Containment_0_1 = childWithForwardReference;
-        originalPartition.Containment_1 = referencedChild;
+        originalParent.Containment_0_1 = childWithForwardReference;
+        originalParent.Containment_1 = referencedChild;
 
         Assert.AreEqual(2, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
@@ -127,7 +128,8 @@ public class NotificationsTestSerialized : DeltaTestsBase
     [TestMethod]
     public void PartitionAdded_ForwardReference()
     {
-        var originalPartition = new LinkTestConcept("partition");
+        var originalParent = new LinkTestConcept("parent");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         var originalForest = new Forest();
         originalForest.AddPartitions([originalPartition]);
 
@@ -136,13 +138,14 @@ public class NotificationsTestSerialized : DeltaTestsBase
         var notificationObserver = new NotificationObserver();
         originalForest.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        var referencedPartition = new LinkTestConcept("referencedPartition");
+        var referencedParent = new LinkTestConcept("referencedParent");
+        var referencedPartition = new TestPartition("referencedPartition") { Links = [referencedParent] };
         var childWithForwardReference = new LinkTestConcept("childWithForwardReference")
         {
-            Reference_0_1 = referencedPartition
+            Reference_0_1 = referencedParent
         };
 
-        originalPartition.Containment_0_1 = childWithForwardReference;
+        originalParent.Containment_0_1 = childWithForwardReference;
         originalForest.AddPartitions([referencedPartition]);
 
         Assert.HasCount(2, notificationObserver.Notifications);

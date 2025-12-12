@@ -36,7 +36,7 @@ public abstract class ClonerTestsBase
         protected override bool GetInternal(Feature feature, out object? result) =>
             _settings.TryGetValue(feature, out result);
 
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
         {
             _settings[feature] = value;
             return true;
@@ -56,7 +56,7 @@ public abstract class ClonerTestsBase
         protected override bool GetInternal(Feature feature, out object? result) =>
             _settings.TryGetValue(feature, out result);
 
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+        protected override bool SetInternal(Feature? feature, object? value)
         {
             _settings[feature] = value;
             return true;

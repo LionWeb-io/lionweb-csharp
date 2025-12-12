@@ -39,11 +39,18 @@ public class UnresolvedReferencesManager : INotificationReceiver
 
     private bool ResolveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, IReferenceTarget target) e)
     {
-        if (e.target.TargetId != newNodeNotification.NewNode.GetId())
-            return false;
+        var result = false;
+        
+        foreach (IReadableNode newNode in M1Extensions.Descendants(newNodeNotification.NewNode, true, true))
+        {
+            if (e.target.TargetId != newNode.GetId())
+                continue;
 
-        e.target.Target = newNodeNotification.NewNode;
-        return true;
+            e.target.Target = newNode;
+            result = true;
+        }
+        
+        return result;
     }
 
     /// Registers unresolved <paramref name="target"/> in <paramref name="reference"/> of <paramref name="parent"/>,

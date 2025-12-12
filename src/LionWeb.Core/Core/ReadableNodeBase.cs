@@ -84,6 +84,71 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// <inheritdoc />
     public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 
+    #region ReadableRaw
+
+    /// <inheritdoc/>
+    public IReadOnlyList<IReadableNode> GetAnnotationsRaw() =>
+        _annotations.Cast<IReadableNode>().ToImmutableList();
+
+    /// <inheritdoc/>
+    bool IReadableNode.TryGetPropertyRaw(Property property, out object? value) =>
+        TryGetPropertyRaw(property, out value);
+
+    /// <inheritdoc cref="IReadableNode.TryGetPropertyRaw"/>
+    protected internal virtual bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc/>
+    bool IReadableNode.TryGetContainmentRaw(Containment containment, out IReadableNode? node) =>
+        TryGetContainmentRaw(containment, out node);
+
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentRaw"/>
+    protected internal virtual bool TryGetContainmentRaw(Containment containment, out IReadableNode? node)
+    {
+        node = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    bool IReadableNode.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes) =>
+        TryGetContainmentsRaw(containment, out nodes);
+
+    /// <inheritdoc cref="IReadableNode.TryGetContainmentsRaw"/>
+    protected internal virtual bool TryGetContainmentsRaw(Containment containment,
+        out IReadOnlyList<IReadableNode> nodes)
+    {
+        nodes = [];
+        return false;
+    }
+
+    /// <inheritdoc/>
+    bool IReadableNode.TryGetReferenceRaw(Reference reference, out IReferenceTarget? target) =>
+        TryGetReferenceRaw(reference, out target);
+
+    /// <inheritdoc cref="IReadableNode.TryGetReferenceRaw"/>
+    protected internal virtual bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        target = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    bool IReadableNode.TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets) =>
+        TryGetReferencesRaw(reference, out targets);
+
+    /// <inheritdoc cref="IReadableNode.TryGetReferencesRaw"/>
+    protected internal virtual bool TryGetReferencesRaw(Reference reference,
+        out IReadOnlyList<IReferenceTarget> targets)
+    {
+        targets = [];
+        return false;
+    }
+
+    #endregion
+
     #region References
 
     /// <summary>
@@ -104,7 +169,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     {
         if (storage?.Target is null)
             return default;
-        
+
         if (storage.Target is not R result)
             throw new InvalidValueException(reference, storage.Target);
 
@@ -135,32 +200,34 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     {
         if (storage is null)
             return default;
-        
+
         if (storage.Target is null)
             throw new UnresolvedReferenceException(GetId(), reference, storage);
-        
+
         if (storage.Target is not R result)
             throw new InvalidValueException(reference, storage.Target);
 
         return result;
     }
-    
+
     protected R? GetRequiredReference<R>(ReferenceTarget? storage, Reference reference) where R : IReadableNode
     {
         if (storage is null)
             throw new UnsetFeatureException(reference);
-        
+
         return ReferenceTargetNullableTarget<R>(storage, reference);
     }
-    
+
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget> storage, Reference reference) where R : IReadableNode =>
+    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget> storage, Reference reference)
+        where R : IReadableNode =>
         storage.Count != 0
             ? ReferenceTargetNullableTargets<R>(storage, reference)
             : throw new UnsetFeatureException(reference);
 
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<R> GetRequiredNonNullReferences<R>(List<ReferenceTarget> storage, Reference reference) where R : IReadableNode =>
+    protected IReadOnlyList<R> GetRequiredNonNullReferences<R>(List<ReferenceTarget> storage, Reference reference)
+        where R : IReadableNode =>
         storage.Count != 0
             ? ReferenceTargetNonNullTargets<R>(storage, reference)
             : throw new UnsetFeatureException(reference);
@@ -180,10 +247,10 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
                 result = false;
                 break;
             }
-                
+
             nodes.Add(target);
         }
-            
+
         targets = result ? nodes.AsReadOnly() : [];
         return result;
     }

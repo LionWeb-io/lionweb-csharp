@@ -190,6 +190,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     {
         var newParent = LookUpNode(notification.NewParent);
         var movedChild = LookUpNode(notification.MovedChild);
+        var oldParent = LookUpNode(notification.OldParent);
         var replacedChild = LookUpNode(notification.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentNotification(
@@ -197,7 +198,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.NewContainment,
             notification.NewIndex,
             movedChild,
-            notification.OldParent,
+            oldParent,
             notification.OldContainment,
             notification.OldIndex,
             replacedChild,
@@ -324,12 +325,13 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     {
         var newParent = LookUpNode(notification.NewParent);
         var movedAnnotation = LookUpNode(notification.MovedAnnotation);
+        var oldParent = LookUpNode(notification.OldParent);
 
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
             notification.NewIndex,
             movedAnnotation,
-            notification.OldParent,
+            oldParent,
             notification.OldIndex,
             notification.NotificationId
         );

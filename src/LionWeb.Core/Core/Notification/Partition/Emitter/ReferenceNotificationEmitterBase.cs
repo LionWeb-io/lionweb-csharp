@@ -23,7 +23,7 @@ public abstract class ReferenceNotificationEmitterBase<T> : PartitionNotificatio
 {
     protected readonly Reference Reference;
 
-    protected ReferenceNotificationEmitterBase(Reference reference, INotifiableNode destinationParent, INotificationId? notificationId) : base(destinationParent, notificationId)
+    protected ReferenceNotificationEmitterBase(Reference reference, INotifiableNode destinationParent) : base(destinationParent)
     {
         Reference = reference;
     }

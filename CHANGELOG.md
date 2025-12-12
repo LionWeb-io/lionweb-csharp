@@ -16,6 +16,11 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * `Throw` (default) :: Throw `UnresolvedReferenceException` on access to unresolved references.
   * `ReturnAsNull`:: Return unresolved references as `null`.
 * Added `DebuggerDisplay` with "NodeType[NodeId]" to most nodes.
+* Add raw node api
+  Not in separate interfaces as we expect every `IForest` / `IReadableNode` / `IWritableNode` to also implement raw api.
+  Raw api is internal, but _can_ be used externally through opt-in (using `XxxRawExtensions`)
+  The multiple mutators (`AddAnnotationsRaw()`, `InsertContainmentsRaw()`, `RemoveReferencesRaw()`, etc.) take only element instead of a list as most use cases work with single elements.
+* Added test to assure changed base classes are compatible with previously generated language
 ### Fixed
 * Bug fix: Introduce check to validate that the deleted node's ID matches the actual node's ID during child deletion notification.
 * Bug fix: Notification emitter now checks whether a moved node is part of partition of not. If the moved node is a floating node – i.e. not part of a partition – and it replaces another node, then `ChildReplacedNotification` is emitted. If there is no replacement, then `ChildAddedNotification` is emitted.
@@ -23,9 +28,22 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `a.InsertBefore(b)` / `a.InsertAfter(b)` work correctly if both `a` and `b` are siblings.
 ### Changed
 * Use `IReferenceTarget` both as return and parameter type of `IDeserializerHandler.UnresolvableReferenceTarget()`.
+* Factored out mutation code from generated classes into base class methods
+  Simplifies changes and reduces the amount of generated code
+* Updated `TestLanguage` to changes from _lionweb-integration-testing_
+  mainly added `TestPartition`
+* Move generated languages to separate project
+  Separate project is required because `LionWeb.Core.Test` has access to `LionWeb.Core` internals, and thus sees raw api methods as `protected internal`.
+  All regular generated languages see these methods as `protected`.
+* Converted lots of tests to use `TestLanguage` instead of `Shapes`
+  The tests are easier to read that way
 ### Removed
 ### Deprecated
-* `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`. 
+* `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`.
+* Remove / obsolete `INotificationId` parameter from regular API
+  Passing notificationIds never worked completely (e.g. if `AddAnnotations()` created multiple notifications, but only one id had been passed).
+  For such functionality, use raw api and deal with notifications from outside.
+
 ### Security
 
 ## [0.3.0] - 2025-10-13

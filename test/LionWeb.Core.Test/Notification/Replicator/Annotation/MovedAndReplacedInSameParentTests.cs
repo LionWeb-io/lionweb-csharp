@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Annotation;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -30,10 +30,11 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Forward_uses_ReplaceWith()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([moved, replaced]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([moved, replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -55,10 +56,11 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Backward_uses_ReplaceWith()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([replaced, moved]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([replaced, moved]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -73,10 +75,11 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Backward_MoreThanThreeNodes_uses_ReplaceWith()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("A"), replaced, new BillOfMaterials("B"), moved, new BillOfMaterials("C")]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("A"), replaced, new TestAnnotation("B"), moved, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -91,10 +94,11 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Forward_MoreThanThreeNodes_uses_ReplaceWith()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("A"), moved, new BillOfMaterials("B"), replaced, new BillOfMaterials("C")]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("A"), moved, new TestAnnotation("B"), replaced, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -112,102 +116,107 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Forward()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([moved, replaced]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([moved, replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 1;
         var oldIndex = 0;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[0].GetId());
     }
 
     [TestMethod]
     public void Backward()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([replaced, moved]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([replaced, moved]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 0;
         var oldIndex = 1;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+        Assert.AreEqual(1, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[0].GetId());
     }
 
     [TestMethod]
     public void Backward_MoreThanThreeNodes()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("A"), replaced, new BillOfMaterials("B"), moved, new BillOfMaterials("C")]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("A"), replaced, new TestAnnotation("B"), moved, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 1;
         var oldIndex = 3;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(4, clonedPartition.GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[1].GetId());
+        Assert.AreEqual(4, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[1].GetId());
     }
 
 
     [TestMethod]
     public void Forward_MoreThanThreeNodes()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("A"), moved, new BillOfMaterials("B"), replaced, new BillOfMaterials("C")]);
+        var replaced = new TestAnnotation("replaced");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([new TestAnnotation("A"), moved, new TestAnnotation("B"), replaced, new TestAnnotation("C")]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 3;
         var oldIndex = 1;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
-        Assert.AreEqual(4, clonedPartition.GetAnnotations().Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[2].GetId());
+        Assert.AreEqual(4, clonedPartition.Links[0].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[0].GetAnnotations()[2].GetId());
     }
     
     [TestMethod]
     public void not_matching_node_ids()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var nodeWithAnotherId = new BillOfMaterials("node-with-another-id");
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([moved, replaced, nodeWithAnotherId]);
+        var replaced = new TestAnnotation("replaced");
+        var nodeWithAnotherId = new TestAnnotation("node-with-another-id");
+        var moved = new TestAnnotation("moved");
+        var originalParent = new LinkTestConcept("a");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        originalParent.AddAnnotations([moved, replaced, nodeWithAnotherId]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition, oldIndex,
+        var notification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
             nodeWithAnotherId, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

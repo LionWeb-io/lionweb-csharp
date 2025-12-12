@@ -17,7 +17,7 @@
 
 namespace LionWeb.Protocol.Delta.Test.Repository;
 
-using Core.Test.Languages.Generated.V2023_1.TestLanguage;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExceptionsBase
@@ -31,16 +31,16 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
         
         await _bClient.SubscribeToChangingPartitions(true, false, false);
 
-        var aPart = new LinkTestConcept("part")
+        var aPart = new TestPartition("part")
         {
-            Containment_0_1 = new LinkTestConcept("cont")
+            Links = [new LinkTestConcept("cont")]
         };
         _aForest.AddPartitions([aPart]);
         WaitForReceived(1);
 
-        var bPart = (LinkTestConcept)_bForest.Partitions.First();
+        var bPart = (TestPartition)_bForest.Partitions.First();
         Assert.IsNotNull(bPart);
-        Assert.IsNotNull(bPart.Containment_0_1);
+        Assert.IsNotEmpty(bPart.Links);
 
         aPart.Name = "changed";
         _aClient.WaitForReceived(1);
@@ -61,9 +61,9 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
         
         await _bClient.SubscribeToChangingPartitions(false, true, false);
 
-        var aPart = new LinkTestConcept("part")
+        var aPart = new TestPartition("part")
         {
-            Containment_0_1 = new LinkTestConcept("cont")
+            Links = [new LinkTestConcept("cont")]
         };
         _aForest.AddPartitions([aPart]);
         WaitForReceived(1);
@@ -85,16 +85,16 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
         
         await _bClient.SubscribeToChangingPartitions(true, false, true);
 
-        var aPart = new LinkTestConcept("part")
+        var aPart = new TestPartition("part")
         {
-            Containment_0_1 = new LinkTestConcept("cont")
+            Links = [new LinkTestConcept("cont")]
         };
         _aForest.AddPartitions([aPart]);
         WaitForReceived(1);
 
-        var bPart = (LinkTestConcept)_bForest.Partitions.First();
+        var bPart = (TestPartition)_bForest.Partitions.First();
         Assert.IsNotNull(bPart);
-        Assert.IsNotNull(bPart.Containment_0_1);
+        Assert.IsNotEmpty(bPart.Links);
 
         aPart.Name = "changed";
         WaitForReceived(1);

@@ -28,11 +28,16 @@ public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitte
     /// <see cref="ReferenceChangedNotification"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
     public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, ReferenceTarget? newTarget,
-        ReferenceTarget? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
+        ReferenceTarget? oldTarget) : base(reference, destinationParent)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
     }
+
+    [Obsolete]
+    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, ReferenceTarget? newTarget,
+        ReferenceTarget? oldTarget, INotificationId? notificationId = null) : this(reference, destinationParent, newTarget, oldTarget)
+    {}
 
     /// <inheritdoc />
     public override void CollectOldData() { }

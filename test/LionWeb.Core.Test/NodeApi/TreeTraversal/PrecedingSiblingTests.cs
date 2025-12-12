@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.NodeApi.TreeTraversal;
 
-using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M3;
@@ -28,22 +27,22 @@ public class PrecedingSiblingTests
     [TestMethod]
     public void PrecedingSibling()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var circleC = new Circle("c");
-        var circleD = new Circle("d");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var circleC = new LinkTestConcept("c");
+        var circleD = new LinkTestConcept("d");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB, circleC, circleD] };
         CollectionAssert.AreEqual(new List<INode> { circleA, circleB }, circleC.PrecedingSiblings().ToList());
     }
 
     [TestMethod]
     public void Self()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var circleC = new Circle("c");
-        var circleD = new Circle("d");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var circleC = new LinkTestConcept("c");
+        var circleD = new LinkTestConcept("d");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB, circleC, circleD] };
         CollectionAssert.AreEqual(new List<INode> { circleA, circleB, circleC },
             circleC.PrecedingSiblings(true).ToList());
     }
@@ -51,33 +50,33 @@ public class PrecedingSiblingTests
     [TestMethod]
     public void NoParent()
     {
-        var circleA = new Circle("a");
+        var circleA = new LinkTestConcept("a");
         Assert.ThrowsExactly<TreeShapeException>(() => circleA.PrecedingSiblings());
     }
 
     [TestMethod]
     public void SingleContainment()
     {
-        var coord = new Coord("a");
-        var circle = new Circle("b") { Center = coord };
+        var coord = new LinkTestConcept("a");
+        var circle = new LinkTestConcept("b") { Containment_0_1 = coord };
         Assert.ThrowsExactly<TreeShapeException>(() => coord.PrecedingSiblings());
     }
 
     [TestMethod]
     public void NoPrecedingSibling()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB] };
         CollectionAssert.AreEqual(new List<INode> { }, circleA.PrecedingSiblings().ToList());
     }
 
     [TestMethod]
     public void NoPrecedingSibling_Self()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB] };
         CollectionAssert.AreEqual(new List<INode> { circleA }, circleA.PrecedingSiblings(true).ToList());
     }
 }

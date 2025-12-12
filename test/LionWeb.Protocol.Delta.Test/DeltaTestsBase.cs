@@ -121,12 +121,12 @@ public abstract class DeltaTestsBase: NotificationTestsBase
     /// 
     /// Different from <see cref="CreateDeltaReplicator"/> this replicator serialize and deserialize delta commands.
     /// </summary>
-    protected Geometry CreateDeltaReplicatorWithJson(Geometry node)
+    protected T CreateDeltaReplicatorWithJson<T>(T node) where T : INode
     {
         var clone = ClonePartition(node);
 
         var lionWebVersion = LionWebVersions.v2024_1;
-        List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
+        List<Language> languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
@@ -138,7 +138,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
                 .WithHandler(new DeltaDeserializerHandler());
 
         var cloneForest = new Forest();
-        cloneForest.AddPartitions([clone]);
+        cloneForest.AddPartitions([(IPartitionInstance)clone]);
         
         var replicator = ForestReplicator.Create(cloneForest, sharedNodeMap, "cloneReplicator");
 
@@ -154,7 +154,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
         var notificationToDeltaCommandMapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
         
-        node.GetNotificationSender()?.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
+        node.GetPartition()!.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
             var command = notificationToDeltaCommandMapper.Map(partitionNotification);
             var json = deltaSerializer.Serialize(command);

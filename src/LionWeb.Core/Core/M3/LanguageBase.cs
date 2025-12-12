@@ -22,6 +22,7 @@ namespace LionWeb.Core.M3;
 using M2;
 using Notification.Partition;
 using Notification.Pipe;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -109,6 +110,64 @@ public abstract class LanguageBase<TNodeFactory>(NodeId id, LionWebVersions lion
         }
 
         value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_builtIns.INamed_name.EqualsIdentity(property) && ((Language)this).TryGetName(out var name))
+        {
+            value = name;
+            return true;
+        }
+
+        if (_m3.IKeyed_key.EqualsIdentity(property) && ((Language)this).TryGetKey(out var key))
+        {
+            value = key;
+            return true;
+        }
+
+        if (_m3.Language_version.EqualsIdentity(property) && ((Language)this).TryGetVersion(out var version))
+        {
+            value = version;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {  
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+
+        if (_m3.Language_entities.EqualsIdentity(containment) && ((Language)this).TryGetEntities(out var entities))
+        {
+            nodes = entities;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+
+        if (_m3.Language_dependsOn.EqualsIdentity(reference) && ((Language)this).TryGetDependsOn(out var dependsOn))
+        {
+            targets = dependsOn.Select(ReferenceTarget.FromNode).ToImmutableList();
+            return true;
+        }
+
         return false;
     }
 
