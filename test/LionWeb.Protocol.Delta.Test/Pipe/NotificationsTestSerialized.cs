@@ -96,6 +96,42 @@ public class NotificationsTestSerialized : DeltaTestsBase
     }
     
     [TestMethod]
+    public void ChildAdded_DeepForwardReference()
+    {
+        var originalParent = new LinkTestConcept("parent");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        var referencedChild = new LinkTestConcept("referencedChild");
+        var addedChild = new LinkTestConcept("addedChild")
+        {
+            Containment_1 = new LinkTestConcept("intermediate")
+            {
+                Containment_0_n = [referencedChild]
+            }
+        };
+        var childWithForwardReference = new LinkTestConcept("childWithForwardReference")
+        {
+            Reference_0_1 = referencedChild
+        };
+
+        originalParent.Containment_0_1 = childWithForwardReference;
+        originalParent.AddContainment_0_n([addedChild]);
+
+        Assert.AreEqual(2, notificationObserver.Count);
+        foreach (var notification in notificationObserver.Notifications)
+        {
+            Assert.IsInstanceOfType<ChildAddedNotification>(notification);
+        }
+
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
     public void ChildReplaced_ForwardReference()
     {
         var originalParent = new LinkTestConcept("parent")
