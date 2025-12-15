@@ -27,7 +27,7 @@ using System.Collections.Concurrent;
 
 public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
-    private readonly string _name;
+    protected readonly string _name;
     protected readonly IForest _forest;
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly List<Language> _languages;

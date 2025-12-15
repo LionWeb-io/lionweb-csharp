@@ -53,19 +53,21 @@ public abstract class RepositoryTestsBase
 
         _repositoryForest = new Forest();
         _deltaRepositoryConnector = new(_lionWebVersion);
-        _repository = new LionWebTestRepository(_lionWebVersion, _languages, "repository", _repositoryForest,
-            _deltaRepositoryConnector);
 
-        _aClient = CreateClient("A", out _aForest, out _aConnector);
-        _bClient = CreateClient("B", out _bForest, out _bConnector);
+        _repository = new LionWebTestRepository(_lionWebVersion, _languages, "repository", _repositoryForest,
+            _deltaRepositoryConnector, Log);
+
+        _aClient = CreateClient("A", out _aForest, out _aConnector, Log);
+        _bClient = CreateClient("B", out _bForest, out _bConnector, Log);
     }
 
-    private LionWebTestClient CreateClient(string name, out IForest forest, out TestDeltaClientConnector connector)
+    private LionWebTestClient CreateClient(string name, out IForest forest, out TestDeltaClientConnector connector,
+        Action<string> logger)
     {
         var clientId = $"{name}ClientId";
         forest = new Forest();
         connector = new TestDeltaClientConnector(_lionWebVersion);
-        var client = new LionWebTestClient(_lionWebVersion, _languages, name, forest, connector)
+        var client = new LionWebTestClient(_lionWebVersion, _languages, name, forest, connector, logger)
         {
             ClientId = clientId
         };
@@ -92,6 +94,9 @@ public abstract class RepositoryTestsBase
         _aClient.WaitForReceived(numberOfMessages);
         _bClient.WaitForReceived(numberOfMessages);
     }
+
+    private static void Log(string message) =>
+        Console.WriteLine(message);
 }
 
 public abstract class RepositoryTestNoExceptionsBase : RepositoryTestsBase

@@ -25,15 +25,18 @@ using Message;
 public class LionWebTestRepository : LionWebRepository
 {
     public const int _sleepInterval = 100;
+    private readonly Action<string> _logger;
 
     public LionWebTestRepository(
         LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
         IForest forest,
-        IRepositoryConnector<IDeltaContent> connector
+        IRepositoryConnector<IDeltaContent> connector,
+        Action<string> logger
     ) : base(lionWebVersion, languages, name, forest, connector)
     {
+        _logger = logger;
         CommunicationError += (_, exception) => Exceptions.Add(exception);
     }
 
@@ -106,4 +109,13 @@ public class LionWebTestRepository : LionWebRepository
     }
 
     #endregion
+
+    /// <inheritdoc />
+    protected override void Log(string message, bool header = false)
+    {
+        var prependedMessage = $"{_name}: {message}";
+        _logger(header
+            ? $"{ILionWebRepository.HeaderColor_Start}{prependedMessage}{ILionWebRepository.HeaderColor_End}"
+            : prependedMessage);
+    }
 }
