@@ -59,11 +59,11 @@ public class ClientTests
 
         _repositoryForest = new Forest();
         _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
-            _repositoryConnector);
+            _repositoryConnector, Log);
 
         _clientForest = new Forest();
         _clientPartition = new TestPartition("partition");
-        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
+        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector, Log);
         _client.SignOn(_repositoryId);
         _client.ParticipationId = _clientInfo.ParticipationId;
 
@@ -156,4 +156,7 @@ public class ClientTests
         Assert.IsTrue(differences.Count == 0,
             differences.DescribeAll(new() { LeftDescription = "a", RightDescription = "b" }));
     }
+
+    private static void Log(string message) =>
+        Console.WriteLine(message);
 }

@@ -87,7 +87,7 @@ public class WebSocketClient
         await _clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text,
             true, CancellationToken.None);
 
-    private static void Log(string message, bool header = false) =>
+    protected virtual void Log(string message, bool header = false) =>
         Console.WriteLine(header
             ? $"{ILionWebClient.HeaderColor_Start}{message}{ILionWebClient.HeaderColor_End}"
             : message);

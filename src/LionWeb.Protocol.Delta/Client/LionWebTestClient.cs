@@ -25,6 +25,7 @@ using Message;
 public class LionWebTestClient : LionWebClient
 {
     public const int _sleepInterval = 100;
+    private readonly Action<string> _logger;
 
     private long _messageCount;
     private bool? _signedIn = null;
@@ -34,9 +35,11 @@ public class LionWebTestClient : LionWebClient
         List<Language> languages,
         string name,
         IForest forest,
-        IDeltaClientConnector connector
+        IDeltaClientConnector connector,
+        Action<string> logger
     ) : base(lionWebVersion, languages, name, forest, connector)
     {
+        _logger = logger;
         CommunicationError += (_, exception) => Exceptions.Add(exception);
     }
 
@@ -77,5 +80,14 @@ public class LionWebTestClient : LionWebClient
     {
         IncrementMessageCount();
         base.Receive(content);
+    }
+
+    /// <inheritdoc />
+    protected override void Log(string message, bool header = false)
+    {
+        var prependedMessage = $"{_name}: {message}";
+        _logger(header
+            ? $"{ILionWebClient.HeaderColor_Start}{prependedMessage}{ILionWebClient.HeaderColor_End}"
+            : prependedMessage);
     }
 }
