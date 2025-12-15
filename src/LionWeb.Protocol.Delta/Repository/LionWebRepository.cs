@@ -40,11 +40,15 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         IRepositoryConnector<IDeltaContent> connector
     ) : base(lionWebVersion, languages, name, forest, connector)
     {
+        var unresolvedReferencesManager = new LoggingUnresolvedReferencesManager(s => Log(s));
+
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
                 .WithLanguages(languages)
-                .WithHandler(new DeltaDeserializerHandler())
+                .WithHandler(new DeltaDeserializerHandler(unresolvedReferencesManager))
             ;
+
+        forest.GetNotificationSender()?.ConnectTo(unresolvedReferencesManager);
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 

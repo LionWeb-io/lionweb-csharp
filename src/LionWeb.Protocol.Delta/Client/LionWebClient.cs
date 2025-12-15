@@ -54,11 +54,15 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         IClientConnector<IDeltaContent> connector
     ) : base(lionWebVersion, languages, name, forest, connector)
     {
+        var unresolvedReferencesManager = new UnresolvedReferencesManager();
+
         _deserializerBuilder = new DeserializerBuilder()
             .WithLionWebVersion(lionWebVersion)
             .WithLanguages(languages)
-            .WithHandler(new DeltaDeserializerHandler());
+            .WithHandler(new DeltaDeserializerHandler(unresolvedReferencesManager));
 
+        forest.GetNotificationSender()?.ConnectTo(unresolvedReferencesManager);
+        
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         _eventReceiver = new DeltaProtocolEventReceiver(
