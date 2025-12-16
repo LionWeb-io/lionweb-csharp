@@ -21,6 +21,8 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using GeneratorExtensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -173,6 +175,9 @@ internal abstract class GeneratorBase
             )));
     }
 
+    protected T Correlate<T>(IKeyedToAstCorrelation<T> correlation, T syntaxNode) where T : SyntaxNode =>
+        _generatorInputParameters.CorrelationManager.Record(correlation, syntaxNode);
+    
     /// <returns><c>TryGetMyFeature</c></returns>
     protected string FeatureTryGet(Feature feature) =>
         $"TryGet{feature.Name.ToFirstUpper()}";

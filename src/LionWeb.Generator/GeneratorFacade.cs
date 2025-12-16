@@ -44,7 +44,7 @@ public class GeneratorFacade
 {
     private CompilationUnitSyntax? _compilationUnit = null;
 
-    private readonly ClassifierToSyntaxCorrelationContainer _classifierToSyntaxCorrelationContainer = new();
+    private readonly CorrelationManager _correlationManager = new();
     
     /// Generates the compilation unit for the input language.
     public CompilationUnitSyntax Generate()
@@ -56,7 +56,7 @@ public class GeneratorFacade
                 Names = Names,
                 LionWebVersion = LionWebVersion,
                 Config = Config,
-                ClassifierToSyntaxCorrelationContainer = _classifierToSyntaxCorrelationContainer
+                CorrelationManager = _correlationManager
             };
 
             var generator = new DefinitionGenerator(generatorInputParameters);
@@ -69,7 +69,7 @@ public class GeneratorFacade
     /// <summary>
     /// Returns a list of generated C# syntax nodes with their corresponding <see cref="Classifier"/>.
     /// </summary>
-    public List<IClassifierToSyntaxCorrelator> ClassifierToSyntaxCorrelationData => _classifierToSyntaxCorrelationContainer.CorrelationData;
+    public CorrelationManager Correlations => _correlationManager;
 
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }
@@ -81,7 +81,11 @@ public class GeneratorFacade
     public GeneratorConfig Config { get; init; } = new();
 
     /// Stores the output of <see cref="Generate"/> to the file at <paramref name="path"/>.
-    public void Persist(string path)
+    public void Persist(string path) =>
+        Persist(path, Generate());
+
+    /// Stores the output of <paramref name="compilationUnit"/> to the file at <paramref name="path"/>.
+    public void Persist(string path, CompilationUnitSyntax compilationUnit)
     {
         var workspace = new AdhocWorkspace();
         var options = workspace.Options
@@ -91,10 +95,10 @@ public class GeneratorFacade
             .WithChangedOption(CSharpFormattingOptions.WrappingKeepStatementsOnSingleLine, value: false)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInAnonymousTypes, value: true)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInObjectInit, value: true);
-        var compilationUnit = (CompilationUnitSyntax)Formatter.Format(Generate(), workspace, options);
+        var formattedCompilationUnit = (CompilationUnitSyntax)Formatter.Format(compilationUnit, workspace, options);
 
         using var streamWriter = new StreamWriter(path, false);
-        streamWriter.Write(compilationUnit.GetText().ToString().ReplaceLineEndings());
+        streamWriter.Write(formattedCompilationUnit.GetText().ToString().ReplaceLineEndings());
         /*
          * Note: .GetText().ToString() probably nullifies any optimization gains through streaming,
          * but it's the only way (that I found) to actually replace line endings.

@@ -26,5 +26,5 @@ internal record GeneratorInputParameters
     internal required INames Names { get; init; }
     internal LionWebVersions LionWebVersion { get; init; }
     internal GeneratorConfig Config { get; init; }
-    internal ClassifierToSyntaxCorrelationContainer ClassifierToSyntaxCorrelationContainer { get; init; } 
+    internal CorrelationManager CorrelationManager { get; init; } 
 }

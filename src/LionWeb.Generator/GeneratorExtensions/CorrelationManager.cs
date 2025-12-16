@@ -17,21 +17,25 @@
 
 namespace LionWeb.Generator.GeneratorExtensions;
 
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Core.M3;
+using Microsoft.CodeAnalysis;
 
-internal class ClassifierToSyntaxCorrelationContainer
+public class CorrelationManager
 {
-    internal List<IClassifierToSyntaxCorrelator> CorrelationData { get; } = [];
+    private readonly List<IKeyedToAstCorrelation> _correlations = [];
 
-    internal TypeDeclarationSyntax Record(ClassSyntax correlationData)
+    public IReadOnlyList<IKeyedToAstCorrelation> Correlations => _correlations.AsReadOnly();
+
+    public IEnumerable<IKeyedToAstCorrelation> FindAll(IKeyed keyed) =>
+        _correlations.Where(c => c.Keyed == keyed);
+
+    /// <inheritdoc cref="FindAll"/>
+    public IEnumerable<T> FindAll<T>(IKeyed keyed) where T : IKeyedToAstCorrelation =>
+        _correlations.OfType<T>().Where(c => c.Keyed == keyed);
+
+    protected internal T Record<T>(IKeyedToAstCorrelation<T> correlation, T syntaxNode) where T : SyntaxNode
     {
-        CorrelationData.Add(correlationData);
-        return correlationData.ClassDeclarationSyntax;
-    }
-    
-    internal TypeDeclarationSyntax Record(InterfaceSyntax correlationData)
-    {
-        CorrelationData.Add(correlationData);
-        return correlationData.InterfaceDeclarationSyntax;
+        _correlations.Add(correlation);
+        return correlation.Init(syntaxNode);
     }
 }

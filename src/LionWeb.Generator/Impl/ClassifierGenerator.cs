@@ -46,12 +46,9 @@ internal class ClassifierGenerator(Classifier classifier, GeneratorInputParamete
     public TypeDeclarationSyntax ClassifierType() =>
         classifier switch
         {
-            Annotation a => _generatorInputParameters.ClassifierToSyntaxCorrelationContainer.Record(
-                correlationData: new ClassSyntax(a, ClassifierAnnotation(a))),
-            Concept c => _generatorInputParameters.ClassifierToSyntaxCorrelationContainer.Record(
-                correlationData: new ClassSyntax(c, ClassifierConcept(c))),
-            Interface i => _generatorInputParameters.ClassifierToSyntaxCorrelationContainer.Record(
-                correlationData: new InterfaceSyntax(i, ClassifierInterface(i))),
+            Annotation a => Correlate(new ClassifierToMainCorrelation(a), ClassifierAnnotation(a)),
+            Concept c => Correlate(new ClassifierToMainCorrelation(c), ClassifierConcept(c)),
+            Interface i => Correlate(new InterfaceToMainCorrelation(i), ClassifierInterface(i)),
             _ => throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier))
         };
 
