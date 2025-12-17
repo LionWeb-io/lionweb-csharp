@@ -26,33 +26,41 @@ public class ClassifierToSyntaxCorrelationTests
 
         Assert.HasCount(4, correlationManager.Correlations.OfType<ClassifierToMainCorrelation>());
 
-        var linkTestCorrelation = correlationManager.FindAll<ClassifierToMainCorrelation>(testLanguage.LinkTestConcept)
+        var linkTestCorrelation = correlationManager
+            .FindAll<ClassifierToMainCorrelation>(testLanguage.LinkTestConcept)
             .Single();
         var currentLinkTest = linkTestCorrelation.ExtractFrom(compilationUnit);
+        Assert.IsInstanceOfType<ClassifierToMainCorrelation>(linkTestCorrelation);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentLinkTest);
         Assert.AreEqual(nameof(testLanguage.LinkTestConcept), currentLinkTest.Identifier.ToString());
         Assert.IsTrue(compilationUnit.Contains(currentLinkTest));
 
         var dataTypeTestCorrelation = correlationManager
-            .FindAll<ClassifierToMainCorrelation>(testLanguage.DataTypeTestConcept).Single();
+            .FindAll<ClassifierToMainCorrelation>(testLanguage.DataTypeTestConcept)
+            .Single();
         var currentDataTypeTest = dataTypeTestCorrelation.ExtractFrom(compilationUnit);
         Assert.IsInstanceOfType<ClassifierToMainCorrelation>(dataTypeTestCorrelation);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentDataTypeTest);
         Assert.AreEqual(nameof(testLanguage.DataTypeTestConcept), currentDataTypeTest.Identifier.ToString());
+        Assert.IsTrue(compilationUnit.Contains(currentDataTypeTest));
 
-        var testAnnotationCorrelation =
-            correlationManager.FindAll<ClassifierToMainCorrelation>(testLanguage.TestAnnotation).Single();
+        var testAnnotationCorrelation = correlationManager
+            .FindAll<ClassifierToMainCorrelation>(testLanguage.TestAnnotation)
+            .Single();
         var currentTestAnnotation = testAnnotationCorrelation.ExtractFrom(compilationUnit);
         Assert.IsInstanceOfType<ClassifierToMainCorrelation>(testAnnotationCorrelation);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentTestAnnotation);
         Assert.AreEqual(nameof(testLanguage.TestAnnotation), currentTestAnnotation.Identifier.ToString());
+        Assert.IsTrue(compilationUnit.Contains(currentTestAnnotation));
         
-        var testPartitionCorrelation =
-            correlationManager.FindAll<ClassifierToMainCorrelation>(testLanguage.TestPartition).Single();
+        var testPartitionCorrelation = correlationManager
+            .FindAll<ClassifierToMainCorrelation>(testLanguage.TestPartition)
+            .Single();
         var currentTestPartition = testPartitionCorrelation.ExtractFrom(compilationUnit);
         Assert.IsInstanceOfType<ClassifierToMainCorrelation>(testPartitionCorrelation);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentTestPartition);
         Assert.AreEqual(nameof(testLanguage.TestPartition), currentTestPartition.Identifier.ToString());
+        Assert.IsTrue(compilationUnit.Contains(currentTestPartition));
     }
 
     [TestMethod]
@@ -70,11 +78,13 @@ public class ClassifierToSyntaxCorrelationTests
         var correlationManager = generator.Correlations;
 
         Assert.HasCount(1, correlationManager.Correlations.OfType<InterfaceToMainCorrelation>());
-        var correlation = correlationManager.FindAll<InterfaceToMainCorrelation>(multiInheritLangLanguage.BaseIface)
+        var correlation = correlationManager
+            .FindAll<InterfaceToMainCorrelation>(multiInheritLangLanguage.BaseIface)
             .Single();
         var currentIface = correlation.ExtractFrom(compilationUnit);
         Assert.IsInstanceOfType<InterfaceToMainCorrelation>(correlation);
         Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(currentIface);
         Assert.AreEqual(nameof(multiInheritLangLanguage.BaseIface), currentIface.Identifier.ToString());
+        Assert.IsTrue(compilationUnit.Contains(currentIface));
     }
 }
