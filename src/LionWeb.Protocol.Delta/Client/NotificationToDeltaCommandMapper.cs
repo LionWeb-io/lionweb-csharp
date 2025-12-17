@@ -60,6 +60,7 @@ public class NotificationToDeltaCommandMapper
                 OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
+            AnnotationReplacedNotification a => OnAnnotationReplaced(a),
             AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParentNotification a => OnAnnotationMovedInSameParent(a),
             ReferenceAddedNotification a => OnReferenceAdded(a),
@@ -228,6 +229,16 @@ public class NotificationToDeltaCommandMapper
             annotationDeletedNotification.Index,
             annotationDeletedNotification.DeletedAnnotation.GetId(),
             ToCommandId(annotationDeletedNotification),
+            []
+        );
+
+    private ReplaceAnnotation OnAnnotationReplaced(AnnotationReplacedNotification annotationReplacedNotification) =>
+        new(
+            ToDeltaChunk(annotationReplacedNotification.NewAnnotation),
+            annotationReplacedNotification.Parent.GetId(),
+            annotationReplacedNotification.Index,
+            annotationReplacedNotification.ReplacedAnnotation.GetId(),
+            ToCommandId(annotationReplacedNotification),
             []
         );
 

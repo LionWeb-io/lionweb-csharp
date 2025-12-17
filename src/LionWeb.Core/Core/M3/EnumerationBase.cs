@@ -66,6 +66,21 @@ public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration w
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+        
+        if (_m3.Enumeration_literals.EqualsIdentity(containment) && ((Enumeration)this).TryGetLiterals(out var literals))
+        {
+            nodes = literals;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<EnumerationLiteral> Literals => LiteralsLazy.Value;
 
     /// <inheritdoc cref="Literals"/>

@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
 using Core.M2;
 using Core.M3;
-using Core.Notification;
 using Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -77,13 +77,13 @@ internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feat
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
 
-    public IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
     [
         AbstractSingleRequiredFeatureProperty(writeable: writeable),
         AbstractRequiredFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
-    public IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
     [
         AbstractSingleOptionalFeatureProperty(),
         AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
@@ -146,25 +146,8 @@ internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feat
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
 
-    protected ExpressionStatementSyntax AsureNotNullCall() =>
-        ExpressionStatement(Call("AssureNotNull",
-            IdentifierName("value"),
-            MetaProperty(feature)
-        ));
-
-    protected static LocalDeclarationStatementSyntax SafeNodesVariable(ExpressionSyntax init) =>
-        Variable("safeNodes", Var(), init);
-
-    protected static ConditionalAccessExpressionSyntax OptionalNodesToList() =>
-        ConditionalAccessExpression(IdentifierName("nodes"),
-            InvocationExpression(MemberBindingExpression(IdentifierName("ToList")))
-        );
-
-    protected ExpressionStatementSyntax AttachChildCall() =>
-        ExpressionStatement(Call("AttachChild", IdentifierName("value")));
-
-    protected ExpressionStatementSyntax AssignFeatureField(ExpressionSyntax? value = null) =>
-        Assignment(FeatureField(feature).ToString(), value ?? IdentifierName("value"));
+    protected ExpressionStatementSyntax AssignFeatureField() =>
+        Assignment(FeatureField(feature).ToString(), IdentifierName("value"));
 
     protected FieldDeclarationSyntax SingleFeatureField(bool writable = false) =>
         Field(FeatureField(feature).ToString(), NullableType(AsType(feature.GetFeatureType(), writeable: writable)),
@@ -281,8 +264,7 @@ internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feat
     private MethodDeclarationSyntax AbstractRequiredFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier),
                 [
-                    Param("value", AsType(feature.GetFeatureType(), writeable: writeable)),
-                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                    Param("value", AsType(feature.GetFeatureType(), writeable: writeable))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -306,25 +288,39 @@ internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feat
         return result;
     }
 
+    protected MethodDeclarationSyntax FeatureSetterRaw(TypeSyntax paramType) =>
+        Method(FeatureSetRaw(feature).ToString(), AsType(typeof(bool)), [
+                Param("value", NullableType(paramType))
+            ])
+            .WithBody(AsStatements([
+                IfStatement(
+                    EqualsSign(IdentifierName("value"), FeatureField(feature)),
+                    ReturnStatement(False())
+                ),
+                AssignFeatureField(),
+                ReturnStatement(True())
+            ]))
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
+
     protected IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
         XdocKeyed(ffeature)
             .Concat(XdocRemarks(ffeature));
 
-    private IEnumerable<XmlNodeSyntax> XdocRemarks(Feature feature)
+    private IEnumerable<XmlNodeSyntax> XdocRemarks(Feature ffeature)
     {
         var builder = new StringBuilder();
-        builder.Append(feature.Optional ? "Optional " : "Required ");
-        if (feature is Link l)
+        builder.Append(ffeature.Optional ? "Optional " : "Required ");
+        if (ffeature is Link l)
         {
             builder.Append(l.Multiple ? "Multiple " : "Single ");
         }
 
-        builder.Append(feature switch
+        builder.Append(ffeature switch
         {
             Property => "Property",
             Containment => "Containment",
             Reference => "Reference",
-            _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
+            _ => throw new ArgumentException($"unsupported feature: {ffeature}", nameof(ffeature))
         });
         return XdocLine(builder.ToString(), "remarks");
     }
@@ -358,15 +354,14 @@ internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feat
 
     private MethodDeclarationSyntax AbstractOptionalFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier), [
-                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable))),
-                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(feature));
 
     protected ExpressionSyntax FeatureSet() =>
-        IdentifierName($"Set{feature.Name.ToFirstUpper()}");
+        IdentifierName(FeatureSet(feature));
 
     protected string FeatureTryGetParam() =>
         _names.FeatureParam(feature);

@@ -23,7 +23,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 /// Convenience functions for Roslyn AST
-internal static class AstExtensions
+public static partial class AstExtensions
 {
     /// <paramref name="value"/> as Roslyn literal.
     public static LiteralExpressionSyntax AsLiteral(this string value) =>
@@ -134,12 +134,6 @@ internal static class AstExtensions
     public static ParameterSyntax Param(string name, TypeSyntax type) =>
         Parameter(Identifier(name))
             .WithType(type);
-    
-    /// <returns><c>type name = null</c></returns>
-    public static ParameterSyntax ParamWithDefaultNullValue(string name, TypeSyntax type) =>
-        Parameter(Identifier(name))
-            .WithType(NullableType(type))
-            .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression)));
 
     /// <returns><c> : base(paramNames)</c></returns>
     public static ConstructorInitializerSyntax Initializer(params string[] paramNames) =>
@@ -240,12 +234,13 @@ internal static class AstExtensions
     }
 
     /// <returns><c>name&lt;type&gt;(parameters)</c></returns>
-    public static InvocationExpressionSyntax CallGeneric(string name, TypeSyntax type, params ExpressionSyntax[] arguments)
+    public static InvocationExpressionSyntax CallGeneric(string name, TypeSyntax type,
+        params ExpressionSyntax[] arguments)
     {
         var result = InvocationExpression(
             GenericName(Identifier(name))
-                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(type)))
-            );
+                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(type)))
+        );
 
         if (arguments.Length != 0)
         {
@@ -286,182 +281,29 @@ internal static class AstExtensions
     public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax expression, SimpleNameSyntax name) =>
         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expression, name);
 
-    /// <returns><c>name</c></returns>
-    public static EnumMemberDeclarationSyntax EnumMember(string name) =>
-        EnumMemberDeclaration(Identifier(name.PrefixKeyword()));
-
-    /// Prepends <paramref name="xdocs"/> before <paramref name="member"/>.
-    public static T Xdoc<T>(this T member, IEnumerable<XmlNodeSyntax> xdocs) where T : MemberDeclarationSyntax
-    {
-        if (member.AttributeLists is { Count: > 0 })
-        {
-            return member.AppendXdoc(member.AttributeLists, xdocs);
-        }
-
-        return member.AppendXdoc(member.Modifiers, member.Modifiers.FirstOrDefault(Token(SyntaxKind.None)).Kind(),
-            xdocs);
-    }
-
-    /// Prepends <paramref name="xdocs"/> before <paramref name="member">member's</paramref> attributes.
-    public static T AppendXdoc<T>(this T member, SyntaxList<AttributeListSyntax> attributeLists,
-        IEnumerable<XmlNodeSyntax> xdocs) where T : MemberDeclarationSyntax
-    {
-        var firstAttributeList = attributeLists.First();
-        return (T)member
-            .WithAttributeLists(List(
-                attributeLists.Skip(1)
-                    .Prepend(
-                        firstAttributeList
-                            .WithOpenBracketToken(Token(
-                                TriviaList(Trivia(
-                                    DocumentationCommentTrivia(
-                                        SyntaxKind.SingleLineDocumentationCommentTrivia,
-                                        List(
-                                            (
-                                                firstAttributeList.HasLeadingTrivia
-                                                    ? firstAttributeList.GetLeadingTrivia()
-                                                        .Select(tr => tr.GetStructure())
-                                                        .OfType<DocumentationCommentTriviaSyntax>()
-                                                        .SelectMany(t => t.Content)
-                                                    : []
-                                            ).Concat(xdocs)
-                                        )
-                                    )
-                                )),
-                                SyntaxKind.OpenBracketToken,
-                                TriviaList()
-                            ))
-                    )
-            ));
-    }
-
-    /// Prepends <paramref name="xdocs"/> before <paramref name="member">member's</paramref> modifiers.
-    public static T AppendXdoc<T>(this T member, SyntaxTokenList modifiers, SyntaxKind syntaxKind,
-        IEnumerable<XmlNodeSyntax> xdocs) where T : MemberDeclarationSyntax
-    {
-        SyntaxToken firstModifier = modifiers.FirstOrDefault(Token(SyntaxKind.None));
-        return (T)member.WithModifiers(TokenList(Token(
-                    TriviaList(
-                        Trivia(
-                            DocumentationCommentTrivia(
-                                SyntaxKind.SingleLineDocumentationCommentTrivia,
-                                List((firstModifier.HasLeadingTrivia
-                                    ? firstModifier.LeadingTrivia
-                                        .Select(tr => tr.GetStructure())
-                                        .OfType<DocumentationCommentTriviaSyntax>()
-                                        .SelectMany(t => t.Content)
-                                    : []).Concat(xdocs))
-                            )
-                        )
-                    ),
-                    syntaxKind,
-                    TriviaList()
-                )
-            ).AddRange(modifiers.Skip(1))
-        );
-    }
-
-
-    /// <returns><c>///&lt;tag&gt;text&lt;/tag&gt;</c></returns>
-    public static IEnumerable<XmlNodeSyntax> XdocLine(string text, string? tag = null)
-    {
-        XmlNodeSyntax body = XdocText(text);
-        if (tag != null)
-        {
-            body = XmlElement(tag, SingletonList(body));
-        }
-
-        return
-        [
-            XdocSlashes(),
-            body,
-            XdocNewline()
-        ];
-    }
-
-    /// <returns><c>///&lt;seealso cref="target"/&gt;</c></returns>
-    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(TypeSyntax target) =>
-    [
-        XdocSlashes(),
-        XmlSeeAlsoElement(NameMemberCref(target)),
-        XdocNewline()
-    ];
-
-    /// <returns><c>///&lt;seealso href="uri"/&gt;</c></returns>
-    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(string uri) =>
-    [
-        XdocSlashes(),
-        XmlEmptyElement("seealso")
-            .AddAttributes(XmlTextAttribute("href", XmlTextLiteral(TriviaList(), uri, uri, TriviaList()))),
-        XdocNewline()
-    ];
-
-    /// <returns><c>&lt;inheritdoc/&gt;</c></returns>
-    public static IEnumerable<XmlNodeSyntax> XdocInheritDoc() =>
-    [
-        XdocSlashes(),
-        XmlEmptyElement("inheritdoc"),
-        XdocNewline()
-    ];
-
-    /// <summary>Takes care of properly wrapping multi-line text with `///` prefix</summary>
-    /// <returns><c>text</c></returns>
-    public static XmlTextSyntax XdocText(string text)
-    {
-        using var reader = new StringReader(text);
-        bool first = true;
-        List<SyntaxToken> texts = new();
-        while (reader.ReadLine() is { } line)
-        {
-            if (first)
-            {
-                texts.Add(XmlTextLiteral(TriviaList(), line, line, TriviaList()));
-                first = false;
-            } else
-            {
-                texts.Add(XdocNewlineToken());
-                var prefixedLine = $" {line}";
-                texts.Add(XmlTextLiteral(TriviaList(XdocSlashesToken()), prefixedLine, prefixedLine, TriviaList()));
-            }
-        }
-
-        return XmlText()
-            .WithTextTokens(
-                TokenList(texts)
-            );
-    }
-
-    /// <returns><c>/// </c></returns>
-    public static XmlTextSyntax XdocSlashes() =>
-        XmlText()
-            .WithTextTokens(
-                TokenList(
-                    XmlTextLiteral(
-                        TriviaList(XdocSlashesToken()), " ", " ", TriviaList()
-                    )
-                )
-            );
-
-    /// <returns><c>///</c></returns>
-    private static SyntaxTrivia XdocSlashesToken() =>
-        DocumentationCommentExterior("///");
-
-    /// <returns>newline inside Xdoc</returns>
-    public static XmlTextSyntax XdocNewline() =>
-        XmlText()
-            .WithTextTokens(TokenList(XdocNewlineToken()));
-
-    /// <returns>newline Xdoc token</returns>
-    private static SyntaxToken XdocNewlineToken() =>
-        XmlTextNewLine(TriviaList(), Environment.NewLine, Environment.NewLine, TriviaList());
 
     /// <returns><c>!=</c></returns>
     public static BinaryExpressionSyntax NotEquals(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.NotEqualsExpression, left, right);
 
+    /// <returns><c>==</c></returns>
+    public static BinaryExpressionSyntax EqualsSign(ExpressionSyntax left, ExpressionSyntax right) =>
+        BinaryExpression(SyntaxKind.EqualsExpression, left, right);
+
     /// <returns><c>||</c></returns>
     public static BinaryExpressionSyntax Or(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.LogicalOrExpression, left, right);
+
+    /// <returns><c>&amp;&amp;</c></returns>
+    public static BinaryExpressionSyntax And(ExpressionSyntax left, ExpressionSyntax right) =>
+        BinaryExpression(SyntaxKind.LogicalAndExpression, left, right);
+
+    /// <returns><c>!</c></returns>
+    public static PrefixUnaryExpressionSyntax Not(ExpressionSyntax inner) =>
+        PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, inner);
+
+    public static IsPatternExpressionSyntax IsNull(string name) =>
+        IsPatternExpression(IdentifierName(name), ConstantPattern(Null()));
 
     /// <returns><paramref name="value"/> <c>?? throw</c> <paramref name="exception"/></returns>
     public static ExpressionSyntax NotNullOrThrow(ExpressionSyntax value, ExpressionSyntax exception) =>
@@ -470,7 +312,7 @@ internal static class AstExtensions
             value,
             ThrowExpression(exception)
         );
-    
+
     /// <returns><c>void</c></returns>
     public static PredefinedTypeSyntax Void() =>
         PredefinedType(Token(SyntaxKind.VoidKeyword));

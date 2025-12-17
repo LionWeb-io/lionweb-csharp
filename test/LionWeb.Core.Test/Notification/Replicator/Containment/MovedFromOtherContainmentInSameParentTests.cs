@@ -17,8 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
-using Languages.Generated.V2025_1.Shapes.M2;
-using Languages.Generated.V2025_1.TestLanguage;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
@@ -26,14 +25,14 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
+        var originalPartition = new TestPartition("a") { Links =  [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        origin.AddDisabledParts([moved]);
+        origin.AddContainment_0_n([moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -41,14 +40,14 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n =  [moved] };
+        var originalPartition = new TestPartition("a") { Links =  [origin] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        origin.EvilPart = moved;
+        origin.Containment_0_1 = moved;
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -59,18 +58,19 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
     {
         var moved1 = new LinkTestConcept("moved1");
         var moved2 = new LinkTestConcept("moved2");
-        var originalPartition = new LinkTestConcept("a")
+        var originalParent = new LinkTestConcept("a")
         {
             Containment_0_1 = moved1,
             Containment_1 = moved2,
         };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.Containment_0_1 = moved2; // emits ChildMovedAndReplacedFromOtherContainmentInSameParentNotification
-        originalPartition.Containment_1 = moved1; // emits ChildAddedNotification
+        originalParent.Containment_0_1 = moved2; // emits ChildMovedAndReplacedFromOtherContainmentInSameParentNotification
+        originalParent.Containment_1 = moved1; // emits ChildAddedNotification
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -81,18 +81,19 @@ public class MovedFromOtherContainmentInSameParentTests : ReplicatorTestsBase
     {
         var moved1 = new LinkTestConcept("moved1");
         var moved2 = new LinkTestConcept("moved2");
-        var originalPartition = new LinkTestConcept("a")
+        var originalParent = new LinkTestConcept("a")
         {
             Containment_0_1 = moved1,
             Containment_1 = moved2,
         };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
         
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.Containment_1 = moved1; // emits ChildMovedAndReplacedFromOtherContainmentInSameParentNotification
-        originalPartition.Containment_0_1 = moved2; // emits ChildAddedNotification
+        originalParent.Containment_1 = moved1; // emits ChildMovedAndReplacedFromOtherContainmentInSameParentNotification
+        originalParent.Containment_0_1 = moved2; // emits ChildAddedNotification
 
         AssertEquals([originalPartition], [clonedPartition]);
     }

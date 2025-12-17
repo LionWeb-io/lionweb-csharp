@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core;
 
-using M2;
 using M3;
 using Notification;
 
@@ -27,29 +26,29 @@ using Notification;
 /// <seealso cref="INotification"/>
 public interface INotifiableNode : IWritableNode
 {
-    void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => AddAnnotations(annotations, null);
-
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    public void AddAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId = null);
-
-    void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) => InsertAnnotations(index, annotations, null);
+    [Obsolete("Use AddAnnotations(IEnumerable<IWritableNode>) instead")]
+    void AddAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) =>
+        AddAnnotations(annotations);
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, INotificationId? notificationId = null);
-
-    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => RemoveAnnotations(annotations, null);
+    [Obsolete("Use InsertAnnotations(Index, IEnumerable<IWritableNode>) instead")]
+    void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, INotificationId? notificationId) =>
+        InsertAnnotations(index, annotations);
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId = null);
-
-    void IWritableNode.Set(Feature feature, object? value) => Set(feature, value, null);
+    [Obsolete("Use RemoveAnnotations(IEnumerable<IWritableNode>) instead")]
+    bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) =>
+        RemoveAnnotations(annotations); 
 
     /// <inheritdoc cref="IWritableNode.Set"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    public void Set(Feature feature, object? value, INotificationId? notificationId = null);
+    [Obsolete("Use Set(Feature, object?) instead")]
+    void Set(Feature feature, object? value, INotificationId? notificationId)
+        => Set(feature, value);
 }
 
 /// The type-parametrized twin of the non-generic <see cref="INotifiableNode"/> interface.
@@ -57,52 +56,32 @@ public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T 
 {
     #region AddAnnotations
 
-    void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => 
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null), null);
-    
-    void INotifiableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) => 
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null), notificationId);
-    
-    void IWritableNode<T>.AddAnnotations(IEnumerable<T> annotations) => 
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null));
-
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    public void AddAnnotations(IEnumerable<T> annotations, INotificationId? notificationId = null);
+    [Obsolete("Use AddAnnotations(IEnumerable<T>) instead")]
+    public void AddAnnotations(IEnumerable<T> annotations, INotificationId? notificationId) =>
+        AddAnnotations(annotations);
 
     #endregion
 
     #region InsertAnnotations
 
-    void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null), null);
-    
-    void INotifiableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, INotificationId? notificationId) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null), notificationId);
-    
-    void IWritableNode<T>.InsertAnnotations(Index index, IEnumerable<T> annotations) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null));
-
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param> 
-    public void InsertAnnotations(Index index, IEnumerable<T> annotations, INotificationId? notificationId = null);
+    [Obsolete("Use InsertAnnotations(Index, IEnumerable<IWritableNode>) instead")]
+    public void InsertAnnotations(Index index, IEnumerable<T> annotations, INotificationId? notificationId) =>
+        InsertAnnotations(index, annotations);
+
 
     #endregion
 
     #region RemoveAnnotations
 
-    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => 
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null), null);
-
-    bool INotifiableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) => 
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null), notificationId);
-
-    bool IWritableNode<T>.RemoveAnnotations(IEnumerable<T> annotations) => 
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null));
-
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
-    public bool RemoveAnnotations(IEnumerable<T> annotations, INotificationId? notificationId = null);
+    [Obsolete("Use RemoveAnnotations(IEnumerable<T>) instead")]
+    public bool RemoveAnnotations(IEnumerable<T> annotations, INotificationId? notificationId) =>
+        RemoveAnnotations(annotations);
 
     #endregion
 }

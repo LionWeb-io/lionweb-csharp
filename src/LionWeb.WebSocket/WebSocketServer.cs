@@ -119,7 +119,7 @@ public class WebSocketServer
         }
     }
 
-    private static void Log(string message, bool header = false) =>
+    protected virtual void Log(string message, bool header = false) =>
         Console.WriteLine(header
             ? $"{ILionWebRepository.HeaderColor_Start}{message}{ILionWebRepository.HeaderColor_End}"
             : message);

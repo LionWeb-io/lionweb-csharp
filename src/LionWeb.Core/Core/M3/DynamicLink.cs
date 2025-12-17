@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
+using Utilities;
 
 /// <inheritdoc cref="Link"/>
 public abstract class DynamicLink(NodeId id, DynamicClassifier? classifier, LionWebVersions lionWebVersion)
@@ -71,7 +71,67 @@ public abstract class DynamicLink(NodeId id, DynamicClassifier? classifier, Lion
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_m3.Link_multiple.EqualsIdentity(property))
+        {
+            value = Multiple;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+        
+        if (_m3.Link_type.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(_type);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetPropertyRaw(Property property, object? value)
+    {
+        if (base.SetPropertyRaw(property, value))
+            return true;
+        
+        if (_m3.Link_multiple.EqualsIdentity(property) && value is bool multiple)
+        {
+            Multiple = multiple;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetReferenceRaw(Reference reference, ReferenceTarget? target)
+    {
+        if (base.SetReferenceRaw(reference, target))
+            return true;
+        
+        if (_m3.Link_type.EqualsIdentity(reference) && target?.Target is Classifier type)
+        {
+            _type = type;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)

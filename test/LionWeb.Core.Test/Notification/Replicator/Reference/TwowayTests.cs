@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Reference;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class TwowayTests : TwowayReplicatorTestsBase
@@ -27,18 +27,18 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceAdded_Multiple_Only()
     {
-        var bof = new BillOfMaterials("bof");
-        var line = new Line("line");
-        var node = new Geometry("a") { Shapes = [line] };
-        node.AddAnnotations([bof]);
+        var bof = new LinkTestConcept("bof");
+        var line = new LinkTestConcept("line");
+        var node = new TestPartition("a") { Links =  [line] };
+        node.AddLinks([bof]);
 
-        var clone = new Geometry("a") { Shapes = [new Line("line")] };
-        clone.AddAnnotations([new BillOfMaterials("bof")]);
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("line")] };
+        clone.AddLinks([new LinkTestConcept("bof")]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        bof.AddMaterials([line]);
+        bof.AddReference_0_n([line]);
 
         AssertEquals([node], [clone]);
     }
@@ -46,20 +46,20 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceAdded_Multiple_First()
     {
-        var circle = new Circle("circle");
-        var bof = new BillOfMaterials("bof") { Materials = [circle] };
-        var line = new Line("line");
-        var node = new Geometry("a") { Shapes = [line, circle] };
-        node.AddAnnotations([bof]);
+        var circle = new LinkTestConcept("circle");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle] };
+        var line = new LinkTestConcept("line");
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
+        var cloneCircle = new LinkTestConcept("circle");
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("line"), cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        bof.InsertMaterials(0, [line]);
+        bof.InsertReference_0_n(0, [line]);
 
         AssertEquals([node], [clone]);
     }
@@ -67,20 +67,20 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceAdded_Multiple_Last()
     {
-        var circle = new Circle("circle");
-        var bof = new BillOfMaterials("bof") { Materials = [circle] };
-        var line = new Line("line");
-        var node = new Geometry("a") { Shapes = [line, circle] };
-        node.AddAnnotations([bof]);
+        var circle = new LinkTestConcept("circle");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle] };
+        var line = new LinkTestConcept("line");
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
+        var cloneCircle = new LinkTestConcept("circle");
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("line"), cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        bof.InsertMaterials(1, [line]);
+        bof.InsertReference_0_n(1, [line]);
 
         AssertEquals([node], [clone]);
     }
@@ -88,16 +88,16 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceAdded_Single()
     {
-        var circle = new Circle("circle");
-        var od = new OffsetDuplicate("od");
-        var node = new Geometry("a") { Shapes = [od, circle] };
+        var circle = new LinkTestConcept("circle");
+        var od = new LinkTestConcept("od");
+        var node = new TestPartition("a") { Links =  [od, circle] };
 
-        var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od"), new Circle("circle")] };
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("od"), new LinkTestConcept("circle")] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        od.Source = circle;
+        od.Reference_0_1 = circle;
 
         AssertEquals([node], [clone]);
     }
@@ -109,19 +109,19 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceDeleted_Multiple_Only()
     {
-        var line = new Line("line");
-        var bof = new BillOfMaterials("bof") { Materials = [line] };
-        var node = new Geometry("a") { Shapes = [line] };
-        node.AddAnnotations([bof]);
+        var line = new LinkTestConcept("line");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [line] };
+        var node = new TestPartition("a") { Links =  [line] };
+        node.AddLinks([bof]);
 
-        var cloneLine = new Line("line");
-        var clone = new Geometry("a") { Shapes = [cloneLine] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine] }]);
+        var cloneLine = new LinkTestConcept("line");
+        var clone = new TestPartition("a") { Links =  [cloneLine] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneLine] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        bof.RemoveMaterials([line]);
+        bof.RemoveReference_0_n([line]);
 
         AssertEquals([node], [clone]);
     }
@@ -129,21 +129,21 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceDeleted_Multiple_First()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var bof = new BillOfMaterials("bof") { Materials = [line, circle] };
-        var node = new Geometry("a") { Shapes = [line, circle] };
-        node.AddAnnotations([bof]);
+        var circle = new LinkTestConcept("circle");
+        var line = new LinkTestConcept("line");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [line, circle] };
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var cloneLine = new Line("line");
-        var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine, cloneCircle] }]);
+        var cloneCircle = new LinkTestConcept("circle");
+        var cloneLine = new LinkTestConcept("line");
+        var clone = new TestPartition("a") { Links =  [cloneLine, cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneLine, cloneCircle] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        bof.RemoveMaterials([line]);
+        bof.RemoveReference_0_n([line]);
 
         AssertEquals([node], [clone]);
     }
@@ -151,21 +151,21 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceDeleted_Multiple_Last()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var bof = new BillOfMaterials("bof") { Materials = [circle, line] };
-        var node = new Geometry("a") { Shapes = [line, circle] };
-        node.AddAnnotations([bof]);
+        var circle = new LinkTestConcept("circle");
+        var line = new LinkTestConcept("line");
+        var bof = new LinkTestConcept("bof") { Reference_0_n =  [circle, line] };
+        var node = new TestPartition("a") { Links =  [line, circle] };
+        node.AddLinks([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var cloneLine = new Line("line");
-        var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle, cloneLine] }]);
+        var cloneCircle = new LinkTestConcept("circle");
+        var cloneLine = new LinkTestConcept("line");
+        var clone = new TestPartition("a") { Links =  [cloneLine, cloneCircle] };
+        clone.AddLinks([new LinkTestConcept("bof") { Reference_0_n =  [cloneCircle, cloneLine] }]);
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        bof.RemoveMaterials([line]);
+        bof.RemoveReference_0_n([line]);
 
         AssertEquals([node], [clone]);
     }
@@ -173,17 +173,17 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceDeleted_Single()
     {
-        var circle = new Circle("circle");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var node = new Geometry("a") { Shapes = [od, circle] };
+        var circle = new LinkTestConcept("circle");
+        var od = new LinkTestConcept("od") { Reference_0_1 = circle };
+        var node = new TestPartition("a") { Links =  [od, circle] };
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle] };
+        var cloneCircle = new LinkTestConcept("circle");
+        var clone = new TestPartition("a") { Links =  [new LinkTestConcept("od") { Reference_0_1 = cloneCircle }, cloneCircle] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        od.AltSource = null;
+        od.Reference_0_1 = null;
 
         AssertEquals([node], [clone]);
     }
@@ -195,21 +195,21 @@ public class TwowayTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void ReferenceChanged_Single()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var node = new Geometry("a") { Shapes = [od, circle, line] };
+        var circle = new LinkTestConcept("circle");
+        var line = new LinkTestConcept("line");
+        var od = new LinkTestConcept("od") { Reference_1 = circle };
+        var node = new TestPartition("a") { Links =  [od, circle, line] };
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a")
+        var cloneCircle = new LinkTestConcept("circle");
+        var clone = new TestPartition("a")
         {
-            Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle, new Line("line")]
+            Links =  [new LinkTestConcept("od") { Reference_1 = cloneCircle }, cloneCircle, new LinkTestConcept("line")]
         };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        od.AltSource = line;
+        od.Reference_1 = line;
 
         AssertEquals([node], [clone]);
     }

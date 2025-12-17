@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core;
 using Core.M3;
-using Core.Notification;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -60,26 +60,6 @@ internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link lin
 
     private IEnumerable<XmlNodeSyntax> XdocThrowsFeatureNodesEmpty() =>
         XdocThrows($"If both {FeatureProperty(link)} and nodes are empty", AsType(typeof(InvalidValueException)));
-
-    protected ExpressionStatementSyntax AssureNotClearingCall() =>
-        ExpressionStatement(Call("AssureNotClearing",
-            IdentifierName("safeNodes"),
-            FeatureField(link),
-            MetaProperty(link)
-        ));
-
-    protected ExpressionStatementSyntax AssureNonEmptyCall() =>
-        ExpressionStatement(Call("AssureNonEmpty",
-            IdentifierName("safeNodes"),
-            FeatureField(link),
-            MetaProperty(link)
-        ));
-
-    protected ExpressionStatementSyntax AssureInRangeCall() =>
-        ExpressionStatement(Call("AssureInRange",
-            IdentifierName("index"),
-            FeatureField(link)
-        ));
 
     protected InvocationExpressionSyntax AsReadOnlyCall() =>
         InvocationExpression(MemberAccess(FeatureField(link),
@@ -128,8 +108,7 @@ internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link lin
         Method(LinkRemove().ToString(), AsType(classifier),
                 [
                     Param("nodes",
-                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
-                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -158,8 +137,7 @@ internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link lin
     private MethodDeclarationSyntax AbstractLinkInserter(bool writeable = false) =>
         Method(LinkInsert().ToString(), AsType(classifier), [
                 Param("index", AsType(typeof(int))),
-                Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
-                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(link)]))
@@ -186,8 +164,7 @@ internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link lin
         Method(LinkAdd(link).ToString(), AsType(classifier),
                 [
                     Param("nodes",
-                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
-                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                        AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -195,11 +172,8 @@ internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link lin
             .Xdoc(XdocDefault(link));
 
     private ExpressionSyntax LinkInsert() =>
-        IdentifierName($"Insert{link.Name.ToFirstUpper()}");
+        LinkInsert(link);
 
     private ExpressionSyntax LinkRemove() =>
-        IdentifierName($"Remove{link.Name.ToFirstUpper()}");
-
-    protected LocalDeclarationStatementSyntax SafeNodesVariable() => 
-        SafeNodesVariable(OptionalNodesToList());
+        LinkRemove(link);
 }

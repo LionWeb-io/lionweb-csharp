@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M3;
 
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -59,6 +60,21 @@ public class InterfaceBase<TLanguage>(NodeId id, TLanguage parent) : ClassifierB
         }
 
         value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+        
+        if (_m3.Interface_extends.EqualsIdentity(reference) && ((Interface)this).TryGetExtends(out var extends))
+        {
+            targets = extends.Select(ReferenceTarget.FromNode).ToImmutableList();
+            return true;
+        }
+
         return false;
     }
 

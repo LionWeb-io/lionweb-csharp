@@ -20,9 +20,23 @@ namespace LionWeb.Core.M1;
 using M3;
 using Notification;
 using Notification.Pipe;
+using System.Diagnostics;
 
 /// <summary>
 /// Collects unresolved references, and updates them once a fitting node has been <see cref="Receive">received</see>.
+///
+/// <para/>
+/// Usage:
+/// <list type="number">
+/// <item><description>
+/// Call <see cref="RegisterUnresolvedReference"/> in <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>
+/// </description></item>
+/// <item><description>
+/// <see cref="INotificationSender.ConnectTo">Connect</see>
+/// a <see cref="IForest"/> or <see cref="IPartitionInstance"/>
+/// to <c>this</c>.
+/// </description></item>
+/// </list> 
 /// </summary>
 public class UnresolvedReferencesManager : INotificationReceiver
 {
@@ -34,15 +48,20 @@ public class UnresolvedReferencesManager : INotificationReceiver
         if (notification is not INewNodeNotification newNodeNotification)
             return;
 
-        _unresolvedReferences.RemoveAll(e => ResolveMatchingReferences(newNodeNotification, e));
+        var allDescendants = M1Extensions.Descendants(newNodeNotification.NewNode, true, true).ToDictionary(n => n.GetId());
+
+        _unresolvedReferences.RemoveAll(e => ResolveMatchingReferences(allDescendants, e));
     }
 
-    private bool ResolveMatchingReferences(INewNodeNotification newNodeNotification, (IWritableNode parent, Feature reference, IReferenceTarget target) e)
+    private bool ResolveMatchingReferences(Dictionary<NodeId, IReadableNode> allDescendants,
+        (IWritableNode parent, Feature reference, IReferenceTarget target) e)
     {
-        if (e.target.TargetId != newNodeNotification.NewNode.GetId())
+        if (e.target.TargetId is null || !allDescendants.TryGetValue(e.target.TargetId, out var newNode))
             return false;
 
-        e.target.Target = newNodeNotification.NewNode;
+        Log($"Resolving {e.target} in {e.parent.GetId()}.{e.reference}");
+        e.target.Target = newNode;
+
         return true;
     }
 
@@ -50,7 +69,11 @@ public class UnresolvedReferencesManager : INotificationReceiver
     /// to be resolved later.
     public IReferenceTarget RegisterUnresolvedReference(IWritableNode parent, Feature reference, IReferenceTarget target)
     {
+        Log($"Registering {target} in {parent.GetId()}.{reference}");
         _unresolvedReferences.Add((parent, reference, target));
         return target;
     }
+
+    protected virtual void Log(string message) =>
+        Debug.WriteLine(message);
 }

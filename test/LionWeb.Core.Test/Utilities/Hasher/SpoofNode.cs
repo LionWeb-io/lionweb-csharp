@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.Utilities.Hasher;
 
-using Core.Notification;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M3;
 using System.Diagnostics.CodeAnalysis;
@@ -43,7 +42,7 @@ class SpoofNode(string id) : IShape
 
     public void DetachFromParent() { }
 
-    public void Set(Feature feature, object? value, INotificationId? notificationId = null) { }
+    public void Set(Feature feature, object? value) { }
     public void Add(Link? link, IEnumerable<IReadableNode> nodes) {}
 
     public void Insert(Link? link, int index, IEnumerable<IReadableNode> nodes) {}
@@ -56,19 +55,77 @@ class SpoofNode(string id) : IShape
 
     public Containment? GetContainmentOf(INode child) => null;
 
-    public void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) { }
+    public void AddAnnotations(IEnumerable<INode> annotations) { }
 
-    public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations, INotificationId? notificationId = null) { }
+    public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations) { }
 
-    public bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) => false;
+    public bool RemoveAnnotations(IEnumerable<INode> annotations) => false;
 
     public IReadOnlyList<Coord> Fixpoints { get => []; init { } }
-    public IShape AddFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null) => this;
+    public IShape AddFixpoints(IEnumerable<Coord> nodes) => this;
 
-    public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes, INotificationId? notificationId = null) => this;
+    public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes) => this;
 
-    public IShape RemoveFixpoints(IEnumerable<Coord> nodes, INotificationId? notificationId = null) => this;
+    public IShape RemoveFixpoints(IEnumerable<Coord> nodes) => this;
         
     public string Uuid { get => null; set { } }
-    public IShape SetUuid(string value, INotificationId? notificationId = null) => this;
+    public IShape SetUuid(string value) => this;
+
+    IReadOnlyList<IReadableNode> IReadableNode.GetAnnotationsRaw() => [];
+
+    bool IReadableNode.TryGetPropertyRaw(Property property, out object? value)
+    {
+        value = null;
+        return false;
+    }
+
+    bool IReadableNode.TryGetContainmentRaw(Containment containment, out IReadableNode? node)
+    {
+        node = null;
+        return false;
+    }
+
+    bool IReadableNode.TryGetContainmentsRaw(Containment containment, out IReadOnlyList<IReadableNode> nodes)
+    {
+        nodes = [];
+        return false;
+    }
+
+    bool IReadableNode.TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        target = null;
+        return false;
+    }
+
+    bool IReadableNode.TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        targets = [];
+        return false;
+    }
+
+    bool IWritableNode.AddAnnotationsRaw(IWritableNode annotationInstances) => false;
+
+    bool IWritableNode.InsertAnnotationsRaw(Index index, IWritableNode annotationInstances) => false;
+
+    bool IWritableNode.RemoveAnnotationsRaw(IWritableNode annotationInstances) => false;
+
+    public bool SetRaw(Feature feature, object? value) => false;
+
+    bool IWritableNode.SetPropertyRaw(Property property, object? value) => false;
+
+    bool IWritableNode.SetContainmentRaw(Containment containment, IWritableNode? node) => false;
+
+    bool IWritableNode.AddContainmentsRaw(Containment containment, IWritableNode node) => false;
+
+    bool IWritableNode.InsertContainmentsRaw(Containment containment, Index index, IWritableNode node) => false;
+
+    bool IWritableNode.RemoveContainmentsRaw(Containment containment, IWritableNode node) => false;
+
+    bool IWritableNode.SetReferenceRaw(Reference reference, ReferenceTarget? targets) => false;
+
+    bool IWritableNode.AddReferencesRaw(Reference reference, ReferenceTarget target) => false;
+
+    bool IWritableNode.InsertReferencesRaw(Reference reference, Index index, ReferenceTarget target) => false;
+
+    bool IWritableNode.RemoveReferencesRaw(Reference reference, ReferenceTarget target) => false;
 }

@@ -28,7 +28,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly List<Language> _languages;
     protected readonly IForest _forest;
-    private readonly string _name;
+    protected readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
 

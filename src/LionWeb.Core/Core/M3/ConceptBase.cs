@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M3;
 
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -85,6 +86,57 @@ public class ConceptBase<TLanguage>(NodeId id, TLanguage parent) : ClassifierBas
         }
 
         value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_m3.Concept_abstract.EqualsIdentity(property) && ((Concept)this).TryGetAbstract(out var @abstract))
+        {
+            value = @abstract;
+            return true;
+        }
+        
+        if (_m3.Concept_partition.EqualsIdentity(property) && ((Concept)this).TryGetPartition(out var partition))
+        {
+            value = partition;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+
+        if (_m3.Concept_extends.EqualsIdentity(reference))
+        {
+            target = ReferenceTarget.FromNodeOptional(Extends);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferencesRaw(Reference reference, out IReadOnlyList<IReferenceTarget> targets)
+    {
+        if (base.TryGetReferencesRaw(reference, out targets))
+            return true;
+        
+        if (_m3.Concept_implements.EqualsIdentity(reference))
+        {
+            targets = Implements.Select(ReferenceTarget.FromNode).ToImmutableList();
+            return true;
+        }
+
         return false;
     }
 

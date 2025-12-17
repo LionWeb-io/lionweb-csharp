@@ -30,8 +30,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    protected ContainmentNotificationEmitterBase(Containment containment, INotifiableNode destinationParent, INotificationId? notificationId = null) : base(destinationParent, notificationId)
+    protected ContainmentNotificationEmitterBase(Containment containment, INotifiableNode destinationParent) : base(destinationParent)
     {
         Containment = containment;
     }

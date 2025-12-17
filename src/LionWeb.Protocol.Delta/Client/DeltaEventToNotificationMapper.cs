@@ -65,6 +65,7 @@ public class DeltaEventToNotificationMapper
                 OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             AnnotationAdded a => OnAnnotationAdded(a),
             AnnotationDeleted a => OnAnnotationDeleted(a),
+            AnnotationReplaced a => OnAnnotationReplaced(a),
             AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParent a => OnAnnotationMovedInSameParent(a),
             ReferenceAdded a => OnReferenceAdded(a),
@@ -310,6 +311,19 @@ public class DeltaEventToNotificationMapper
             parent,
             annotationDeletedEvent.Index,
             ToNotificationId(annotationDeletedEvent)
+        );
+    }
+
+    private AnnotationReplacedNotification OnAnnotationReplaced(AnnotationReplaced annotationReplacedEvent)
+    {
+        var parent = ToNode(annotationReplacedEvent.Parent);
+        var replacedAnnotation = parent.GetAnnotations()[annotationReplacedEvent.Index];
+        return new AnnotationReplacedNotification(
+            Deserialize(annotationReplacedEvent.NewAnnotation),
+            replacedAnnotation as IWritableNode ?? throw new InvalidValueException(null, replacedAnnotation),
+            parent,
+            annotationReplacedEvent.Index,
+            ToNotificationId(annotationReplacedEvent)
         );
     }
 

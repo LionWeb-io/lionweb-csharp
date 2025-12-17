@@ -92,7 +92,7 @@ internal class ContainmentsInstaller_2025_1(
         switch (_node)
         {
             case DynamicStructuredDataType sdt:
-                sdt.AddFields(Lookup<Field>(LionCore.StructuredDataType_fields));
+                sdt.SetFieldsRaw(Lookup<DynamicField>(LionCore.StructuredDataType_fields).ToList());
                 HashSet<StructuredDataType> owners = [];
                 if (LanguageDeserializerVersionSpecifics_2025_1.ContainsSelf(sdt, owners))
                     _versionSpecifics._handler.CircularStructuredDataType(sdt, owners);

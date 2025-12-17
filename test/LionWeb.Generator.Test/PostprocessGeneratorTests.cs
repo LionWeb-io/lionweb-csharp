@@ -19,8 +19,8 @@ namespace LionWeb.Generator.Test;
 
 using Core.M2;
 using Core.M3;
-using Core.Test.Languages.Generated.V2024_1.MultiInheritLang;
-using Core.Test.Languages.Generated.V2024_1.TestLanguage;
+using Core.Test.Languages.Generated.V2023_1.MultiInheritLang;
+using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 using GeneratorExtensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

@@ -38,7 +38,7 @@ internal abstract class GeneratorBase
 
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly GeneratorConfig _config;
-    protected readonly ILionCoreLanguage _m3;
+    private readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
     protected readonly GeneratorInputParameters _generatorInputParameters;
@@ -86,6 +86,27 @@ internal abstract class GeneratorBase
     /// <returns><c>AddMyLink</c></returns>
     protected ExpressionSyntax LinkAdd(Link link) =>
         IdentifierName($"Add{link.Name.ToFirstUpper()}");
+
+    /// <returns><c>AddMyLinkRaw</c></returns>
+    protected ExpressionSyntax LinkAddRaw(Link link) =>
+        IdentifierName(LinkAdd(link) + "Raw");
+
+    /// <returns><c>InsertMyLink</c></returns>
+    protected ExpressionSyntax LinkInsert(Link link) =>
+        IdentifierName($"Insert{link.Name.ToFirstUpper()}");
+
+    /// <returns><c>InsertMyLinkRaw</c></returns>
+    protected ExpressionSyntax LinkInsertRaw(Link link) =>
+        IdentifierName(LinkInsert(link) + "Raw");
+
+    /// <returns><c>RemoveMyLink</c></returns>
+    protected ExpressionSyntax LinkRemove(Link link) =>
+        IdentifierName($"Remove{link.Name.ToFirstUpper()}");
+
+    /// <returns><c>RemoveMyLinkRaw</c></returns>
+    protected ExpressionSyntax LinkRemoveRaw(Link link) =>
+        IdentifierName(LinkRemove(link) + "Raw");
+
 
     /// <inheritdoc cref="INames.FeatureField"/>
     protected ExpressionSyntax FeatureField(Feature feature) =>

@@ -57,7 +57,7 @@ public class KeywordLangTests
             {
                 String = @enum.@internal, Double = new @struct("struct") { Ref = new @var("var") }
             },
-            Default = new @if(@namespace: "hello")
+            Default = new @if { Namespace = "hello"}
         };
 
         List<IReadableNode?> input = [root, root.Ref, ((@struct)root.Ref.Double).Ref];

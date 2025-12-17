@@ -15,6 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
 using Core.M2;
@@ -23,7 +24,6 @@ using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static AstExtensions;
 
 /// <summary>
 /// Common base class for all generators for concept/annotation classes and interface interfaces.
@@ -55,41 +55,6 @@ internal abstract class ClassifierGeneratorBase(GeneratorInputParameters generat
                 .SelectMany(InterfaceFeatures)
             );
 
-    protected ExpressionStatementSyntax AssureNotNullCall(Link link) =>
-        ExpressionStatement(Call("AssureNotNull",
-            IdentifierName("safeNodes"),
-            MetaProperty(link)
-        ));
-
-    protected ExpressionStatementSyntax AssureNotNullMembersCall(Link link) =>
-        ExpressionStatement(Call("AssureNotNullMembers",
-            IdentifierName("safeNodes"),
-            MetaProperty(link)
-        ));
-
-    protected ExpressionStatementSyntax EmitterCollectOldDataCall() =>
-        ExpressionStatement(
-            InvocationExpression(MemberAccess(IdentifierName("emitter"), IdentifierName("CollectOldData"))));
-
-    protected ExpressionStatementSyntax EmitterNotifyCall() =>
-        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("emitter"), IdentifierName("Notify"))));
-
-    protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment, bool isAddedNodeSingle = false) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", isAddedNodeSingle ? IdentifierName("[safeNode]") : IdentifierName("safeNodes"), 
-                    MetaProperty(containment))
-            ])
-        ));
-
-    protected ExpressionStatementSyntax RequiredAddRangeCall(Containment containment, bool isAddedNodeSingle = false) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", isAddedNodeSingle ? IdentifierName("[safeNode]") : IdentifierName("safeNodes"),
-                    MetaProperty(containment)
-                )
-            ])
-        ));
+    protected ExpressionSyntax FeatureSetRaw(Feature feature) =>
+        IdentifierName(FeatureSet(feature) + "Raw");
 }

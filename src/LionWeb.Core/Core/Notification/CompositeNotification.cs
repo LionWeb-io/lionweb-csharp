@@ -59,6 +59,9 @@ public record CompositeNotification : IForestNotification, IPartitionNotificatio
     public NodeId ContextNodeId => throw new NotImplementedException();
 
     /// <inheritdoc />
+    public IWritableNode ContextNode => throw new NotImplementedException();
+
+    /// <inheritdoc />
     public virtual bool Equals(CompositeNotification? other)
     {
         if (other is null)

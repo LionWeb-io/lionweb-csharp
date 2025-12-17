@@ -18,7 +18,7 @@
 namespace LionWeb.Protocol.Delta.Test.Pipe;
 
 using Core.Notification.Partition;
-using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Core.Test.Notification;
 
 [TestClass]
@@ -27,8 +27,8 @@ public class NotificationsTestJson : DeltaTestsBase
     [TestMethod]
     public void PropertyAdded()
     {
-        var circle = new Circle("c");
-        var originalPartition = new Geometry("a") { Shapes = [circle] };
+        var circle = new LinkTestConcept("c");
+        var originalPartition = new TestPartition("a") { Links = [circle] };
         var clonedPartition = CreateDeltaReplicatorWithJson(originalPartition);
 
         var notificationObserver = new NotificationObserver();
@@ -44,16 +44,16 @@ public class NotificationsTestJson : DeltaTestsBase
     [TestMethod]
     public void ChildReplaced_Single_with_same_node_id()
     {
-        var documentation = new Documentation("doc") { Text = "a" };
-        var originalPartition = new Geometry("a") { Documentation = documentation };
+        var documentation = new LinkTestConcept("doc") { Name = "a" };
+        var originalPartition = new TestPartition("a") { Links = [new LinkTestConcept("parent") {Containment_1 = documentation }]};
 
         var clonedPartition = CreateDeltaReplicatorWithJson(originalPartition);
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        var documentation2 = new Documentation("doc") { Text = "b" };
-        originalPartition.Documentation = documentation2;
+        var documentation2 = new LinkTestConcept("doc") { Name = "b" };
+        originalPartition.Links[0].Containment_1 = documentation2;
 
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);

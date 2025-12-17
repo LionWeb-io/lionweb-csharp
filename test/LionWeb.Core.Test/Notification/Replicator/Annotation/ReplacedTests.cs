@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification.Replicator.Annotation;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -30,9 +30,9 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only_uses_ReplaceWith()
     {
-        var replacement = new BillOfMaterials("replacement");
-        var replaced = new BillOfMaterials("replaced");
-        var originalPartition = new Geometry("a");
+        var replacement = new TestAnnotation("replacement");
+        var replaced = new TestAnnotation("replaced");
+        var originalPartition = new TestPartition("a");
         originalPartition.AddAnnotations([replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
@@ -55,10 +55,10 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_First_uses_ReplaceWith()
     {
-        var replacement = new BillOfMaterials("replacement");
-        var replaced = new BillOfMaterials("replaced");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([replaced, new BillOfMaterials("bof")]);
+        var replacement = new TestAnnotation("replacement");
+        var replaced = new TestAnnotation("replaced");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([replaced, new TestAnnotation("bof")]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -72,10 +72,10 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Last_uses_ReplaceWith()
     {
-        var replacement = new BillOfMaterials("replacement");
-        var replaced = new BillOfMaterials("replaced");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), replaced]);
+        var replacement = new TestAnnotation("replacement");
+        var replaced = new TestAnnotation("replaced");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([new TestAnnotation("bof"), replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -93,13 +93,13 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Only()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var originalPartition = new Geometry("a");
+        var replaced = new TestAnnotation("replaced");
+        var originalPartition = new TestPartition("a");
         originalPartition.AddAnnotations([replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newAnnotation = new BillOfMaterials("new");
+        var newAnnotation = new TestAnnotation("new");
         var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition,
             0, new NumericNotificationId("annotationReplaced", 0));
 
@@ -112,13 +112,13 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_First()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([replaced, new BillOfMaterials("bof")]);
+        var replaced = new TestAnnotation("replaced");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([replaced, new TestAnnotation("bof")]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newAnnotation = new BillOfMaterials("new");
+        var newAnnotation = new TestAnnotation("new");
         var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition,
             0, new NumericNotificationId("annotationReplaced", 0));
 
@@ -131,14 +131,14 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_Last()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), replaced]);
+        var replaced = new TestAnnotation("replaced");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([new TestAnnotation("bof"), replaced]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
         var index = 1;
-        var newAnnotation = new BillOfMaterials("new");
+        var newAnnotation = new TestAnnotation("new");
         var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition,
             index, new NumericNotificationId("annotationReplaced", 0));
 
@@ -151,15 +151,15 @@ public class ReplacedTests : ReplicatorTestsBase
     [TestMethod]
     public void Multiple_not_matching_node_ids()
     {
-        var replaced = new BillOfMaterials("replaced");
-        var nodeWithAnotherId = new BillOfMaterials("node-with-another-id");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), replaced, nodeWithAnotherId]);
+        var replaced = new TestAnnotation("replaced");
+        var nodeWithAnotherId = new TestAnnotation("node-with-another-id");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([new TestAnnotation("bof"), replaced, nodeWithAnotherId]);
 
         var clonedPartition = ClonePartition(originalPartition);
 
         var index = 1;
-        var newAnnotation = new BillOfMaterials("new");
+        var newAnnotation = new TestAnnotation("new");
         var notification = new AnnotationReplacedNotification(newAnnotation, nodeWithAnotherId, originalPartition,
             index, new NumericNotificationId("annotationReplaced", 0));
 
