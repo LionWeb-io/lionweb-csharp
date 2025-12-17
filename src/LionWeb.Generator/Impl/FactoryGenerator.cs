@@ -22,15 +22,14 @@ using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
 /// <summary>
 /// Generates Factory class.
 /// </summary>
-public class FactoryGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-    : GeneratorBase(names, lionWebVersion, config)
+internal class FactoryGenerator(GeneratorInputParameters generatorInputParameters)
+    : GeneratorBase(generatorInputParameters)
 {
     private string FactoryName => _names.FactoryName;
     private string FactoryInterfaceName => _names.FactoryInterfaceName;

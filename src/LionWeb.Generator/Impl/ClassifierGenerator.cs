@@ -23,6 +23,7 @@ using Core.M3;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
 using Core.Utilities;
+using GeneratorExtensions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -38,20 +39,16 @@ using static AstExtensions;
 /// <seealso cref="FeatureMethodsGenerator"/>
 /// <seealso cref="ContainmentMethodsGenerator"/>
 /// <seealso cref="FeatureGeneratorBase"/>
-public class ClassifierGenerator(
-    Classifier classifier,
-    INames names,
-    LionWebVersions lionWebVersion,
-    GeneratorConfig config)
-    : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion, config)
+internal class ClassifierGenerator(Classifier classifier, GeneratorInputParameters generatorInputParameters)
+    : ClassifierGeneratorBase(generatorInputParameters with { Names = new UniqueFeatureNames(generatorInputParameters.Names) })
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
     public TypeDeclarationSyntax ClassifierType() =>
         classifier switch
         {
-            Annotation a => ClassifierAnnotation(a),
-            Concept c => ClassifierConcept(c),
-            Interface i => ClassifierInterface(i),
+            Annotation a => Correlate(new ClassifierToMainCorrelation(a), ClassifierAnnotation(a)),
+            Concept c => Correlate(new ClassifierToMainCorrelation(c), ClassifierConcept(c)),
+            Interface i => Correlate(new InterfaceToMainCorrelation(i), ClassifierInterface(i)),
             _ => throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier))
         };
 
@@ -145,11 +142,11 @@ public class ClassifierGenerator(
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
                 FeaturesToImplement(classifier)
-                    .SelectMany(f => FeatureGeneratorBase.Members(classifier, f, _names, _lionWebVersion, _config))
+                    .SelectMany(f => FeatureGeneratorBase.Members(classifier, f, _generatorInputParameters))
                     .Append(GenConstructor(additionalConstructorStatements ?? []))
                     .Concat(additionalMembers)
-                    .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion, _config).FeatureMethods())
-                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion, _config).ContainmentMethods())
+                    .Concat(new FeatureMethodsGenerator(classifier, _generatorInputParameters).FeatureMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _generatorInputParameters).ContainmentMethods())
             ))
             .Xdoc(XdocDefault());
     }
@@ -206,7 +203,7 @@ public class ClassifierGenerator(
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
-                FeatureGeneratorBase.AbstractMembers(classifier, f, _names, _lionWebVersion, _config))))
+                FeatureGeneratorBase.AbstractMembers(classifier, f, _generatorInputParameters))))
             .Xdoc(XdocDefault());
     }
 

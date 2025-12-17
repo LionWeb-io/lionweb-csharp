@@ -18,7 +18,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
-using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
@@ -29,8 +28,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 /// <summary>
 /// Common base class for all generators for concept/annotation classes and interface interfaces.
 /// </summary>
-public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-    : GeneratorBase(names, lionWebVersion, config)
+internal abstract class ClassifierGeneratorBase(GeneratorInputParameters generatorInputParameters)
+    : GeneratorBase(generatorInputParameters)
 {
     /// <summary>
     /// Required by <see cref="UniqueFeatureNames"/> to 

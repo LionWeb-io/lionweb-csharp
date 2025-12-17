@@ -18,21 +18,17 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace LionWeb.Generator.Impl;
 
-using Core;
 using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
-public class FeatureGeneratorContainment(
+internal class FeatureGeneratorContainment(
     Classifier classifier,
     Containment containment,
-    INames names,
-    LionWebVersions lionWebVersion,
-    GeneratorConfig config) : FeatureGeneratorLinkBase(classifier, containment, names, lionWebVersion, config)
+    GeneratorInputParameters generatorInputParameters) : FeatureGeneratorLinkBase(classifier, containment, generatorInputParameters)
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment() =>
         new List<MemberDeclarationSyntax>

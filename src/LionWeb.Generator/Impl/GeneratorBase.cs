@@ -21,6 +21,8 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using GeneratorExtensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -29,7 +31,7 @@ using static AstExtensions;
 /// <summary>
 /// Common base class for all generators.
 /// </summary>
-public abstract class GeneratorBase
+internal abstract class GeneratorBase
 {
     /// <inheritdoc cref="INames"/>
     protected readonly INames _names;
@@ -39,15 +41,18 @@ public abstract class GeneratorBase
     private readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
+    protected readonly GeneratorInputParameters _generatorInputParameters;
+    
     /// <inheritdoc cref="GeneratorBase"/>
-    protected GeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    protected GeneratorBase(GeneratorInputParameters generatorInputParameters)
     {
-        lionWebVersion.AssureCompatible(names.Language.LionWebVersion);
-        _names = names;
-        _lionWebVersion = lionWebVersion;
-        _config = config;
-        _m3 = lionWebVersion.LionCore;
-        _builtIns = lionWebVersion.BuiltIns;
+        generatorInputParameters.LionWebVersion.AssureCompatible(generatorInputParameters.Names.Language.LionWebVersion);
+        _generatorInputParameters = generatorInputParameters;
+        _names = _generatorInputParameters.Names;
+        _lionWebVersion = _generatorInputParameters.LionWebVersion;
+        _config = _generatorInputParameters.Config;
+        _m3 = _generatorInputParameters.LionWebVersion.LionCore;
+        _builtIns = _generatorInputParameters.LionWebVersion.BuiltIns;
     }
 
     /// <inheritdoc cref="INames.Language"/>
@@ -191,6 +196,10 @@ public abstract class GeneratorBase
             )));
     }
 
+    /// <inheritdoc cref="Correlator.Record"/>
+    protected T Correlate<T>(IKeyedToAstCorrelation<T> correlation, T syntaxNode) where T : SyntaxNode =>
+        _generatorInputParameters.Correlator.Record(correlation, syntaxNode);
+    
     /// <returns><c>TryGetMyFeature</c></returns>
     protected string FeatureTryGet(Feature feature) =>
         $"TryGet{feature.Name.ToFirstUpper()}";

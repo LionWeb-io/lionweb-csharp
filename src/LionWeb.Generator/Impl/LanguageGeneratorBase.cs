@@ -17,7 +17,6 @@
 
 namespace LionWeb.Generator.Impl;
 
-using Core;
 using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,11 +26,11 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 /// <summary>
 /// Common base class for all generators for the language class.
 /// </summary>
-public abstract class LanguageGeneratorBase : GeneratorBase
+internal abstract class LanguageGeneratorBase : GeneratorBase
 {
     /// <inheritdoc cref="LanguageGeneratorBase"/>
-    protected LanguageGeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-        : base(names, lionWebVersion, config)
+    protected LanguageGeneratorBase(GeneratorInputParameters generatorInputParameters)
+        : base(generatorInputParameters)
     {
     }
 

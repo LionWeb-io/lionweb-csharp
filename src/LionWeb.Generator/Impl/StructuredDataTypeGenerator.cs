@@ -21,19 +21,16 @@ using Core;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
 /// <summary>
 /// Generates StructuredDataType readonly record structs.
 /// </summary>
-public class StructuredDataTypeGenerator(
+internal class StructuredDataTypeGenerator(
     StructuredDataType sdt,
-    INames names,
-    LionWebVersions lionWebVersion,
-    GeneratorConfig config)
-    : GeneratorBase(names, lionWebVersion, config)
+    GeneratorInputParameters generatorInputParameters)
+    : GeneratorBase(generatorInputParameters)
 {
     private string SdtName => sdt.Name.PrefixKeyword();
     private IEnumerable<Field> Fields => sdt.Fields.Ordered();

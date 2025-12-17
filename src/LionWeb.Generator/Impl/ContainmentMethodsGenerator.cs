@@ -21,7 +21,6 @@ using Core;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
@@ -31,8 +30,8 @@ using static AstExtensions;
 /// - DetachChild()
 /// - GetContainmentOf()
 /// </summary>
-public class ContainmentMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-    : ClassifierGeneratorBase(names, lionWebVersion, config)
+internal class ContainmentMethodsGenerator(Classifier classifier, GeneratorInputParameters generatorInputParameters)
+    : ClassifierGeneratorBase(generatorInputParameters)
 {
     /// <inheritdoc cref="ContainmentMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> ContainmentMethods()

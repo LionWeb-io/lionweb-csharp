@@ -25,7 +25,6 @@ using Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Names;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -43,38 +42,38 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public abstract class FeatureGeneratorBase(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
-    : ClassifierGeneratorBase(names, lionWebVersion, config)
+internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feature, GeneratorInputParameters generatorInputParameters)
+    : ClassifierGeneratorBase(generatorInputParameters)
 {
     /// <inheritdoc cref="FeatureGeneratorBase"/>
-    public static IEnumerable<MemberDeclarationSyntax> Members(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) =>
+    public static IEnumerable<MemberDeclarationSyntax> Members(Classifier classifier, Feature feature, GeneratorInputParameters generatorInputParameters) =>
         feature switch
         {
-            Property { Optional: false } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).RequiredProperty(),
-            Property { Optional: true } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).OptionalProperty(),
-            Containment { Optional: false, Multiple: false } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).RequiredSingleContainment(),
-            Containment { Optional: true, Multiple: false } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).OptionalSingleContainment(),
-            Containment { Optional: false, Multiple: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).RequiredMultiContainment(),
-            Containment { Optional: true, Multiple: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).OptionalMultiContainment(),
-            Reference { Optional: false, Multiple: false } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).RequiredSingleReference(),
-            Reference { Optional: true, Multiple: false } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).OptionalSingleReference(),
-            Reference { Optional: false, Multiple: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).RequiredMultiReference(),
-            Reference { Optional: true, Multiple: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).OptionalMultiReference(),
+            Property { Optional: false } p => new FeatureGeneratorProperty(classifier, p, generatorInputParameters).RequiredProperty(),
+            Property { Optional: true } p => new FeatureGeneratorProperty(classifier, p, generatorInputParameters).OptionalProperty(),
+            Containment { Optional: false, Multiple: false } c => new FeatureGeneratorContainment(classifier, c, generatorInputParameters).RequiredSingleContainment(),
+            Containment { Optional: true, Multiple: false } c => new FeatureGeneratorContainment(classifier, c, generatorInputParameters).OptionalSingleContainment(),
+            Containment { Optional: false, Multiple: true } c => new FeatureGeneratorContainment(classifier, c, generatorInputParameters).RequiredMultiContainment(),
+            Containment { Optional: true, Multiple: true } c => new FeatureGeneratorContainment(classifier, c, generatorInputParameters).OptionalMultiContainment(),
+            Reference { Optional: false, Multiple: false } r => new FeatureGeneratorReference(classifier, r, generatorInputParameters).RequiredSingleReference(),
+            Reference { Optional: true, Multiple: false } r => new FeatureGeneratorReference(classifier, r, generatorInputParameters).OptionalSingleReference(),
+            Reference { Optional: false, Multiple: true } r => new FeatureGeneratorReference(classifier, r, generatorInputParameters).RequiredMultiReference(),
+            Reference { Optional: true, Multiple: true } r => new FeatureGeneratorReference(classifier, r, generatorInputParameters).OptionalMultiReference(),
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
 
     /// <inheritdoc cref="FeatureGeneratorBase"/>
-    public static IEnumerable<MemberDeclarationSyntax> AbstractMembers(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config) =>
+    public static IEnumerable<MemberDeclarationSyntax> AbstractMembers(Classifier classifier, Feature feature, GeneratorInputParameters generatorInputParameters) =>
         feature switch
         {
-            Property { Optional: false } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).AbstractSingleRequiredMembers(false),
-            Property { Optional: true } p => new FeatureGeneratorProperty(classifier, p, names, lionWebVersion, config).AbstractSingleOptionalMembers(false),
-            Containment { Multiple: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).AbstractLinkMembers(writeable: true),
-            Containment { Optional: false } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).AbstractSingleRequiredMembers(true),
-            Containment { Optional: true } c => new FeatureGeneratorContainment(classifier, c, names, lionWebVersion, config).AbstractSingleOptionalMembers(writeable: true),
-            Reference { Multiple: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).AbstractLinkMembers(writeable: false),
-            Reference { Optional: false } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).AbstractSingleRequiredMembers(false),
-            Reference { Optional: true } r => new FeatureGeneratorReference(classifier, r, names, lionWebVersion, config).AbstractSingleOptionalMembers(false),
+            Property { Optional: false } p => new FeatureGeneratorProperty(classifier, p, generatorInputParameters).AbstractSingleRequiredMembers(false),
+            Property { Optional: true } p => new FeatureGeneratorProperty(classifier, p, generatorInputParameters).AbstractSingleOptionalMembers(false),
+            Containment { Multiple: true } c => new FeatureGeneratorContainment(classifier, c, generatorInputParameters).AbstractLinkMembers(writeable: true),
+            Containment { Optional: false } c => new FeatureGeneratorContainment(classifier, c, generatorInputParameters).AbstractSingleRequiredMembers(true),
+            Containment { Optional: true } c => new FeatureGeneratorContainment(classifier, c, generatorInputParameters).AbstractSingleOptionalMembers(writeable: true),
+            Reference { Multiple: true } r => new FeatureGeneratorReference(classifier, r, generatorInputParameters).AbstractLinkMembers(writeable: false),
+            Reference { Optional: false } r => new FeatureGeneratorReference(classifier, r, generatorInputParameters).AbstractSingleRequiredMembers(false),
+            Reference { Optional: true } r => new FeatureGeneratorReference(classifier, r, generatorInputParameters).AbstractSingleOptionalMembers(false),
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
 
