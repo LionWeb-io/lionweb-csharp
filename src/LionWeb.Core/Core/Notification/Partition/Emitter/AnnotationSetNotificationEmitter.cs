@@ -29,11 +29,9 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
     public AnnotationSetNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? setValues,
-        List<INode> existingValues,
-        INotificationId? notificationId = null) : base(destinationParent, setValues, notificationId)
+        List<INode> existingValues) : base(destinationParent, setValues)
     {
         if (!IsActive() || setValues == null)
             return;
@@ -41,6 +39,13 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
         var listComparer = IListComparer.CreateForNodes(existingValues, setValues);
         _changes = listComparer.Compare();
     }
+
+    [Obsolete]
+    public AnnotationSetNotificationEmitter(INotifiableNode destinationParent,
+        List<INode>? setValues,
+        List<INode> existingValues,
+        INotificationId? notificationId = null) : this(destinationParent, setValues, existingValues)
+    {}
 
     /// <inheritdoc />
     public override void Notify()

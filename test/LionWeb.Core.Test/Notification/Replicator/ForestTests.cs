@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -28,7 +28,7 @@ public class ForestTests : ReplicatorTestsBase
     [TestMethod]
     public void PartitionAdded()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
         var originalForest = new Forest();
         var clonedForest = new Forest();
 
@@ -42,7 +42,7 @@ public class ForestTests : ReplicatorTestsBase
     [TestMethod]
     public void PartitionDeleted()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
         var originalForest = new Forest();
         originalForest.AddPartitions([node]);
 
@@ -56,11 +56,11 @@ public class ForestTests : ReplicatorTestsBase
         Assert.IsEmpty(clonedForest.Partitions);
         Assert.IsEmpty(originalForest.Partitions);
     }
-    
+
     [TestMethod]
     public void PartitionAddedAndDeleted_AfterSubscribe()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
         var originalForest = new Forest();
         var clonedForest = new Forest();
 
@@ -82,9 +82,9 @@ public class ForestTests : ReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Works()
     {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var node = new Geometry("a") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var node = new TestPartition("a") { Links = [origin] };
 
         var originalForest = new Forest();
         var clonedForest = new Forest();
@@ -92,7 +92,7 @@ public class ForestTests : ReplicatorTestsBase
         CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([node]);
-        node.AddShapes([moved]);
+        node.AddLinks([moved]);
 
         AssertEquals([node], clonedForest.Partitions);
     }
@@ -102,11 +102,11 @@ public class ForestTests : ReplicatorTestsBase
     {
         // Original and cloned forests are out of sync: their initial states differ.
         // One approach to tackle this: cloned forest can check available partitions in original forest, and can clone them.
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var originPartition = new Geometry("g") { Shapes = [origin] };
+        var moved = new LinkTestConcept("moved");
+        var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
+        var originPartition = new TestPartition("g") { Links = [origin] };
 
-        var destinationPartition = new Geometry("a") { Shapes = [] };
+        var destinationPartition = new TestPartition("a") { Links = [] };
 
         var originalForest = new Forest();
         originalForest.AddPartitions([originPartition]);
@@ -117,28 +117,31 @@ public class ForestTests : ReplicatorTestsBase
 
         originalForest.AddPartitions([destinationPartition]);
         // Node "moved" is unknown in the cloned forest
-        Assert.ThrowsExactly<InvalidOperationException>(() => destinationPartition.AddShapes([moved]));
+        Assert.ThrowsExactly<InvalidOperationException>(() => destinationPartition.AddLinks([moved]));
     }
 
     [TestMethod]
     public void ChildMovedFromOtherContainment_AddBeforeSubscribe_CloneExists_Replicated()
     {
-        var moved = new Documentation("moved");
-        var node = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+        var moved = new LinkTestConcept("moved");
+        var node = new TestPartition("a") { Links = [new LinkTestConcept("l") { Containment_0_1 = moved }] };
 
         var originalForest = new Forest();
         originalForest.AddPartitions([node]);
 
-        var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
+        var clone = new TestPartition("a")
+        {
+            Links = [new LinkTestConcept("l") { Containment_0_1 = new LinkTestConcept("moved") }]
+        };
 
         var clonedForest = new Forest();
         clonedForest.AddPartitions([clone]);
 
         CreateForestReplicator(clonedForest, originalForest);
 
-        node.Documentation = moved;
+        node.Links[0].Containment_1 = moved;
 
-        Assert.AreSame(node, moved.GetParent());
+        Assert.AreSame(node.Links[0], moved.GetParent());
         AssertEquals([node], [clone]);
         AssertEquals(originalForest.Partitions, clonedForest.Partitions);
     }
@@ -146,10 +149,10 @@ public class ForestTests : ReplicatorTestsBase
     [TestMethod]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_DifferentPartitions_Works()
     {
-        var moved = new Documentation("moved");
-        var originPartition = new Geometry("g") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+        var moved = new LinkTestConcept("moved");
+        var originPartition = new TestPartition("g") { Links = [new LinkTestConcept("l") { Containment_0_1 = moved }] };
 
-        var node = new Geometry("a") { };
+        var node = new TestPartition("a") { };
 
         var originalForest = new Forest();
         var clonedForest = new Forest();
@@ -162,7 +165,7 @@ public class ForestTests : ReplicatorTestsBase
 
         originalForest.AddPartitions([node, originPartition]);
 
-        node.Documentation = moved;
+        node.AddLinks([moved]);
 
         Assert.AreEqual(
             notificationObserver.Notifications.DistinctBy(n => n.NotificationId).Count(),
@@ -174,6 +177,115 @@ public class ForestTests : ReplicatorTestsBase
     }
 
     #endregion
+
+    #endregion
+
+    #region Descendants
+
+    [TestMethod]
+    public void Descendants_empty()
+    {
+        var forest = new Forest();
+
+        Assert.IsEmpty(forest.Descendants());
+    }
+
+    [TestMethod]
+    public void Descendants_OnlyPartitions()
+    {
+        List<IPartitionInstance> partitions = [new TestPartition("partitionA"), new TestPartition("partitionB")];
+
+        var forest = new Forest();
+        forest.AddPartitions(partitions);
+
+        CollectionAssert.AreEqual(partitions.Cast<IReadableNode>().ToList(), forest.Descendants().ToList());
+    }
+
+    [TestMethod]
+    public void Descendants_AnnotatedPartitions_Exclude()
+    {
+        var partitionB = new TestPartition("partitionB");
+        partitionB.AddAnnotations([new TestAnnotation("annotation")]);
+        List<IPartitionInstance> partitions = [new TestPartition("partitionA"), partitionB];
+
+        var forest = new Forest();
+        forest.AddPartitions(partitions);
+
+        CollectionAssert.AreEqual(partitions.Cast<IReadableNode>().ToList(), forest.Descendants(false).ToList());
+    }
+
+    [TestMethod]
+    public void Descendants_AnnotatedPartitions_Include()
+    {
+        var partitionA = new TestPartition("partitionA");
+        var partitionB = new TestPartition("partitionB");
+        var annotation = new TestAnnotation("annotation");
+        partitionB.AddAnnotations([annotation]);
+        List<IPartitionInstance> partitions = [partitionA, partitionB];
+
+        var forest = new Forest();
+        forest.AddPartitions(partitions);
+
+        var actual = forest.Descendants(true).ToList();
+        CollectionAssert.AreEqual(new List<IReadableNode> { partitionA, partitionB, annotation }, actual);
+    }
+
+    [TestMethod]
+    public void Descendants_DeepPartitions()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+        var childC = new LinkTestConcept("childC") { Containment_1 = childB };
+        var partitionA = new TestPartition("partitionA") { Links = [childA] };
+        var partitionB = new TestPartition("partitionB") { Links = [childC] };
+        List<IPartitionInstance> partitions = [partitionA, partitionB];
+
+        var forest = new Forest();
+        forest.AddPartitions(partitions);
+
+        var actual = forest.Descendants(false).ToList();
+        CollectionAssert.AreEqual(new List<IReadableNode>
+        {
+            partitionA,
+            childA,
+            partitionB,
+            childC,
+            childB
+        }, actual);
+    }
+
+    [TestMethod]
+    public void Descendants_DeepPartitions_WithAnnotations()
+    {
+        var childA = new LinkTestConcept("childA");
+        var childB = new LinkTestConcept("childB");
+        var childC = new LinkTestConcept("childC") { Containment_1 = childB };
+        var partitionA = new TestPartition("partitionA") { Links = [childA] };
+        var partitionB = new TestPartition("partitionB") { Links = [childC] };
+
+        var annotationA = new TestAnnotation("annotationA");
+        partitionA.AddAnnotations([annotationA]);
+        
+        var annotationB = new TestAnnotation("annotationB");
+        childC.AddAnnotations([annotationB]);
+
+        List<IPartitionInstance> partitions = [partitionA, partitionB];
+
+        var forest = new Forest();
+        forest.AddPartitions(partitions);
+
+        var actual = forest.Descendants(true).ToList();
+        CollectionAssert.AreEqual(new List<IReadableNode>
+        {
+            partitionA,
+            childA,
+            annotationA,
+            partitionB,
+            childC,
+            childB,
+            annotationB
+        }, actual);
+    }
 
     #endregion
 }

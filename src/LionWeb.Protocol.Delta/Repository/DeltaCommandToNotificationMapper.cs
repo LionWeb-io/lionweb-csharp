@@ -65,6 +65,7 @@ public class DeltaCommandToNotificationMapper
                 OnMoveAndReplaceChildFromOtherContainmentInSameParent(a),
             AddAnnotation a => OnAddAnnotation(a),
             DeleteAnnotation a => OnDeleteAnnotation(a),
+            ReplaceAnnotation a => OnReplaceAnnotation(a),
             MoveAnnotationFromOtherParent a => OnMoveAnnotationFromOtherParent(a),
             MoveAnnotationInSameParent a => OnMoveAnnotationInSameParent(a),
             AddReference a => OnAddReference(a),
@@ -342,6 +343,18 @@ public class DeltaCommandToNotificationMapper
             parent,
             deleteAnnotationCommand.Index,
             ToNotificationId(deleteAnnotationCommand)
+        );
+    }
+
+    private AnnotationReplacedNotification OnReplaceAnnotation(ReplaceAnnotation command)
+    {
+        var parent = ToNode(command.Parent);
+        return new AnnotationReplacedNotification(
+            Deserialize(command.NewAnnotation),
+            M2Extensions.AsNodes<IWritableNode>(parent.GetAnnotations()).ToList()[command.Index],
+            parent,
+            command.Index,
+            ToNotificationId(command)
         );
     }
 

@@ -71,6 +71,36 @@ public abstract class LinkBase<TLanguage> : FeatureBase<TLanguage>, Link where T
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_m3.Link_multiple.EqualsIdentity(property) && ((Link)this).TryGetMultiple(out var multiple))
+        {
+            value = multiple;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+        
+        if (_m3.Link_type.EqualsIdentity(reference) && ((Link)this).TryGetType(out var type))
+        {
+            target = ReferenceTarget.FromNode(type);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     public required bool Multiple { get; init; }
 
     /// <inheritdoc />

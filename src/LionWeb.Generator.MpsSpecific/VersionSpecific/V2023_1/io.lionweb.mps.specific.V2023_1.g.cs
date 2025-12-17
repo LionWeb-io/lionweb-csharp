@@ -9,7 +9,6 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Notification;
-using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
@@ -173,13 +172,18 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		return conceptAlias != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public ConceptDescription SetConceptAlias(string? value, INotificationId? notificationId = null)
+	private bool SetConceptAliasRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ConceptDescription_conceptAlias, this, value, _conceptAlias, notificationId);
-		emitter.CollectOldData();
+		if (value == _conceptAlias)
+			return false;
 		_conceptAlias = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public ConceptDescription SetConceptAlias(string? value)
+	{
+		SetOptionalReferenceTypeProperty<string>(value, SpecificLanguage.Instance.ConceptDescription_conceptAlias, _conceptAlias, SetConceptAliasRaw);
 		return this;
 	}
 
@@ -196,13 +200,18 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		return conceptShortDescription != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public ConceptDescription SetConceptShortDescription(string? value, INotificationId? notificationId = null)
+	private bool SetConceptShortDescriptionRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription, this, value, _conceptShortDescription, notificationId);
-		emitter.CollectOldData();
+		if (value == _conceptShortDescription)
+			return false;
 		_conceptShortDescription = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public ConceptDescription SetConceptShortDescription(string? value)
+	{
+		SetOptionalReferenceTypeProperty<string>(value, SpecificLanguage.Instance.ConceptDescription_conceptShortDescription, _conceptShortDescription, SetConceptShortDescriptionRaw);
 		return this;
 	}
 
@@ -219,13 +228,18 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		return helpUrl != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public ConceptDescription SetHelpUrl(string? value, INotificationId? notificationId = null)
+	private bool SetHelpUrlRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ConceptDescription_helpUrl, this, value, _helpUrl, notificationId);
-		emitter.CollectOldData();
+		if (value == _helpUrl)
+			return false;
 		_helpUrl = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public ConceptDescription SetHelpUrl(string? value)
+	{
+		SetOptionalReferenceTypeProperty<string>(value, SpecificLanguage.Instance.ConceptDescription_helpUrl, _helpUrl, SetHelpUrlRaw);
 		return this;
 	}
 
@@ -261,16 +275,41 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		return false;
 	}
 
-	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+	protected override bool TryGetPropertyRaw(Property feature, out object? result)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (SpecificLanguage.Instance.ConceptDescription_conceptAlias.EqualsIdentity(feature))
+		{
+			result = _conceptAlias;
+			return true;
+		}
+
+		if (SpecificLanguage.Instance.ConceptDescription_conceptShortDescription.EqualsIdentity(feature))
+		{
+			result = _conceptShortDescription;
+			return true;
+		}
+
+		if (SpecificLanguage.Instance.ConceptDescription_helpUrl.EqualsIdentity(feature))
+		{
+			result = _helpUrl;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, object? value)
+	{
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.ConceptDescription_conceptAlias.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetConceptAlias((string?)value, notificationId);
+				SetConceptAlias((string?)value);
 				return true;
 			}
 
@@ -281,7 +320,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetConceptShortDescription((string?)value, notificationId);
+				SetConceptShortDescription((string?)value);
 				return true;
 			}
 
@@ -292,13 +331,26 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetHelpUrl((string?)value, notificationId);
+				SetHelpUrl((string?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (SpecificLanguage.Instance.ConceptDescription_conceptAlias.EqualsIdentity(feature) && value is null or string)
+			return SetConceptAliasRaw((string?)value);
+		if (SpecificLanguage.Instance.ConceptDescription_conceptShortDescription.EqualsIdentity(feature) && value is null or string)
+			return SetConceptShortDescriptionRaw((string?)value);
+		if (SpecificLanguage.Instance.ConceptDescription_helpUrl.EqualsIdentity(feature) && value is null or string)
+			return SetHelpUrlRaw((string?)value);
 		return false;
 	}
 
@@ -332,13 +384,18 @@ public partial class Deprecated : AnnotationInstanceBase
 		return build != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public Deprecated SetBuild(string? value, INotificationId? notificationId = null)
+	private bool SetBuildRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.Deprecated_build, this, value, _build, notificationId);
-		emitter.CollectOldData();
+		if (value == _build)
+			return false;
 		_build = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public Deprecated SetBuild(string? value)
+	{
+		SetOptionalReferenceTypeProperty<string>(value, SpecificLanguage.Instance.Deprecated_build, _build, SetBuildRaw);
 		return this;
 	}
 
@@ -355,13 +412,18 @@ public partial class Deprecated : AnnotationInstanceBase
 		return comment != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public Deprecated SetComment(string? value, INotificationId? notificationId = null)
+	private bool SetCommentRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.Deprecated_comment, this, value, _comment, notificationId);
-		emitter.CollectOldData();
+		if (value == _comment)
+			return false;
 		_comment = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public Deprecated SetComment(string? value)
+	{
+		SetOptionalReferenceTypeProperty<string>(value, SpecificLanguage.Instance.Deprecated_comment, _comment, SetCommentRaw);
 		return this;
 	}
 
@@ -391,16 +453,35 @@ public partial class Deprecated : AnnotationInstanceBase
 		return false;
 	}
 
-	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+	protected override bool TryGetPropertyRaw(Property feature, out object? result)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (SpecificLanguage.Instance.Deprecated_build.EqualsIdentity(feature))
+		{
+			result = _build;
+			return true;
+		}
+
+		if (SpecificLanguage.Instance.Deprecated_comment.EqualsIdentity(feature))
+		{
+			result = _comment;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, object? value)
+	{
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.Deprecated_build.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetBuild((string?)value, notificationId);
+				SetBuild((string?)value);
 				return true;
 			}
 
@@ -411,13 +492,24 @@ public partial class Deprecated : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetComment((string?)value, notificationId);
+				SetComment((string?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (SpecificLanguage.Instance.Deprecated_build.EqualsIdentity(feature) && value is null or string)
+			return SetBuildRaw((string?)value);
+		if (SpecificLanguage.Instance.Deprecated_comment.EqualsIdentity(feature) && value is null or string)
+			return SetCommentRaw((string?)value);
 		return false;
 	}
 
@@ -449,13 +541,18 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		return documentation != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public KeyedDescription SetDocumentation(string? value, INotificationId? notificationId = null)
+	private bool SetDocumentationRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.KeyedDescription_documentation, this, value, _documentation, notificationId);
-		emitter.CollectOldData();
+		if (value == _documentation)
+			return false;
 		_documentation = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public KeyedDescription SetDocumentation(string? value)
+	{
+		SetOptionalReferenceTypeProperty<string>(value, SpecificLanguage.Instance.KeyedDescription_documentation, _documentation, SetDocumentationRaw);
 		return this;
 	}
 
@@ -467,40 +564,28 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso) => TryGetReference<IReadableNode>(_seeAlso, out seeAlso);
+	private bool SetSeeAlsoRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _seeAlso);
+	private bool AddSeeAlsoRaw(ReferenceTarget target) => AddReferencesRaw(target, _seeAlso);
+	private bool InsertSeeAlsoRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _seeAlso);
+	private bool RemoveSeeAlsoRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _seeAlso);
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
+        public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes)
 	{
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso.Count, notificationId);
-		emitter.CollectOldData();
-		_seeAlso.AddRange(safeNodes);
-		emitter.Notify();
+		AddOptionalMultipleReference<IReadableNode>(nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, AddSeeAlsoRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
+        public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes)
 	{
-		AssureInRange(index, _seeAlso);
-		var safeNodes = nodes?.Select(ReferenceTarget.FromNode).ToList();
-		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, index, notificationId);
-		emitter.CollectOldData();
-		_seeAlso.InsertRange(index, safeNodes);
-		emitter.Notify();
+		InsertOptionalMultipleReference<IReadableNode>(index, nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, InsertSeeAlsoRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription RemoveSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
+        public KeyedDescription RemoveSeeAlso(IEnumerable<IReadableNode> nodes)
 	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		RemoveAll(safeNodes, _seeAlso, ReferenceRemover<IReadableNode>(SpecificLanguage.Instance.KeyedDescription_seeAlso));
+		RemoveOptionalMultipleReference<IReadableNode>(nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, RemoveSeeAlsoRaw);
 		return this;
 	}
 
@@ -530,16 +615,42 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		return false;
 	}
 
-	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+	protected override bool TryGetPropertyRaw(Property feature, out object? result)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature))
+		{
+			result = _documentation;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected override bool TryGetReferencesRaw(Reference feature, out IReadOnlyList<IReferenceTarget> result)
+	{
+		if (base.TryGetReferencesRaw(feature, out result))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
+		{
+			result = _seeAlso;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, object? value)
+	{
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetDocumentation((string?)value, notificationId);
+				SetDocumentation((string?)value);
 				return true;
 			}
 
@@ -548,17 +659,19 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsReferenceTargets<IReadableNode>(value).ToList();
-			AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-			AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, notificationId);
-			emitter.CollectOldData();
-			_seeAlso.Clear();
-			_seeAlso.AddRange(safeNodes);
-			emitter.Notify();
+			SetOptionalMultipleReference<IReadableNode>(value, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, SetSeeAlsoRaw);
 			return true;
 		}
 
+		return false;
+	}
+
+	protected override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature) && value is null or string)
+			return SetDocumentationRaw((string?)value);
 		return false;
 	}
 
@@ -571,6 +684,33 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		if (TryGetSeeAlso(out _))
 			result.Add(SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		return result;
+	}
+
+	protected override bool AddReferencesRaw(Reference feature, ReferenceTarget value)
+	{
+		if (base.AddReferencesRaw(feature, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
+			return AddSeeAlsoRaw(value);
+		return false;
+	}
+
+	protected override bool InsertReferencesRaw(Reference feature, int index, ReferenceTarget value)
+	{
+		if (base.InsertReferencesRaw(feature, index, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
+			return InsertSeeAlsoRaw(index, value);
+		return false;
+	}
+
+	protected override bool RemoveReferencesRaw(Reference feature, ReferenceTarget value)
+	{
+		if (base.RemoveReferencesRaw(feature, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
+			return RemoveSeeAlsoRaw(value);
+		return false;
 	}
 
 	/// <inheritdoc/>
@@ -632,13 +772,18 @@ public partial class ShortDescription : AnnotationInstanceBase
 		return description != null;
 	}
 
-	/// <remarks>Optional Property</remarks>
-        public ShortDescription SetDescription(string? value, INotificationId? notificationId = null)
+	private bool SetDescriptionRaw(string? value)
 	{
-		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ShortDescription_description, this, value, _description, notificationId);
-		emitter.CollectOldData();
+		if (value == _description)
+			return false;
 		_description = value;
-		emitter.Notify();
+		return true;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public ShortDescription SetDescription(string? value)
+	{
+		SetOptionalReferenceTypeProperty<string>(value, SpecificLanguage.Instance.ShortDescription_description, _description, SetDescriptionRaw);
 		return this;
 	}
 
@@ -662,22 +807,44 @@ public partial class ShortDescription : AnnotationInstanceBase
 		return false;
 	}
 
-	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+	protected override bool TryGetPropertyRaw(Property feature, out object? result)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (SpecificLanguage.Instance.ShortDescription_description.EqualsIdentity(feature))
+		{
+			result = _description;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, object? value)
+	{
+		if (base.SetInternal(feature, value))
 			return true;
 		if (SpecificLanguage.Instance.ShortDescription_description.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetDescription((string?)value, notificationId);
+				SetDescription((string?)value);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (SpecificLanguage.Instance.ShortDescription_description.EqualsIdentity(feature) && value is null or string)
+			return SetDescriptionRaw((string?)value);
 		return false;
 	}
 
@@ -695,6 +862,14 @@ public partial class ShortDescription : AnnotationInstanceBase
 public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 {
 	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -711,16 +886,12 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public VirtualPackage SetName(string value, INotificationId? notificationId = null)
+        public VirtualPackage SetName(string value)
 	{
-		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		emitter.CollectOldData();
-		_name = value;
-		emitter.Notify();
+		SetRequiredReferenceTypeProperty<string>(value, _builtIns.INamed_name, _name, SetNameRaw);
 		return this;
 	}
 
@@ -744,22 +915,44 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 		return false;
 	}
 
-	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+	protected override bool TryGetPropertyRaw(Property feature, out object? result)
 	{
-		if (base.SetInternal(feature, value, notificationId))
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, object? value)
+	{
+		if (base.SetInternal(feature, value))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
-				SetName(v, notificationId);
+				SetName(v);
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
+		return false;
+	}
+
+	protected override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
 		return false;
 	}
 

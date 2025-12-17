@@ -17,21 +17,36 @@
 
 namespace LionWeb.Core.M3;
 
-using Notification;
 using System.Collections;
+using Utilities;
 
 /// <inheritdoc cref="Enumeration"/>
 public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, DynamicLanguage? language)
     : DynamicDatatype(id, lionWebVersion, language), Enumeration
 {
-    private readonly List<EnumerationLiteral> _literals = [];
+    private readonly List<DynamicEnumerationLiteral> _literals = [];
 
     /// <inheritdoc />
     public IReadOnlyList<EnumerationLiteral> Literals => _literals.AsReadOnly();
 
     /// <inheritdoc cref="Literals"/>
-    public void AddLiterals(IEnumerable<EnumerationLiteral> literals) =>
-        _literals.AddRange(SetSelfParent(literals?.ToList(), _m3.Enumeration_literals));
+    public void AddLiterals(IEnumerable<DynamicEnumerationLiteral> literals) =>
+        AddOptionalMultipleContainment(literals, _m3.Enumeration_literals, _literals, AddLiteralsRaw);
+
+    /// <inheritdoc cref="Literals"/>
+    protected internal bool SetLiteralsRaw(List<DynamicEnumerationLiteral> nodes) =>
+        ExchangeChildrenRaw(nodes, _literals);
+
+    /// <inheritdoc cref="Literals"/>
+    protected internal bool AddLiteralsRaw(DynamicEnumerationLiteral? value) => AddChildRaw(value, _literals);
+
+    /// <inheritdoc cref="Literals"/>
+    private bool InsertLiteralsRaw(int index, DynamicEnumerationLiteral? value) =>
+        InsertChildRaw(index, value, _literals);
+
+    /// <inheritdoc cref="Literals"/>
+    private bool RemoveLiteralsRaw(DynamicEnumerationLiteral? value) => RemoveChildRaw(value, _literals);
+
 
     /// <inheritdoc />
     protected override bool DetachChild(INode child)
@@ -43,7 +58,7 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
 
         var c = GetContainmentOf(child);
         if (c == _m3.Enumeration_literals)
-            return _literals.Remove((EnumerationLiteral)child);
+            return _literals.Remove((DynamicEnumerationLiteral)child);
 
         return false;
     }
@@ -86,7 +101,66 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected internal override bool TryGetContainmentsRaw(Containment containment,
+        out IReadOnlyList<IReadableNode> nodes)
+    {
+        if (base.TryGetContainmentsRaw(containment, out nodes))
+            return true;
+
+        if (_m3.Enumeration_literals.EqualsIdentity(containment))
+        {
+            nodes = _literals;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool AddContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.AddContainmentsRaw(containment, node))
+            return true;
+
+        if (_m3.Enumeration_literals.EqualsIdentity(containment) && node is DynamicEnumerationLiteral literal)
+        {
+            return AddLiteralsRaw(literal);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool InsertContainmentsRaw(Containment containment, Index index, IWritableNode node)
+    {
+        if (base.InsertContainmentsRaw(containment, index, node))
+            return true;
+
+        if (_m3.Enumeration_literals.EqualsIdentity(containment) && node is DynamicEnumerationLiteral literal)
+        {
+            return InsertLiteralsRaw(index, literal);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool RemoveContainmentsRaw(Containment containment, IWritableNode node)
+    {
+        if (base.RemoveContainmentsRaw(containment, node))
+            return true;
+
+        if (_m3.Enumeration_literals.EqualsIdentity(containment) && node is DynamicEnumerationLiteral literal)
+        {
+            return RemoveLiteralsRaw(literal);
+        }
+
+        return false;
+    }
+
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         var result = base.SetInternal(feature, value);
         if (result)
@@ -100,7 +174,7 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
             {
                 case IEnumerable e:
                     RemoveSelfParent(_literals?.ToList(), _literals, _m3.Enumeration_literals);
-                    AddLiterals(e.OfType<EnumerationLiteral>().ToArray());
+                    AddLiterals(e.OfType<DynamicEnumerationLiteral>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);

@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class MovedInSameContainmentTests : ReplicatorTestsBase
@@ -26,13 +26,13 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Forward()
     {
-        var moved = new Circle("moved");
-        var originalPartition = new Geometry("a") { Shapes = [moved, new Line("l")] };
+        var moved = new LinkTestConcept("moved");
+        var originalPartition = new TestPartition("a") { Links =  [moved, new LinkTestConcept("l")] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.AddShapes([moved]);
+        originalPartition.AddLinks([moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -40,13 +40,13 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Backward()
     {
-        var moved = new Circle("moved");
-        var originalPartition = new Geometry("a") { Shapes = [new Line("l"), moved] };
+        var moved = new LinkTestConcept("moved");
+        var originalPartition = new TestPartition("a") { Links =  [new LinkTestConcept("l"), moved] };
         var clonedPartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        originalPartition.InsertShapes(0, [moved]);
+        originalPartition.InsertLinks(0, [moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -54,11 +54,11 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Adds_first_of_the_existing_children()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -67,7 +67,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddShapes([a]);
+        originalPartition.AddLinks([a]);
 
         Assert.AreEqual(1, notificationObserver.Count);
         
@@ -78,17 +78,17 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         Assert.AreEqual(0, childMovedInSameContainmentNotification!.OldIndex);
         Assert.AreEqual(3, childMovedInSameContainmentNotification.NewIndex);
         
-        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
     public void Adds_two_of_the_existing_children()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -97,7 +97,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddShapes([a, b]);
+        originalPartition.AddLinks([a, b]);
 
         Assert.AreEqual(2, notificationObserver.Count);
 
@@ -109,17 +109,17 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }
         
-        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
     public void Sets_two_of_the_existing_children_using_set()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -128,8 +128,8 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        var values = new IShape[] { a, b };
-        originalPartition.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        var values = new LinkTestConcept[] { a, b };
+        originalPartition.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
 
         Assert.AreEqual(2, notificationObserver.Count);
 
@@ -140,17 +140,17 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
             Assert.AreEqual(2, childDeletedNotification?.Index);
         }
 
-        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
     public void Adds_three_of_the_existing_children()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -159,7 +159,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddShapes([a, b, c]);
+        originalPartition.AddLinks([a, b, c]);
 
         Assert.AreEqual(3, notificationObserver.Count);
 
@@ -171,17 +171,17 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }
         
-        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
     public void Adds_three_of_the_existing_children_in_a_mixed_order()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -190,7 +190,7 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddShapes([c, a, b]);
+        originalPartition.AddLinks([c, a, b]);
 
         Assert.AreEqual(3, notificationObserver.Count);
 
@@ -211,17 +211,17 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         Assert.AreEqual(0, lastNotification?.OldIndex);
         Assert.AreEqual(3, lastNotification?.NewIndex);
         
-        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 
     [TestMethod]
     public void Adds_new_node_to_the_existing_children()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo") { Links =  [a, b, c, d] };
 
         var clonedPartition = ClonePartition(originalPartition);
 
@@ -230,8 +230,8 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        var e = new Circle("e");
-        originalPartition.AddShapes([a, b, c, d, e]);
+        var e = new LinkTestConcept("e");
+        originalPartition.AddLinks([a, b, c, d, e]);
 
         Assert.AreEqual(5, notificationObserver.Count);
 
@@ -245,6 +245,6 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
 
         Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[^1]);
 
-        AssertEquals(originalPartition.Shapes, clonedPartition.Shapes);
+        AssertEquals(originalPartition.Links, clonedPartition.Links);
     }
 }

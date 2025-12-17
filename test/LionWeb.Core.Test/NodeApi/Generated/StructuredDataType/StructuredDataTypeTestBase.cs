@@ -28,12 +28,12 @@ public abstract class StructuredDataTypeTestBase
     protected Field DecimalInt() => SDTLangLanguage.Instance.Decimal_int;
     protected Field DecimalFrac() => SDTLangLanguage.Instance.Decimal_frac;
 
-    protected Decimal NewDecimal(int dec, int frac) => new Decimal(frac, dec);
+    protected Decimal NewDecimal(int dec, int frac) => new Decimal {Frac = frac, Int = dec};
     protected Decimal NewDecimal() => new();
     protected E NewE(F e2F) => new() { E2f = e2F };
     protected E NewE(string name) => new() { Name = name };
     protected E NewE(F e2F, string? name) => new() { E2f = e2F, Name = name! };
-    protected F NewF(string name) => new(name);
+    protected F NewF(string name) => new() {Name  = name};
     protected Field E_e2f() => SDTLangLanguage.Instance.E_e2f;
     protected Field E_name() => SDTLangLanguage.Instance.E_name;
     protected Currency CurrencyEUR() => Currency.EUR;
@@ -45,9 +45,10 @@ public abstract class StructuredDataTypeTestBase
     protected Amount NewAmount() => new();
     protected Amount NewAmount(Currency cur) => new() { Currency = cur };
     protected Amount NewAmount(int dec, int frac, string currency, bool digital)
-        => new Amount(
-            Enum.TryParse<Currency>(currency, out var result) ? result : null,
-            digital,
-            NewDecimal(dec, frac)
-        );
+        => new Amount()
+        {
+            Currency =Enum.TryParse<Currency>(currency, out var result) ? result : default,
+            Digital = digital,
+            Value =NewDecimal(dec, frac) 
+        };
 }

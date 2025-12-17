@@ -361,7 +361,8 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         if (target is not null)
             return new ReferenceTarget(resolveInfo, target?.GetId() ?? targetId?.Original, target);
 
-        return _handler.UnresolvableReferenceTarget(new ReferenceTarget(resolveInfo, targetId?.Original, null), reference, node);
+        var defaultTarget = new ReferenceTarget(resolveInfo, targetId?.Original, null);
+        return _handler.UnresolvableReferenceTarget(defaultTarget, reference, node);
     }
 
     /// Compresses <paramref name="r"/>.

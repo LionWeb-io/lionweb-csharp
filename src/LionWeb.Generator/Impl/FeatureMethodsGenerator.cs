@@ -21,9 +21,9 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Notification;
-using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 using Property = Core.M3.Property;
@@ -38,8 +38,12 @@ using Property = Core.M3.Property;
 /// - RemoveInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputParameters generatorInputParameters)
-    : ClassifierGeneratorBase(generatorInputParameters)
+public class FeatureMethodsGenerator(
+    Classifier classifier,
+    INames names,
+    LionWebVersions lionWebVersion,
+    GeneratorConfig config)
+    : ClassifierGeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> FeatureMethods()
@@ -47,18 +51,33 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
         if (!FeaturesToImplement(classifier).Any())
             return [];
 
-        IEnumerable<MemberDeclarationSyntax> featureMethods = [
+        IEnumerable<MemberDeclarationSyntax> featureMethods = new List<MemberDeclarationSyntax?>
+        {
             GenGetInternal(),
+            GenTryGetPropertyRaw(),
+            GenTryGetContainmentRaw(),
+            GenTryGetContainmentsRaw(),
+            GenTryGetReferenceRaw(),
+            GenTryGetReferencesRaw(),
             GenSetInternal(),
-            GenCollectAllSetFeatures()
-        ];
+            GenSetPropertyRaw(),
+            GenSetContainmentRaw(),
+            GenSetReferenceRaw(),
+            GenCollectAllSetFeatures(),
+            GenAddContainmentsRaw(),
+            GenAddReferencesRaw(),
+            GenInsertContainmentsRaw(),
+            GenInsertReferencesRaw(),
+            GenRemoveContainmentsRaw(),
+            GenRemoveReferencesRaw()
+        }.Where(m => m is not null)!;
 
         if (!FeaturesToImplement(classifier).OfType<Link>().Any(link => link.Multiple))
         {
             return featureMethods;
         }
 
-        var addInternal =  GenAddInternal();
+        var addInternal = GenAddInternal();
         var insertInternal = GenInsertInternal();
         var removeInternal = GenRemoveInternal();
 
@@ -98,24 +117,76 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
 
     #endregion
 
+    #region TryGetRaw
+
+    private MethodDeclarationSyntax? GenTryGetPropertyRaw() =>
+        AbstractGetRaw("TryGetPropertyRaw", typeof(Property), NullableType(AsType(typeof(object))),
+            PropertiesToImplement());
+
+    private MethodDeclarationSyntax? GenTryGetContainmentRaw() =>
+        AbstractGetRaw("TryGetContainmentRaw", typeof(Containment), NullableType(AsType(typeof(IReadableNode))),
+            ContainmentsToImplement(false));
+
+    private MethodDeclarationSyntax? GenTryGetContainmentsRaw() =>
+        AbstractGetRaw("TryGetContainmentsRaw", typeof(Containment), AsType(typeof(IReadOnlyList<IReadableNode>)),
+            ContainmentsToImplement(true));
+
+    private MethodDeclarationSyntax? GenTryGetReferenceRaw() =>
+        AbstractGetRaw("TryGetReferenceRaw", typeof(Reference), NullableType(AsType(typeof(IReferenceTarget))),
+            ReferencesToImplement(false));
+
+    private MethodDeclarationSyntax? GenTryGetReferencesRaw() =>
+        AbstractGetRaw("TryGetReferencesRaw", typeof(Reference), AsType(typeof(IReadOnlyList<IReferenceTarget>)),
+            ReferencesToImplement(true));
+
+    private MethodDeclarationSyntax? AbstractGetRaw(string methodName, Type featureType, TypeSyntax resultType,
+        IReadOnlyList<Feature> features) =>
+        features.Count == 0
+            ? null
+            : Method(methodName, AsType(typeof(bool)), [
+                    Param("feature", AsType(featureType)),
+                    Param("result", resultType)
+                        .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
+                ])
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+                .WithBody(AsStatements(new List<StatementSyntax>
+                    {
+                        IfStatement(ParseExpression($"base.{methodName}(feature, out result)"), ReturnTrue())
+                    }
+                    .Concat(features.Select(GenGetInternalRaw))
+                    .Append(ReturnStatement(false.AsLiteral()))
+                ));
+
+    private StatementSyntax GenGetInternalRaw(Feature feature) =>
+        IfStatement(GenEqualsIdentityFeature(feature),
+            AsStatements([
+                Assignment("result", FeatureField(feature)),
+                ReturnTrue()
+            ])
+        );
+
+    #endregion
+
     #region SetInternal
 
-    private MethodDeclarationSyntax GenSetInternal() =>
-        Method("SetInternal", AsType(typeof(bool)), [
+    private MethodDeclarationSyntax GenSetInternal()
+    {
+        TypeSyntax type = AsType(typeof(INotificationId));
+        return Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
-                Param("value", NullableType(AsType(typeof(object)))),
-                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                Param("value", NullableType(AsType(typeof(object))))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.SetInternal(feature, value, notificationId)"),
+                    IfStatement(ParseExpression("base.SetInternal(feature, value)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).Select(GenSetInternal))
                 .Append(ReturnStatement(false.AsLiteral()))
             ));
+    }
 
     private StatementSyntax GenSetInternal(Feature feature)
     {
@@ -147,7 +218,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(property)), AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
+                        IdentifierName(FeatureSet(property)), AsArguments([IdentifierName("v")]))),
                 ReturnTrue()
             ])
         ),
@@ -161,7 +232,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(property)), AsArguments([CastValueType(property), IdentifierName("notificationId")]))),
+                        IdentifierName(FeatureSet(property)), AsArguments([CastValueType(property)]))),
                 ReturnTrue()
             ])
         ),
@@ -188,7 +259,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
                 ExpressionStatement(
                     InvocationExpression(
                         IdentifierName(FeatureSet(link)),
-                        AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
+                        AsArguments([IdentifierName("v")]))),
                 ReturnTrue()
             ])
         );
@@ -204,7 +275,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
                 ExpressionStatement(
                     InvocationExpression(
                         IdentifierName(FeatureSet(reference)),
-                        AsArguments([IdentifierName("target"), IdentifierName("notificationId")]))),
+                        AsArguments([IdentifierName("target")]))),
                 ReturnTrue()
             ])
         );
@@ -229,93 +300,188 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
                 ExpressionStatement(
                     InvocationExpression(
                         IdentifierName(FeatureSet(link)),
-                        AsArguments([CastValueType(link, writeable: writeable), IdentifierName("notificationId")]))),
+                        AsArguments([CastValueType(link, writeable: writeable)]))),
                 ReturnTrue()
             ])
         );
 
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
-        SafeNodesVar(containment, writeable: true),
-        SetContainmentEmitterVariable(containment),
-        EmitterCollectOldDataCall(),
-        RemoveSelfParentCall(containment),
-        OptionalAddRangeCall(containment),
-        EmitterNotifyCall(),
+        ExpressionStatement(CallGeneric("SetOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment) =>
     [
-        SafeNodesVar(containment, writeable: true),
-        AssureNonEmptyCall(containment),
-        SetContainmentEmitterVariable(containment),
-        EmitterCollectOldDataCall(),
-        RemoveSelfParentCall(containment),
-        RequiredAddRangeCall(containment),
-        EmitterNotifyCall(),
+        ExpressionStatement(CallGeneric("SetRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiOptionalReference(Reference reference) =>
     [
-        SafeNodesVarReference(reference),
-        AssureNotNullCall(reference),
-        AssureNotNullMembersCall(reference),
-        SetReferenceEmitterVariable(reference),
-        EmitterCollectOldDataCall(),
-        ClearFieldCall(reference),
-        ReferenceAddRangeCall(reference),
-        EmitterNotifyCall(),
+        ExpressionStatement(CallGeneric("SetOptionalMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
         ReturnTrue()
     ];
-
-    private LocalDeclarationStatementSyntax SafeNodesVarReference(Reference reference) =>
-        Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(InvocationExpression(
-                MemberAccess(MetaProperty(reference),
-                    Generic("AsReferenceTargets", AsType(reference.Type, true))
-                ),
-                AsArguments([IdentifierName("value")])
-            ), IdentifierName("ToList")))
-        );
 
     private List<StatementSyntax> GenSetInternalMultiRequiredReference(Reference reference) =>
     [
-        SafeNodesVarReference(reference),
-        AssureNonEmptyCall(reference),
-        SetReferenceEmitterVariable(reference),
-        EmitterCollectOldDataCall(),
-        ClearFieldCall(reference),
-        ReferenceAddRangeCall(reference),
-        EmitterNotifyCall(),
+        ExpressionStatement(CallGeneric("SetRequiredMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
         ReturnTrue()
     ];
 
-    private ExpressionStatementSyntax ClearFieldCall(Reference reference) =>
-        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear"))));
+    #region Raw
 
-    private ExpressionStatementSyntax ReferenceAddRangeCall(Reference reference) =>
-        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
-            AsArguments([IdentifierName("safeNodes")])));
+    #region SetRaw
 
-    private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
-        Variable(
-            "emitter",
-            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable: true)),
-            NewCall([
-                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
-            ])
+    private MethodDeclarationSyntax? GenSetPropertyRaw() =>
+        AbstractGenSetRaw("SetPropertyRaw", NullableType(AsType(typeof(object))), PropertiesToImplement(),
+            (p, _) => GenSetSingleFeatureRaw(p));
+
+    private MethodDeclarationSyntax? GenSetContainmentRaw() =>
+        AbstractGenSetRaw("SetContainmentRaw", NullableType(AsType(typeof(IWritableNode))),
+            ContainmentsToImplement(false),
+            (c, _) => GenSetSingleFeatureRaw(c, writeable: true));
+
+    private MethodDeclarationSyntax? GenSetReferenceRaw() =>
+        AbstractGenSetRaw("SetReferenceRaw", NullableType(AsType(typeof(ReferenceTarget))),
+            ReferencesToImplement(false),
+            (feature, _) => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(FeatureSetRaw(feature).ToString(), IdentifierName("value")))
+            ));
+
+    private IfStatementSyntax GenSetSingleFeatureRaw(Feature feature, bool writeable = false) =>
+        IfStatement(
+            And(
+                GenEqualsIdentityFeature(feature),
+                IsPatternExpression(IdentifierName("value"), NullOrTypePattern(feature, writeable: writeable))
+            ),
+            ReturnStatement(Call(FeatureSetRaw(feature).ToString(), CastValueType(feature, writeable: writeable)))
         );
 
-    private LocalDeclarationStatementSyntax SetReferenceEmitterVariable(Reference reference) =>
-        Variable(
-            "emitter",
-            AsType(typeof(ReferenceSetNotificationEmitter<>), AsType(reference.GetFeatureType())),
-            NewCall([
-                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("notificationId")
-            ])
-        );
+    #endregion
+
+    #region AddRaw
+
+    private MethodDeclarationSyntax? GenAddContainmentsRaw() =>
+        AbstractGenSetRaw("AddContainmentsRaw", AsType(typeof(IWritableNode)),
+            ContainmentsToImplement(true),
+            (feature, i) =>
+            {
+                var variableName = $"v{i}";
+                return IfStatement(
+                    And(
+                        GenEqualsIdentityFeature(feature),
+                        IsPatternExpression(IdentifierName("value"), AsTypePattern(feature, variableName, writeable: true))
+                    ),
+                    ReturnStatement(Call(LinkAddRaw(feature).ToString(), IdentifierName(variableName)))
+                );
+            });
+
+    private MethodDeclarationSyntax? GenAddReferencesRaw() =>
+        AbstractGenSetRaw("AddReferencesRaw", AsType(typeof(ReferenceTarget)),
+            ReferencesToImplement(true),
+            (feature, _) => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(LinkAddRaw(feature).ToString(), IdentifierName("value")))
+            ));
+
+    #endregion
+
+    #region InsertRaw
+
+    private MethodDeclarationSyntax? GenInsertContainmentsRaw() =>
+        AbstractInsertRaw("InsertContainmentsRaw", AsType(typeof(IWritableNode)),
+            ContainmentsToImplement(true),
+            (feature, i) =>
+            {
+                var variableName = $"v{i}";
+                return IfStatement(
+                    And(
+                        GenEqualsIdentityFeature(feature),
+                        IsPatternExpression(IdentifierName("value"), AsTypePattern(feature, variableName, writeable: true))
+                    ),
+                    ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"),
+                        IdentifierName(variableName)))
+                );
+            });
+
+    private MethodDeclarationSyntax? GenInsertReferencesRaw() =>
+        AbstractInsertRaw("InsertReferencesRaw", AsType(typeof(ReferenceTarget)),
+            ReferencesToImplement(true),
+            (feature, _) => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(LinkInsertRaw(feature).ToString(), IdentifierName("index"),
+                    IdentifierName("value")))
+            ));
+
+    private MethodDeclarationSyntax? AbstractInsertRaw<T>(string methodName, TypeSyntax resultType,
+        IReadOnlyList<T> features, Func<T, int, StatementSyntax> converter) where T : Feature =>
+        features.Count == 0
+            ? null
+            : Method(methodName, AsType(typeof(bool)), [
+                    Param("feature", AsType(typeof(T))),
+                    Param("index", AsType(typeof(int))),
+                    Param("value", resultType)
+                ])
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+                .WithBody(AsStatements(new List<StatementSyntax>
+                    {
+                        IfStatement(ParseExpression($"base.{methodName}(feature, index, value)"),
+                            ReturnTrue())
+                    }
+                    .Concat(features.Select(converter))
+                    .Append(ReturnStatement(false.AsLiteral()))
+                ));
+
+    #endregion
+
+    #region RemoveRaw
+
+    private MethodDeclarationSyntax? GenRemoveContainmentsRaw() =>
+        AbstractGenSetRaw("RemoveContainmentsRaw", AsType(typeof(IWritableNode)),
+            ContainmentsToImplement(true),
+            (feature, i) =>
+            {
+                var variableName = $"v{i}";
+                return IfStatement(
+                    And(
+                        GenEqualsIdentityFeature(feature),
+                        IsPatternExpression(IdentifierName("value"), AsTypePattern(feature, variableName, writeable: true))
+                    ),
+                    ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), IdentifierName(variableName)))
+                );
+            });
+
+    private MethodDeclarationSyntax? GenRemoveReferencesRaw() =>
+        AbstractGenSetRaw("RemoveReferencesRaw", AsType(typeof(ReferenceTarget)),
+            ReferencesToImplement(true),
+            (feature, _) => IfStatement(
+                GenEqualsIdentityFeature(feature),
+                ReturnStatement(Call(LinkRemoveRaw(feature).ToString(), IdentifierName("value")))
+            ));
+
+    #endregion
+
+    private MethodDeclarationSyntax? AbstractGenSetRaw<T>(string methodName, TypeSyntax resultType,
+        IReadOnlyList<T> features, Func<T, int, StatementSyntax> converter) where T : Feature =>
+        features.Count == 0
+            ? null
+            : Method(methodName, AsType(typeof(bool)), [
+                    Param("feature", AsType(typeof(T))),
+                    Param("value", resultType)
+                ])
+                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+                .WithBody(AsStatements(new List<StatementSyntax>
+                    {
+                        IfStatement(ParseExpression($"base.{methodName}(feature, value)"),
+                            ReturnTrue())
+                    }
+                    .Concat(features.Select(converter))
+                    .Append(ReturnStatement(false.AsLiteral()))
+                ));
+    
+    #endregion
 
     private BinaryPatternSyntax NullOrTypePattern(Feature feature, bool writeable = false) =>
         BinaryPattern(
@@ -325,54 +491,22 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
         );
 
     private DeclarationPatternSyntax AsTypePattern(Feature feature, bool writeable = false) =>
+        AsTypePattern(feature, "v", writeable);
+
+    private DeclarationPatternSyntax AsTypePattern(Feature feature, string variableName, bool writeable = false) =>
         DeclarationPattern(
             AsType(feature.GetFeatureType(), true, writeable: writeable),
-            SingleVariableDesignation(Identifier("v"))
+            SingleVariableDesignation(Identifier(variableName))
         );
-
-    private ExpressionStatementSyntax AssignToFeatureProperty(Feature feature, ExpressionSyntax expression) =>
-        Assignment(FeatureProperty(feature).ToString(), expression);
 
     private ThrowStatementSyntax GenThrowInvalidValueException() =>
         ThrowStatement(
             NewCall([IdentifierName("feature"), IdentifierName("value")], AsType(typeof(InvalidValueException)))
         );
 
-    private LocalDeclarationStatementSyntax EnumerableVar(Link link, bool writeable = false) =>
-        Variable("enumerable", Var(), AsNodesCall(link, writeable: writeable));
-
-    private LocalDeclarationStatementSyntax EnumerableToListVar(Link link, bool writeable = false) =>
-        Variable("enumerable", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
-        );
-
-    private LocalDeclarationStatementSyntax SafeNodesVar(Link link, bool writeable = false) =>
-        Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
-        );
-
-    private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
-        ExpressionStatement(Call("AssureNonEmpty", IdentifierName("safeNodes"), MetaProperty(link)));
-
-    private ExpressionStatementSyntax RemoveSelfParentCall(Containment containment) =>
-        ExpressionStatement(Call("RemoveSelfParent",
-            InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("ToList"))),
-            FeatureField(containment),
-            MetaProperty(containment)
-        ));
-
-    private ExpressionStatementSyntax LinkAddCall(Link link) =>
-        ExpressionStatement(InvocationExpression(LinkAdd(link),
-            AsArguments([IdentifierName("enumerable")])
-        ));
-
-    private ExpressionStatementSyntax ClearCall(Reference reference) =>
-        ExpressionStatement(
-            InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
-        );
-
     private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) =>
-        CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)), IdentifierName("value"));
+        CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)),
+            IdentifierName("value"));
 
     private InvocationExpressionSyntax AsNodesCall(Link link, bool writeable = false)
     {
@@ -436,7 +570,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
                 IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
-    
+
     #endregion
 
     #region InsertInternal
@@ -458,7 +592,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
                 .Append(ReturnStatement(false.AsLiteral()))
             ));
 
-    
+
     private StatementSyntax GenInsertInternal(Link link)
     {
         List<StatementSyntax> body = link switch
@@ -490,7 +624,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
                 AsArguments([IdentifierName("index"), AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
-    
+
     #endregion
 
     #region RemoveInternal
@@ -512,7 +646,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
             ));
 
     #endregion
-    
+
     private StatementSyntax GenRemoveInternal(Link link)
     {
         List<StatementSyntax> body = link switch
@@ -544,7 +678,7 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
                 AsArguments([AsNodesCall(containment, writeable)]))),
         ReturnTrue()
     ];
-    
+
     #region CollectAllSetFeatures
 
     private MethodDeclarationSyntax GenCollectAllSetFeatures() =>
@@ -582,8 +716,24 @@ internal class FeatureMethodsGenerator(Classifier classifier, GeneratorInputPara
         InvocationExpression(MemberAccess(MetaProperty(feature), IdentifierName("EqualsIdentity")),
             AsArguments([IdentifierName("feature")])
         );
+
     private InvocationExpressionSyntax GenEqualsIdentityLink(Link link) =>
         InvocationExpression(MemberAccess(MetaProperty(link), IdentifierName("EqualsIdentity")),
             AsArguments([IdentifierName("link")])
         );
+
+    private List<Property> PropertiesToImplement() =>
+        FeaturesToImplement(classifier).OfType<Property>().ToList();
+
+    private List<Containment> ContainmentsToImplement(bool multiple) =>
+        FeaturesToImplement(classifier)
+            .OfType<Containment>()
+            .Where(c => c.Multiple == multiple)
+            .ToList();
+
+    private List<Reference> ReferencesToImplement(bool multiple) =>
+        FeaturesToImplement(classifier)
+            .OfType<Reference>()
+            .Where(r => r.Multiple == multiple)
+            .ToList();
 }

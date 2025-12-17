@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.NodeApi.TreeTraversal;
 
-using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M3;
@@ -28,55 +27,55 @@ public class FollowingSiblingTests
     [TestMethod]
     public void FollowingSibling()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var circleC = new Circle("c");
-        var circleD = new Circle("d");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var circleC = new LinkTestConcept("c");
+        var circleD = new LinkTestConcept("d");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB, circleC, circleD] };
         CollectionAssert.AreEqual(new List<INode> { circleD }, circleC.FollowingSiblings().ToList());
     }
 
     [TestMethod]
     public void Self()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var circleC = new Circle("c");
-        var circleD = new Circle("d");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var circleC = new LinkTestConcept("c");
+        var circleD = new LinkTestConcept("d");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB, circleC, circleD] };
         CollectionAssert.AreEqual(new List<INode> { circleC, circleD }, circleC.FollowingSiblings(true).ToList());
     }
 
     [TestMethod]
     public void NoParent()
     {
-        var circleA = new Circle("a");
+        var circleA = new LinkTestConcept("a");
         Assert.ThrowsExactly<TreeShapeException>(() => circleA.FollowingSiblings());
     }
 
     [TestMethod]
     public void SingleContainment()
     {
-        var coord = new Coord("a");
-        var circle = new Circle("b") { Center = coord };
+        var coord = new LinkTestConcept("a");
+        var circle = new LinkTestConcept("b") { Containment_0_1 = coord };
         Assert.ThrowsExactly<TreeShapeException>(() => coord.FollowingSiblings());
     }
 
     [TestMethod]
     public void NoFollowingSibling()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB] };
         CollectionAssert.AreEqual(new List<INode> { }, circleB.FollowingSiblings().ToList());
     }
 
     [TestMethod]
     public void NoFollowingSibling_Self()
     {
-        var circleA = new Circle("a");
-        var circleB = new Circle("b");
-        var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
+        var circleA = new LinkTestConcept("a");
+        var circleB = new LinkTestConcept("b");
+        var ancestor = new TestPartition("a") { Links = [circleA, circleB] };
         CollectionAssert.AreEqual(new List<INode> { circleB }, circleB.FollowingSiblings(true).ToList());
     }
 }

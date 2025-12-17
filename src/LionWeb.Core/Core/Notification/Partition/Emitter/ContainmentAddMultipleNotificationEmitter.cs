@@ -23,26 +23,32 @@ using M3;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : INode
 {
-    private readonly List<T> _existingValues;
     private Index _newIndex;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
-    /// <param name="addedValues">Newly added values.</param>
+    /// <param name="addedValue">Newly added value.</param>
     /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
-    /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <paramref name="containment"/>.</param>
+    public ContainmentAddMultipleNotificationEmitter(Containment containment,
+        INotifiableNode destinationParent,
+        T addedValue,
+        List<T> existingValues,
+        Index? startIndex = null) : this(containment, destinationParent, [addedValue], existingValues, startIndex)
+    {
+    }
+
+    [Obsolete]
     public ContainmentAddMultipleNotificationEmitter(Containment containment,
         INotifiableNode destinationParent,
         List<T>? addedValues,
         List<T> existingValues,
         Index? startIndex = null,
-        INotificationId? notificationId = null) : base(containment, destinationParent, addedValues, notificationId)
+        INotificationId? notificationId = null) : base(containment, destinationParent, addedValues)
     {
-        _existingValues = existingValues;
         _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
     }
-
+    
     /// <inheritdoc />
     public override void Notify()
     {
@@ -73,11 +79,12 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                 case not null when old.Parent == DestinationParent && old.Containment == Containment:
                     if (old.Index < _newIndex)
                         _newIndex--;
-                    if (old.Index != _newIndex)
-                    {
-                        ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added, DestinationParent,
-                            old.Containment, old.Index, GetNotificationId()));
-                    }
+                    if (old.Index == _newIndex)
+                        break;
+                    
+                    ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added,
+                        DestinationParent,
+                        old.Containment, old.Index, GetNotificationId()));
 
                     break;
 

@@ -30,17 +30,24 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <paramref name="containment"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
     public ContainmentSetNotificationEmitter(Containment containment,
         INotifiableNode destinationParent,
         List<T>? setValues,
-        List<T> existingValues, INotificationId? notificationId = null) : base(containment, destinationParent, setValues, notificationId)
+        List<T> existingValues) : base(containment, destinationParent, setValues)
     {
         if (!IsActive() || setValues == null)
             return;
 
         var listComparer = IListComparer.CreateForNodes(existingValues, setValues);
         _changes = listComparer.Compare();
+    }
+
+    [Obsolete]
+    public ContainmentSetNotificationEmitter(Containment containment,
+        INotifiableNode destinationParent,
+        List<T>? setValues,
+        List<T> existingValues, INotificationId? notificationId = null) : this(containment, destinationParent, setValues, existingValues)
+    {
     }
 
     /// <inheritdoc />

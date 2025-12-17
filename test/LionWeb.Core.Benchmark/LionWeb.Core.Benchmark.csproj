@@ -8,6 +8,7 @@
         <RootNamespace>LionWeb.Core.Benchmark</RootNamespace>
         <!-- Disable entry point generation as this project has it's own entry point -->
         <GenerateProgramFile>false</GenerateProgramFile>
+        <NoWarn>1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,6 +22,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj">
+          <PrivateAssets>None</PrivateAssets>
+      </ProjectReference>
+      <ProjectReference Include="..\LionWeb.Core.Test.Languages\LionWeb.Core.Test.Languages.csproj">
           <PrivateAssets>None</PrivateAssets>
       </ProjectReference>
       <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj">

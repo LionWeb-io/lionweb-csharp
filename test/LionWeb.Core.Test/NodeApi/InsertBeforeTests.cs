@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.NodeApi;
 
-using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
@@ -27,54 +26,54 @@ public class InsertBeforeTests
     [TestMethod]
     public void Beginning()
     {
-        var circle = new Circle("circ0");
-        var offsetDuplicate = new OffsetDuplicate("off0");
+        var circle = new LinkTestConcept("circ0");
+        var offsetDuplicate = new LinkTestConcept("off0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle,
                 offsetDuplicate
             ]
         };
-        var line = new Line("line");
+        var line = new LinkTestConcept("line");
         circle.InsertBefore(line);
 
         Assert.AreEqual(geometry, line.GetParent());
         Assert.AreEqual(geometry, circle.GetParent());
 
-        CollectionAssert.AreEqual(new List<IShape> { line, circle, offsetDuplicate }, geometry.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circle, offsetDuplicate }, geometry.Links.ToList());
     }
 
     [TestMethod]
     public void Middle()
     {
-        var circle = new Circle("circ0");
-        var offsetDuplicate = new OffsetDuplicate("off0");
+        var circle = new LinkTestConcept("circ0");
+        var offsetDuplicate = new LinkTestConcept("off0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle,
                 offsetDuplicate
             ]
         };
-        var line = new Line("line");
+        var line = new LinkTestConcept("line");
         offsetDuplicate.InsertBefore(line);
 
         Assert.AreEqual(geometry, line.GetParent());
         Assert.AreEqual(geometry, offsetDuplicate.GetParent());
 
-        CollectionAssert.AreEqual(new List<IShape> { circle, line, offsetDuplicate }, geometry.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line, offsetDuplicate }, geometry.Links.ToList());
     }
 
     [TestMethod]
     public void NoParent()
     {
-        var circle = new Circle("circ0");
-        var line = new Line("line");
+        var circle = new LinkTestConcept("circ0");
+        var line = new LinkTestConcept("line");
 
         Assert.ThrowsExactly<TreeShapeException>(() => circle.InsertBefore(line));
     }
@@ -82,10 +81,10 @@ public class InsertBeforeTests
     [TestMethod]
     public void SingleContainment()
     {
-        var coord = new Coord("coord0");
-        var circle = new Circle("circ0") { Center = coord };
+        var coord = new LinkTestConcept("coord0");
+        var circle = new LinkTestConcept("circ0") { Containment_0_1 = coord };
 
-        var line = new Line("line");
+        var line = new LinkTestConcept("line");
 
         Assert.ThrowsExactly<TreeShapeException>(() => coord.InsertBefore(line));
     }
@@ -93,27 +92,27 @@ public class InsertBeforeTests
     [TestMethod]
     public void NonFittingType()
     {
-        var circle = new Circle("circ0");
+        var circle = new LinkTestConcept("circ0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle
             ]
         };
-        var coord = new Coord("coord");
+        var coord = new DataTypeTestConcept("coord");
         Assert.ThrowsExactly<InvalidValueException>(() => circle.InsertBefore(coord));
     }
 
     [TestMethod]
     public void Null()
     {
-        var circle = new Circle("circ0");
+        var circle = new LinkTestConcept("circ0");
 
-        var geometry = new Geometry("geom")
+        var geometry = new TestPartition("geom")
         {
-            Shapes =
+            Links =
             [
                 circle
             ]

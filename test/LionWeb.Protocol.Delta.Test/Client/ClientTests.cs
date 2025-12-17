@@ -22,7 +22,7 @@ using Core.M1;
 using Core.M3;
 using Core.Notification.Pipe;
 using Core.Serialization;
-using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Core.Utilities;
 using Delta.Client;
 using Delta.Repository;
@@ -36,20 +36,20 @@ public class ClientTests
 
     private readonly TestDeltaRepositoryConnector _repositoryConnector;
     private readonly IForest _repositoryForest;
-    private readonly Geometry _repositoryPartition;
+    private readonly TestPartition _repositoryPartition;
     private readonly LionWebTestRepository _repository;
 
     private readonly TestDeltaClientConnector _clientConnector;
 
     private readonly IForest _clientForest;
-    private readonly Geometry _clientPartition;
+    private readonly TestPartition _clientPartition;
     private readonly LionWebTestClient _client;
     private readonly IClientInfo _clientInfo;
 
     public ClientTests()
     {
-        var lionWebVersion = LionWebVersions.v2023_1;
-        List<Language> languages = [ShapesLanguage.Instance];
+        var lionWebVersion = LionWebVersions.v2024_1;
+        List<Language> languages = [TestLanguageLanguage.Instance];
 
         _repositoryConnector = new TestDeltaRepositoryConnector(lionWebVersion);
         _clientInfo = new ClientInfo { ParticipationId = "clientParticipation" };
@@ -59,24 +59,24 @@ public class ClientTests
 
         _repositoryForest = new Forest();
         _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
-            _repositoryConnector);
+            _repositoryConnector, Log);
 
         _clientForest = new Forest();
-        _clientPartition = new Geometry("partition");
-        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
+        _clientPartition = new TestPartition("partition");
+        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector, Log);
         _client.SignOn(_repositoryId);
         _client.ParticipationId = _clientInfo.ParticipationId;
 
         _clientForest.AddPartitions([_clientPartition]);
         _repository.WaitForReceived(1);
-        _repositoryPartition = (Geometry)_repositoryForest.Partitions.First();
+        _repositoryPartition = (TestPartition)_repositoryForest.Partitions.First();
     }
 
     [TestMethod]
     [Timeout(6000)]
     public void ConnectionWorks()
     {
-        _clientPartition.Documentation = new Documentation("doc");
+        _clientPartition.Data = new DataTypeTestConcept("doc");
 
         _repository.WaitForReceived(1);
 
@@ -91,7 +91,7 @@ public class ClientTests
         _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
         _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
 
-        AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
+        AssertEquals(new TestPartition("partition") { Data = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
             _clientPartition);
     }
 
@@ -103,7 +103,7 @@ public class ClientTests
         _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
         _repositoryConnector.SendToAllClients(ChildAdded(0), []);
 
-        AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
+        AssertEquals(new TestPartition("partition") { Data = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
             _clientPartition);
     }
 
@@ -113,7 +113,7 @@ public class ClientTests
                 new SerializedNode()
                 {
                     Id = "doc",
-                    Classifier = ShapesLanguage.Instance.Documentation.ToMetaPointer(),
+                    Classifier = TestLanguageLanguage.Instance.DataTypeTestConcept.ToMetaPointer(),
                     Properties = [],
                     Containments = [],
                     References = [],
@@ -121,7 +121,7 @@ public class ClientTests
                     Parent = _repositoryPartition.GetId()
                 }
             ]),
-            ShapesLanguage.Instance.Geometry_documentation.ToMetaPointer(),
+            TestLanguageLanguage.Instance.TestPartition_data.ToMetaPointer(),
             0,
             [new CommandSource(_clientInfo.ParticipationId, "cmdX")],
             null
@@ -129,7 +129,7 @@ public class ClientTests
 
     private PropertyAdded PropertyAdded(EventSequenceNumber sequenceNumber) =>
         new("doc",
-            ShapesLanguage.Instance.Documentation_text.ToMetaPointer(),
+            TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1.ToMetaPointer(),
             "text",
             [new CommandSource(_clientInfo.ParticipationId, "cmdY")],
             null
@@ -137,15 +137,15 @@ public class ClientTests
 
     private PropertyChanged PropertyChanged(EventSequenceNumber sequenceNumber) =>
         new("doc",
-            ShapesLanguage.Instance.Documentation_text.ToMetaPointer(),
+            TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1.ToMetaPointer(),
             "changed text",
             "text",
             [new CommandSource(_clientInfo.ParticipationId, "cmdZ")],
             null
         ) { SequenceNumber = sequenceNumber };
 
-    protected Geometry Clone(Geometry node) =>
-        (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
+    protected TestPartition Clone(TestPartition node) =>
+        (TestPartition)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
     protected void AssertEquals(INode? a, INode? b) =>
         AssertEquals([a], [b]);
@@ -156,4 +156,7 @@ public class ClientTests
         Assert.IsTrue(differences.Count == 0,
             differences.DescribeAll(new() { LeftDescription = "a", RightDescription = "b" }));
     }
+
+    private static void Log(string message) =>
+        Console.WriteLine(message);
 }

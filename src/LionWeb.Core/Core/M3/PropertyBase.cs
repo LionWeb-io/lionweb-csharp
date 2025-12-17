@@ -66,6 +66,21 @@ public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TL
     }
 
     /// <inheritdoc />
+    protected internal override bool TryGetReferenceRaw(Reference reference, out IReferenceTarget? target)
+    {
+        if (base.TryGetReferenceRaw(reference, out target))
+            return true;
+        
+        if (_m3.Property_type.EqualsIdentity(reference) && ((Property)this).TryGetType(out var type))
+        {
+            target = ReferenceTarget.FromNode(type);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     public required Datatype Type { get; init; }
 
     /// <inheritdoc />

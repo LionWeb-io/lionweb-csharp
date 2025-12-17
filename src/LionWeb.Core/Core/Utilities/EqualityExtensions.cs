@@ -25,90 +25,153 @@ using M3;
 /// </summary>
 public static class EqualityExtensions
 {
-    private static readonly LanguageIdentityComparer _languageComparer = new();
-    private static readonly LanguageEntityIdentityComparer _entityComparer = new();
-    private static readonly FeatureIdentityComparer _featureComparer = new();
-    private static readonly FieldIdentityComparer _fieldComparer = new();
-    private static readonly EnumerationLiteralIdentityComparer _enumerationLiteralComparer = new();
-    private static readonly KeyedIdentityComparer _keyedIdentityComparer = new();
-
     /// <inheritdoc cref="LanguageIdentityComparer"/>
-    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="Language.Version"/>; <c>false</c> otherwise.</returns>
-    public static bool EqualsIdentity(this Language left, Language? right) =>
-        _languageComparer.Equals(left, right);
-
-    /// <summary>
-    /// Calculates <see cref="Language"/> hash code by its <see cref="IKeyed.Key"/> and <see cref="Language.Version"/>.
-    /// </summary>
-    public static int GetHashCodeIdentity(this Language obj) =>
-        _languageComparer.GetHashCode(obj);
+    public static readonly LanguageIdentityComparer LanguageComparer = new();
 
     /// <inheritdoc cref="LanguageEntityIdentityComparer"/>
-    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetLanguage">Language</see>; <c>false</c> otherwise.</returns>
-    /// <seealso cref="EqualsIdentity(Language,Language?)"/>
-    public static bool EqualsIdentity(this LanguageEntity left, LanguageEntity? right) =>
-        _entityComparer.Equals(left, right);
-
-    /// <summary>
-    /// Calculates <see cref="LanguageEntity"/> hash code by its <see cref="IKeyed.Key"/> and its <see cref="M2Extensions.GetLanguage"/>.
-    /// </summary>
-    public static int GetHashCodeIdentity(this LanguageEntity obj) =>
-        _entityComparer.GetHashCode(obj);
+    public static readonly LanguageEntityIdentityComparer EntityComparer = new();
 
     /// <inheritdoc cref="FeatureIdentityComparer"/>
-    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetFeatureClassifier">hosting Classifier</see>; <c>false</c> otherwise.</returns>
+    public static readonly FeatureIdentityComparer FeatureComparer = new();
+
+    /// <inheritdoc cref="FieldIdentityComparer"/>
+    public static readonly FieldIdentityComparer FieldComparer = new();
+
+    /// <inheritdoc cref="EnumerationLiteralIdentityComparer"/>
+    public static readonly EnumerationLiteralIdentityComparer EnumerationLiteralComparer = new();
+
+    /// <inheritdoc cref="Utilities.KeyedIdentityComparer"/>
+    public static readonly KeyedIdentityComparer KeyedIdentityComparer = new();
+
+    /// <inheritdoc cref="LanguageIdentityComparer"/>
+    /// <returns>
+    /// <c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/>
+    /// and <see cref="Language.Version"/>;
+    /// <c>false</c> otherwise.
+    /// </returns>
+    public static bool EqualsIdentity(this Language left, Language? right) =>
+        LanguageComparer.Equals(left, right);
+
+    /// <summary>
+    /// Calculates <see cref="Language"/> hash code by its <see cref="IKeyed.Key"/>
+    /// and <see cref="Language.Version"/>.
+    /// </summary>
+    public static int GetHashCodeIdentity(this Language obj) =>
+        LanguageComparer.GetHashCode(obj);
+
+    /// <inheritdoc cref="LanguageIdentityComparer"/>
+    public static int CompareIdentity(this Language left, Language? right) =>
+        LanguageComparer.Compare(left, right);
+
+    /// <inheritdoc cref="LanguageEntityIdentityComparer"/>
+    /// <returns>
+    /// <c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/>
+    /// and <see cref="M2Extensions.GetLanguage">Language</see>;
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <seealso cref="EqualsIdentity(Language,Language?)"/>
+    public static bool EqualsIdentity(this LanguageEntity left, LanguageEntity? right) =>
+        EntityComparer.Equals(left, right);
+
+    /// <summary>
+    /// Calculates <see cref="LanguageEntity"/> hash code by its <see cref="IKeyed.Key"/>
+    /// and its <see cref="M2Extensions.GetLanguage"/>.
+    /// </summary>
+    public static int GetHashCodeIdentity(this LanguageEntity obj) =>
+        EntityComparer.GetHashCode(obj);
+
+    /// <inheritdoc cref="LanguageEntityIdentityComparer"/>
+    public static int CompareIdentity(this LanguageEntity left, LanguageEntity? right) =>
+        EntityComparer.Compare(left, right);
+
+    /// <inheritdoc cref="FeatureIdentityComparer"/>
+    /// <returns>
+    /// <c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/>
+    /// and <see cref="M2Extensions.GetFeatureClassifier">hosting Classifier</see>;
+    /// <c>false</c> otherwise.
+    /// </returns>
     /// <seealso cref="EqualsIdentity(LanguageEntity,LanguageEntity?)"/>
     public static bool EqualsIdentity(this Feature left, Feature? right) =>
-        _featureComparer.Equals(left, right);
+        FeatureComparer.Equals(left, right);
 
     /// <summary>
-    /// Calculates <see cref="Feature"/> hash code by its <see cref="IKeyed.Key"/> and its <see cref="M2Extensions.GetFeatureClassifier">hosting Classifier</see>.
+    /// Calculates <see cref="Feature"/> hash code by its <see cref="IKeyed.Key"/>
+    /// and its <see cref="M2Extensions.GetFeatureClassifier">hosting Classifier</see>.
     /// </summary>
     public static int GetHashCodeIdentity(this Feature obj) =>
-        _featureComparer.GetHashCode(obj);
-    
+        FeatureComparer.GetHashCode(obj);
+
+    /// <inheritdoc cref="FeatureIdentityComparer"/>
+    public static int CompareIdentity(this Feature left, Feature? right) =>
+        FeatureComparer.Compare(left, right);
+
     /// <inheritdoc cref="FieldIdentityComparer"/>
-    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetStructuredDataType">hosting StructuredDataType</see>; <c>false</c> otherwise.</returns>
+    /// <returns>
+    /// <c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/>
+    /// and <see cref="M2Extensions.GetStructuredDataType">hosting StructuredDataType</see>;
+    /// <c>false</c> otherwise.
+    /// </returns>
     /// <seealso cref="EqualsIdentity(LanguageEntity,LanguageEntity?)"/>
     public static bool EqualsIdentity(this Field left, Field? right) =>
-        _fieldComparer.Equals(left, right);
+        FieldComparer.Equals(left, right);
 
     /// <summary>
-    /// Calculates <see cref="Field"/> hash code by its <see cref="IKeyed.Key"/> and its <see cref="M2Extensions.GetStructuredDataType">hosting StructuredDataType</see>.
+    /// Calculates <see cref="Field"/> hash code by its <see cref="IKeyed.Key"/>
+    /// and its <see cref="M2Extensions.GetStructuredDataType">hosting StructuredDataType</see>.
     /// </summary>
     public static int GetHashCodeIdentity(this Field obj) =>
-        _fieldComparer.GetHashCode(obj);
-    
+        FieldComparer.GetHashCode(obj);
+
+    /// <inheritdoc cref="FieldIdentityComparer"/>
+    public static int CompareIdentity(this Field left, Field? right) =>
+        FieldComparer.Compare(left, right);
+
     /// <inheritdoc cref="EnumerationLiteralIdentityComparer"/>
-    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetEnumeration">hosting Enumeration</see>; <c>false</c> otherwise.</returns>
+    /// <returns>
+    /// <c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/>
+    /// and <see cref="M2Extensions.GetEnumeration">hosting Enumeration</see>;
+    /// <c>false</c> otherwise.
+    /// </returns>
     /// <seealso cref="EqualsIdentity(LanguageEntity,LanguageEntity?)"/>
     public static bool EqualsIdentity(this EnumerationLiteral left, EnumerationLiteral? right) =>
-        _enumerationLiteralComparer.Equals(left, right);
+        EnumerationLiteralComparer.Equals(left, right);
 
     /// <summary>
-    /// Calculates <see cref="EnumerationLiteral"/> hash code by its <see cref="IKeyed.Key"/> and its <see cref="M2Extensions.GetEnumeration">hosting Enumeration</see>.
+    /// Calculates <see cref="EnumerationLiteral"/> hash code by its <see cref="IKeyed.Key"/>
+    /// and its <see cref="M2Extensions.GetEnumeration">hosting Enumeration</see>.
     /// </summary>
     public static int GetHashCodeIdentity(this EnumerationLiteral obj) =>
-        _enumerationLiteralComparer.GetHashCode(obj);
+        EnumerationLiteralComparer.GetHashCode(obj);
 
-    /// <inheritdoc cref="KeyedIdentityComparer"/>
-    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> are equal according to the applicable IdentityComparer; <c>false</c> otherwise.</returns>
-    /// <seealso cref="KeyedIdentityComparer"/>
+    /// <inheritdoc cref="EnumerationLiteralIdentityComparer"/>
+    public static int CompareIdentity(this EnumerationLiteral left, EnumerationLiteral? right) =>
+        EnumerationLiteralComparer.Compare(left, right);
+
+    /// <inheritdoc cref="Utilities.KeyedIdentityComparer"/>
+    /// <returns>
+    /// <c>true</c> if <paramref name="left"/> and <paramref name="right"/> are equal according to the applicable IdentityComparer;
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <seealso cref="Utilities.KeyedIdentityComparer"/>
     public static bool EqualsIdentity(this IKeyed left, IKeyed? right) =>
-        _keyedIdentityComparer.Equals(left, right);
+        KeyedIdentityComparer.Equals(left, right);
 
     /// <summary>
     /// Calculates <see cref="IKeyed"/> hash code by forwarding to the applicable IdentityComparer.
     /// </summary>
-    /// <seealso cref="KeyedIdentityComparer"/>
+    /// <seealso cref="Utilities.KeyedIdentityComparer"/>
     public static int GetHashCodeIdentity(this IKeyed obj) =>
-        _keyedIdentityComparer.GetHashCode(obj);
+        KeyedIdentityComparer.GetHashCode(obj);
+
+    /// <inheritdoc cref="Utilities.KeyedIdentityComparer"/>
+    public static int CompareIdentity(this IKeyed left, IKeyed? right) =>
+        KeyedIdentityComparer.Compare(left, right);
 }
 
 /// <summary>
 /// Compares <see cref="Language">Languages</see> by their <see cref="IKeyed.Key"/> and <see cref="Language.Version"/>.
 /// </summary>
-public class LanguageIdentityComparer : IEqualityComparer<Language>
+public class LanguageIdentityComparer : IEqualityComparer<Language>, IComparer<Language>
 {
     /// <inheritdoc />
     public bool Equals(Language? x, Language? y)
@@ -130,6 +193,25 @@ public class LanguageIdentityComparer : IEqualityComparer<Language>
     /// <inheritdoc />
     public int GetHashCode(Language obj) =>
         HashCode.Combine(obj.Key, obj.Version);
+
+    /// <inheritdoc />
+    public int Compare(Language? x, Language? y)
+    {
+        if (ReferenceEquals(x, y))
+            return 0;
+
+        if (y is null)
+            return 1;
+
+        if (x is null)
+            return -1;
+
+        var keyComparison = string.Compare(x.Key, y.Key, StringComparison.InvariantCulture);
+        if (keyComparison != 0)
+            return keyComparison;
+
+        return string.Compare(x.Version, y.Version, StringComparison.InvariantCulture);
+    }
 }
 
 /// <summary>
@@ -137,7 +219,7 @@ public class LanguageIdentityComparer : IEqualityComparer<Language>
 /// </summary>
 /// <seealso cref="LanguageEntityIdentityComparer"/>
 /// <seealso cref="LanguageIdentityComparer"/>
-public class FeatureClassifierIdentityComparer : IEqualityComparer<Feature>
+public class FeatureClassifierIdentityComparer : IEqualityComparer<Feature>, IComparer<Feature>
 {
     /// <inheritdoc />
     public bool Equals(Feature? x, Feature? y)
@@ -159,6 +241,25 @@ public class FeatureClassifierIdentityComparer : IEqualityComparer<Feature>
     /// <inheritdoc />
     public int GetHashCode(Feature obj) =>
         HashCode.Combine(obj.Key, obj.GetFeatureClassifier().GetHashCodeIdentity());
+
+    /// <inheritdoc />
+    public int Compare(Feature? x, Feature? y)
+    {
+        if (ReferenceEquals(x, y))
+            return 0;
+
+        if (y is null)
+            return 1;
+
+        if (x is null)
+            return -1;
+
+        var keyComparison = string.Compare(x.Key, y.Key, StringComparison.InvariantCulture);
+        if (keyComparison != 0)
+            return keyComparison;
+
+        return x.GetFeatureClassifier().CompareIdentity(y.GetFeatureClassifier());
+    }
 }
 
 /// <summary>
@@ -170,7 +271,7 @@ public class FeatureClassifierIdentityComparer : IEqualityComparer<Feature>
 /// Refer to <see cref="FeatureClassifierIdentityComparer"/> to also include the feature's classifier.
 /// </remarks>
 /// <seealso cref="LanguageIdentityComparer"/>
-public class FeatureIdentityComparer : IEqualityComparer<Feature>
+public class FeatureIdentityComparer : IEqualityComparer<Feature>, IComparer<Feature>
 {
     /// <inheritdoc />
     public bool Equals(Feature? x, Feature? y)
@@ -192,6 +293,25 @@ public class FeatureIdentityComparer : IEqualityComparer<Feature>
     /// <inheritdoc />
     public int GetHashCode(Feature obj) =>
         HashCode.Combine(obj.Key, obj.GetLanguage().GetHashCodeIdentity());
+
+    /// <inheritdoc />
+    public int Compare(Feature? x, Feature? y)
+    {
+        if (ReferenceEquals(x, y))
+            return 0;
+
+        if (y is null)
+            return 1;
+
+        if (x is null)
+            return -1;
+
+        var keyComparison = string.Compare(x.Key, y.Key, StringComparison.InvariantCulture);
+        if (keyComparison != 0)
+            return keyComparison;
+
+        return x.GetLanguage().CompareIdentity(y.GetLanguage());
+    }
 }
 
 /// <summary>
@@ -199,7 +319,7 @@ public class FeatureIdentityComparer : IEqualityComparer<Feature>
 /// </summary>
 /// <seealso cref="LanguageEntityIdentityComparer"/>
 /// <seealso cref="LanguageIdentityComparer"/>
-public class FieldIdentityComparer : IEqualityComparer<Field>
+public class FieldIdentityComparer : IEqualityComparer<Field>, IComparer<Field>
 {
     /// <inheritdoc />
     public bool Equals(Field? x, Field? y)
@@ -221,13 +341,32 @@ public class FieldIdentityComparer : IEqualityComparer<Field>
     /// <inheritdoc />
     public int GetHashCode(Field obj) =>
         HashCode.Combine(obj.Key, obj.GetStructuredDataType().GetHashCodeIdentity());
+
+    /// <inheritdoc />
+    public int Compare(Field? x, Field? y)
+    {
+        if (ReferenceEquals(x, y))
+            return 0;
+
+        if (y is null)
+            return 1;
+
+        if (x is null)
+            return -1;
+
+        var keyComparison = string.Compare(x.Key, y.Key, StringComparison.InvariantCulture);
+        if (keyComparison != 0)
+            return keyComparison;
+
+        return x.GetStructuredDataType().CompareIdentity(y.GetStructuredDataType());
+    }
 }
 
 /// <summary>
 /// Compares <see cref="LanguageEntity">LanguageEntities</see> by their <see cref="IKeyed.Key"/>, and their <see cref="M2Extensions.GetLanguage">Languages</see>.
 /// </summary>
 /// <seealso cref="LanguageIdentityComparer"/>
-public class LanguageEntityIdentityComparer : IEqualityComparer<LanguageEntity>
+public class LanguageEntityIdentityComparer : IEqualityComparer<LanguageEntity>, IComparer<LanguageEntity>
 {
     /// <inheritdoc />
     public bool Equals(LanguageEntity? x, LanguageEntity? y)
@@ -249,9 +388,28 @@ public class LanguageEntityIdentityComparer : IEqualityComparer<LanguageEntity>
     /// <inheritdoc />
     public int GetHashCode(LanguageEntity obj)
     {
-        if(obj.GetParent() != null)
+        if (obj.GetParent() != null)
             return HashCode.Combine(obj.Key, obj.GetLanguage().GetHashCodeIdentity());
         return HashCode.Combine(obj.Key);
+    }
+
+    /// <inheritdoc />
+    public int Compare(LanguageEntity? x, LanguageEntity? y)
+    {
+        if (ReferenceEquals(x, y))
+            return 0;
+
+        if (y is null)
+            return 1;
+
+        if (x is null)
+            return -1;
+
+        var keyComparison = string.Compare(x.Key, y.Key, StringComparison.InvariantCulture);
+        if (keyComparison != 0)
+            return keyComparison;
+
+        return x.GetLanguage().CompareIdentity(y.GetLanguage());
     }
 }
 
@@ -259,7 +417,7 @@ public class LanguageEntityIdentityComparer : IEqualityComparer<LanguageEntity>
 /// Compares <see cref="EnumerationLiteral">EnumerationLiterals</see> by their <see cref="IKeyed.Key"/>, and their <see cref="M2Extensions.GetEnumeration">hosting Enumeration.</see>.
 /// </summary>
 /// <seealso cref="LanguageEntityIdentityComparer"/>
-public class EnumerationLiteralIdentityComparer : IEqualityComparer<EnumerationLiteral>
+public class EnumerationLiteralIdentityComparer : IEqualityComparer<EnumerationLiteral>, IComparer<EnumerationLiteral>
 {
     /// <inheritdoc />
     public bool Equals(EnumerationLiteral? x, EnumerationLiteral? y)
@@ -281,9 +439,28 @@ public class EnumerationLiteralIdentityComparer : IEqualityComparer<EnumerationL
     /// <inheritdoc />
     public int GetHashCode(EnumerationLiteral obj)
     {
-        if(obj.GetParent() != null)
+        if (obj.GetParent() != null)
             return HashCode.Combine(obj.Key, obj.GetEnumeration().GetHashCodeIdentity());
         return HashCode.Combine(obj.Key);
+    }
+
+    /// <inheritdoc />
+    public int Compare(EnumerationLiteral? x, EnumerationLiteral? y)
+    {
+        if (ReferenceEquals(x, y))
+            return 0;
+
+        if (y is null)
+            return 1;
+
+        if (x is null)
+            return -1;
+
+        var keyComparison = string.Compare(x.Key, y.Key, StringComparison.InvariantCulture);
+        if (keyComparison != 0)
+            return keyComparison;
+
+        return x.GetEnumeration().CompareIdentity(y.GetEnumeration());
     }
 }
 
@@ -295,7 +472,7 @@ public class EnumerationLiteralIdentityComparer : IEqualityComparer<EnumerationL
 /// <seealso cref="FeatureIdentityComparer"/>
 /// <seealso cref="FieldIdentityComparer"/>
 /// <seealso cref="EnumerationLiteralIdentityComparer"/>
-public class KeyedIdentityComparer : IEqualityComparer<IKeyed>
+public class KeyedIdentityComparer : IEqualityComparer<IKeyed>, IComparer<IKeyed>
 {
     /// <inheritdoc />
     public bool Equals(IKeyed? x, IKeyed? y) => (x, y) switch
@@ -319,10 +496,24 @@ public class KeyedIdentityComparer : IEqualityComparer<IKeyed>
         EnumerationLiteral l => l.GetHashCodeIdentity(),
         _ => 0
     };
+
+    /// <inheritdoc />
+    public int Compare(IKeyed? x, IKeyed? y) => (x, y) switch
+    {
+        (Language a, Language b) => a.CompareIdentity(b),
+        (LanguageEntity a, LanguageEntity b) => a.CompareIdentity(b),
+        (Feature a, Feature b) => a.CompareIdentity(b),
+        (Field a, Field b) => a.CompareIdentity(b),
+        (EnumerationLiteral a, EnumerationLiteral b) => a.CompareIdentity(b),
+        ({ } a, { } b) => string.Compare(a.Key, b.Key, StringComparison.InvariantCulture),
+        (null, null) => 0,
+        (_, null) => 1,
+        (null, _) => -1
+    };
 }
 
 /// Compares nodes by id.
-public class NodeIdComparer<T> : IEqualityComparer<T> where T : IReadableNode
+public class NodeIdComparer<T> : IEqualityComparer<T>, IComparer<T> where T : IReadableNode
 {
     /// <inheritdoc />
     public bool Equals(T? x, T? y) =>
@@ -331,4 +522,19 @@ public class NodeIdComparer<T> : IEqualityComparer<T> where T : IReadableNode
     /// <inheritdoc />
     public int GetHashCode(T obj) =>
         obj.GetId().GetHashCode();
+
+    /// <inheritdoc />
+    public int Compare(T? x, T? y)
+    {
+        if (ReferenceEquals(x, y))
+            return 0;
+
+        if (y is null)
+            return 1;
+
+        if (x is null)
+            return -1;
+
+        return string.Compare(x.GetId(), y.GetId(), StringComparison.InvariantCulture);
+    }
 }

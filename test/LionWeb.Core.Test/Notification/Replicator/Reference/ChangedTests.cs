@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Reference;
 
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class ChangedTests : ReplicatorTestsBase
@@ -25,15 +25,15 @@ public class ChangedTests : ReplicatorTestsBase
     [TestMethod]
     public void Single()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
+        var circle = new LinkTestConcept("circle");
+        var line = new LinkTestConcept("line");
+        var od = new LinkTestConcept("od") { Reference_1 = circle };
+        var originalPartition = new TestPartition("a") { Links = [od, circle, line] };
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        od.AltSource = line;
+        od.Reference_1 = line;
 
         AssertEquals([originalPartition], [clonedPartition]);
     }

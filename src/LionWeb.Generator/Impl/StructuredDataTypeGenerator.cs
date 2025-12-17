@@ -92,12 +92,10 @@ internal class StructuredDataTypeGenerator(
 
     #endregion
 
-    private MemberDeclarationSyntax GenGetStructuredDataType()
-    {
-        return Method("GetStructuredDataType", AsType(typeof(StructuredDataType)), exprBody: MetaProperty())
+    private MemberDeclarationSyntax GenGetStructuredDataType() =>
+        Method("GetStructuredDataType", AsType(typeof(StructuredDataType)), exprBody: MetaProperty())
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocInheritDoc());
-    }
 
     private MemberAccessExpressionSyntax MetaProperty() =>
         MemberAccess(MemberAccess(LanguageType, IdentifierName("Instance")), _names.AsProperty(sdt));
@@ -172,17 +170,6 @@ internal class StructuredDataTypeGenerator(
                 TriviaList()
             ));
 
-    private BinaryExpressionSyntax LazyFieldNotNull(Field field, ExpressionSyntax condition) =>
-        BinaryExpression(
-            SyntaxKind.LogicalAndExpression,
-            condition,
-            BinaryExpression(
-                SyntaxKind.NotEqualsExpression,
-                LazyFieldValue(field),
-                Null()
-            )
-        );
-
     private InvocationExpressionSyntax GenEqualsIdentityField(Field field) =>
         InvocationExpression(MemberAccess(MetaProperty(field), IdentifierName("EqualsIdentity")),
             AsArguments([IdentifierName("field")])
@@ -219,11 +206,4 @@ internal class StructuredDataTypeGenerator(
 
         return [memberField, property];
     }
-
-    private MemberAccessExpressionSyntax LazyFieldValue(Field field) =>
-        MemberAccessExpression(
-            SyntaxKind.SimpleMemberAccessExpression,
-            FieldField(field),
-            IdentifierName("Value")
-        );
 }

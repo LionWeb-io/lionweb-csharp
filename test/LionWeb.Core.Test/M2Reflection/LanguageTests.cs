@@ -145,8 +145,8 @@ public class LanguageTests : M2ReflectionTestsBase
     [TestMethod]
     public void Replace_Entity()
     {
-        DynamicConcept conceptA = new DynamicConcept("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
-        DynamicEnumeration enumA = new DynamicEnumeration("enum-id", _lionWebVersion, lang) { Key = "enum-key", Name = "SomeEnum" };
+        DynamicConcept conceptA = lang.Concept("my-id",  "my-key", "SomeName");
+        DynamicEnumeration enumA = lang.Enumeration("enum-id", "enum-key", "SomeEnum");
         lang.Set(LanguageEntities, new List<LanguageEntity> { conceptA });
         CollectionAssert.AreEqual(new List<object> { conceptA }, lang.Entities.ToList());
         Assert.AreSame(_lionWebVersion.LionCore.Language_entities, lang.GetContainmentOf(conceptA));

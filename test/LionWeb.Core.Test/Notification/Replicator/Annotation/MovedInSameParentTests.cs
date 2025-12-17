@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Annotation;
 
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class MovedInSameParentTests : ReplicatorTestsBase
@@ -25,9 +25,9 @@ public class MovedInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Forward()
     {
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([moved, new BillOfMaterials("bof")]);
+        var moved = new TestAnnotation("moved");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([moved, new TestAnnotation("bof")]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);
@@ -40,9 +40,9 @@ public class MovedInSameParentTests : ReplicatorTestsBase
     [TestMethod]
     public void Backward()
     {
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), moved]);
+        var moved = new TestAnnotation("moved");
+        var originalPartition = new TestPartition("a");
+        originalPartition.AddAnnotations([new TestAnnotation("bof"), moved]);
 
         var clonedPartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonedPartition, originalPartition);

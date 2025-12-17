@@ -88,5 +88,11 @@ public interface INamedWritable : INamed, IWritableNode
     public new string Name { get; set; }
 
     /// <inheritdoc cref="INamed.Name"/>
-    public INamedWritable SetName(string value, INotificationId? notificationId = null);
+    public INamedWritable SetName(string value) => SetName(value, null);
+
+    /// <inheritdoc cref="INamed.Name"/>
+    [Obsolete("Use SetName(string) instead.")]
+    public INamedWritable SetName(string value, INotificationId? notificationId = null) =>
+        throw new NotImplementedException(
+            $"Obsolete variant of {nameof(INamedWritable)}.{nameof(SetName)}(string, {nameof(INotificationId)}?) called");
 }

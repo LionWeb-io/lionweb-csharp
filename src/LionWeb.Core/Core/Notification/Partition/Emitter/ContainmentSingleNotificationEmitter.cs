@@ -33,13 +33,19 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValue">Newly set value.</param>
     /// <param name="oldValue">Previous value of <paramref name="containment"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    public ContainmentSingleNotificationEmitter(Containment containment, INotifiableNode destinationParent, T? newValue, T? oldValue,
-        INotificationId? notificationId = null)
-        : base(containment, destinationParent, notificationId)
+    public ContainmentSingleNotificationEmitter(Containment containment, INotifiableNode destinationParent, T? newValue, T? oldValue)
+        : base(containment, destinationParent)
     {
         _oldValue = oldValue;
         _newValue = newValue;
+    }
+
+    [Obsolete]
+    public ContainmentSingleNotificationEmitter(Containment containment, INotifiableNode destinationParent, T? newValue,
+        T? oldValue,
+        INotificationId? notificationId = null)
+        : this(containment, destinationParent, newValue, oldValue)
+    {
     }
 
     /// <inheritdoc />

@@ -18,8 +18,8 @@
 namespace LionWeb.Core.M3;
 
 using M2;
-using Notification;
 using System.Diagnostics.CodeAnalysis;
+using Utilities;
 
 /// <inheritdoc cref="IKeyed"/>
 public abstract class DynamicIKeyed(NodeId id, LionWebVersions lionWebVersion) : NodeBase(id), IKeyed
@@ -76,24 +76,57 @@ public abstract class DynamicIKeyed(NodeId id, LionWebVersions lionWebVersion) :
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (_builtIns.INamed_name == feature)
-        {
-            result = Name;
-            return true;
-        }
-
-        if (_m3.IKeyed_key == feature)
-        {
-            result = Key;
-            return true;
-        }
+        if (feature is Property p)
+            return TryGetPropertyRaw(p, out result);
 
         result = null;
         return false;
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
+    protected internal override bool TryGetPropertyRaw(Property property, out object? value)
+    {
+        if (base.TryGetPropertyRaw(property, out value))
+            return true;
+        
+        if (_builtIns.INamed_name.EqualsIdentity(property))
+        {
+            value = _name;
+            return true;
+        }
+
+        if (_m3.IKeyed_key.EqualsIdentity(property))
+        {
+            value = _key;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected internal override bool SetPropertyRaw(Property property, object? value)
+    {
+        if (base.SetPropertyRaw(property, value))
+            return true;
+        
+        if (_builtIns.INamed_name.EqualsIdentity(property) && value is null or string)
+        {
+            _name = (string?)value;
+            return true;
+        }
+
+        if (_m3.IKeyed_key.EqualsIdentity(property) && value is null or string)
+        {
+            _key = (string?)value;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
     {
         if (_builtIns.INamed_name == feature)
         {

@@ -21,8 +21,8 @@ using Client;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
-using Core.Test.Languages.Generated.V2023_1.TestLanguage;
+using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Core.Utilities;
 using Delta.Client;
 using Delta.Repository;
@@ -44,28 +44,30 @@ public abstract class RepositoryTestsBase
     private TestDeltaClientConnector _aConnector;
     private TestDeltaClientConnector _bConnector;
     private readonly List<Language> _languages;
-    private readonly IVersion2023_1 _lionWebVersion;
+    private readonly IVersion2024_1 _lionWebVersion;
 
     public RepositoryTestsBase()
     {
-        _lionWebVersion = LionWebVersions.v2023_1;
+        _lionWebVersion = LionWebVersions.v2024_1;
         _languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance];
 
         _repositoryForest = new Forest();
         _deltaRepositoryConnector = new(_lionWebVersion);
-        _repository = new LionWebTestRepository(_lionWebVersion, _languages, "repository", _repositoryForest,
-            _deltaRepositoryConnector);
 
-        _aClient = CreateClient("A", out _aForest, out _aConnector);
-        _bClient = CreateClient("B", out _bForest, out _bConnector);
+        _repository = new LionWebTestRepository(_lionWebVersion, _languages, "repository", _repositoryForest,
+            _deltaRepositoryConnector, Log);
+
+        _aClient = CreateClient("A", out _aForest, out _aConnector, Log);
+        _bClient = CreateClient("B", out _bForest, out _bConnector, Log);
     }
 
-    private LionWebTestClient CreateClient(string name, out IForest forest, out TestDeltaClientConnector connector)
+    private LionWebTestClient CreateClient(string name, out IForest forest, out TestDeltaClientConnector connector,
+        Action<string> logger)
     {
         var clientId = $"{name}ClientId";
         forest = new Forest();
         connector = new TestDeltaClientConnector(_lionWebVersion);
-        var client = new LionWebTestClient(_lionWebVersion, _languages, name, forest, connector)
+        var client = new LionWebTestClient(_lionWebVersion, _languages, name, forest, connector, logger)
         {
             ClientId = clientId
         };
@@ -92,6 +94,9 @@ public abstract class RepositoryTestsBase
         _aClient.WaitForReceived(numberOfMessages);
         _bClient.WaitForReceived(numberOfMessages);
     }
+
+    private static void Log(string message) =>
+        Console.WriteLine(message);
 }
 
 public abstract class RepositoryTestNoExceptionsBase : RepositoryTestsBase
