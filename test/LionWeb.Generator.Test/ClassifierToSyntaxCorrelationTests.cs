@@ -22,27 +22,27 @@ public class ClassifierToSyntaxCorrelationTests
         };
 
         var compilationUnit = generator.Generate();
-        var correlationManager = generator.Correlations;
+        var correlationManager = generator.Correlator;
 
         Assert.HasCount(3, correlationManager.Correlations.OfType<ClassifierToMainCorrelation>());
 
         var linkTestCorrelation = correlationManager.FindAll<ClassifierToMainCorrelation>(testLanguage.LinkTestConcept)
             .Single();
-        var currentLinkTest = linkTestCorrelation.ExtractFrom(compilationUnit);
+        var currentLinkTest = linkTestCorrelation.LookupIn(compilationUnit);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentLinkTest);
         Assert.AreEqual(nameof(testLanguage.LinkTestConcept), currentLinkTest.Identifier.ToString());
         Assert.IsTrue(compilationUnit.Contains(currentLinkTest));
 
         var dataTypeTestCorrelation = correlationManager
             .FindAll<ClassifierToMainCorrelation>(testLanguage.DataTypeTestConcept).Single();
-        var currentDataTypeTest = dataTypeTestCorrelation.ExtractFrom(compilationUnit);
+        var currentDataTypeTest = dataTypeTestCorrelation.LookupIn(compilationUnit);
         Assert.IsInstanceOfType<ClassifierToMainCorrelation>(dataTypeTestCorrelation);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentDataTypeTest);
         Assert.AreEqual(nameof(testLanguage.DataTypeTestConcept), currentDataTypeTest.Identifier.ToString());
 
         var testAnnotationCorrelation =
             correlationManager.FindAll<ClassifierToMainCorrelation>(testLanguage.TestAnnotation).Single();
-        var currentTestAnnotation = testAnnotationCorrelation.ExtractFrom(compilationUnit);
+        var currentTestAnnotation = testAnnotationCorrelation.LookupIn(compilationUnit);
         Assert.IsInstanceOfType<ClassifierToMainCorrelation>(testAnnotationCorrelation);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentTestAnnotation);
         Assert.AreEqual(nameof(testLanguage.TestAnnotation), currentTestAnnotation.Identifier.ToString());
@@ -60,12 +60,12 @@ public class ClassifierToSyntaxCorrelationTests
         };
 
         var compilationUnit = generator.Generate();
-        var correlationManager = generator.Correlations;
+        var correlationManager = generator.Correlator;
 
         Assert.HasCount(1, correlationManager.Correlations.OfType<InterfaceToMainCorrelation>());
         var correlation = correlationManager.FindAll<InterfaceToMainCorrelation>(multiInheritLangLanguage.BaseIface)
             .Single();
-        var currentIface = correlation.ExtractFrom(compilationUnit);
+        var currentIface = correlation.LookupIn(compilationUnit);
         Assert.IsInstanceOfType<InterfaceToMainCorrelation>(correlation);
         Assert.IsInstanceOfType<InterfaceDeclarationSyntax>(currentIface);
         Assert.AreEqual(nameof(multiInheritLangLanguage.BaseIface), currentIface.Identifier.ToString());

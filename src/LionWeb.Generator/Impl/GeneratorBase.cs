@@ -175,8 +175,9 @@ internal abstract class GeneratorBase
             )));
     }
 
+    /// <inheritdoc cref="Correlator.Record"/>
     protected T Correlate<T>(IKeyedToAstCorrelation<T> correlation, T syntaxNode) where T : SyntaxNode =>
-        _generatorInputParameters.CorrelationManager.Record(correlation, syntaxNode);
+        _generatorInputParameters.Correlator.Record(correlation, syntaxNode);
     
     /// <returns><c>TryGetMyFeature</c></returns>
     protected string FeatureTryGet(Feature feature) =>

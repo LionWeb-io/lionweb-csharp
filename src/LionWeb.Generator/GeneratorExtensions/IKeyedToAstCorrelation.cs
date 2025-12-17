@@ -22,36 +22,47 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 /// <summary>
-/// Interface for correlating LionWeb's <see cref="Classifier"/>s to their corresponding generated C# syntax nodes.
+/// Correlates LionWeb's <see cref="IKeyed">language elements</see>
+/// to their corresponding generated <see cref="SyntaxNode">C# syntax nodes</see>.
 /// </summary>
 public interface IKeyedToAstCorrelation
 {
+    /// <summary>
+    /// The correlated LionWeb <see cref="IKeyed">language element</see>.
+    /// </summary>
     IKeyed Keyed { get; }
 
-    SyntaxNode ExtractFrom(SyntaxNode baseSyntax);
+    /// <summary>
+    /// Looks up the corresponding generated <see cref="SyntaxNode">C# syntax node</see> in <paramref name="baseSyntax"/>.
+    /// </summary>
+    /// <param name="baseSyntax"></param>
+    /// <returns></returns>
+    SyntaxNode LookupIn(SyntaxNode baseSyntax);
 }
 
 /// <inheritdoc />
+/// <typeparam name="TAst">Type of the correlated <see cref="SyntaxNode">AST node</see>.</typeparam>
 public interface IKeyedToAstCorrelation<TAst> : IKeyedToAstCorrelation
     where TAst : SyntaxNode
 {
     /// <remarks>
     /// We do <i>not</i> want to store the AST node, as it will be outdated very soon,
     /// and takes lots of memory (whole subtree).
-    /// However, we want to pass it through <see cref="CorrelationManager.Record{T}"/>
+    /// However, we want to pass it through <see cref="Correlator.Record{T}"/>
     /// to simplify usage in the generator.
     /// Thus, we initialize outside the constructor. 
     /// </remarks>
     protected internal TAst Init(TAst ast);
 
-    SyntaxNode IKeyedToAstCorrelation.ExtractFrom(SyntaxNode baseSyntax) =>
-        ExtractFrom(baseSyntax);
+    SyntaxNode IKeyedToAstCorrelation.LookupIn(SyntaxNode baseSyntax) =>
+        LookupIn(baseSyntax);
 
-    /// <inheritdoc cref="IKeyedToAstCorrelation.ExtractFrom"/>
-    new TAst ExtractFrom(SyntaxNode baseSyntax);
+    /// <inheritdoc cref="IKeyedToAstCorrelation.LookupIn"/>
+    new TAst LookupIn(SyntaxNode baseSyntax);
 }
 
 /// <inheritdoc />
+/// <typeparam name="TKeyed">Type of the correlated <see cref="IKeyed">language element</see>.</typeparam>
 public interface IKeyedToAstCorrelation<out TKeyed, TAst> : IKeyedToAstCorrelation<TAst>
     where TKeyed : IKeyed
     where TAst : SyntaxNode
@@ -62,6 +73,9 @@ public interface IKeyedToAstCorrelation<out TKeyed, TAst> : IKeyedToAstCorrelati
     new TKeyed Keyed { get; }
 }
 
+/// <summary>
+/// Base implementation for <see cref="IKeyedToAstCorrelation{TKeyed, TAst}"/>
+/// </summary>
 public abstract record CorrelationBase<TKeyed, TAst> : IKeyedToAstCorrelation<TKeyed, TAst>
     where TKeyed : IKeyed
     where TAst : SyntaxNode
@@ -72,7 +86,11 @@ public abstract record CorrelationBase<TKeyed, TAst> : IKeyedToAstCorrelation<TK
     /// <inheritdoc />
     public TKeyed Keyed { get; }
 
-    public CorrelationBase(TKeyed keyed)
+    /// <summary>
+    /// Stores <paramref name="keyed"/> and initializes the <see cref="_syntaxAnnotation"/>
+    /// to find the correlated <see cref="TAst">AST node</see>.
+    /// </summary>
+    protected CorrelationBase(TKeyed keyed)
     {
         _syntaxAnnotation = new SyntaxAnnotation(_syntaxAnnotationKind);
         Keyed = keyed;
@@ -82,19 +100,23 @@ public abstract record CorrelationBase<TKeyed, TAst> : IKeyedToAstCorrelation<TK
         ast.WithAdditionalAnnotations(_syntaxAnnotation);
 
     /// <inheritdoc />
-    public TAst ExtractFrom(SyntaxNode baseSyntax) =>
+    public TAst LookupIn(SyntaxNode baseSyntax) =>
         baseSyntax.DescendantNodesAndSelf().OfType<TAst>().First(n => n.HasAnnotation(_syntaxAnnotation));
 }
 
+/// <summary>
+/// Correlates a LionWeb <see cref="Classifier"/> to the generated C# <see cref="TypeDeclarationSyntax">main class</see>.
+/// </summary>
 public interface IClassifierToMainCorrelation : IKeyedToAstCorrelation
 {
+    /// <inheritdoc cref="IKeyedToAstCorrelation.Keyed"/>
     Classifier Classifier { get; }
 
-    /// <inheritdoc cref="IKeyedToAstCorrelation.ExtractFrom"/>
-    new TypeDeclarationSyntax ExtractFrom(SyntaxNode baseSyntax);
+    /// <inheritdoc cref="IKeyedToAstCorrelation.LookupIn"/>
+    new TypeDeclarationSyntax LookupIn(SyntaxNode baseSyntax);
 }
 
-/// <inheritdoc />
+/// <inheritdoc cref="IClassifierToMainCorrelation" />
 public interface IClassifierToMainCorrelation<out TKeyed, TAst> :
     IClassifierToMainCorrelation,
     IKeyedToAstCorrelation<TKeyed, TAst>
@@ -104,19 +126,19 @@ public interface IClassifierToMainCorrelation<out TKeyed, TAst> :
     Classifier IClassifierToMainCorrelation.Classifier =>
         Keyed;
 
-    TypeDeclarationSyntax IClassifierToMainCorrelation.ExtractFrom(SyntaxNode baseSyntax) =>
-        ((IKeyedToAstCorrelation<TKeyed, TAst>)this).ExtractFrom(baseSyntax);
+    TypeDeclarationSyntax IClassifierToMainCorrelation.LookupIn(SyntaxNode baseSyntax) =>
+        ((IKeyedToAstCorrelation<TKeyed, TAst>)this).LookupIn(baseSyntax);
 }
 
 /// <summary>
-/// Record for holding <see cref="ClassDeclarationSyntax"/> of <see cref="Concept"/> and <see cref="Annotation"/> type of classifier.
+/// Correlates a LionWeb <see cref="Concept"/> or <see cref="Annotation"/> to the generated C# <see cref="ClassDeclarationSyntax">main class</see>.
 /// </summary>
 public record ClassifierToMainCorrelation(Classifier Classifier) :
     CorrelationBase<Classifier, ClassDeclarationSyntax>(Classifier),
     IClassifierToMainCorrelation<Classifier, ClassDeclarationSyntax>;
 
 /// <summary>
-/// Record for holding <see cref="InterfaceDeclarationSyntax"/> of <see cref="Interface"/> type of classifier.
+/// Correlates a LionWeb <see cref="Interface"/> to the generated C# <see cref="InterfaceDeclarationSyntax"/>.
 /// </summary>
 public record InterfaceToMainCorrelation(Interface Keyed) :
     CorrelationBase<Interface, InterfaceDeclarationSyntax>(Keyed),

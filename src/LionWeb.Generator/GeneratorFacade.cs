@@ -18,7 +18,6 @@
 namespace LionWeb.Generator;
 
 using Core;
-using Core.M3;
 using GeneratorExtensions;
 using Impl;
 using Microsoft.CodeAnalysis;
@@ -44,8 +43,6 @@ public class GeneratorFacade
 {
     private CompilationUnitSyntax? _compilationUnit = null;
 
-    private readonly CorrelationManager _correlationManager = new();
-    
     /// Generates the compilation unit for the input language.
     public CompilationUnitSyntax Generate()
     {
@@ -53,10 +50,7 @@ public class GeneratorFacade
         {
             var generatorInputParameters = new GeneratorInputParameters
             {
-                Names = Names,
-                LionWebVersion = LionWebVersion,
-                Config = Config,
-                CorrelationManager = _correlationManager
+                Names = Names, LionWebVersion = LionWebVersion, Config = Config, Correlator = Correlator
             };
 
             var generator = new DefinitionGenerator(generatorInputParameters);
@@ -66,19 +60,17 @@ public class GeneratorFacade
         return _compilationUnit;
     }
 
-    /// <summary>
-    /// Returns a list of generated C# syntax nodes with their corresponding <see cref="Classifier"/>.
-    /// </summary>
-    public CorrelationManager Correlations => _correlationManager;
-
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }
 
     /// Version of LionWeb standard to use for generation.
     public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
-    
+
     /// <inheritdoc cref="GeneratorConfig"/>
     public GeneratorConfig Config { get; init; } = new();
+
+    /// <inheritdoc cref="Correlator"/>
+    public Correlator Correlator { get; } = new();
 
     /// Stores the output of <see cref="Generate"/> to the file at <paramref name="path"/>.
     public void Persist(string path) =>
@@ -108,9 +100,13 @@ public class GeneratorFacade
     }
 
     /// Compiles the output of <see cref="Generate"/> and returns all diagnostic messages.
-    public ImmutableArray<Diagnostic> Compile()
+    public ImmutableArray<Diagnostic> Compile() =>
+        Compile(Generate());
+
+    /// Compiles <paramref name="compilationUnit"/> and returns all diagnostic messages.
+    public ImmutableArray<Diagnostic> Compile(CompilationUnitSyntax compilationUnit)
     {
-        var tree = SyntaxTree(Generate());
+        var tree = SyntaxTree(compilationUnit);
         var refApis = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic)
             .Select(a => MetadataReference.CreateFromFile(a.Location))

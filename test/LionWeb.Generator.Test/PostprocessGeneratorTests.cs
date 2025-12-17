@@ -42,16 +42,16 @@ public class PostprocessGeneratorTests
         };
 
         var compilationUnit = generator.Generate();
-        var correlationManager = generator.Correlations;
+        var correlator = generator.Correlator;
 
         var classifiersWithoutSpecializations = language.Entities
             .OfType<Classifier>()
             .Where(c => !c.AllSpecializations([language]).Any())
-            .Select(c => correlationManager.FindAll<IClassifierToMainCorrelation>(c).Single());
+            .Select(c => correlator.FindAll<IClassifierToMainCorrelation>(c).Single());
         
         foreach (var correlation in classifiersWithoutSpecializations)
         {
-            var typeDeclaration = correlation.ExtractFrom(compilationUnit);
+            var typeDeclaration = correlation.LookupIn(compilationUnit);
             compilationUnit = compilationUnit.ReplaceNode(
                 typeDeclaration,
                 typeDeclaration
