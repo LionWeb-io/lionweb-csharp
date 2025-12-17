@@ -24,7 +24,7 @@ public class ClassifierToSyntaxCorrelationTests
         var compilationUnit = generator.Generate();
         var correlationManager = generator.Correlations;
 
-        Assert.HasCount(3, correlationManager.Correlations.OfType<ClassifierToMainCorrelation>());
+        Assert.HasCount(4, correlationManager.Correlations.OfType<ClassifierToMainCorrelation>());
 
         var linkTestCorrelation = correlationManager.FindAll<ClassifierToMainCorrelation>(testLanguage.LinkTestConcept)
             .Single();
@@ -46,6 +46,13 @@ public class ClassifierToSyntaxCorrelationTests
         Assert.IsInstanceOfType<ClassifierToMainCorrelation>(testAnnotationCorrelation);
         Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentTestAnnotation);
         Assert.AreEqual(nameof(testLanguage.TestAnnotation), currentTestAnnotation.Identifier.ToString());
+        
+        var testPartitionCorrelation =
+            correlationManager.FindAll<ClassifierToMainCorrelation>(testLanguage.TestPartition).Single();
+        var currentTestPartition = testPartitionCorrelation.ExtractFrom(compilationUnit);
+        Assert.IsInstanceOfType<ClassifierToMainCorrelation>(testPartitionCorrelation);
+        Assert.IsInstanceOfType<ClassDeclarationSyntax>(currentTestPartition);
+        Assert.AreEqual(nameof(testLanguage.TestPartition), currentTestPartition.Identifier.ToString());
     }
 
     [TestMethod]
