@@ -38,6 +38,9 @@ public class TestLanguagesDefinitions
     public Language GeneralNodeLang { get; private set; }
     public Language? LowerCaseLang { get; private set; }
     public Language? UpperCaseLang { get; private set; }
+    public Language NamespaceStartsWithLionWebLang { get; private set; }
+    public Language NamespaceContainsLionWebLang { get; private set; }
+
     public List<Language> MixedLangs { get; private set; } = [];
 
     public TestLanguagesDefinitions(LionWebVersions lionWebVersion)
@@ -49,6 +52,8 @@ public class TestLanguagesDefinitions
         CreateMultiInheritLang();
         CreateNamedLang();
         CreateGeneralNodeLang();
+        CreateNamespaceStartsWithLionWebLang();
+        CreateNamespaceContainsLionWebLang();
 
         if (lionWebVersion.LionCore is ILionCoreLanguageWithStructuredDataType)
         {
@@ -518,5 +523,29 @@ public class TestLanguagesDefinitions
         ]);
 
         UpperCaseLang = casingLang;
+    }
+
+    private void CreateNamespaceStartsWithLionWebLang()
+    {
+        var lwLang = new DynamicLanguage("id-NamespaceStartsWithLionWebLang-lang", _lionWebVersion)
+        {
+            Name = "NamespaceStartsWithLionWebLang", Key = "key-NamespaceStartsWithLionWebLang", Version = "1"
+        };
+        
+        lwLang.Concept("id-concept", "key-concept", "MYConcept");
+
+        NamespaceStartsWithLionWebLang = lwLang;
+    }
+
+    private void CreateNamespaceContainsLionWebLang()
+    {
+        var lwLang = new DynamicLanguage("id-NamespaceContainsLionWebLang-lang", _lionWebVersion)
+        {
+            Name = "NamespaceContainsLionWebLang", Key = "key-NamespaceContainsLionWebLang", Version = "1"
+        };
+        
+        lwLang.Concept("id-concept", "key-concept", "MYConcept");
+
+        NamespaceContainsLionWebLang = lwLang;
     }
 }
