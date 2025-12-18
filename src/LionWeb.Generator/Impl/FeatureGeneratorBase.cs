@@ -365,4 +365,8 @@ internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feat
 
     protected string FeatureTryGetParam() =>
         _names.FeatureParam(feature);
+    
+    /// <inheritdoc cref="INames.FeatureProperty"/>
+    protected ExpressionSyntax FeatureProperty(Feature feature) =>
+        _names.FeatureProperty(feature, classifier);
 }

@@ -112,10 +112,6 @@ internal abstract class GeneratorBase
     protected ExpressionSyntax FeatureField(Feature feature) =>
         _names.FeatureField(feature);
 
-    /// <inheritdoc cref="INames.FeatureProperty"/>
-    protected ExpressionSyntax FeatureProperty(Feature feature) =>
-        _names.FeatureProperty(feature);
-
     /// <inheritdoc cref="INames.FieldField"/>
     protected ExpressionSyntax FieldField(Field field) =>
         _names.FieldField(field);

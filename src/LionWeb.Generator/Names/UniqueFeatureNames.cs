@@ -17,6 +17,7 @@
 
 namespace LionWeb.Generator.Names;
 
+using Core.M2;
 using Core.M3;
 using Impl;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
