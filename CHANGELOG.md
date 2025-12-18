@@ -8,7 +8,6 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ## [0.4.0] - tbd
 ### Added
-* Add `global::` prefix to `using` statements to support generating languages that contain `LionWeb` in their namespace.
 * `INewNodeNotification` and `IDeletedNodeNotification` to mark notifications that add/remove nodes from the (notified) world.
 * `GeneratorFacade` now exposes `Correlations` property. This correlates LionWeb language elements to their corresponding C# syntax nodes.
 * Added the following check for a new node received via a delta event: If a delta event adds a new node, the node itself and its sub nodes have to be new (not present in the model) according to delta specification. If this is not the case, we warn the user by throwing an invalid notification exception. For the replacement logic, we allow replacing if a new node is a both existing and to be replaced node, we allow this because after replacement model is valid.  
@@ -30,6 +29,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Bugfix: `DeltaDeserializerHandler` is made public. This handler enables deserializer to accept node id that appears both in received delta(s) and local nodes. In the context of delta protocol, this enables replacing a node in a model with a new node with the same id, which results in a valid model.
 * `a.InsertBefore(b)` / `a.InsertAfter(b)` work correctly if both `a` and `b` are siblings.
 ### Changed
+* Add `global::` prefix to `using` statements to support generating languages that contain `LionWeb` in their namespace.
+* Generator escapes user language names conflicting with framework names.
 * Use `IReferenceTarget` both as return and parameter type of `IDeserializerHandler.UnresolvableReferenceTarget()`.
 * Factored out mutation code from generated classes into base class methods
   Simplifies changes and reduces the amount of generated code
