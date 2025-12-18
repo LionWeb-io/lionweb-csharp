@@ -72,7 +72,7 @@ public partial class Names : INames
         get => _namespaceMappings;
         init
         {
-            foreach ((Language? lang, var ns) in value)
+            foreach ((Language? lang, var ns) in value.Where(p => p.Key != _language))
             {
                 _namespaceMappings[lang] = ns;
             }

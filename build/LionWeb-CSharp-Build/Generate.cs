@@ -127,7 +127,6 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
             {
                 NamespaceMappings = testLanguagesDefinitions
                     .MixedLangs
-                    .Except([l])
                     .Select(n => (n, $"{prefix}.Mixed.{n.Name}"))
                     .ToDictionary()
             }
