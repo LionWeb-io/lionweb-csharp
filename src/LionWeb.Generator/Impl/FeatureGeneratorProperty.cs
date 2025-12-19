@@ -79,5 +79,6 @@ internal class FeatureGeneratorProperty(Classifier classifier, Property property
           || _builtIns.Integer.EqualsIdentity(property.Type)
           || property.Type is Enumeration
           || property.Type is StructuredDataType
+          || property.Type is PrimitiveType p && _names.PrimitiveTypeMappings.TryGetValue(p, out var t) && t.IsValueType
             );
 }

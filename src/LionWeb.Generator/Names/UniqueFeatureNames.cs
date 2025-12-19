@@ -46,6 +46,9 @@ public class UniqueFeatureNames(INames parent) : INames
     public IDictionary<Language, string> NamespaceMappings => parent.NamespaceMappings;
 
     /// <inheritdoc />
+    public IDictionary<PrimitiveType, Type> PrimitiveTypeMappings => parent.PrimitiveTypeMappings;
+
+    /// <inheritdoc />
     public string LanguageName(Language lang) => parent.LanguageName(lang);
 
     /// <inheritdoc />

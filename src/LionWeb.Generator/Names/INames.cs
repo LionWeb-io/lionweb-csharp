@@ -40,6 +40,9 @@ public interface INames
     /// Maps external languages to their namespaces.
     IDictionary<Language, string> NamespaceMappings { get; }
 
+    /// Maps custom primitive types between LionWeb and C#.
+    IDictionary<PrimitiveType, Type> PrimitiveTypeMappings { get; }
+    
     /// Register a new <see cref="NamespaceMappings">NamespaceMapping</see>.
     void AddNamespaceMapping(Language lang, string nsName);
 
