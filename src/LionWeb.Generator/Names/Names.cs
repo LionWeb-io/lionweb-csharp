@@ -38,7 +38,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 public partial class Names : INames
 {
     private const char _namespaceSeparator = '.';
-    
+    protected internal const string FeatureSameNameAsContainingClassifier_Suffix = "_";
+
     private readonly HashSet<Type> _usedTypes = [];
 
     /// <inheritdoc />
@@ -356,7 +357,8 @@ public partial class Names : INames
         Language l => AsType(l),
         Classifier c => ToName(AsType(c, disambiguate)),
         Datatype d => ToName(AsType(d, disambiguate)),
-        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)), FeatureProperty(f)),
+        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)),
+            FeatureProperty(f, f.GetFeatureClassifier())),
         Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)), FieldProperty(f)),
         EnumerationLiteral f => QualifiedName(ToName(AsType(f.GetEnumeration(), disambiguate)),
             IdentifierName(f.Name.PrefixKeyword()))
@@ -425,8 +427,16 @@ public partial class Names : INames
         IdentifierName($"_{feature.Name.ToFirstLower()}".PrefixKeyword());
 
     /// <inheritdoc />
-    public IdentifierNameSyntax FeatureProperty(Feature feature) =>
-        IdentifierName(feature.Name.ToFirstUpper().PrefixKeyword());
+    public IdentifierNameSyntax FeatureProperty(Feature feature, Classifier container)
+    {
+        var name = FeaturePropertyInternal(feature);
+        if (name == AsName(container).ToString())
+            name += FeatureSameNameAsContainingClassifier_Suffix;
+        return IdentifierName(name);
+    }
+
+    protected internal static string FeaturePropertyInternal(Feature feature) =>
+        feature.Name.ToFirstUpper().PrefixKeyword();
 
     /// <inheritdoc />
     public string FeatureParam(Feature feature) =>

@@ -43,6 +43,7 @@ public class TestLanguagesDefinitions
     public Language NamespaceStartsWithLionWebLang { get; private set; }
     public Language NamespaceContainsLionWebLang { get; private set; }
     public Language LanguageWithLionWebNamedConcepts { get; private set; }
+    public Language FeatureSameNameAsContainingConcept { get; private set; }
 
     public List<Language> MixedLangs { get; private set; } = [];
 
@@ -58,6 +59,7 @@ public class TestLanguagesDefinitions
         CreateNamespaceStartsWithLionWebLang();
         CreateNamespaceContainsLionWebLang();
         CreateLanguageWithLionWebNamedConcepts();
+        CreateFeatureSameNameAsContainingConcept();
 
         if (lionWebVersion.LionCore is ILionCoreLanguageWithStructuredDataType)
         {
@@ -746,6 +748,36 @@ public class TestLanguagesDefinitions
         
         LanguageWithLionWebNamedConcepts = lang;
     }
+    
+    private void CreateFeatureSameNameAsContainingConcept()
+    {
+        var lang = new DynamicLanguage("id-FeatureSameNameAsContainingConcept-lang", _lionWebVersion)
+        {
+            Name = "FeatureSameNameAsContainingConcept", Key = "key-FeatureSameNameAsContainingConcept", Version = "1"
+        };
+
+        var baseConceptA = lang.Concept("BaseConceptA").IsAbstract();
+        baseConceptA.Property("BaseConceptA");
+        lang.Concept("SubConceptA").Extending(baseConceptA);
+
+        var baseConceptB = lang.Concept("BaseConceptB").IsAbstract();
+        baseConceptB.Property("SubConceptB");
+        lang.Concept("SubConceptB").Extending(baseConceptB);
+
+        var iface = lang.Interface("Iface");
+        iface.Property("IfaceMethod");
+        var ifaceImplA = lang.Concept("IfaceImplA").Implementing(iface);
+        lang.Concept("IfaceImplB").Implementing(iface);
+        var ifaceMethodConcept = lang.Concept("IfaceMethod").Extending(ifaceImplA);
+        
+        var baseConceptC = lang.Concept("BaseConceptC").IsAbstract();
+        baseConceptC.Property("BaseConceptD");
+        
+        var baseConceptD = lang.Concept("BaseConceptD").IsAbstract();
+        baseConceptD.Property("BaseConceptE");
+        
+        FeatureSameNameAsContainingConcept = lang;
+    }
 }
 
 internal static class LanguageExtensions
@@ -753,4 +785,9 @@ internal static class LanguageExtensions
     internal static DynamicConcept Concept(this DynamicLanguage language, string name) =>
         language.Concept($"id-{name}", $"key-{name}", name);
 
+    internal static DynamicInterface Interface(this DynamicLanguage language, string name) =>
+        language.Interface($"id-{name}", $"key-{name}", name);
+
+    internal static DynamicProperty Property(this DynamicClassifier classifier, string name) =>
+        classifier.Property($"id-{name}", $"key-{name}", name).OfType(classifier.GetLanguage().LionWebVersion.BuiltIns.String);
 }

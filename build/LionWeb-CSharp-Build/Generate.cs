@@ -73,6 +73,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var namespaceStartsWithLionWebLang = testLanguagesDefinitions.NamespaceStartsWithLionWebLang;
     var namespaceContainsLionWebLang = testLanguagesDefinitions.NamespaceContainsLionWebLang;
     var languageWithLionWebNamedConcepts = testLanguagesDefinitions.LanguageWithLionWebNamedConcepts;
+    var featureSameNameAsContainingConcept = testLanguagesDefinitions.FeatureSameNameAsContainingConcept;
 
     var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');
     string prefix = $"LionWeb.Core.Test.Languages.Generated.{lionWebVersionNamespace}";
@@ -96,6 +97,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(namespaceStartsWithLionWebLang, $"LionWeb.Generated.{lionWebVersionNamespace}.namespaceStartsWithLionWebLang"),
         new(namespaceContainsLionWebLang, $"io.LionWeb.Generated.{lionWebVersionNamespace}.namespaceStartsWithLionWebLang"),
         new(languageWithLionWebNamedConcepts, $"{prefix}.LanguageWithLionWebNamedConcepts"),
+        new(featureSameNameAsContainingConcept, $"{prefix}.FeatureSameNameAsContainingConcept"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
         // Step 3: Uncomment the line below 
