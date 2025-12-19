@@ -77,7 +77,7 @@ public class GeneratorFacade
         Persist(path, Generate());
 
     /// Stores the output of <paramref name="compilationUnit"/> to the file at <paramref name="path"/>.
-    public void Persist(string path, CompilationUnitSyntax compilationUnit)
+    public void Persist(string path, CompilationUnitSyntax compilationUnit, bool formatted = true)
     {
         var workspace = new AdhocWorkspace();
         var options = workspace.Options
@@ -87,7 +87,9 @@ public class GeneratorFacade
             .WithChangedOption(CSharpFormattingOptions.WrappingKeepStatementsOnSingleLine, value: false)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInAnonymousTypes, value: true)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInObjectInit, value: true);
-        var formattedCompilationUnit = (CompilationUnitSyntax)Formatter.Format(compilationUnit, workspace, options);
+        var formattedCompilationUnit = formatted
+            ? (CompilationUnitSyntax)Formatter.Format(compilationUnit, workspace, options)
+            : compilationUnit;
 
         using var streamWriter = new StreamWriter(path, false);
         streamWriter.Write(formattedCompilationUnit.GetText().ToString().ReplaceLineEndings());
@@ -101,19 +103,19 @@ public class GeneratorFacade
 
     /// Compiles the output of <see cref="Generate"/> and returns all diagnostic messages.
     public ImmutableArray<Diagnostic> Compile() =>
-        Compile(Generate());
+        Compile([Generate()]);
 
-    /// Compiles <paramref name="compilationUnit"/> and returns all diagnostic messages.
-    public ImmutableArray<Diagnostic> Compile(CompilationUnitSyntax compilationUnit)
+    /// Compiles <paramref name="compilationUnits"/> and returns all diagnostic messages.
+    public ImmutableArray<Diagnostic> Compile(IEnumerable<CompilationUnitSyntax> compilationUnits)
     {
-        var tree = SyntaxTree(compilationUnit);
+        var trees = compilationUnits.Select(cu => SyntaxTree(cu));
         var refApis = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic)
             .Select(a => MetadataReference.CreateFromFile(a.Location))
             .Append(MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(ISet<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location));
-        var compilation = CSharpCompilation.Create("foo", [tree], refApis);
+        var compilation = CSharpCompilation.Create("foo", trees, refApis);
         var diagnostics = compilation.GetDiagnostics();
         return diagnostics;
     }
