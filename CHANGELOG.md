@@ -28,6 +28,11 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Bugfix: `DeltaDeserializerHandler` is made public. This handler enables deserializer to accept node id that appears both in received delta(s) and local nodes. In the context of delta protocol, this enables replacing a node in a model with a new node with the same id, which results in a valid model.
 * `a.InsertBefore(b)` / `a.InsertAfter(b)` work correctly if both `a` and `b` are siblings.
 ### Changed
+* Make formatting optional during persisting generated classes.
+* Escape feature names that have the same name as an implementing type during generation.
+* Don't generate current namespace as fully qualified name. 
+* Add `global::` prefix to `using` statements to support generating languages that contain `LionWeb` in their namespace.
+* Generator escapes user language names conflicting with framework names.
 * Use `IReferenceTarget` both as return and parameter type of `IDeserializerHandler.UnresolvableReferenceTarget()`.
 * Factored out mutation code from generated classes into base class methods
   Simplifies changes and reduces the amount of generated code

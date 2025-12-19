@@ -40,6 +40,9 @@ public interface INames
     /// Maps external languages to their namespaces.
     IDictionary<Language, string> NamespaceMappings { get; }
 
+    /// Maps custom primitive types between LionWeb and C#.
+    IDictionary<PrimitiveType, Type> PrimitiveTypeMappings { get; }
+    
     /// Register a new <see cref="NamespaceMappings">NamespaceMapping</see>.
     void AddNamespaceMapping(Language lang, string nsName);
 
@@ -128,7 +131,7 @@ public interface INames
     IdentifierNameSyntax FeatureField(Feature feature);
 
     /// <returns><c>MyFeature</c></returns>
-    IdentifierNameSyntax FeatureProperty(Feature feature);
+    IdentifierNameSyntax FeatureProperty(Feature feature, Classifier container);
 
     /// <returns><c>myFeature</c></returns>
     string FeatureParam(Feature feature);
