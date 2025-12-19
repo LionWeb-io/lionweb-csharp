@@ -128,7 +128,7 @@ public interface INames
     IdentifierNameSyntax FeatureField(Feature feature);
 
     /// <returns><c>MyFeature</c></returns>
-    IdentifierNameSyntax FeatureProperty(Feature feature);
+    IdentifierNameSyntax FeatureProperty(Feature feature, Classifier container);
 
     /// <returns><c>myFeature</c></returns>
     string FeatureParam(Feature feature);
