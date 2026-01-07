@@ -21,6 +21,8 @@ namespace LionWeb.Generator.Impl;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
@@ -48,7 +50,7 @@ internal class FeatureGeneratorProperty(Classifier classifier, Property property
         return new List<MemberDeclarationSyntax>
         {
             SingleFeatureField(),
-            FeatureSetterRaw(AsType(property.Type))
+            PropertySetterRaw(property.Type)
         }.Concat(members);
     }
 
@@ -63,7 +65,7 @@ internal class FeatureGeneratorProperty(Classifier classifier, Property property
                 SingleFeatureField(),
                 SingleOptionalFeatureProperty(),
                 TryGet(),
-                FeatureSetterRaw(AsType(property.Type))
+                PropertySetterRaw(property.Type)
             }
             .Concat(
                 OptionalFeatureSetter([
@@ -74,11 +76,57 @@ internal class FeatureGeneratorProperty(Classifier classifier, Property property
             );
     }
 
-    private bool IsReferenceType() =>
-        !(_builtIns.Boolean.EqualsIdentity(property.Type)
-          || _builtIns.Integer.EqualsIdentity(property.Type)
-          || property.Type is Enumeration
-          || property.Type is StructuredDataType
-          || property.Type is PrimitiveType p && _names.PrimitiveTypeMappings.TryGetValue(p, out var t) && t.IsValueType
+    private MethodDeclarationSyntax PropertySetterRaw(Datatype datatype)
+    {
+        ExpressionSyntax comparison = !IsCustomPrimitiveTypeWithoutEqualityOperator(datatype)
+            ? EqualsSign(IdentifierName("value"), FeatureField(property))
+            : Or(
+                And(
+                    IsNull("value"),
+                    IsNull(FeatureField(property).ToString())
+                ),
+                And(
+                    ParseExpression("value is not null"),
+                    InvocationExpression(
+                        MemberAccess(
+                            IdentifierName("value"),
+                            IdentifierName("Equals")
+                        )
+                    )
+                    .WithArgumentList(AsArguments([
+                            FeatureField(property)
+                        ])
+                    )
+                )
             );
+
+        var paramType = AsType(datatype);
+        return Method(FeatureSetRaw(property).ToString(), AsType(typeof(bool)), [
+                Param("value", NullableType(paramType))
+            ])
+            .WithBody(AsStatements([
+                IfStatement(
+                    comparison,
+                    ReturnStatement(False())
+                ),
+                AssignFeatureField(),
+                ReturnStatement(True())
+            ]))
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
+    }
+
+    private bool IsCustomPrimitiveTypeWithoutEqualityOperator(Datatype datatype) =>
+        datatype is PrimitiveType primitiveType
+        && !primitiveType.GetLanguage().EqualsIdentity(_builtIns)
+        && _names.PrimitiveTypeMappings[primitiveType].GetMethod(WellKnownMemberNames.EqualityOperatorName) is null;
+
+    private bool IsReferenceType() => property.Type switch
+        {
+            Enumeration or StructuredDataType => false,
+            PrimitiveType b when _builtIns.Boolean.EqualsIdentity(b) => false,
+            PrimitiveType i when _builtIns.Integer.EqualsIdentity(i) => false,
+            PrimitiveType s when _builtIns.String.EqualsIdentity(s) => true,
+            PrimitiveType p => !_names.PrimitiveTypeMappings[p].IsValueType,
+            _ => true
+        };
 }

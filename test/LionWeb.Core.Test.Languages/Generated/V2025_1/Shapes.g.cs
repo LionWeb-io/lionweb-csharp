@@ -16,7 +16,6 @@ using global::LionWeb.Core.VersionSpecific.V2025_1;
 using global::System;
 using global::System.Collections.Generic;
 using global::System.Diagnostics.CodeAnalysis;
-using Time = string;
 
 [LionCoreLanguage(Key = "key-Shapes", Version = "1")]
 public partial class ShapesLanguage : LanguageBase<IShapesFactory>
