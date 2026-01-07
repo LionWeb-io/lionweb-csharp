@@ -83,8 +83,8 @@ internal class DefinitionGenerator(GeneratorInputParameters generatorInputParame
             .Prepend(_builtIns.GetType().Namespace)
             .Distinct()
             .Order()
-            .Select(n => UsingDirective(ParseName(n)))
-            .Concat(PrimitiveTypesAsUsings())
+            .Select(n => UsingDirective(ParseName($"global::{n}")))
+            // .Concat(PrimitiveTypesAsUsings())
             .ToArray();
 
     private IEnumerable<UsingDirectiveSyntax> PrimitiveTypesAsUsings() =>

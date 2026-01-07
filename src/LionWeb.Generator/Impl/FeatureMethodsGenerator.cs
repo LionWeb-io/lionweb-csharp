@@ -106,7 +106,7 @@ internal class FeatureMethodsGenerator(
     private StatementSyntax GenGetInternal(Feature feature) =>
         IfStatement(GenEqualsIdentityFeature(feature),
             AsStatements([
-                Assignment("result", FeatureProperty(feature)),
+                Assignment("result", _names.FeatureProperty(feature, classifier)),
                 ReturnTrue()
             ])
         );
@@ -678,13 +678,13 @@ internal class FeatureMethodsGenerator(
     #region CollectAllSetFeatures
 
     private MethodDeclarationSyntax GenCollectAllSetFeatures() =>
-        Method("CollectAllSetFeatures", AsType(typeof(IEnumerable<Feature>)))
+        Method("CollectAllSetFeatures", AsType(typeof(IEnumerable<>), AsType(typeof(Feature))))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(
                 new List<StatementSyntax>
                     {
-                        ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();")
+                        Variable("result", AsType(typeof(List<>), AsType(typeof(Feature))), ParseExpression("base.CollectAllSetFeatures().ToList()"))
                     }
                     .Concat(FeaturesToImplement(classifier).Select(GenCollectAllSetFeatures))
                     .Append(ReturnStatement(IdentifierName("result")))
