@@ -14,7 +14,6 @@ using global::LionWeb.Core.VersionSpecific.V2023_1;
 using global::System;
 using global::System.Collections.Generic;
 using global::System.Diagnostics.CodeAnalysis;
-using DeprDatatype = string;
 
 [LionCoreLanguage(Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh", Version = "0")]
 public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>

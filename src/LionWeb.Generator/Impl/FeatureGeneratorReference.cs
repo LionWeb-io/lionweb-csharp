@@ -74,7 +74,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                     ExpressionStatement(CallGeneric("SetRequiredSingleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
                     ReturnStatement(This())
                 ]),
-                FeatureSetterRaw(AsType(typeof(ReferenceTarget)))
+                ReferenceSetterRaw(AsType(typeof(ReferenceTarget)))
             }
             .Concat(RequiredFeatureSetter([
                     SingleReferenceSetterForwarder()
@@ -149,7 +149,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                     ExpressionStatement(CallGeneric("SetOptionalSingleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
                     ReturnStatement(This())
                 ]),
-                FeatureSetterRaw(AsType(typeof(ReferenceTarget)))
+                ReferenceSetterRaw(AsType(typeof(ReferenceTarget)))
             }
             .Concat(OptionalFeatureSetter([
                 SingleReferenceSetterForwarder()
@@ -414,4 +414,18 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
     private InvocationExpressionSyntax ReferenceTargetNullableTargetsCall() =>
         CallGeneric("ReferenceTargetNullableTargets",
             AsType(reference.GetFeatureType()), FeatureField(reference), MetaProperty(reference));
+    
+    private MethodDeclarationSyntax ReferenceSetterRaw(TypeSyntax paramType) =>
+        Method(FeatureSetRaw(reference).ToString(), AsType(typeof(bool)), [
+                Param("value", NullableType(paramType))
+            ])
+            .WithBody(AsStatements([
+                IfStatement(
+                    EqualsSign(IdentifierName("value"), FeatureField(reference)),
+                    ReturnStatement(False())
+                ),
+                AssignFeatureField(),
+                ReturnStatement(True())
+            ]))
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 }

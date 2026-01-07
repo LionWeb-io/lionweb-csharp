@@ -18,10 +18,12 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using Io.Lionweb.Mps.Specific;
+using LionWeb.Build.Languages;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Generator.Impl;
 using System.Reflection;
 
 // ReSharper disable SuggestVarOrType_SimpleTypes
@@ -44,6 +46,8 @@ public class TestLanguagesDefinitions
     public Language NamespaceContainsLionWebLang { get; private set; }
     public Language LanguageWithLionWebNamedConcepts { get; private set; }
     public Language FeatureSameNameAsContainingConcept { get; private set; }
+    public Language? CustomPrimitiveTypeLang { get; private set; }
+    public Dictionary<PrimitiveType, Type> CustomPrimitiveTypeMapping { get; } = [];
 
     public List<Language> MixedLangs { get; private set; } = [];
 
@@ -68,6 +72,7 @@ public class TestLanguagesDefinitions
             CreateKeywordLang();
             CreateLowerCaseLang();
             CreateUpperCaseLang();
+            CreateCustomPrimitiveTypeLang();
         }
     }
 
@@ -77,6 +82,7 @@ public class TestLanguagesDefinitions
         {
             Key = "key-ALang", Name = "ALang", Version = "1"
         };
+        var aDatatype = aLang.PrimitiveType("id-AType", "key-AType", "CustomPrimitiveType");
         var aConcept = aLang.Concept("id-AConcept", "key-AConcept", "AConcept");
         aConcept.AddAnnotations([
             CreateConceptDescription("aaa-desc", "AConcept Alias", """
@@ -99,6 +105,7 @@ public class TestLanguagesDefinitions
         bLang.AddAnnotations([
             CreateKeyedDescription("aaa-bLangDesc", "bLang desc", [aLang])
         ]);
+        var bDatatype = bLang.PrimitiveType("id-BType", "key-BType", "CustomPrimitiveType");
         var bConcept = bLang.Concept("id-BConcept", "key-BConcept", "BConcept");
         bConcept.AddAnnotations([CreateConceptDescription("xxx", null, "Some enum", null)]);
 
@@ -120,6 +127,12 @@ public class TestLanguagesDefinitions
         aEnumProp.AddAnnotations([
             CreateKeyedDescription("aaa-enumPropDesc", "enum desc", [aLang, bRef])
         ]);
+
+        aConcept.Property("AProp").OfType(aDatatype);
+        aConcept.Property("BProp").OfType(bDatatype);
+        
+        bConcept.Property("AProp").OfType(aDatatype);
+        bConcept.Property("BProp").OfType(bDatatype);
 
         ALang = aLang;
         BLang = bLang;
@@ -778,6 +791,48 @@ public class TestLanguagesDefinitions
         
         FeatureSameNameAsContainingConcept = lang;
     }
+    
+    private void CreateCustomPrimitiveTypeLang()
+    {
+        var lang = new DynamicLanguage("id-CustomPrimitiveTypeLang-lang", _lionWebVersion)
+        {
+            Name = "CustomPrimitiveTypeLang", Key = "key-CustomPrimitiveTypeLang", Version = "1"
+        };
+
+        var concept = lang.Concept("PrimitiveConcept");
+        
+        CustomType(typeof(CustomType));
+        var nested = CustomType(typeof(LionWeb.Build.Languages.SubNamespace.CustomType), "CustomNestedType");
+        CustomType(typeof(CustomEqualityType));
+        var enm = CustomType(typeof(CustomEnumType));
+        CustomType(typeof(CustomReferenceType));
+        CustomType(typeof(string), "String");
+        CustomType(typeof(int), "Integer");
+        CustomType(typeof(int), "Int");
+        CustomType(typeof(bool), "Boolean");
+        
+        var sdt = lang.StructuredDataType("Sdt");
+        
+        var boolType = lang.PrimitiveType("Bool");
+        CustomPrimitiveTypeMapping[boolType] = typeof(bool);
+        sdt.Field("boolField").OfType(boolType);
+        
+        sdt.Field("customField").OfType(nested);
+        sdt.Field("enumField").OfType(enm);
+        
+        CustomPrimitiveTypeLang = lang;
+        return;
+
+        PrimitiveType CustomType(Type type, string? name = null)
+        {
+            var safeName = name ?? type.Name;
+            var customType = lang.PrimitiveType(safeName);
+            concept.Property(safeName.ToFirstLower() + "Optional").IsOptional(true).OfType(customType);
+            concept.Property(safeName.ToFirstLower() + "Required").IsOptional(false).OfType(customType);
+            CustomPrimitiveTypeMapping[customType] = type;
+            return customType;
+        }
+    }
 }
 
 internal static class LanguageExtensions
@@ -788,6 +843,17 @@ internal static class LanguageExtensions
     internal static DynamicInterface Interface(this DynamicLanguage language, string name) =>
         language.Interface($"id-{name}", $"key-{name}", name);
 
+    internal static DynamicPrimitiveType PrimitiveType(this DynamicLanguage language, string name) =>
+        language.PrimitiveType($"id-{name}", $"key-{name}", name);
+
+    internal static DynamicStructuredDataType StructuredDataType(this DynamicLanguage language, string name) =>
+        language.StructuredDataType($"id-{name}", $"key-{name}", name);
+
+
     internal static DynamicProperty Property(this DynamicClassifier classifier, string name) =>
         classifier.Property($"id-{name}", $"key-{name}", name).OfType(classifier.GetLanguage().LionWebVersion.BuiltIns.String);
+
+    
+    internal static DynamicField Field(this DynamicStructuredDataType sdt, string name) =>
+        sdt.Field($"id-{name}", $"key-{name}", name).OfType(sdt.GetLanguage().LionWebVersion.BuiltIns.String);
 }

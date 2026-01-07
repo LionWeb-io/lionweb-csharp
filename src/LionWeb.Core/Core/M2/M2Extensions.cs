@@ -54,7 +54,7 @@ public static class M2Extensions
     /// <returns>A <typeparamref name="T"/> with the given key, or:</returns>
     /// <exception cref="KeyNotFoundException">If the given <paramref name="language"/> does not contain a thing with the given key.</exception>
     public static T FindByKey<T>(this Language language, MetaPointerKey key) where T : IKeyed =>
-        M1Extensions.Descendants<IKeyed>(language, true, true)
+        M1Extensions.Descendants<IKeyed>(language, true, false)
             .OfType<T>()
             .FindByKey(key);
 

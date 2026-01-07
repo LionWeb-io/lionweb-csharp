@@ -247,30 +247,8 @@ public partial class Names : INames
     {
         TypeSyntax? result = null;
 
-        if (type.IsPrimitive)
-        {
-            result = PredefinedType(Token(
-                type switch
-                {
-                    _ when type == typeof(bool) => SyntaxKind.BoolKeyword,
-                    _ when type == typeof(byte) => SyntaxKind.ByteKeyword,
-                    _ when type == typeof(char) => SyntaxKind.CharKeyword,
-                    _ when type == typeof(double) => SyntaxKind.DoubleKeyword,
-                    _ when type == typeof(short) => SyntaxKind.ShortKeyword,
-                    _ when type == typeof(int) => SyntaxKind.IntKeyword,
-                    _ when type == typeof(long) => SyntaxKind.LongKeyword,
-                    _ when type == typeof(sbyte) => SyntaxKind.SByteKeyword,
-                    _ when type == typeof(float) => SyntaxKind.FloatKeyword,
-                    _ when type == typeof(ushort) => SyntaxKind.UShortKeyword,
-                    _ when type == typeof(uint) => SyntaxKind.UIntKeyword,
-                    _ when type == typeof(ulong) => SyntaxKind.StringKeyword
-                }));
-        } else if (type == typeof(object))
-            result = PredefinedType(Token(SyntaxKind.ObjectKeyword));
-        else if (type == typeof(string))
-            result = PredefinedType(Token(SyntaxKind.StringKeyword));
-        else if (type == typeof(decimal))
-            result = PredefinedType(Token(SyntaxKind.DecimalKeyword));
+        if (_cSharpBuiltinTypes.TryGetValue(type, out var syntaxKind))
+            result = PredefinedType(Token(syntaxKind));
         else if (_internalTypes.Contains(type)
                  && M1Extensions.Descendants<IKeyed>(_language, true).Any(k => k.Name == type.Name))
             result = ParseName($"global::" + type.FullName);
@@ -291,6 +269,25 @@ public partial class Names : INames
 
         return result;
     }
+
+    private static readonly Dictionary<Type, SyntaxKind> _cSharpBuiltinTypes = new()
+    {
+        { typeof(bool), SyntaxKind.BoolKeyword },
+        { typeof(byte), SyntaxKind.ByteKeyword },
+        { typeof(char), SyntaxKind.CharKeyword },
+        { typeof(double), SyntaxKind.DoubleKeyword },
+        { typeof(short), SyntaxKind.ShortKeyword },
+        { typeof(int), SyntaxKind.IntKeyword },
+        { typeof(long), SyntaxKind.LongKeyword },
+        { typeof(sbyte), SyntaxKind.SByteKeyword },
+        { typeof(float), SyntaxKind.FloatKeyword },
+        { typeof(ushort), SyntaxKind.UShortKeyword },
+        { typeof(uint), SyntaxKind.UIntKeyword },
+        { typeof(ulong), SyntaxKind.StringKeyword },
+        { typeof(object), SyntaxKind.ObjectKeyword },
+        { typeof(string), SyntaxKind.StringKeyword },
+        { typeof(decimal), SyntaxKind.DecimalKeyword }
+    };
 
     private static readonly HashSet<string> _typeInternalNames =
     [
@@ -373,19 +370,18 @@ public partial class Names : INames
     /// <inheritdoc />
     public TypeSyntax AsType(Datatype datatype, bool disambiguate = false)
     {
-        TypeSyntax type;
         if (datatype is PrimitiveType p && _primitiveTypeMappings.TryGetValue(p, out var t))
         {
-            type = AsType(t);
-        } else
-        {
-            var result = VersionSpecifics.AsType(datatype, _namespaceMappings);
-            if (result != null)
-                return result;
-
-            type = IdentifierName(datatype.Name.PrefixKeyword());
+            return _cSharpBuiltinTypes.ContainsKey(t)
+                ? AsType(t)
+                : ParseName($"global::{t.FullName}");
         }
 
+        var result = VersionSpecifics.AsType(datatype, _namespaceMappings);
+        if (result != null)
+            return result;
+
+        TypeSyntax type = IdentifierName(datatype.Name.PrefixKeyword());
 
         if (!disambiguate || type is not SimpleNameSyntax s)
             return type;
