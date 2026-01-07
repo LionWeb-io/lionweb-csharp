@@ -21,6 +21,8 @@ namespace LionWeb.Generator.Impl;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
@@ -30,9 +32,9 @@ internal class FeatureGeneratorProperty(Classifier classifier, Property property
 {
     public IEnumerable<MemberDeclarationSyntax> RequiredProperty()
     {
-        var setterName = IsReferenceType()
-            ? "SetRequiredReferenceTypeProperty"
-            : "SetRequiredValueTypeProperty";
+        var setterName = IsValueType()
+            ? "SetRequiredValueTypeProperty"
+            : "SetRequiredReferenceTypeProperty";
 
         var members = new List<MemberDeclarationSyntax>
         {
@@ -42,28 +44,28 @@ internal class FeatureGeneratorProperty(Classifier classifier, Property property
             ExpressionStatement(CallGeneric(setterName, AsType(property.Type), IdentifierName("value"), MetaProperty(property), FeatureField(property), FeatureSetRaw(property))),
             ReturnStatement(This())
         ]));
-        if (IsReferenceType())
+        if (!IsValueType())
             members = members.Select(member => member.Xdoc(XdocThrowsIfSetToNull()));
 
         return new List<MemberDeclarationSyntax>
         {
             SingleFeatureField(),
-            FeatureSetterRaw(AsType(property.Type))
+            PropertySetterRaw(property.Type)
         }.Concat(members);
     }
 
     public IEnumerable<MemberDeclarationSyntax> OptionalProperty()
     {
-        var setterName = IsReferenceType()
-            ? "SetOptionalReferenceTypeProperty"
-            : "SetOptionalValueTypeProperty";
+        var setterName = IsValueType()
+            ? "SetOptionalValueTypeProperty"
+            : "SetOptionalReferenceTypeProperty";
 
         return new List<MemberDeclarationSyntax>
             {
                 SingleFeatureField(),
                 SingleOptionalFeatureProperty(),
                 TryGet(),
-                FeatureSetterRaw(AsType(property.Type))
+                PropertySetterRaw(property.Type)
             }
             .Concat(
                 OptionalFeatureSetter([
@@ -74,11 +76,67 @@ internal class FeatureGeneratorProperty(Classifier classifier, Property property
             );
     }
 
-    private bool IsReferenceType() =>
-        !(_builtIns.Boolean.EqualsIdentity(property.Type)
-          || _builtIns.Integer.EqualsIdentity(property.Type)
-          || property.Type is Enumeration
-          || property.Type is StructuredDataType
-          || property.Type is PrimitiveType p && _names.PrimitiveTypeMappings.TryGetValue(p, out var t) && t.IsValueType
+    private MethodDeclarationSyntax PropertySetterRaw(Datatype datatype)
+    {
+        ExpressionSyntax comparison = SupportsEqualityOperator(datatype)
+            ? EqualsSign(IdentifierName("value"), FeatureField(property))
+            : Or(
+                And(
+                    IsNull("value"),
+                    IsNull(FeatureField(property).ToString())
+                ),
+                And(
+                    ParseExpression("value is not null"),
+                    InvocationExpression(
+                        MemberAccess(
+                            IdentifierName("value"),
+                            IdentifierName("Equals")
+                        )
+                    )
+                    .WithArgumentList(AsArguments([
+                            FeatureField(property)
+                        ])
+                    )
+                )
             );
+
+        var paramType = AsType(datatype);
+        return Method(FeatureSetRaw(property).ToString(), AsType(typeof(bool)), [
+                Param("value", NullableType(paramType))
+            ])
+            .WithBody(AsStatements([
+                IfStatement(
+                    comparison,
+                    ReturnStatement(False())
+                ),
+                AssignFeatureField(),
+                ReturnStatement(True())
+            ]))
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
+    }
+
+    private bool SupportsEqualityOperator(Datatype datatype) => datatype switch
+    {
+        Enumeration or StructuredDataType => true,
+        _ when datatype.GetLanguage().EqualsIdentity(_builtIns) => true,
+        PrimitiveType p => _names.PrimitiveTypeMappings[p] switch
+        {
+            { IsPrimitive: true} => true,
+            { IsEnum: true } => true,
+            { IsValueType: false } => true,
+            { } eq when eq.GetMethod(WellKnownMemberNames.EqualityOperatorName) is not null => true,
+            _ => false
+        },
+        _ => false
+    };
+
+    private bool IsValueType() => property.Type switch
+        {
+            Enumeration or StructuredDataType => true,
+            PrimitiveType b when _builtIns.Boolean.EqualsIdentity(b) => true,
+            PrimitiveType i when _builtIns.Integer.EqualsIdentity(i) => true,
+            PrimitiveType s when _builtIns.String.EqualsIdentity(s) => false,
+            PrimitiveType p => _names.PrimitiveTypeMappings[p].IsValueType,
+            _ => false
+        };
 }

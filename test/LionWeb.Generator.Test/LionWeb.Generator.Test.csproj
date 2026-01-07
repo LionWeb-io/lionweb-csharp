@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\build\LionWeb-CSharp-Build\LionWeb-CSharp-Build.csproj" />
         <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
         <ProjectReference Include="..\..\src\LionWeb.Generator\LionWeb.Generator.csproj" />
         <ProjectReference Include="..\LionWeb.Core.Test.Languages\LionWeb.Core.Test.Languages.csproj" />

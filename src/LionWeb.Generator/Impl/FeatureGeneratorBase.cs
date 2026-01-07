@@ -288,20 +288,6 @@ internal abstract class FeatureGeneratorBase(Classifier classifier, Feature feat
         return result;
     }
 
-    protected MethodDeclarationSyntax FeatureSetterRaw(TypeSyntax paramType) =>
-        Method(FeatureSetRaw(feature).ToString(), AsType(typeof(bool)), [
-                Param("value", NullableType(paramType))
-            ])
-            .WithBody(AsStatements([
-                IfStatement(
-                    EqualsSign(IdentifierName("value"), FeatureField(feature)),
-                    ReturnStatement(False())
-                ),
-                AssignFeatureField(),
-                ReturnStatement(True())
-            ]))
-            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
-
     protected IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
         XdocKeyed(ffeature)
             .Concat(XdocRemarks(ffeature));

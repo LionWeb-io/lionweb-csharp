@@ -14,7 +14,6 @@ using global::LionWeb.Core.VersionSpecific.V2024_1;
 using global::System;
 using global::System.Collections.Generic;
 using global::System.Diagnostics.CodeAnalysis;
-using @base = string;
 
 [LionCoreLanguage(Key = "class", Version = "struct")]
 public partial class ClassLanguage : LanguageBase<IClassFactory>

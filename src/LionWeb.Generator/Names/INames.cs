@@ -41,6 +41,9 @@ public interface INames
     IDictionary<Language, string> NamespaceMappings { get; }
 
     /// Maps custom primitive types between LionWeb and C#.
+    /// MUST contain a mapping for all <see cref="LionWeb.Core.M2.IBuiltInsLanguage">non-builtin</see> PrimitiveTypes present in
+    /// <see cref="Language"/>, either as <see cref="PrimitiveType"/> or <see cref="Property.Type"/>.
+    /// <c>ref struct</c>s are not valid mapped types. 
     IDictionary<PrimitiveType, Type> PrimitiveTypeMappings { get; }
     
     /// Register a new <see cref="NamespaceMappings">NamespaceMapping</see>.
@@ -48,33 +51,33 @@ public interface INames
 
     /// Name of class generated for <see cref="Language"/>.
     /// <returns><c>MyLangNameLanguage</c></returns>
-    string LanguageName(Language lang);
+    protected internal string LanguageName(Language lang);
 
     /// Roslyn type of class generated for <see cref="Language"/>.
     /// <returns><c>MyLangNameLanguage</c></returns>
-    NameSyntax LanguageType { get; }
+    protected internal NameSyntax LanguageType { get; }
 
     /// Name of interface generated for <see cref="Language">Language's</see> Factory.
     /// <returns><c>IMyLangFactory</c></returns>
-    string FactoryInterfaceName { get; }
+    protected internal string FactoryInterfaceName { get; }
 
     /// Name of class generated for <see cref="Language">Language's</see> Factory.
     /// <returns><c>MyLangFactory</c></returns>
-    string FactoryName { get; }
+    protected internal string FactoryName { get; }
 
     /// Roslyn type of class generated for <see cref="Language">Language's</see> Factory.
     /// <returns><c>MyLangFactory</c></returns>
-    IdentifierNameSyntax FactoryType { get; }
+    protected internal IdentifierNameSyntax FactoryType { get; }
 
     /// Roslyn type of interface generated for <see cref="Language">Language's</see> Factory.
     /// <returns><c>IMyLangFactory</c></returns>
-    IdentifierNameSyntax FactoryInterfaceType { get; }
+    protected internal IdentifierNameSyntax FactoryInterfaceType { get; }
 
     /// Converts <paramref name="type"/> to Roslyn type and registers it with <see cref="UsedTypes"/>.
     /// If <paramref name="type"/> includes generic type parameters and <paramref name="generics"/> is unset,
     /// <paramref name="type">type's</paramref> generic type parameters are used.
     /// If <paramref name="generics"/> is set, it overrides any generic type parameters of <paramref name="type"/>. 
-    TypeSyntax AsType(Type type, params TypeSyntax?[] generics);
+    protected internal TypeSyntax AsType(Type type, params TypeSyntax?[] generics);
 
     /// Roslyn type of <paramref name="classifier"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
@@ -94,54 +97,54 @@ public interface INames
     /// </item>
     /// </list>
     /// 
-    TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false);
+    protected internal TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false);
 
     /// Roslyn type of <paramref name="datatype"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
-    TypeSyntax AsType(Datatype datatype, bool disambiguate = false);
+    protected internal TypeSyntax AsType(Datatype datatype, bool disambiguate = false);
 
     /// Roslyn type of <paramref name="keyed"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
-    NameSyntax AsName(IKeyed keyed, bool disambiguate = false);
+    protected internal NameSyntax AsName(IKeyed keyed, bool disambiguate = false);
 
     /// Roslyn type of <paramref name="lang"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="lang"/> is mentioned in <see cref="NamespaceMappings"/>.
     /// <returns><c>MyLangNameLanguage</c></returns>
-    NameSyntax AsType(Language lang);
+    protected internal NameSyntax AsType(Language lang);
 
     /// Registers <paramref name="type"/> with <see cref="UsedTypes"/>.
-    string Use(Type type);
+    protected internal string Use(Type type);
 
     /// <returns><c>MyClassifier</c></returns>
-    IdentifierNameSyntax AsProperty(LanguageEntity classifier);
+    protected internal IdentifierNameSyntax AsProperty(LanguageEntity classifier);
 
     /// <returns><c>MyClassifier_MyFeature</c></returns>
-    IdentifierNameSyntax AsProperty(Feature feature);
+    protected internal IdentifierNameSyntax AsProperty(Feature feature);
 
     /// <returns><c>MyEnum_MyLiteral</c></returns>
-    IdentifierNameSyntax AsProperty(EnumerationLiteral literal);
+    protected internal IdentifierNameSyntax AsProperty(EnumerationLiteral literal);
 
     /// <returns><c>MyStructuredDataType_MyField</c></returns>
-    IdentifierNameSyntax AsProperty(Field field);
+    protected internal IdentifierNameSyntax AsProperty(Field field);
 
     /// <returns><c>MyLanguage.Instance</c></returns>
-    NameSyntax MetaProperty(Language lang);
+    protected internal NameSyntax MetaProperty(Language lang);
 
     /// <returns><c>_myFeature</c></returns>
-    IdentifierNameSyntax FeatureField(Feature feature);
+    protected internal IdentifierNameSyntax FeatureField(Feature feature);
 
     /// <returns><c>MyFeature</c></returns>
-    IdentifierNameSyntax FeatureProperty(Feature feature, Classifier container);
+    protected internal IdentifierNameSyntax FeatureProperty(Feature feature, Classifier container);
 
     /// <returns><c>myFeature</c></returns>
-    string FeatureParam(Feature feature);
+    protected internal string FeatureParam(Feature feature);
 
     /// <returns><c>_myField</c></returns>
-    IdentifierNameSyntax FieldField(Field field);
+    protected internal IdentifierNameSyntax FieldField(Field field);
 
     /// <returns><c>MyField</c></returns>
-    IdentifierNameSyntax FieldProperty(Field field);
+    protected internal IdentifierNameSyntax FieldProperty(Field field);
 
     /// <returns><c>myField</c></returns>
-    string FieldParam(Field field);
+    protected internal string FieldParam(Field field);
 }

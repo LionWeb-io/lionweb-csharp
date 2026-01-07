@@ -18,6 +18,8 @@
 namespace LionWeb.Generator;
 
 using Core;
+using Core.M1;
+using Core.M3;
 using GeneratorExtensions;
 using Impl;
 using Microsoft.CodeAnalysis;
@@ -44,10 +46,13 @@ public class GeneratorFacade
     private CompilationUnitSyntax? _compilationUnit = null;
 
     /// Generates the compilation unit for the input language.
+    /// <exception cref="ArgumentException">If <see cref="Names"/>.<see cref="Generator.Names.Names.PrimitiveTypeMappings">PrimitiveTypeMappings</see> is invalid.</exception>
     public CompilationUnitSyntax Generate()
     {
         if (_compilationUnit == null)
         {
+            CheckPrimitiveTypes(Names);
+            
             var generatorInputParameters = new GeneratorInputParameters
             {
                 Names = Names, LionWebVersion = LionWebVersion, Config = Config, Correlator = Correlator
@@ -118,5 +123,37 @@ public class GeneratorFacade
         var compilation = CSharpCompilation.Create("foo", trees, refApis);
         var diagnostics = compilation.GetDiagnostics();
         return diagnostics;
+    }
+
+    private void CheckPrimitiveTypes(INames names)
+    {
+        List<string> issues = [];
+        
+        var missingMappings = M1Extensions.Descendants<IReadableNode>(names.Language)
+            .Select(n => n switch
+            {
+                PrimitiveType pt => pt,
+                Property pr => pr.Type,
+                Field f => f.Type,
+                _ => null
+            })
+            .OfType<PrimitiveType>()
+            .Distinct()
+            .Except(names.PrimitiveTypeMappings.Keys)
+            .Except(LionWebVersion.BuiltIns.Entities.OfType<PrimitiveType>())
+            .ToList();
+        
+        if (missingMappings.Count != 0)
+            issues.Add($"Missing primitive type mappings for: {string.Join(",", missingMappings.Select(m => m.Key))}");
+
+        var invalidMappings = names.PrimitiveTypeMappings.Values
+            .Where(t => t.IsByRefLike)
+            .ToList();
+        
+        if (invalidMappings.Count != 0)
+            issues.Add($"Cannot use ref types as mappings: {string.Join(",", invalidMappings.Select(t => t.FullName))}");
+
+        if (issues.Count != 0)
+            throw new ArgumentException(string.Join("\n", issues));
     }
 }
