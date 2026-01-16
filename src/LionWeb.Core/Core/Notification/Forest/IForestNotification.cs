@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.Notification.Forest;
 
+using M1;
+
 /// All LionWeb notifications relating to a forest.
 public interface IForestNotification : INotification
 {
@@ -43,10 +45,14 @@ public abstract record AForestNotification(INotificationId NotificationId) : IFo
 public record PartitionDeletedNotification(
     IPartitionInstance DeletedPartition,
     INotificationId NotificationId)
-    : AForestNotification(NotificationId)
+    : AForestNotification(NotificationId), IDeletedNodeNotification
 {
     /// <inheritdoc />
     public override IPartitionInstance Partition => DeletedPartition;
+
+    /// <inheritdoc />
+    public IEnumerable<IReadableNode> DeletedNodes =>
+        M1Extensions.Descendants<IReadableNode>(DeletedPartition, true, true);
 }
 
 /// A new partition has been added to this forest.
