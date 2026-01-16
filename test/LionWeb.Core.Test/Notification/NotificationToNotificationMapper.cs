@@ -59,7 +59,6 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
-            EntryMovedInSameReferenceNotification a => OnEntryMovedInSameReference(a),
             _ => throw new ArgumentException($"{notification.GetType().Name} is not implemented")
         };
 
@@ -433,20 +432,6 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
     
-    private EntryMovedInSameReferenceNotification OnEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
-    {
-        var parent = LookUpNode(notification.Parent);
-        var target = LookUpNode(notification.Target);
-        
-        return new EntryMovedInSameReferenceNotification(
-            parent, 
-            notification.Reference,
-            notification.OldIndex,
-            notification.NewIndex,
-            target,
-            notification.NotificationId);
-    }
-
     #endregion
 
     private T LookUpNode<T>(T node) where T : IReadableNode
