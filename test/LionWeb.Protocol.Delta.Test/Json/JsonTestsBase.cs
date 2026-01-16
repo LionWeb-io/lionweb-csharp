@@ -231,57 +231,6 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(),
             ResolveInfo(), CommandId(), ProtocolMessages());
 
-    protected static MoveEntryFromOtherReference CreateMoveEntryFromOtherReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(),
-            Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
-
-    protected static MoveEntryFromOtherReferenceInSameParent CreateMoveEntryFromOtherReferenceInSameParent() =>
-        new(TargetNode(), MetaPointer(), Index(), MetaPointer(),
-            Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
-
-    protected static MoveEntryInSameReference CreateMoveEntryInSameReference() =>
-        new(TargetNode(), MetaPointer(), Index(), Index(), TargetNode(),
-            ResolveInfo(), CommandId(), ProtocolMessages());
-
-    protected static MoveAndReplaceEntryFromOtherReference CreateMoveAndReplaceEntryFromOtherReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            ResolveInfo(), TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
-
-    protected static MoveAndReplaceEntryFromOtherReferenceInSameParent
-        CreateMoveAndReplaceEntryFromOtherReferenceInSameParent() =>
-        new(TargetNode(), MetaPointer(), Index(),
-            TargetNode(), ResolveInfo(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
-
-    protected static MoveAndReplaceEntryInSameReference CreateMoveAndReplaceEntryInSameReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            ResolveInfo(), Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
-
-    protected static AddReferenceResolveInfo CreateAddReferenceResolveInfo() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(),
-            CommandId(), ProtocolMessages());
-
-    protected static DeleteReferenceResolveInfo CreateDeleteReferenceResolveInfo() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(),
-            CommandId(), ProtocolMessages());
-
-    protected static ChangeReferenceResolveInfo CreateChangeReferenceResolveInfo() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(),
-            ResolveInfo(), CommandId(), ProtocolMessages());
-
-    protected static AddReferenceTarget CreateAddReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            CommandId(), ProtocolMessages());
-
-    protected static DeleteReferenceTarget CreateDeleteReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            CommandId(), ProtocolMessages());
-
-    protected static ChangeReferenceTarget CreateChangeReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            TargetNode(), CommandId(), ProtocolMessages());
-
     #endregion
 
     protected static CompositeCommand CreateCompositeCommand() =>
@@ -320,18 +269,6 @@ public abstract class JsonTestsBase
         [CreateAddReference()],
         [CreateDeleteReference()],
         [CreateChangeReference()],
-        [CreateMoveEntryFromOtherReference()],
-        [CreateMoveEntryFromOtherReferenceInSameParent()],
-        [CreateMoveEntryInSameReference()],
-        [CreateMoveAndReplaceEntryFromOtherReference()],
-        [CreateMoveAndReplaceEntryFromOtherReferenceInSameParent()],
-        [CreateMoveAndReplaceEntryInSameReference()],
-        [CreateAddReferenceResolveInfo()],
-        [CreateDeleteReferenceResolveInfo()],
-        [CreateChangeReferenceResolveInfo()],
-        [CreateAddReferenceTarget()],
-        [CreateDeleteReferenceTarget()],
-        [CreateChangeReferenceTarget()],
         [CreateCompositeCommand()]
     ];
 
@@ -482,65 +419,6 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(), ResolveInfo(), Origin(),
             ProtocolMessages()) { SequenceNumber = Sequence() };
 
-    protected static EntryMovedFromOtherReference CreateEntryMovedFromOtherReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
-
-    protected static EntryMovedFromOtherReferenceInSameParent CreateEntryMovedFromOtherReferenceInSameParent() =>
-        new(TargetNode(), MetaPointer(), Index(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(),
-            ProtocolMessages()) { SequenceNumber = Sequence() };
-
-    protected static EntryMovedInSameReference CreateEntryMovedInSameReference() =>
-        new(TargetNode(), MetaPointer(), Index(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
-        {
-            SequenceNumber = Sequence()
-        };
-
-    protected static EntryMovedAndReplacedFromOtherReference CreateEntryMovedAndReplacedFromOtherReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(), MetaPointer(), Index(),
-            TargetNode(), ResolveInfo(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
-
-    protected static EntryMovedAndReplacedFromOtherReferenceInSameParent
-        CreateEntryMovedAndReplacedFromOtherReferenceInSameParent() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), MetaPointer(), Index(), TargetNode(),
-            ResolveInfo(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
-
-    protected static EntryMovedAndReplacedInSameReference CreateEntryMovedAndReplacedInSameReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Index(), TargetNode(), ResolveInfo(),
-            Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
-
-    protected static ReferenceResolveInfoAdded CreateReferenceResolveInfoAdded() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), Origin(), ProtocolMessages())
-        {
-            SequenceNumber = Sequence()
-        };
-
-    protected static ReferenceResolveInfoDeleted CreateReferenceResolveInfoDeleted() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
-        {
-            SequenceNumber = Sequence()
-        };
-
-    protected static ReferenceResolveInfoChanged CreateReferenceResolveInfoChanged() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), ResolveInfo(), Origin(),
-            ProtocolMessages()) { SequenceNumber = Sequence() };
-
-    protected static ReferenceTargetAdded CreateReferenceTargetAdded() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
-        {
-            SequenceNumber = Sequence()
-        };
-
-    protected static ReferenceTargetDeleted CreateReferenceTargetDeleted() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), Origin(), ProtocolMessages())
-        {
-            SequenceNumber = Sequence()
-        };
-
-    protected static ReferenceTargetChanged CreateReferenceTargetChanged() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(), Origin(),
-            ProtocolMessages()) { SequenceNumber = Sequence() };
-
     #endregion
 
     #region Miscellaneous
@@ -589,18 +467,6 @@ public abstract class JsonTestsBase
         [CreateReferenceAdded()],
         [CreateReferenceDeleted()],
         [CreateReferenceChanged()],
-        [CreateEntryMovedFromOtherReference()],
-        [CreateEntryMovedFromOtherReferenceInSameParent()],
-        [CreateEntryMovedInSameReference()],
-        [CreateEntryMovedAndReplacedFromOtherReference()],
-        [CreateEntryMovedAndReplacedFromOtherReferenceInSameParent()],
-        [CreateEntryMovedAndReplacedInSameReference()],
-        [CreateReferenceResolveInfoAdded()],
-        [CreateReferenceResolveInfoDeleted()],
-        [CreateReferenceResolveInfoChanged()],
-        [CreateReferenceTargetAdded()],
-        [CreateReferenceTargetDeleted()],
-        [CreateReferenceTargetChanged()],
         [CreateCompositeEvent()],
         [CreateNoOpEvent()],
         [CreateError()]
