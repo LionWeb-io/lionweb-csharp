@@ -18,9 +18,13 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using Io.Lionweb.Mps.Specific;
+using LionWeb.Build.Languages;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Utilities;
+using LionWeb.Generator.Impl;
+using System.Reflection;
 
 // ReSharper disable SuggestVarOrType_SimpleTypes
 
@@ -38,6 +42,13 @@ public class TestLanguagesDefinitions
     public Language GeneralNodeLang { get; private set; }
     public Language? LowerCaseLang { get; private set; }
     public Language? UpperCaseLang { get; private set; }
+    public Language NamespaceStartsWithLionWebLang { get; private set; }
+    public Language NamespaceContainsLionWebLang { get; private set; }
+    public Language LanguageWithLionWebNamedConcepts { get; private set; }
+    public Language FeatureSameNameAsContainingConcept { get; private set; }
+    public Language? CustomPrimitiveTypeLang { get; private set; }
+    public Dictionary<PrimitiveType, Type> CustomPrimitiveTypeMapping { get; } = [];
+
     public List<Language> MixedLangs { get; private set; } = [];
 
     public TestLanguagesDefinitions(LionWebVersions lionWebVersion)
@@ -49,6 +60,10 @@ public class TestLanguagesDefinitions
         CreateMultiInheritLang();
         CreateNamedLang();
         CreateGeneralNodeLang();
+        CreateNamespaceStartsWithLionWebLang();
+        CreateNamespaceContainsLionWebLang();
+        CreateLanguageWithLionWebNamedConcepts();
+        CreateFeatureSameNameAsContainingConcept();
 
         if (lionWebVersion.LionCore is ILionCoreLanguageWithStructuredDataType)
         {
@@ -57,6 +72,7 @@ public class TestLanguagesDefinitions
             CreateKeywordLang();
             CreateLowerCaseLang();
             CreateUpperCaseLang();
+            CreateCustomPrimitiveTypeLang();
         }
     }
 
@@ -66,6 +82,7 @@ public class TestLanguagesDefinitions
         {
             Key = "key-ALang", Name = "ALang", Version = "1"
         };
+        var aDatatype = aLang.PrimitiveType("id-AType", "key-AType", "CustomPrimitiveType");
         var aConcept = aLang.Concept("id-AConcept", "key-AConcept", "AConcept");
         aConcept.AddAnnotations([
             CreateConceptDescription("aaa-desc", "AConcept Alias", """
@@ -88,6 +105,7 @@ public class TestLanguagesDefinitions
         bLang.AddAnnotations([
             CreateKeyedDescription("aaa-bLangDesc", "bLang desc", [aLang])
         ]);
+        var bDatatype = bLang.PrimitiveType("id-BType", "key-BType", "CustomPrimitiveType");
         var bConcept = bLang.Concept("id-BConcept", "key-BConcept", "BConcept");
         bConcept.AddAnnotations([CreateConceptDescription("xxx", null, "Some enum", null)]);
 
@@ -109,6 +127,12 @@ public class TestLanguagesDefinitions
         aEnumProp.AddAnnotations([
             CreateKeyedDescription("aaa-enumPropDesc", "enum desc", [aLang, bRef])
         ]);
+
+        aConcept.Property("AProp").OfType(aDatatype);
+        aConcept.Property("BProp").OfType(bDatatype);
+        
+        bConcept.Property("AProp").OfType(aDatatype);
+        bConcept.Property("BProp").OfType(bDatatype);
 
         ALang = aLang;
         BLang = bLang;
@@ -519,4 +543,317 @@ public class TestLanguagesDefinitions
 
         UpperCaseLang = casingLang;
     }
+
+    private void CreateNamespaceStartsWithLionWebLang()
+    {
+        var lwLang = new DynamicLanguage("id-NamespaceStartsWithLionWebLang-lang", _lionWebVersion)
+        {
+            Name = "NamespaceStartsWithLionWebLang", Key = "key-NamespaceStartsWithLionWebLang", Version = "1"
+        };
+        
+        lwLang.Concept("id-concept", "key-concept", "MYConcept");
+
+        NamespaceStartsWithLionWebLang = lwLang;
+    }
+
+    private void CreateNamespaceContainsLionWebLang()
+    {
+        var lwLang = new DynamicLanguage("id-NamespaceContainsLionWebLang-lang", _lionWebVersion)
+        {
+            Name = "NamespaceContainsLionWebLang", Key = "key-NamespaceContainsLionWebLang", Version = "1"
+        };
+        
+        lwLang.Concept("id-concept", "key-concept", "MYConcept");
+
+        NamespaceContainsLionWebLang = lwLang;
+    }
+    
+    private void CreateLanguageWithLionWebNamedConcepts()
+    {
+        var lang = new DynamicLanguage("id-LanguageWithLionWebNamedConcepts-lang", _lionWebVersion)
+        {
+            Name = "LanguageWithLionWebNamedConcepts", Key = "key-LanguageWithLionWebNamedConcepts", Version = "1"
+        };
+
+        BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+        
+        HashSet<string> conceptNames = 
+        [
+            // M3
+            "Language",
+            "EnumerationLiteral",
+            "Link",
+            "Containment",
+            "Reference",
+            "Property",
+            "Field",
+            "LanguageEntity",
+            "Classifier",
+            "Annotation",
+            "Concept",
+            "Interface",
+            "Datatype",
+            "Enumeration",
+            "PrimitiveType",
+            "StructuredDataType",
+
+            // M3 base
+            "LanguageBase",
+            "EnumerationLiteralBase",
+            "ContainmentBase",
+            "ReferenceBase",
+            "PropertyBase",
+            "FieldBase",
+            "AnnotationBase",
+            "ConceptBase",
+            "InterfaceBase",
+            "DatatypeBase",
+            "EnumerationBase",
+            "PrimitiveTypeBase",
+            "StructuredDataTypeBase",
+
+            // Framework
+            "Abstract",
+            "AbstractBaseNodeFactory",
+            "AddChildRaw",
+            "AddContainmentsRaw",
+            "AddInternal",
+            "AddOptionalMultipleContainment",
+            "AddOptionalMultipleReference",
+            "AddReferencesRaw",
+            "AddRequiredMultipleContainment",
+            "AddRequiredMultipleReference",
+            "AnnotatesLazy",
+            "AnnotationInstanceBase",
+            "ArgumentOutOfRangeException",
+            "Bool",
+            "Boolean",
+            // "boolean",
+            "Char",
+            "Character",
+            "CodeAnalysis",
+            "CollectAllSetFeatures",
+            "Collections",
+            "ConceptInstanceBase",
+            "Core",
+            "Decimal",
+            "DetachChild",
+            "Diagnostics",
+            "Enum",
+            "ExchangeChildRaw",
+            "ExchangeChildrenRaw",
+            "FeaturesLazy",
+            "FieldsLazy",
+            "Generic",
+            "GetAnnotation",
+            "GetConcept",
+            "GetContainmentOf",
+            "GetInternal",
+            "IEnumerable",
+            "IFieldValues",
+            "INamed",
+            "INamedWritable",
+            "INode",
+            "INodeFactory",
+            "IPartitionInstance",
+            "IReadOnlyList",
+            "IReadableNode",
+            "IStructuredDataTypeInstance",
+            "IWritableNode",
+            "ImplementsLazy",
+            "InsertChildRaw",
+            "InsertInternal",
+            "InsertOptionalMultipleContainment",
+            "InsertOptionalMultipleReference",
+            "InsertReferencesRaw",
+            "InsertRequiredMultipleContainment",
+            "InsertRequiredMultipleReference",
+            "Instance",
+            "Integer",
+            // "integer",
+            "InvalidValueException",
+            "Key",
+            "Lazy",
+            "LionCoreFeature",
+            "LionCoreFeatureKind",
+            "LionCoreLanguage",
+            "LionCoreMetaPointer",
+            "LionWeb",
+            "LionWebVersions",
+            "List",
+            "LiteralsLazy",
+            "M2",
+            "M3",
+            "Multiple",
+            "Name",
+            // "_name",
+            "NotNullWhenAttribute",
+            "Notification",
+            "Optional",
+            "Partition",
+            "Pipe",
+            "ReferenceEquals",
+            "RemoveChildRaw",
+            "RemoveInternal",
+            "RemoveOptionalMultipleContainment",
+            "RemoveOptionalMultipleReference",
+            "RemoveReferencesRaw",
+            "RemoveRequiredMultipleContainment",
+            "RemoveRequiredMultipleReference",
+            "RemoveSelfParentRaw",
+            "SetContainmentRaw",
+            "SetInternal",
+            "SetName",
+            "SetNameRaw",
+            "SetOptionalMultipleContainment",
+            "SetOptionalMultipleReference",
+            "SetOptionalSingleContainment",
+            "SetOptionalSingleReference",
+            "SetPropertyRaw",
+            "SetReferenceRaw",
+            "SetReferencesRaw",
+            "SetRequiredMultipleContainment",
+            "SetRequiredMultipleReference",
+            "SetRequiredReferenceTypeProperty",
+            "SetRequiredSingleContainment",
+            "SetRequiredSingleReference",
+            "SetRequiredValueTypeProperty",
+            "String",
+            "System",
+            "TryGetContainmentRaw",
+            "TryGetContainmentsRaw",
+            "TryGetName",
+            "TryGetPropertyRaw",
+            "TryGetReferenceRaw",
+            "TryGetReferencesRaw",
+            "Type",
+            "UnsetFeatureException",
+            "UnsetFieldException",
+            "UnsupportedClassifierException",
+            "UnsupportedEnumerationLiteralException",
+            "UnsupportedStructuredDataTypeException",
+            "Utilities",
+            "V2023_1",
+            "V2024_1",
+            "V2024_1_Compatible",
+            "V2025_1",
+            "V2025_1_Compatible",
+            "VersionSpecific",
+            "_builtIns",
+            "result",
+            // "v2023_1",
+            // "v2024_1",
+            // "v2024_1_Compatible",
+            // "v2025_1",
+            // "v2025_1_Compatible",
+            ..typeof(ReadableNodeBase<>).GetMembers(bindingFlags)
+                .Concat(typeof(NodeBase).GetMembers(bindingFlags))
+                .OfType<MethodInfo>()
+                .Select(i => i.Name)
+                .Where(n => !n.Contains('.'))
+                .Where(IdUtils.IsValid)
+        ];
+        
+        foreach (var conceptName in conceptNames)
+        {
+            lang.Concept(conceptName);
+        }
+        
+        LanguageWithLionWebNamedConcepts = lang;
+    }
+    
+    private void CreateFeatureSameNameAsContainingConcept()
+    {
+        var lang = new DynamicLanguage("id-FeatureSameNameAsContainingConcept-lang", _lionWebVersion)
+        {
+            Name = "FeatureSameNameAsContainingConcept", Key = "key-FeatureSameNameAsContainingConcept", Version = "1"
+        };
+
+        var baseConceptA = lang.Concept("BaseConceptA").IsAbstract();
+        baseConceptA.Property("BaseConceptA");
+        lang.Concept("SubConceptA").Extending(baseConceptA);
+
+        var baseConceptB = lang.Concept("BaseConceptB").IsAbstract();
+        baseConceptB.Property("SubConceptB");
+        lang.Concept("SubConceptB").Extending(baseConceptB);
+
+        var iface = lang.Interface("Iface");
+        iface.Property("IfaceMethod");
+        var ifaceImplA = lang.Concept("IfaceImplA").Implementing(iface);
+        lang.Concept("IfaceImplB").Implementing(iface);
+        var ifaceMethodConcept = lang.Concept("IfaceMethod").Extending(ifaceImplA);
+        
+        var baseConceptC = lang.Concept("BaseConceptC").IsAbstract();
+        baseConceptC.Property("BaseConceptD");
+        
+        var baseConceptD = lang.Concept("BaseConceptD").IsAbstract();
+        baseConceptD.Property("BaseConceptE");
+        
+        FeatureSameNameAsContainingConcept = lang;
+    }
+    
+    private void CreateCustomPrimitiveTypeLang()
+    {
+        var lang = new DynamicLanguage("id-CustomPrimitiveTypeLang-lang", _lionWebVersion)
+        {
+            Name = "CustomPrimitiveTypeLang", Key = "key-CustomPrimitiveTypeLang", Version = "1"
+        };
+
+        var concept = lang.Concept("PrimitiveConcept");
+        
+        CustomType(typeof(CustomType));
+        var nested = CustomType(typeof(LionWeb.Build.Languages.SubNamespace.CustomType), "CustomNestedType");
+        CustomType(typeof(CustomEqualityType));
+        var enm = CustomType(typeof(CustomEnumType));
+        CustomType(typeof(CustomReferenceType));
+        CustomType(typeof(string), "String");
+        CustomType(typeof(int), "Integer");
+        CustomType(typeof(int), "Int");
+        CustomType(typeof(bool), "Boolean");
+        
+        var sdt = lang.StructuredDataType("Sdt");
+        
+        var boolType = lang.PrimitiveType("Bool");
+        CustomPrimitiveTypeMapping[boolType] = typeof(bool);
+        sdt.Field("boolField").OfType(boolType);
+        
+        sdt.Field("customField").OfType(nested);
+        sdt.Field("enumField").OfType(enm);
+        
+        CustomPrimitiveTypeLang = lang;
+        return;
+
+        PrimitiveType CustomType(Type type, string? name = null)
+        {
+            var safeName = name ?? type.Name;
+            var customType = lang.PrimitiveType(safeName);
+            concept.Property(safeName.ToFirstLower() + "Optional").IsOptional(true).OfType(customType);
+            concept.Property(safeName.ToFirstLower() + "Required").IsOptional(false).OfType(customType);
+            CustomPrimitiveTypeMapping[customType] = type;
+            return customType;
+        }
+    }
+}
+
+internal static class LanguageExtensions
+{
+    internal static DynamicConcept Concept(this DynamicLanguage language, string name) =>
+        language.Concept($"id-{name}", $"key-{name}", name);
+
+    internal static DynamicInterface Interface(this DynamicLanguage language, string name) =>
+        language.Interface($"id-{name}", $"key-{name}", name);
+
+    internal static DynamicPrimitiveType PrimitiveType(this DynamicLanguage language, string name) =>
+        language.PrimitiveType($"id-{name}", $"key-{name}", name);
+
+    internal static DynamicStructuredDataType StructuredDataType(this DynamicLanguage language, string name) =>
+        language.StructuredDataType($"id-{name}", $"key-{name}", name);
+
+
+    internal static DynamicProperty Property(this DynamicClassifier classifier, string name) =>
+        classifier.Property($"id-{name}", $"key-{name}", name).OfType(classifier.GetLanguage().LionWebVersion.BuiltIns.String);
+
+    
+    internal static DynamicField Field(this DynamicStructuredDataType sdt, string name) =>
+        sdt.Field($"id-{name}", $"key-{name}", name).OfType(sdt.GetLanguage().LionWebVersion.BuiltIns.String);
 }

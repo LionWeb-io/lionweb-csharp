@@ -70,26 +70,53 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var generalNodeLang = testLanguagesDefinitions.GeneralNodeLang;
     var lowerCaseLang = testLanguagesDefinitions.LowerCaseLang;
     var upperCaseLang = testLanguagesDefinitions.UpperCaseLang;
+    var namespaceStartsWithLionWebLang = testLanguagesDefinitions.NamespaceStartsWithLionWebLang;
+    var namespaceContainsLionWebLang = testLanguagesDefinitions.NamespaceContainsLionWebLang;
+    var languageWithLionWebNamedConcepts = testLanguagesDefinitions.LanguageWithLionWebNamedConcepts;
+    var featureSameNameAsContainingConcept = testLanguagesDefinitions.FeatureSameNameAsContainingConcept;
+    var customPrimitiveTypeLang = testLanguagesDefinitions.CustomPrimitiveTypeLang;
 
     var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');
     string prefix = $"LionWeb.Core.Test.Languages.Generated.{lionWebVersionNamespace}";
-    
+
+    IDictionary<PrimitiveType, Type> aLangBLangPrimitiveTypes = new Dictionary<PrimitiveType, Type>
+    {
+        { aLang.FindByKey<PrimitiveType>("key-AType"), typeof(LionWeb.Build.Languages.CustomType)},
+        { bLang.FindByKey<PrimitiveType>("key-BType"), typeof(LionWeb.Build.Languages.SubNamespace.CustomType)},
+    };
     List<Names> names =
     [
         new(libraryLanguage, $"{prefix}.Library.M2"),
         new(multiLanguage, $"{prefix}.Multi.M2") { NamespaceMappings = { [libraryLanguage] = $"{prefix}.Library.M2" } },
         new(withEnumLanguage, $"{prefix}.WithEnum.M2"),
-        new(shapesLanguage, $"{prefix}.Shapes.M2"),
-        new(aLang, $"{prefix}.Circular.A") { NamespaceMappings = { [bLang] = $"{prefix}.Circular.B" } },
-        new(bLang, $"{prefix}.Circular.B") { NamespaceMappings = { [aLang] = $"{prefix}.Circular.A" } },
+        new(shapesLanguage, $"{prefix}.Shapes.M2")
+        {
+            PrimitiveTypeMappings = { { shapesLanguage.FindByKey<PrimitiveType>("key-Time"), typeof(TimeOnly) } }
+        },
+        new(aLang, $"{prefix}.Circular.A") { NamespaceMappings = { [bLang] = $"{prefix}.Circular.B" }, PrimitiveTypeMappings = aLangBLangPrimitiveTypes },
+        new(bLang, $"{prefix}.Circular.B") { NamespaceMappings = { [aLang] = $"{prefix}.Circular.A" }, PrimitiveTypeMappings = aLangBLangPrimitiveTypes },
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
-        new(deprecatedLang, $"{prefix}.DeprecatedLang"),
+        new(deprecatedLang, $"{prefix}.DeprecatedLang")
+        {
+            PrimitiveTypeMappings =
+            {
+                {
+                    deprecatedLang.FindByKey<PrimitiveType>(
+                        "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0ODQ"),
+                    typeof(decimal)
+                }
+            }
+        },
         new(multiInheritLang, $"{prefix}.MultiInheritLang"),
         new(namedLang, $"{prefix}.NamedLang"),
         new(namedLangReadInterfaces, $"{prefix}.NamedLangReadInterfaces"),
         new(generalNodeLang, $"{prefix}.GeneralNodeLang"),
         new(testLanguage, $"{prefix}.TestLanguage"),
         new(nullableReferencesTestLanguage, $"{prefix}.NullableReferencesTestLang"),
+        new(namespaceStartsWithLionWebLang, $"LionWeb.Generated.{lionWebVersionNamespace}.namespaceStartsWithLionWebLang"),
+        new(namespaceContainsLionWebLang, $"io.LionWeb.Generated.{lionWebVersionNamespace}.namespaceStartsWithLionWebLang"),
+        new(languageWithLionWebNamedConcepts, $"{prefix}.LanguageWithLionWebNamedConcepts"),
+        new(featureSameNameAsContainingConcept, $"{prefix}.FeatureSameNameAsContainingConcept"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
         // Step 3: Uncomment the line below 
@@ -106,13 +133,22 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         names.Add(new(sdtLang, $"{prefix}.SDTLang"));
 
     if (keywordLang != null)
-        names.Add(new(keywordLang, $"@namespace.@int.@public.{lionWebVersionNamespace}"));
+        names.Add(new(keywordLang, $"@namespace.@int.@public.{lionWebVersionNamespace}")
+        {
+            PrimitiveTypeMappings = { { keywordLang.FindByKey<PrimitiveType>("key-keyword-prim"), typeof(LionWeb.Build.Languages.CustomEnumType) } }
+        });
 
     if (lowerCaseLang != null)
         names.Add(new(lowerCaseLang, $"{prefix}.myLowerCaseLang"));
     
     if (upperCaseLang != null)
         names.Add(new(upperCaseLang, $"{prefix}.MYUpperCaseLang"));
+
+    if (customPrimitiveTypeLang != null)
+        names.Add(new(customPrimitiveTypeLang, $"{prefix}.CustomPrimitiveTypeLang")
+        {
+            PrimitiveTypeMappings = testLanguagesDefinitions.CustomPrimitiveTypeMapping
+        });
     
     names.AddRange(testLanguagesDefinitions
         .MixedLangs
@@ -121,7 +157,6 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
             {
                 NamespaceMappings = testLanguagesDefinitions
                     .MixedLangs
-                    .Except([l])
                     .Select(n => (n, $"{prefix}.Mixed.{n.Name}"))
                     .ToDictionary()
             }

@@ -5,15 +5,15 @@
 #pragma warning disable 1591
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A;
-using LionWeb.Core;
-using LionWeb.Core.M2;
-using LionWeb.Core.M3;
-using LionWeb.Core.Notification;
-using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2024_1;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using global::LionWeb.Core;
+using global::LionWeb.Core.M2;
+using global::LionWeb.Core.M3;
+using global::LionWeb.Core.Notification;
+using global::LionWeb.Core.Utilities;
+using global::LionWeb.Core.VersionSpecific.V2024_1;
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-ALang", Version = "1")]
 public partial class ALangLanguage : LanguageBase<IALangFactory>
@@ -21,11 +21,14 @@ public partial class ALangLanguage : LanguageBase<IALangFactory>
 	public static readonly ALangLanguage Instance = new Lazy<ALangLanguage>(() => new("id-ALang")).Value;
 	public ALangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
-		_aConcept = new(() => new ConceptBase<ALangLanguage>("id-AConcept", this) { Key = "key-AConcept", Name = "AConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [AConcept_BRef]) });
+		_aConcept = new(() => new ConceptBase<ALangLanguage>("id-AConcept", this) { Key = "key-AConcept", Name = "AConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [AConcept_AProp, AConcept_BProp, AConcept_BRef]) });
+		_aConcept_AProp = new(() => new PropertyBase<ALangLanguage>("id-AProp", AConcept, this) { Key = "key-AProp", Name = "AProp", Optional = false, Type = CustomPrimitiveType });
+		_aConcept_BProp = new(() => new PropertyBase<ALangLanguage>("id-BProp", AConcept, this) { Key = "key-BProp", Name = "BProp", Optional = false, Type = LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BLangLanguage.Instance.CustomPrimitiveType });
 		_aConcept_BRef = new(() => new ReferenceBase<ALangLanguage>("id-AConcept-BRef", AConcept, this) { Key = "key-BRef", Name = "BRef", Optional = true, Multiple = false, Type = LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BLangLanguage.Instance.BConcept });
 		_aEnum = new(() => new EnumerationBase<ALangLanguage>("id-aEnum", this) { Key = "key-AEnum", Name = "AEnum", LiteralsLazy = new(() => [AEnum_left, AEnum_right]) });
 		_aEnum_left = new(() => new EnumerationLiteralBase<ALangLanguage>("id-left", AEnum, this) { Key = "key-left", Name = "left" });
 		_aEnum_right = new(() => new EnumerationLiteralBase<ALangLanguage>("id-right", AEnum, this) { Key = "key-right", Name = "right" });
+		_customPrimitiveType = new(() => new PrimitiveTypeBase<ALangLanguage>("id-AType", this) { Key = "key-AType", Name = "CustomPrimitiveType" });
 		_factory = new ALangFactory(this);
 	}
 
@@ -49,6 +52,12 @@ public partial class ALangLanguage : LanguageBase<IALangFactory>
 	private readonly Lazy<Concept> _aConcept;
 	public Concept AConcept => _aConcept.Value;
 
+	private readonly Lazy<Property> _aConcept_AProp;
+	public Property AConcept_AProp => _aConcept_AProp.Value;
+
+	private readonly Lazy<Property> _aConcept_BProp;
+	public Property AConcept_BProp => _aConcept_BProp.Value;
+
 	private readonly Lazy<Reference> _aConcept_BRef;
 	public Reference AConcept_BRef => _aConcept_BRef.Value;
 
@@ -60,6 +69,9 @@ public partial class ALangLanguage : LanguageBase<IALangFactory>
 
 	private readonly Lazy<EnumerationLiteral> _aEnum_right;
 	public EnumerationLiteral AEnum_right => _aEnum_right.Value;
+
+	private readonly Lazy<PrimitiveType> _customPrimitiveType;
+	public PrimitiveType CustomPrimitiveType => _customPrimitiveType.Value;
 }
 
 public partial interface IALangFactory : INodeFactory
@@ -112,6 +124,64 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
 public partial class AConcept : ConceptInstanceBase
 {
+	private global::LionWeb.Build.Languages.CustomType? _aProp = null;
+	private bool SetAPropRaw(global::LionWeb.Build.Languages.CustomType? value)
+	{
+		if (value == _aProp)
+			return false;
+		_aProp = value;
+		return true;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If AProp has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AProp")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public global::LionWeb.Build.Languages.CustomType AProp { get => _aProp ?? throw new UnsetFeatureException(ALangLanguage.Instance.AConcept_AProp); set => SetAProp(value); }
+
+	/// <remarks>Required Property</remarks>
+        public bool TryGetAProp([NotNullWhenAttribute(true)] out global::LionWeb.Build.Languages.CustomType? aProp)
+	{
+		aProp = _aProp;
+		return aProp != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+        public AConcept SetAProp(global::LionWeb.Build.Languages.CustomType value)
+	{
+		SetRequiredValueTypeProperty<global::LionWeb.Build.Languages.CustomType>(value, ALangLanguage.Instance.AConcept_AProp, _aProp, SetAPropRaw);
+		return this;
+	}
+
+	private global::LionWeb.Build.Languages.SubNamespace.CustomType? _bProp = null;
+	private bool SetBPropRaw(global::LionWeb.Build.Languages.SubNamespace.CustomType? value)
+	{
+		if (value is null && _bProp is null || value is not null && value.Equals(_bProp))
+			return false;
+		_bProp = value;
+		return true;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If BProp has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BProp")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public global::LionWeb.Build.Languages.SubNamespace.CustomType BProp { get => _bProp ?? throw new UnsetFeatureException(ALangLanguage.Instance.AConcept_BProp); set => SetBProp(value); }
+
+	/// <remarks>Required Property</remarks>
+        public bool TryGetBProp([NotNullWhenAttribute(true)] out global::LionWeb.Build.Languages.SubNamespace.CustomType? bProp)
+	{
+		bProp = _bProp;
+		return bProp != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+        public AConcept SetBProp(global::LionWeb.Build.Languages.SubNamespace.CustomType value)
+	{
+		SetRequiredValueTypeProperty<global::LionWeb.Build.Languages.SubNamespace.CustomType>(value, ALangLanguage.Instance.AConcept_BProp, _bProp, SetBPropRaw);
+		return this;
+	}
+
 	private ReferenceTarget? _bRef = null;
 	/// bRef desc
     	/// <seealso cref = "AEnum.left"/>
@@ -165,9 +235,40 @@ public partial class AConcept : ConceptInstanceBase
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
+		if (ALangLanguage.Instance.AConcept_AProp.EqualsIdentity(feature))
+		{
+			result = AProp;
+			return true;
+		}
+
+		if (ALangLanguage.Instance.AConcept_BProp.EqualsIdentity(feature))
+		{
+			result = BProp;
+			return true;
+		}
+
 		if (ALangLanguage.Instance.AConcept_BRef.EqualsIdentity(feature))
 		{
 			result = BRef;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (ALangLanguage.Instance.AConcept_AProp.EqualsIdentity(feature))
+		{
+			result = _aProp;
+			return true;
+		}
+
+		if (ALangLanguage.Instance.AConcept_BProp.EqualsIdentity(feature))
+		{
+			result = _bProp;
 			return true;
 		}
 
@@ -192,6 +293,28 @@ public partial class AConcept : ConceptInstanceBase
 	{
 		if (base.SetInternal(feature, value))
 			return true;
+		if (ALangLanguage.Instance.AConcept_AProp.EqualsIdentity(feature))
+		{
+			if (value is global::LionWeb.Build.Languages.CustomType v)
+			{
+				SetAProp(v);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
+		if (ALangLanguage.Instance.AConcept_BProp.EqualsIdentity(feature))
+		{
+			if (value is global::LionWeb.Build.Languages.SubNamespace.CustomType v)
+			{
+				SetBProp(v);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		if (ALangLanguage.Instance.AConcept_BRef.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept)
@@ -212,6 +335,17 @@ public partial class AConcept : ConceptInstanceBase
 		return false;
 	}
 
+	protected override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (ALangLanguage.Instance.AConcept_AProp.EqualsIdentity(feature) && value is null or global::LionWeb.Build.Languages.CustomType)
+			return SetAPropRaw((global::LionWeb.Build.Languages.CustomType?)value);
+		if (ALangLanguage.Instance.AConcept_BProp.EqualsIdentity(feature) && value is null or global::LionWeb.Build.Languages.SubNamespace.CustomType)
+			return SetBPropRaw((global::LionWeb.Build.Languages.SubNamespace.CustomType?)value);
+		return false;
+	}
+
 	protected override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
 	{
 		if (base.SetReferenceRaw(feature, value))
@@ -225,6 +359,10 @@ public partial class AConcept : ConceptInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
+		if (TryGetAProp(out _))
+			result.Add(ALangLanguage.Instance.AConcept_AProp);
+		if (TryGetBProp(out _))
+			result.Add(ALangLanguage.Instance.AConcept_BProp);
 		if (TryGetBRef(out _))
 			result.Add(ALangLanguage.Instance.AConcept_BRef);
 		return result;
