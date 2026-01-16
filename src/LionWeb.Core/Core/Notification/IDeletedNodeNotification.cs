@@ -17,6 +17,9 @@
 
 namespace LionWeb.Core.Notification;
 
+/// <summary>
+/// Implementers delete nodes.
+/// </summary>
 public interface IDeletedNodeNotification : INotification
 {
     /// <summary>
