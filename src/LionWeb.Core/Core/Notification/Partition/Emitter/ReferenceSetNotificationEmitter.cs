@@ -65,8 +65,9 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
                         GetNotificationId()));
                     break;
                 case ListMoved<ReferenceTarget> moved:
-                    ProduceNotification(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
-                        moved.LeftIndex, moved.LeftElement,
+                    ProduceNotification(new ReferenceDeletedNotification(DestinationParent, Reference, moved.LeftIndex,
+                        moved.Element, GetNotificationId()));
+                    ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, moved.RightIndex, moved.Element,
                         GetNotificationId()));
                     break;
                 case ListDeleted<ReferenceTarget> deleted:
@@ -81,7 +82,6 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
     protected override bool IsActive() =>
         Handles(
             typeof(ReferenceAddedNotification),
-            typeof(EntryMovedInSameReferenceNotification),
             typeof(ReferenceDeletedNotification)
         );
 }

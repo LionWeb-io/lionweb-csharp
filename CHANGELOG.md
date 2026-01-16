@@ -39,6 +39,43 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Converted lots of tests to use `TestLanguage` instead of `Shapes`
   The tests are easier to read that way
 ### Removed
+* Deleted notifications and delta messages for moving references and adding/changing/deleting reference parts:
+  * `EntryMovedFromOtherReferenceNotification`
+  * `EntryMovedFromOtherReferenceInSameParentNotification`
+  * `EntryMovedInSameReferenceNotification`
+  * `EntryMovedAndReplacedFromOtherReferenceNotification`
+  * `EntryMovedAndReplacedFromOtherReferenceInSameParentNotification`
+  * `EntryMovedAndReplacedInSameReferenceNotification`
+  * `ReferenceResolveInfoAddedNotification`
+  * `ReferenceResolveInfoDeletedNotification`
+  * `ReferenceResolveInfoChangedNotification`
+  * `ReferenceTargetAddedNotification`
+  * `ReferenceTargetDeletedNotification`
+  * `ReferenceTargetChangedNotification`
+  * `MoveEntryFromOtherReference`
+  * `MoveEntryFromOtherReferenceInSameParent`
+  * `MoveEntryInSameReference`
+  * `MoveAndReplaceEntryFromOtherReference`
+  * `MoveAndReplaceEntryFromOtherReferenceInSameParent`
+  * `MoveAndReplaceEntryInSameReference`
+  * `AddReferenceResolveInfo`
+  * `DeleteReferenceResolveInfo`
+  * `ChangeReferenceResolveInfo`
+  * `AddReferenceTarget`
+  * `DeleteReferenceTarget`
+  * `ChangeReferenceTarget`
+  * `EntryMovedFromOtherReference`
+  * `EntryMovedFromOtherReferenceInSameParent`
+  * `EntryMovedInSameReference`
+  * `EntryMovedAndReplacedFromOtherReference`
+  * `EntryMovedAndReplacedFromOtherReferenceInSameParent`
+  * `EntryMovedAndReplacedInSameReference`
+  * `ReferenceResolveInfoAdded`
+  * `ReferenceResolveInfoDeleted`
+  * `ReferenceResolveInfoChanged`
+  * `ReferenceTargetAdded`
+  * `ReferenceTargetDeleted`
+  * `ReferenceTargetChanged`
 ### Deprecated
 * `M2Extensions.AsNodes(object?)` should always get another parameter: `M2Extensions.AsNodes(object?, Feature)`.
 * Remove / obsolete `INotificationId` parameter from regular API

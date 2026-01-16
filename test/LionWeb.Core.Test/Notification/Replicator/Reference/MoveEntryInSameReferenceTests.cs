@@ -17,8 +17,6 @@
 
 namespace LionWeb.Core.Test.Notification.Replicator.Reference;
 
-using Core.Notification;
-using Core.Notification.Partition;
 using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
@@ -38,13 +36,10 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, moved] };
         
         var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var oldIndex = 2;
-        var newIndex = 0;
-        var notification = new EntryMovedInSameReferenceNotification(originalParent, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
-        
-        CreatePartitionReplicator(clonedPartition, notification);
+        originalParent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<IReadableNode> { moved, ref1, ref2 });
 
         var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(3, clonedReferences.Count);
@@ -65,13 +60,10 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, moved] };
 
         var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var oldIndex = 0;
-        var newIndex = 2;
-        var notification = new EntryMovedInSameReferenceNotification(originalParent, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
-        
-        CreatePartitionReplicator(clonedPartition, notification);
+        originalParent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<IReadableNode> { ref1, ref2, moved });
 
         var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(3, clonedReferences.Count);
@@ -94,13 +86,10 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, ref3, ref4, moved] };
         
         var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var oldIndex = 1;
-        var newIndex = 3;
-        var notification = new EntryMovedInSameReferenceNotification(originalParent, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
-        
-        CreatePartitionReplicator(clonedPartition, notification);
+        originalParent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<IReadableNode> { ref1, ref2, ref3, moved, ref4 });
 
         var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(5, clonedReferences.Count);
@@ -123,13 +112,10 @@ public class MoveEntryInSameReferenceTests : ReplicatorTestsBase
         var originalPartition = new TestPartition("partition") { Links = [originalParent, ref1, ref2, ref3, ref4, moved] };
 
         var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        var oldIndex = 3;
-        var newIndex = 1;
-        var notification = new EntryMovedInSameReferenceNotification(originalParent, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
-            oldIndex, newIndex, ReferenceTarget.FromNode(moved), new NumericNotificationId("moveEntryInSameReference", 0));
-        
-        CreatePartitionReplicator(clonedPartition, notification);
+        originalParent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            new List<IReadableNode> { ref1, moved, ref2, ref3, ref4 });
 
         var clonedReferences = clonedPartition.Links[0].Reference_0_n;
         Assert.AreEqual(5, clonedReferences.Count);
