@@ -49,7 +49,12 @@ public class GeneratorExtensionsTests
                 {
                     Names = new Names(language, basePath)
                     {
-                        NamespaceMappings = namespaceMappings
+                        NamespaceMappings = namespaceMappings,
+                        PrimitiveTypeMappings =
+                        {
+                            { ALangLanguage.Instance.CustomPrimitiveType, typeof(int) },
+                            { BLangLanguage.Instance.CustomPrimitiveType, typeof(bool) }
+                        }
                     },
                     LionWebVersion = lionWebVersion
                 };
