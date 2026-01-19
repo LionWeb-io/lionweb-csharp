@@ -126,9 +126,6 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case ReferenceChangedNotification e:
                 OnRemoteReferenceChanged(e);
                 break;
-            case EntryMovedInSameReferenceNotification e:
-                OnRemoteEntryMovedInSameReference(e);
-                break;
             default:
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
@@ -410,18 +407,6 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             var success = ReplaceReference(n.Parent, n.OldTarget, n.Reference, n.Index, n.NewTarget);
             ProduceNotification(n, success);
         });
-
-    private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification n)
-    {
-        IWritableNode localNewParent = n.Parent;
-        var success = n.Reference.Multiple switch
-        {
-            true => localNewParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.Target)
-                && localNewParent.InsertReferencesRaw(n.Reference, n.NewIndex, (ReferenceTarget)n.Target),
-            false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.Target)
-        };
-        ProduceNotification(n, success);
-    }
 
     private static bool ReplaceReference(IWritableNode localParent, IReferenceTarget replacedTarget,
         Reference reference,
