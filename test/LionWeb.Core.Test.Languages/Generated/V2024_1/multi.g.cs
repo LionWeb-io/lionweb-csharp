@@ -5,15 +5,15 @@
 #pragma warning disable 1591
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Multi.M2;
-using LionWeb.Core;
-using LionWeb.Core.M2;
-using LionWeb.Core.M3;
-using LionWeb.Core.Notification;
-using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2024_1;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using global::LionWeb.Core;
+using global::LionWeb.Core.M2;
+using global::LionWeb.Core.M3;
+using global::LionWeb.Core.Notification;
+using global::LionWeb.Core.Utilities;
+using global::LionWeb.Core.VersionSpecific.V2024_1;
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "multi", Version = "1")]
 public partial class MultiLanguage : LanguageBase<IMultiFactory>

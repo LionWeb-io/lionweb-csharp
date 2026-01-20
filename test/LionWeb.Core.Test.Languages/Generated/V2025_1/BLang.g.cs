@@ -5,15 +5,15 @@
 #pragma warning disable 1591
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B;
-using LionWeb.Core;
-using LionWeb.Core.M2;
-using LionWeb.Core.M3;
-using LionWeb.Core.Notification;
-using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2025_1;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using global::LionWeb.Core;
+using global::LionWeb.Core.M2;
+using global::LionWeb.Core.M3;
+using global::LionWeb.Core.Notification;
+using global::LionWeb.Core.Utilities;
+using global::LionWeb.Core.VersionSpecific.V2025_1;
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Diagnostics.CodeAnalysis;
 
 /// bLang desc
 /// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.ALangLanguage"/>
@@ -23,9 +23,12 @@ public partial class BLangLanguage : LanguageBase<IBLangFactory>
 	public static readonly BLangLanguage Instance = new Lazy<BLangLanguage>(() => new("id-BLang")).Value;
 	public BLangLanguage(string id) : base(id, LionWebVersions.v2025_1)
 	{
-		_bConcept = new(() => new ConceptBase<BLangLanguage>("id-BConcept", this) { Key = "key-BConcept", Name = "BConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [BConcept_AEnumProp, BConcept_ARef]) });
+		_bConcept = new(() => new ConceptBase<BLangLanguage>("id-BConcept", this) { Key = "key-BConcept", Name = "BConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [BConcept_AEnumProp, BConcept_AProp, BConcept_ARef, BConcept_BProp]) });
 		_bConcept_AEnumProp = new(() => new PropertyBase<BLangLanguage>("id-BConcept-AEnumProp", BConcept, this) { Key = "key-AEnumProp", Name = "AEnumProp", Optional = false, Type = LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.ALangLanguage.Instance.AEnum });
+		_bConcept_AProp = new(() => new PropertyBase<BLangLanguage>("id-AProp", BConcept, this) { Key = "key-AProp", Name = "AProp", Optional = false, Type = LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.ALangLanguage.Instance.CustomPrimitiveType });
 		_bConcept_ARef = new(() => new ReferenceBase<BLangLanguage>("id-BConcept-ARef", BConcept, this) { Key = "key-ARef", Name = "ARef", Optional = true, Multiple = false, Type = LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.ALangLanguage.Instance.AConcept });
+		_bConcept_BProp = new(() => new PropertyBase<BLangLanguage>("id-BProp", BConcept, this) { Key = "key-BProp", Name = "BProp", Optional = false, Type = CustomPrimitiveType });
+		_customPrimitiveType = new(() => new PrimitiveTypeBase<BLangLanguage>("id-BType", this) { Key = "key-BType", Name = "CustomPrimitiveType" });
 		_factory = new BLangFactory(this);
 	}
 
@@ -52,8 +55,17 @@ public partial class BLangLanguage : LanguageBase<IBLangFactory>
 	private readonly Lazy<Property> _bConcept_AEnumProp;
 	public Property BConcept_AEnumProp => _bConcept_AEnumProp.Value;
 
+	private readonly Lazy<Property> _bConcept_AProp;
+	public Property BConcept_AProp => _bConcept_AProp.Value;
+
 	private readonly Lazy<Reference> _bConcept_ARef;
 	public Reference BConcept_ARef => _bConcept_ARef.Value;
+
+	private readonly Lazy<Property> _bConcept_BProp;
+	public Property BConcept_BProp => _bConcept_BProp.Value;
+
+	private readonly Lazy<PrimitiveType> _customPrimitiveType;
+	public PrimitiveType CustomPrimitiveType => _customPrimitiveType.Value;
 }
 
 public partial interface IBLangFactory : INodeFactory
@@ -136,6 +148,35 @@ public partial class BConcept : ConceptInstanceBase
 		return this;
 	}
 
+	private global::LionWeb.Build.Languages.CustomType? _aProp = null;
+	private bool SetAPropRaw(global::LionWeb.Build.Languages.CustomType? value)
+	{
+		if (value == _aProp)
+			return false;
+		_aProp = value;
+		return true;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If AProp has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-AProp")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public global::LionWeb.Build.Languages.CustomType AProp { get => _aProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_AProp); set => SetAProp(value); }
+
+	/// <remarks>Required Property</remarks>
+        public bool TryGetAProp([NotNullWhenAttribute(true)] out global::LionWeb.Build.Languages.CustomType? aProp)
+	{
+		aProp = _aProp;
+		return aProp != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+        public BConcept SetAProp(global::LionWeb.Build.Languages.CustomType value)
+	{
+		SetRequiredValueTypeProperty<global::LionWeb.Build.Languages.CustomType>(value, BLangLanguage.Instance.BConcept_AProp, _aProp, SetAPropRaw);
+		return this;
+	}
+
 	private ReferenceTarget? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
@@ -169,6 +210,35 @@ public partial class BConcept : ConceptInstanceBase
 		return SetARef(ReferenceTarget.FromNodeOptional(value));
 	}
 
+	private global::LionWeb.Build.Languages.SubNamespace.CustomType? _bProp = null;
+	private bool SetBPropRaw(global::LionWeb.Build.Languages.SubNamespace.CustomType? value)
+	{
+		if (value is null && _bProp is null || value is not null && value.Equals(_bProp))
+			return false;
+		_bProp = value;
+		return true;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If BProp has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-BProp")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public global::LionWeb.Build.Languages.SubNamespace.CustomType BProp { get => _bProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_BProp); set => SetBProp(value); }
+
+	/// <remarks>Required Property</remarks>
+        public bool TryGetBProp([NotNullWhenAttribute(true)] out global::LionWeb.Build.Languages.SubNamespace.CustomType? bProp)
+	{
+		bProp = _bProp;
+		return bProp != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+        public BConcept SetBProp(global::LionWeb.Build.Languages.SubNamespace.CustomType value)
+	{
+		SetRequiredValueTypeProperty<global::LionWeb.Build.Languages.SubNamespace.CustomType>(value, BLangLanguage.Instance.BConcept_BProp, _bProp, SetBPropRaw);
+		return this;
+	}
+
 	public BConcept(string id) : base(id)
 	{
 	}
@@ -186,9 +256,21 @@ public partial class BConcept : ConceptInstanceBase
 			return true;
 		}
 
+		if (BLangLanguage.Instance.BConcept_AProp.EqualsIdentity(feature))
+		{
+			result = AProp;
+			return true;
+		}
+
 		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
 		{
 			result = ARef;
+			return true;
+		}
+
+		if (BLangLanguage.Instance.BConcept_BProp.EqualsIdentity(feature))
+		{
+			result = BProp;
 			return true;
 		}
 
@@ -202,6 +284,18 @@ public partial class BConcept : ConceptInstanceBase
 		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature))
 		{
 			result = _aEnumProp;
+			return true;
+		}
+
+		if (BLangLanguage.Instance.BConcept_AProp.EqualsIdentity(feature))
+		{
+			result = _aProp;
+			return true;
+		}
+
+		if (BLangLanguage.Instance.BConcept_BProp.EqualsIdentity(feature))
+		{
+			result = _bProp;
 			return true;
 		}
 
@@ -237,6 +331,17 @@ public partial class BConcept : ConceptInstanceBase
 			throw new InvalidValueException(feature, value);
 		}
 
+		if (BLangLanguage.Instance.BConcept_AProp.EqualsIdentity(feature))
+		{
+			if (value is global::LionWeb.Build.Languages.CustomType v)
+			{
+				SetAProp(v);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AConcept)
@@ -254,6 +359,17 @@ public partial class BConcept : ConceptInstanceBase
 			throw new InvalidValueException(feature, value);
 		}
 
+		if (BLangLanguage.Instance.BConcept_BProp.EqualsIdentity(feature))
+		{
+			if (value is global::LionWeb.Build.Languages.SubNamespace.CustomType v)
+			{
+				SetBProp(v);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		return false;
 	}
 
@@ -263,6 +379,10 @@ public partial class BConcept : ConceptInstanceBase
 			return true;
 		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AEnum)
 			return SetAEnumPropRaw((LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AEnum?)value);
+		if (BLangLanguage.Instance.BConcept_AProp.EqualsIdentity(feature) && value is null or global::LionWeb.Build.Languages.CustomType)
+			return SetAPropRaw((global::LionWeb.Build.Languages.CustomType?)value);
+		if (BLangLanguage.Instance.BConcept_BProp.EqualsIdentity(feature) && value is null or global::LionWeb.Build.Languages.SubNamespace.CustomType)
+			return SetBPropRaw((global::LionWeb.Build.Languages.SubNamespace.CustomType?)value);
 		return false;
 	}
 
@@ -281,8 +401,12 @@ public partial class BConcept : ConceptInstanceBase
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (TryGetAEnumProp(out _))
 			result.Add(BLangLanguage.Instance.BConcept_AEnumProp);
+		if (TryGetAProp(out _))
+			result.Add(BLangLanguage.Instance.BConcept_AProp);
 		if (TryGetARef(out _))
 			result.Add(BLangLanguage.Instance.BConcept_ARef);
+		if (TryGetBProp(out _))
+			result.Add(BLangLanguage.Instance.BConcept_BProp);
 		return result;
 	}
 }

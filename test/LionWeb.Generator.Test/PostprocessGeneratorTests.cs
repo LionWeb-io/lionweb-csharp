@@ -34,7 +34,7 @@ public class PostprocessGeneratorTests
     public void AddSealed()
     {
         var language = MultiInheritLangLanguage.Instance;
-        
+
         var generator = new GeneratorFacade
         {
             Names = new Names(language, "TestLanguage"),
@@ -48,7 +48,7 @@ public class PostprocessGeneratorTests
             .OfType<Classifier>()
             .Where(c => !c.AllSpecializations([language]).Any())
             .Select(c => correlator.FindAll<IClassifierToMainCorrelation>(c).Single());
-        
+
         foreach (var correlation in classifiersWithoutSpecializations)
         {
             var typeDeclaration = correlation.LookupIn(compilationUnit);

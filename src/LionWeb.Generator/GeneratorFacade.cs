@@ -18,6 +18,8 @@
 namespace LionWeb.Generator;
 
 using Core;
+using Core.M1;
+using Core.M3;
 using GeneratorExtensions;
 using Impl;
 using Microsoft.CodeAnalysis;
@@ -44,10 +46,13 @@ public class GeneratorFacade
     private CompilationUnitSyntax? _compilationUnit = null;
 
     /// Generates the compilation unit for the input language.
+    /// <exception cref="ArgumentException">If <see cref="Names"/>.<see cref="Generator.Names.Names.PrimitiveTypeMappings">PrimitiveTypeMappings</see> is invalid.</exception>
     public CompilationUnitSyntax Generate()
     {
         if (_compilationUnit == null)
         {
+            CheckPrimitiveTypes(Names);
+            
             var generatorInputParameters = new GeneratorInputParameters
             {
                 Names = Names, LionWebVersion = LionWebVersion, Config = Config, Correlator = Correlator
@@ -77,7 +82,7 @@ public class GeneratorFacade
         Persist(path, Generate());
 
     /// Stores the output of <paramref name="compilationUnit"/> to the file at <paramref name="path"/>.
-    public void Persist(string path, CompilationUnitSyntax compilationUnit)
+    public void Persist(string path, CompilationUnitSyntax compilationUnit, bool formatted = true)
     {
         var workspace = new AdhocWorkspace();
         var options = workspace.Options
@@ -87,7 +92,9 @@ public class GeneratorFacade
             .WithChangedOption(CSharpFormattingOptions.WrappingKeepStatementsOnSingleLine, value: false)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInAnonymousTypes, value: true)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInObjectInit, value: true);
-        var formattedCompilationUnit = (CompilationUnitSyntax)Formatter.Format(compilationUnit, workspace, options);
+        var formattedCompilationUnit = formatted
+            ? (CompilationUnitSyntax)Formatter.Format(compilationUnit, workspace, options)
+            : compilationUnit;
 
         using var streamWriter = new StreamWriter(path, false);
         streamWriter.Write(formattedCompilationUnit.GetText().ToString().ReplaceLineEndings());
@@ -101,20 +108,52 @@ public class GeneratorFacade
 
     /// Compiles the output of <see cref="Generate"/> and returns all diagnostic messages.
     public ImmutableArray<Diagnostic> Compile() =>
-        Compile(Generate());
+        Compile([Generate()]);
 
-    /// Compiles <paramref name="compilationUnit"/> and returns all diagnostic messages.
-    public ImmutableArray<Diagnostic> Compile(CompilationUnitSyntax compilationUnit)
+    /// Compiles <paramref name="compilationUnits"/> and returns all diagnostic messages.
+    public ImmutableArray<Diagnostic> Compile(IEnumerable<CompilationUnitSyntax> compilationUnits)
     {
-        var tree = SyntaxTree(compilationUnit);
+        var trees = compilationUnits.Select(cu => SyntaxTree(cu));
         var refApis = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic)
             .Select(a => MetadataReference.CreateFromFile(a.Location))
             .Append(MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(ISet<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location));
-        var compilation = CSharpCompilation.Create("foo", [tree], refApis);
+        var compilation = CSharpCompilation.Create("foo", trees, refApis);
         var diagnostics = compilation.GetDiagnostics();
         return diagnostics;
+    }
+
+    private void CheckPrimitiveTypes(INames names)
+    {
+        List<string> issues = [];
+        
+        var missingMappings = M1Extensions.Descendants<IReadableNode>(names.Language)
+            .Select(n => n switch
+            {
+                PrimitiveType pt => pt,
+                Property pr => pr.Type,
+                Field f => f.Type,
+                _ => null
+            })
+            .OfType<PrimitiveType>()
+            .Distinct()
+            .Except(names.PrimitiveTypeMappings.Keys)
+            .Except(LionWebVersion.BuiltIns.Entities.OfType<PrimitiveType>())
+            .ToList();
+        
+        if (missingMappings.Count != 0)
+            issues.Add($"Missing primitive type mappings for: {string.Join(",", missingMappings.Select(m => m.Key))}");
+
+        var invalidMappings = names.PrimitiveTypeMappings.Values
+            .Where(t => t.IsByRefLike)
+            .ToList();
+        
+        if (invalidMappings.Count != 0)
+            issues.Add($"Cannot use ref types as mappings: {string.Join(",", invalidMappings.Select(t => t.FullName))}");
+
+        if (issues.Count != 0)
+            throw new ArgumentException(string.Join("\n", issues));
     }
 }

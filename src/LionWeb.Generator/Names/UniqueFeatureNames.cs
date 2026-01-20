@@ -17,6 +17,7 @@
 
 namespace LionWeb.Generator.Names;
 
+using Core.M2;
 using Core.M3;
 using Impl;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -43,6 +44,9 @@ public class UniqueFeatureNames(INames parent) : INames
 
     /// <inheritdoc />
     public IDictionary<Language, string> NamespaceMappings => parent.NamespaceMappings;
+
+    /// <inheritdoc />
+    public IDictionary<PrimitiveType, Type> PrimitiveTypeMappings => parent.PrimitiveTypeMappings;
 
     /// <inheritdoc />
     public string LanguageName(Language lang) => parent.LanguageName(lang);
@@ -117,7 +121,7 @@ public class UniqueFeatureNames(INames parent) : INames
     }
 
     /// <inheritdoc />
-    public IdentifierNameSyntax FeatureProperty(Feature feature)
+    public IdentifierNameSyntax FeatureProperty(Feature feature, Classifier container)
     {
         RegisterFeatureName(feature);
         return IdentifierName(_featureNames[feature].ToFirstUpper().PrefixKeyword());
@@ -136,6 +140,12 @@ public class UniqueFeatureNames(INames parent) : INames
             return;
 
         var featureName = feature.Name;
+        var mangledName = Names.FeaturePropertyInternal(feature);
+        
+        var sameNameClassifiers = Language.Entities.OfType<Classifier>().Where(c => AsName(c).ToString() == mangledName);
+        if (sameNameClassifiers.Any(c => c.AllFeatures().Contains(feature))) 
+            featureName += Names.FeatureSameNameAsContainingClassifier_Suffix;
+
         int i = 0;
         while (_featureNames.ContainsValue(featureName))
         {

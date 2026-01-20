@@ -39,19 +39,19 @@ internal abstract class LanguageGeneratorBase : GeneratorBase
 
     /// <returns><c>_myEntity</c></returns>
     protected string LanguageFieldName(LanguageEntity entity) =>
-        $"_{entity.Name.ToFirstLower()}";
+        Names.EscapeLanguageInternal($"_{entity.Name.ToFirstLower()}");
 
     /// <returns><c>_myClassifier_MyFeature</c></returns>
     protected string LanguageFieldName(Feature feature) =>
-        $"_{feature.GetFeatureClassifier().Name.ToFirstLower()}_{feature.Name}";
+        Names.EscapeLanguageInternal($"_{feature.GetFeatureClassifier().Name.ToFirstLower()}_{feature.Name}");
 
     /// <returns><c>myEnum_MyEnumLiteral</c></returns>
     protected string LanguageFieldName(EnumerationLiteral literal) =>
-        $"_{literal.GetEnumeration().Name.ToFirstLower()}_{literal.Name}";
+        Names.EscapeLanguageInternal($"_{literal.GetEnumeration().Name.ToFirstLower()}_{literal.Name}");
 
     /// <returns><c>myStructuredDataType_MyField</c></returns>
     protected string LanguageFieldName(Field field) =>
-        $"_{field.GetStructuredDataType().Name.ToFirstLower()}_{field.Name}";
+        Names.EscapeLanguageInternal($"_{field.GetStructuredDataType().Name.ToFirstLower()}_{field.Name}");
 
     /// Returns FQN if <paramref name="entity">entity's</paramref> language is part of <see cref="INames.NamespaceMappings"/>.
     /// <inheritdoc cref="INames.AsProperty(LanguageEntity)"/>
@@ -66,7 +66,7 @@ internal abstract class LanguageGeneratorBase : GeneratorBase
             return
                 QualifiedName(
                     _names.MetaProperty(entity.GetLanguage()),
-                    IdentifierName(entity.Name)
+                    IdentifierName(Names.EscapeLanguageInternal(entity.Name))
                 );
         }
 

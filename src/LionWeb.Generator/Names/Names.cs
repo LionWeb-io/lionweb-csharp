@@ -18,12 +18,14 @@
 namespace LionWeb.Generator.Names;
 
 using Core;
+using Core.M1;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
 using Impl;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -36,7 +38,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 public partial class Names : INames
 {
     private const char _namespaceSeparator = '.';
-    
+    protected internal const string FeatureSameNameAsContainingClassifier_Suffix = "_";
+
     private readonly HashSet<Type> _usedTypes = [];
 
     /// <inheritdoc />
@@ -48,6 +51,7 @@ public partial class Names : INames
     protected readonly IBuiltInsLanguage _builtIns;
 
     private readonly Dictionary<Language, string> _namespaceMappings = new();
+    private readonly Dictionary<PrimitiveType, Type> _primitiveTypeMappings = new();
 
     /// <summary>
     /// Central handling of all naming.
@@ -58,7 +62,8 @@ public partial class Names : INames
     public Names(Language language, string namespaceName)
     {
         _language = language;
-        _namespaceName = string.Join(_namespaceSeparator, namespaceName.Split(_namespaceSeparator).Select(p => p.PrefixKeyword()));
+        _namespaceName = string.Join(_namespaceSeparator,
+            namespaceName.Split(_namespaceSeparator).Select(p => p.PrefixKeyword()));
 
         _m3 = language.LionWebVersion.LionCore;
         _builtIns = language.LionWebVersion.BuiltIns;
@@ -70,9 +75,22 @@ public partial class Names : INames
         get => _namespaceMappings;
         init
         {
-            foreach ((Language? lang, var ns) in value)
+            foreach ((Language? lang, var ns) in value.Where(p => p.Key != _language))
             {
                 _namespaceMappings[lang] = ns;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public IDictionary<PrimitiveType, Type> PrimitiveTypeMappings
+    {
+        get => _primitiveTypeMappings;
+        init
+        {
+            foreach ((PrimitiveType key, Type type) in value)
+            {
+                _primitiveTypeMappings[key] = type;
             }
         }
     }
@@ -84,7 +102,8 @@ public partial class Names : INames
     /// <inheritdoc />
     public string LanguageName(Language lang) => LanguageBaseName(lang) + "Language";
 
-    private string LanguageBaseName(Language lang) => lang.Name.Split(_namespaceSeparator).Last().ToFirstUpper().PrefixKeyword();
+    private string LanguageBaseName(Language lang) =>
+        lang.Name.Split(_namespaceSeparator).Last().ToFirstUpper().PrefixKeyword();
 
     /// <inheritdoc />
     public NameSyntax LanguageType => AsType(_language);
@@ -107,20 +126,132 @@ public partial class Names : INames
     /// <inheritdoc />
     public string NamespaceName => _namespaceName;
 
+    private static readonly HashSet<string> _languageInternalNames =
+    [
+        "CollectAllSetFeatures",
+        "DependsOn",
+        "Entities",
+        "Equals",
+        "Get",
+        "GetAnnotations",
+        "GetAnnotationsRaw",
+        "GetClassifier",
+        "GetConcept",
+        "GetFactory",
+        "GetHashCode",
+        "GetId",
+        "GetNotificationSender",
+        "GetParent",
+        "GetType",
+        "Instance",
+        "Key",
+        "LionWebVersion",
+        "MemberwiseClone",
+        "Name",
+        "ReferenceEquals",
+        "SetFactory",
+        "ToString",
+        "TryGet",
+        "TryGetContainmentRaw",
+        "TryGetContainmentsRaw",
+        "TryGetKey",
+        "TryGetName",
+        "TryGetPropertyRaw",
+        "TryGetReferenceRaw",
+        "TryGetReferencesRaw",
+        "TryGetVersion",
+        "Version",
+        "_builtIns",
+        "_factory",
+        "_key",
+        "_m3",
+        "_name",
+        "_version",
+    ];
+
+    protected internal static string EscapeLanguageInternal(string name) =>
+        _languageInternalNames.Contains(name)
+            ? name + "_"
+            : name;
+
+    private static readonly HashSet<Type> _internalTypes =
+    [
+        // M3
+        typeof(Language),
+        typeof(EnumerationLiteral),
+        typeof(Feature),
+        typeof(Link),
+        typeof(Containment),
+        typeof(Reference),
+        typeof(Property),
+        typeof(Field),
+        typeof(LanguageEntity),
+        typeof(Classifier),
+        typeof(Annotation),
+        typeof(Concept),
+        typeof(Interface),
+        typeof(Datatype),
+        typeof(Enumeration),
+        typeof(PrimitiveType),
+        typeof(StructuredDataType),
+
+        // M3 Base
+        typeof(LanguageBase<>),
+        typeof(EnumerationLiteralBase<>),
+        typeof(ContainmentBase<>),
+        typeof(ReferenceBase<>),
+        typeof(PropertyBase<>),
+        typeof(FieldBase<>),
+        typeof(AnnotationBase<>),
+        typeof(ConceptBase<>),
+        typeof(InterfaceBase<>),
+        typeof(EnumerationBase<>),
+        typeof(PrimitiveTypeBase<>),
+        typeof(StructuredDataTypeBase<>),
+
+        // Framework
+        typeof(AbstractBaseNodeFactory),
+        typeof(AnnotationInstanceBase),
+        typeof(ArgumentOutOfRangeException),
+        typeof(ConceptInstanceBase),
+        typeof(Enum),
+        typeof(IEnumerable<>),
+        typeof(IFieldValues),
+        typeof(INamed),
+        typeof(INamedWritable),
+        typeof(INode),
+        typeof(INodeFactory),
+        typeof(IPartitionInstance),
+        typeof(IReadOnlyList<>),
+        typeof(IReadableNode),
+        typeof(IStructuredDataTypeInstance),
+        typeof(IWritableNode),
+        typeof(InvalidValueException),
+        typeof(Lazy<>),
+        typeof(LionCoreLanguage),
+        typeof(LionCoreMetaPointer),
+        typeof(LionWebVersions),
+        typeof(List<>),
+        typeof(NotNullWhenAttribute),
+        typeof(PartitionInstanceBase),
+        typeof(Type),
+        typeof(UnsetFeatureException),
+        typeof(UnsetFieldException),
+        typeof(UnsupportedClassifierException),
+        typeof(UnsupportedEnumerationLiteralException),
+        typeof(UnsupportedStructuredDataTypeException)
+    ];
+
     /// <inheritdoc />
     public TypeSyntax AsType(Type type, params TypeSyntax?[] generics)
     {
         TypeSyntax? result = null;
 
-        if (type == typeof(string))
-            result = PredefinedType(Token(SyntaxKind.StringKeyword));
-        else if (type == typeof(int))
-            result = PredefinedType(Token(SyntaxKind.IntKeyword));
-        else if (type == typeof(bool))
-            result = PredefinedType(Token(SyntaxKind.BoolKeyword));
-        else if (type == typeof(object))
-            result = PredefinedType(Token(SyntaxKind.ObjectKeyword));
-
+        if (_cSharpBuiltinTypes.TryGetValue(type, out var syntaxKind))
+            result = PredefinedType(Token(syntaxKind));
+        else if (_internalTypes.Contains(type)
+                 && M1Extensions.Descendants<IKeyed>(_language, true).Any(k => k.Name == type.Name))
+            result = ParseName($"global::" + type.FullName);
         else if (generics == null || generics.Length == 0)
         {
             if (type.GenericTypeArguments is { Length: > 0 })
@@ -133,11 +264,84 @@ public partial class Names : INames
         }
 
         if (result == null)
-            result = GenericName(Use(type))
+            result = GenericName(IdentifierName(Use(type)).ToString())
                 .WithTypeArgumentList(TypeArgumentList(SeparatedList(generics)));
 
         return result;
     }
+
+    private static readonly Dictionary<Type, SyntaxKind> _cSharpBuiltinTypes = new()
+    {
+        { typeof(bool), SyntaxKind.BoolKeyword },
+        { typeof(byte), SyntaxKind.ByteKeyword },
+        { typeof(char), SyntaxKind.CharKeyword },
+        { typeof(double), SyntaxKind.DoubleKeyword },
+        { typeof(short), SyntaxKind.ShortKeyword },
+        { typeof(int), SyntaxKind.IntKeyword },
+        { typeof(long), SyntaxKind.LongKeyword },
+        { typeof(sbyte), SyntaxKind.SByteKeyword },
+        { typeof(float), SyntaxKind.FloatKeyword },
+        { typeof(ushort), SyntaxKind.UShortKeyword },
+        { typeof(uint), SyntaxKind.UIntKeyword },
+        { typeof(ulong), SyntaxKind.StringKeyword },
+        { typeof(object), SyntaxKind.ObjectKeyword },
+        { typeof(string), SyntaxKind.StringKeyword },
+        { typeof(decimal), SyntaxKind.DecimalKeyword }
+    };
+
+    private static readonly HashSet<string> _typeInternalNames =
+    [
+        // "Add",
+        // "AddAnnotations",
+        // "AddAnnotationsRaw",
+        "AddContainmentsRaw",
+        "AddInternal",
+        "AddReferencesRaw",
+        "CollectAllSetFeatures",
+        "DetachChild",
+        "DetachFromParent",
+        // "Equals",
+        // "Finalize",
+        // "Get",
+        // "GetAnnotations",
+        // "GetAnnotationsRaw",
+        "GetClassifier",
+        "GetConcept",
+        "GetContainmentOf",
+        // "GetHashCode",
+        // "GetId",
+        "GetInternal",
+        // "GetParent",
+        "GetPartitionNotificationProducer",
+        // "Insert",
+        // "InsertAnnotations",
+        "InsertContainmentsRaw",
+        "InsertInternal",
+        "InsertReferencesRaw",
+        // "Remove",
+        // "RemoveAnnotations",
+        "RemoveContainmentsRaw",
+        "RemoveInternal",
+        "RemoveReferencesRaw",
+        // "Set",
+        "SetContainmentRaw",
+        "SetInternal",
+        "SetPropertyRaw",
+        "SetRaw",
+        "SetReferenceRaw",
+        // "ToString",
+        "TryGet",
+        "TryGetContainmentRaw",
+        "TryGetContainmentsRaw",
+        "TryGetPropertyRaw",
+        "TryGetReferenceRaw",
+        "TryGetReferencesRaw"
+    ];
+
+    protected internal static string EscapeTypeInternal(string name) =>
+        _typeInternalNames.Contains(name)
+            ? name + "_"
+            : name;
 
     /// <inheritdoc />
     public TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false)
@@ -154,10 +358,10 @@ public partial class Names : INames
 
         if (_namespaceMappings.TryGetValue(classifier.GetLanguage(), out var ns))
         {
-            return QualifiedName(ParseName(ns), IdentifierName(classifier.Name.PrefixKeyword()));
+            return QualifiedName(ParseName(ns), IdentifierName(EscapeTypeInternal(classifier.Name.PrefixKeyword())));
         }
 
-        var type = IdentifierName(classifier.Name.PrefixKeyword());
+        var type = IdentifierName(EscapeTypeInternal(classifier.Name.PrefixKeyword()));
         if (!disambiguate)
             return type;
         return QualifiedName(ParseName(NamespaceName), type);
@@ -166,16 +370,23 @@ public partial class Names : INames
     /// <inheritdoc />
     public TypeSyntax AsType(Datatype datatype, bool disambiguate = false)
     {
+        if (datatype is PrimitiveType p && _primitiveTypeMappings.TryGetValue(p, out var t))
+        {
+            return _cSharpBuiltinTypes.ContainsKey(t)
+                ? AsType(t)
+                : ParseName($"global::{t.FullName}");
+        }
+
         var result = VersionSpecifics.AsType(datatype, _namespaceMappings);
         if (result != null)
             return result;
 
-        var type = IdentifierName(datatype.Name.PrefixKeyword());
+        TypeSyntax type = IdentifierName(datatype.Name.PrefixKeyword());
 
-        if (!disambiguate || datatype is PrimitiveType)
+        if (!disambiguate || type is not SimpleNameSyntax s)
             return type;
 
-        return QualifiedName(ParseName(NamespaceName), type);
+        return QualifiedName(ParseName(NamespaceName), s);
     }
 
     /// <inheritdoc />
@@ -184,7 +395,8 @@ public partial class Names : INames
         Language l => AsType(l),
         Classifier c => ToName(AsType(c, disambiguate)),
         Datatype d => ToName(AsType(d, disambiguate)),
-        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)), FeatureProperty(f)),
+        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)),
+            FeatureProperty(f, f.GetFeatureClassifier())),
         Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)), FieldProperty(f)),
         EnumerationLiteral f => QualifiedName(ToName(AsType(f.GetEnumeration(), disambiguate)),
             IdentifierName(f.Name.PrefixKeyword()))
@@ -227,7 +439,7 @@ public partial class Names : INames
 
     /// <inheritdoc />
     public IdentifierNameSyntax AsProperty(LanguageEntity classifier) =>
-        IdentifierName(classifier.Name.PrefixKeyword());
+        IdentifierName(EscapeLanguageInternal(classifier.Name.PrefixKeyword()));
 
     /// <inheritdoc />
     public IdentifierNameSyntax AsProperty(Feature feature) =>
@@ -253,8 +465,16 @@ public partial class Names : INames
         IdentifierName($"_{feature.Name.ToFirstLower()}".PrefixKeyword());
 
     /// <inheritdoc />
-    public IdentifierNameSyntax FeatureProperty(Feature feature) =>
-        IdentifierName(feature.Name.ToFirstUpper().PrefixKeyword());
+    public IdentifierNameSyntax FeatureProperty(Feature feature, Classifier container)
+    {
+        var name = FeaturePropertyInternal(feature);
+        if (name == AsName(container).ToString())
+            name += FeatureSameNameAsContainingClassifier_Suffix;
+        return IdentifierName(name);
+    }
+
+    protected internal static string FeaturePropertyInternal(Feature feature) =>
+        feature.Name.ToFirstUpper().PrefixKeyword();
 
     /// <inheritdoc />
     public string FeatureParam(Feature feature) =>
