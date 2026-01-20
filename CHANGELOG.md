@@ -8,6 +8,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ## [0.4.0] - tbd
 ### Added
+* Added Generator extension to add annotations to generated M2 types.
 * Enable attaching annotations to generated M2 types.
 * Added `M1Extensions.WithAnnotation()` to fluently add an annotation to a node.
 * Added `GeneratorFacade` extension `PersistFilePerType()` to generate one file per generated type.

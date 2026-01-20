@@ -16,6 +16,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using Io.Lionweb.Mps.Specific;
+using Io.Lionweb.Mps.Specific.V2024_1;
+using LionWeb.Build.Languages;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -23,7 +25,12 @@ using LionWeb.Core.M3;
 using LionWeb.Core.Migration;
 using LionWeb.Core.Serialization;
 using LionWeb.Generator;
+using LionWeb.Generator.GeneratorExtensions;
+using LionWeb.Generator.Impl;
 using LionWeb.Generator.Names;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 {
@@ -81,7 +88,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 
     IDictionary<PrimitiveType, Type> aLangBLangPrimitiveTypes = new Dictionary<PrimitiveType, Type>
     {
-        { aLang.FindByKey<PrimitiveType>("key-AType"), typeof(LionWeb.Build.Languages.CustomType)},
+        { aLang.FindByKey<PrimitiveType>("key-AType"), typeof(CustomType)},
         { bLang.FindByKey<PrimitiveType>("key-BType"), typeof(LionWeb.Build.Languages.SubNamespace.CustomType)},
     };
     List<Names> names =
@@ -135,7 +142,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     if (keywordLang != null)
         names.Add(new(keywordLang, $"@namespace.@int.@public.{lionWebVersionNamespace}")
         {
-            PrimitiveTypeMappings = { { keywordLang.FindByKey<PrimitiveType>("key-keyword-prim"), typeof(LionWeb.Build.Languages.CustomEnumType) } }
+            PrimitiveTypeMappings = { { keywordLang.FindByKey<PrimitiveType>("key-keyword-prim"), typeof(CustomEnumType) } }
         });
 
     if (lowerCaseLang != null)
@@ -168,12 +175,21 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 
     foreach (var name in names)
     {
-        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion, Config = configs.GetValueOrDefault(name.Language) ?? new() };
-        generator.Generate();
+        var generator = new GeneratorFacade
+        {
+            Names = name,
+            LionWebVersion = lionWebVersion,
+            Config = configs.GetValueOrDefault(name.Language) ?? new()
+        };
+        var compilationUnit = generator.Generate();
+        if (name.Language == deprecatedLang)
+        {
+            compilationUnit = AddM2DeprecatedAnnotations(compilationUnit, deprecatedLang, specificLanguage, generator);
+        }
         Console.WriteLine($"generated code for: {name.Language.Name}");
 
-        var path = @$"{generationPath}/{lionWebVersionNamespace}/{name.Language.Name}.g.cs";
-        generator.Persist(path);
+        var path = $"{generationPath}/{lionWebVersionNamespace}/{name.Language.Name}.g.cs";
+        generator.Persist(path, compilationUnit);
         Console.WriteLine($"persisted to: {path}");
     }
 }
@@ -199,4 +215,52 @@ DynamicLanguage[] DeserializeExternalLanguage(LionWebVersions lionWebVersion, st
         .WithCompressedIds(new(KeepOriginal: true))
         .Build()
         .Deserialize(serializationChunk, dependentLanguages).ToArray();
+}
+
+CompilationUnitSyntax AddM2DeprecatedAnnotations(CompilationUnitSyntax compilationUnitSyntax, DynamicLanguage deprecatedLang, ISpecificLanguage specificLanguage, GeneratorFacade generatorFacade)
+{
+    int i = 0;
+    var annotations = M1Extensions.Descendants<IKeyed>(deprecatedLang)
+        .Select(keyed => (keyed,
+            ann: keyed.GetAnnotations().FirstOrDefault(a => a.GetClassifier() == specificLanguage.Deprecated)))
+        .Where(pair => pair is { ann: not null })
+        .ToDictionary(
+            pair => pair.keyed,
+            pair =>
+            {
+                var creation = ObjectCreationExpression(IdentifierName(nameof(Deprecated)))
+                    .WithArgumentList(ArgumentList(SingletonSeparatedList(
+                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression,
+                            Literal($"deprecatedAnnotation{i}")))
+                    )));
+
+                var setProperties = pair.ann!
+                    .CollectAllSetFeatures()
+                    .OfType<Property>()
+                    .ToList();
+
+                if (setProperties.Count > 0)
+                {
+                    creation = creation.WithInitializer(InitializerExpression(
+                        SyntaxKind.ObjectInitializerExpression,
+                        SeparatedList<ExpressionSyntax>(
+                            setProperties
+                                .Select(p => AssignmentExpression(
+                                    SyntaxKind.SimpleAssignmentExpression,
+                                    IdentifierName(p.Name.ToFirstUpper()),
+                                    LiteralExpression(SyntaxKind.StringLiteralExpression,
+                                        Literal((string)pair.ann.Get(p)))
+                                )),
+                            [Token(SyntaxKind.CommaToken)]
+                        )
+                    ));
+                }
+
+                return CollectionExpression(
+                    SingletonSeparatedList<CollectionElementSyntax>(ExpressionElement(creation)));
+            });
+
+    return compilationUnitSyntax
+        .AddUsing(specificLanguage.GetType())
+        .AddM2Annotations(generatorFacade.Correlator, annotations);
 }

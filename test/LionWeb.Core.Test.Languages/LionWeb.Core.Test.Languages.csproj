@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\build\LionWeb-CSharp-Build\LionWeb-CSharp-Build.csproj" />
       <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
+      <ProjectReference Include="..\..\src\LionWeb.Generator.MpsSpecific\LionWeb.Generator.MpsSpecific.csproj" />
     </ItemGroup>
 
 </Project>

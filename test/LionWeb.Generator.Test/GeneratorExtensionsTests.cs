@@ -21,7 +21,9 @@ using Core;
 using Core.M3;
 using Core.Test.Languages.Generated.V2023_1.Circular.A;
 using Core.Test.Languages.Generated.V2023_1.Circular.B;
+using Core.Test.Languages.Generated.V2024_1.DeprecatedLang;
 using GeneratorExtensions;
+using Io.Lionweb.Mps.Specific.V2024_1;
 using Names;
 
 [TestClass]
@@ -86,5 +88,34 @@ public class GeneratorExtensionsTests
             if (Path.Exists(path))
                 Directory.Delete(path, true);
         }
+    }
+
+    [TestMethod]
+    public void DeprecatedAnnotations()
+    {
+        var lang = DeprecatedLanguage.Instance;
+        
+        var deprAnnotationAnn = lang.DeprAnnotation.GetAnnotations().First();
+        Assert.IsInstanceOfType<Deprecated>(deprAnnotationAnn);
+        Assert.AreEqual("deprAnnotation build", ((Deprecated)deprAnnotationAnn).Build);
+        Assert.AreEqual("deprAnnotation comment", ((Deprecated)deprAnnotationAnn).Comment);
+
+        var deprEnumAnn = lang.DeprEnum.GetAnnotations().First();
+        Assert.IsInstanceOfType<Deprecated>(deprEnumAnn);
+        Assert.AreEqual("deprEnum build", ((Deprecated)deprEnumAnn).Build);
+        Assert.AreEqual("deprEnum comment", ((Deprecated)deprEnumAnn).Comment);
+
+        var deprNoCommentAnn = lang.DeprNoComment.GetAnnotations().First();
+        Assert.IsInstanceOfType<Deprecated>(deprNoCommentAnn);
+        Assert.IsNull(((Deprecated)deprNoCommentAnn).Build);
+        Assert.IsNull(((Deprecated)deprNoCommentAnn).Comment);
+
+        Assert.IsInstanceOfType<Deprecated>(lang.DeprConcept.GetAnnotations().First());
+        Assert.IsInstanceOfType<Deprecated>(lang.DeprConcept_deprChild.GetAnnotations().First());
+        Assert.IsInstanceOfType<Deprecated>(lang.DeprConcept_deprProp.GetAnnotations().First());
+        Assert.IsInstanceOfType<Deprecated>(lang.DeprConcept_deprRef.GetAnnotations().First());
+        Assert.IsInstanceOfType<Deprecated>(lang.DeprDatatype.GetAnnotations().First());
+        Assert.IsInstanceOfType<Deprecated>(lang.DeprIface.GetAnnotations().First());
+        Assert.IsInstanceOfType<Deprecated>(lang.DeprConcept_deprRef.GetAnnotations().First());
     }
 }

@@ -17,15 +17,19 @@
 
 namespace LionWeb.Generator.Test;
 
+using Core.M1;
 using Core.M2;
 using Core.M3;
-using Core.Test.Languages.Generated.V2023_1.MultiInheritLang;
-using Core.Test.Languages.Generated.V2023_1.TestLanguage;
+using Core.Test.Languages.Generated.V2024_1.MultiInheritLang;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using GeneratorExtensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Annotation = Core.M3.Annotation;
+using Classifier = Core.M3.Classifier;
 
 [TestClass]
 public class PostprocessGeneratorTests
@@ -38,7 +42,7 @@ public class PostprocessGeneratorTests
         var generator = new GeneratorFacade
         {
             Names = new Names(language, "TestLanguage"),
-            LionWebVersion = TestLanguageLanguage.Instance.LionWebVersion
+            LionWebVersion = language.LionWebVersion
         };
 
         var compilationUnit = generator.Generate();
@@ -67,6 +71,43 @@ public class PostprocessGeneratorTests
 
             var generatedContent = File.ReadAllText(path);
             Assert.Contains("public partial sealed class CombinedConcept", generatedContent);
+        } finally
+        {
+            if (Path.Exists(path))
+                File.Delete(path);
+        }
+    }
+
+    [TestMethod]
+    public void AddAnnotation()
+    {
+        var language = TestLanguageLanguage.Instance;
+
+        var generator = new GeneratorFacade
+        {
+            Names = new Names(language, "TestLanguage"), LionWebVersion = language.LionWebVersion
+        };
+
+        var compilationUnit = generator.Generate();
+        var correlator = generator.Correlator;
+
+        int i = 0;
+        var annotations = M1Extensions.Descendants<IKeyed>(language)
+            .OfType<Annotation>()
+            .ToDictionary(IKeyed (k) => k,
+                v => (CollectionExpressionSyntax)ParseExpression($"""[new TestAnnotation("testAnnotation{i++}")]""")
+                );
+
+        compilationUnit = compilationUnit.AddM2Annotations(correlator, annotations);
+
+        var path = Path.GetTempFileName();
+        try
+        {
+            generator.Persist(path, compilationUnit);
+            Console.WriteLine($"Wrote output to {path}");
+
+            var generatedContent = File.ReadAllText(path);
+            Assert.Contains("""[new TestAnnotation("testAnnotation0")]""", generatedContent);
         } finally
         {
             if (Path.Exists(path))
