@@ -195,14 +195,18 @@ public static class M2Extensions
     public static ISet<Classifier> DirectSpecializations(this Classifier classifier,
         IEnumerable<Language> languages)
     {
-        ILookup<Classifier, Classifier> directSpecializations = MapAllSpecializations(languages);
+        ILookup<Classifier, Classifier> directSpecializations = MapDirectSpecializations(languages);
 
         return directSpecializations[classifier]
             .Except([classifier])
             .ToImmutableHashSet();
     }
 
-    private static ILookup<Classifier, Classifier> MapAllSpecializations(IEnumerable<Language> languages) =>
+    /// <summary>
+    /// Builds a lookup for all <see cref="Classifier"/>s within <paramref name="languages"/>
+    /// to their direct specializations (aka subtypes). 
+    /// </summary>
+    public static ILookup<Classifier, Classifier> MapDirectSpecializations(IEnumerable<Language> languages) =>
         languages
             .SelectMany(l => l
                 .Entities
@@ -221,9 +225,12 @@ public static class M2Extensions
     /// <param name="includeSelf">If <c>true</c>, the result includes <paramref name="classifier"/>.</param>
     /// <returns>All direct and indirect specializations of <paramref name="classifier"/> within <paramref name="languages"/>.</returns>
     public static ISet<Classifier> AllSpecializations(this Classifier classifier,
-        IEnumerable<Language> languages, bool includeSelf = false)
+        IEnumerable<Language> languages,
+        bool includeSelf = false,
+        ILookup<Classifier, Classifier>? directSpecializations = null
+    )
     {
-        ILookup<Classifier, Classifier> directSpecializations = MapAllSpecializations(languages);
+        directSpecializations ??= MapDirectSpecializations(languages);
 
         IEnumerable<Classifier> result =
             CollectSpecializations(classifier, directSpecializations, new HashSet<Classifier>());

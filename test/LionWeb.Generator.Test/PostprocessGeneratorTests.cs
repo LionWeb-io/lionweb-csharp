@@ -17,12 +17,15 @@
 
 namespace LionWeb.Generator.Test;
 
+using Core;
 using Core.M1;
 using Core.M3;
 using Core.Test.Languages.Generated.V2024_1.MultiInheritLang;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using GeneratorExtensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Formatting;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Annotation = Core.M3.Annotation;
@@ -45,19 +48,56 @@ public class PostprocessGeneratorTests
 
         compilationUnit = compilationUnit.SealClassifiers(generator.Correlator, [language]);
 
-        var path = Path.GetTempFileName();
-        try
-        {
-            generator.Persist(path, compilationUnit);
-            Console.WriteLine($"Wrote output to {path}");
+        var workspace = new AdhocWorkspace();
+        var generatedContent = Formatter.Format(compilationUnit, workspace).GetText().ToString();
+        Assert.Contains("public sealed partial class CombinedConcept", generatedContent);
+    }
 
-            var generatedContent = File.ReadAllText(path);
-            Assert.Contains("public partial sealed class CombinedConcept", generatedContent);
-        } finally
+    [TestMethod]
+    public void SealedNoClassifiers()
+    {
+        var lionWebVersion = LionWebVersions.Current;
+        var language = new DynamicLanguage("l", lionWebVersion) { Key = "lang", Name = "lang", Version = "lang" };
+        language.Enumeration("enm", "enm", "enm");
+        language.StructuredDataType("sdt", "sdt", "sdt");
+
+        var generator = new GeneratorFacade
         {
-            if (Path.Exists(path))
-                File.Delete(path);
-        }
+            Names = new Names(language, "TestLanguage"),
+            LionWebVersion = language.LionWebVersion
+        };
+
+        var compilationUnit = generator.Generate();
+
+        compilationUnit = compilationUnit.SealClassifiers(generator.Correlator, [language]);
+
+        var generatedContent = compilationUnit.GetText().ToString();
+        Assert.DoesNotContain("sealed", generatedContent);
+    }
+
+    [TestMethod]
+    public void SealedNoMatchingClassifiers()
+    {
+        var lionWebVersion = LionWebVersions.Current;
+        var lang0 = new DynamicLanguage("lang0", lionWebVersion) { Key = "lang0", Name = "lang0", Version = "lang0" };
+        lang0.Interface("iface", "iface", "iface");
+        lang0.Concept("conc", "conc", "conc").IsAbstract(true);
+
+        var lang1 = new DynamicLanguage("lang1", lionWebVersion) { Key = "lang1", Name = "lang1", Version = "lang1" };
+        lang1.Concept("conc", "conc", "conc");
+
+        var generator = new GeneratorFacade
+        {
+            Names = new Names(lang0, "TestLanguage"),
+            LionWebVersion = lang0.LionWebVersion
+        };
+
+        var compilationUnit = generator.Generate();
+
+        compilationUnit = compilationUnit.SealClassifiers(generator.Correlator, [lang0, lang1]);
+
+        var generatedContent = compilationUnit.GetText().ToString();
+        Assert.DoesNotContain("sealed", generatedContent);
     }
 
     [TestMethod]
@@ -82,18 +122,7 @@ public class PostprocessGeneratorTests
 
         compilationUnit = compilationUnit.AddM2Annotations(correlator, annotations);
 
-        var path = Path.GetTempFileName();
-        try
-        {
-            generator.Persist(path, compilationUnit);
-            Console.WriteLine($"Wrote output to {path}");
-
-            var generatedContent = File.ReadAllText(path);
-            Assert.Contains("""[new TestAnnotation("testAnnotation0")]""", generatedContent);
-        } finally
-        {
-            if (Path.Exists(path))
-                File.Delete(path);
-        }
+        var generatedContent = compilationUnit.GetText().ToString();
+        Assert.Contains("""[new TestAnnotation("testAnnotation0")]""", generatedContent);
     }
 }

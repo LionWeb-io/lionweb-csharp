@@ -80,8 +80,8 @@ public static class Extensions
     /// Adds <paramref name="annotations"/> to the initializers in the language constructor in <paramref name="compilationUnit"/>.
     /// </summary>
     /// <returns>Modified version of <paramref name="compilationUnit"/>.</returns>
-    public static CompilationUnitSyntax AddM2Annotations(this CompilationUnitSyntax compilationUnit, Correlator correlator,
-        Dictionary<IKeyed, CollectionExpressionSyntax> annotations)
+    public static CompilationUnitSyntax AddM2Annotations(this CompilationUnitSyntax compilationUnit,
+        Correlator correlator, Dictionary<IKeyed, CollectionExpressionSyntax> annotations)
     {
         var correlations = annotations.Keys
             .SelectMany(correlator.FindAll<KeyedToLanguageConstructorCorrelation>);
@@ -98,7 +98,7 @@ public static class Extensions
                             {
                                 Body: ObjectCreationExpressionSyntax
                                 {
-                                    Initializer: {} init
+                                    Initializer: { } init
                                 }
                             }
                         }
@@ -126,13 +126,21 @@ public static class Extensions
     /// </summary>
     /// <returns>Modified version of <paramref name="compilationUnit"/>.</returns>
     public static CompilationUnitSyntax SealClassifiers(this CompilationUnitSyntax compilationUnit,
-        Correlator correlator, List<Language> languages)
+        Correlator correlator, List<Language> languages, ILookup<Classifier, Classifier>? directSpecializations = null)
     {
+        directSpecializations ??= M2Extensions.MapDirectSpecializations(languages);
+
         var classifiersWithoutSpecializations = languages
             .SelectMany(l => l.Entities)
             .OfType<Classifier>()
-            .Where(c => !c.AllSpecializations(languages).Any())
-            .Select(c => correlator.FindAll<IClassifierToMainCorrelation>(c).Single());
+            .Where(c => c switch
+            {
+                Concept { Abstract: true } => false,
+                Interface => false,
+                _ => true
+            })
+            .Where(c => !c.AllSpecializations(languages, directSpecializations: directSpecializations).Any())
+            .SelectMany(correlator.FindAll<IClassifierToMainCorrelation>);
 
         foreach (var correlation in classifiersWithoutSpecializations)
         {
@@ -140,10 +148,43 @@ public static class Extensions
             compilationUnit = compilationUnit.ReplaceNode(
                 typeDeclaration,
                 typeDeclaration
-                    .AddModifiers(Token(SyntaxKind.SealedKeyword))
+                    .WithModifiers(TokenList(
+                        typeDeclaration.Modifiers.Append(Token(SyntaxKind.SealedKeyword))
+                            .Order(new TokenComparer())
+                    ))
             );
         }
 
         return compilationUnit;
+    }
+
+    private class TokenComparer : IComparer<SyntaxToken>
+    {
+        private static readonly List<SyntaxKind> _order =
+        [
+            SyntaxKind.PublicKeyword,
+            SyntaxKind.PrivateKeyword,
+            SyntaxKind.ProtectedKeyword,
+            SyntaxKind.InternalKeyword,
+            SyntaxKind.FileKeyword,
+            SyntaxKind.StaticKeyword,
+            SyntaxKind.ExternKeyword,
+            SyntaxKind.NewKeyword,
+            SyntaxKind.VirtualKeyword,
+            SyntaxKind.AbstractKeyword,
+            SyntaxKind.SealedKeyword,
+            SyntaxKind.OverrideKeyword,
+            SyntaxKind.ReadOnlyKeyword,
+            SyntaxKind.UnsafeKeyword,
+            SyntaxKind.RequiredKeyword,
+            SyntaxKind.VolatileKeyword,
+            SyntaxKind.AsyncKeyword,
+            SyntaxKind.PartialKeyword
+        ];
+
+        public int Compare(SyntaxToken x, SyntaxToken y) => Priority(x).CompareTo(Priority(y));
+
+        private static int Priority(SyntaxToken token) =>
+            _order.IndexOf(token.Kind());
     }
 }
