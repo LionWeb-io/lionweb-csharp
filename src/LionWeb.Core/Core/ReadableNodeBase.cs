@@ -70,7 +70,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     protected readonly List<T> _annotations = [];
 
     /// <inheritdoc />
-    public IReadOnlyList<T> GetAnnotations() => _annotations.AsReadOnly();
+    public virtual IReadOnlyList<T> GetAnnotations() => _annotations.AsReadOnly();
 
     /// <inheritdoc />
     public abstract Classifier GetClassifier();
@@ -87,7 +87,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     #region ReadableRaw
 
     /// <inheritdoc/>
-    public IReadOnlyList<IReadableNode> GetAnnotationsRaw() =>
+    public virtual IReadOnlyList<IReadableNode> GetAnnotationsRaw() =>
         _annotations.Cast<IReadableNode>().ToImmutableList();
 
     /// <inheritdoc/>
@@ -252,6 +252,65 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
         }
 
         targets = result ? nodes.AsReadOnly() : [];
+        return result;
+    }
+
+    #endregion
+
+    #region Annotations
+
+    /// <summary>
+    /// Assures <paramref name="value"/> is not <c>null</c>.
+    /// </summary>
+    /// <param name="value">Value to guard against <c>null</c>.</param>
+    /// <param name="feature">Feature <paramref name="value"/> originates from.</param>
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> is <c>null</c>.</exception>
+    protected void AssureNotNull([NotNull] object? value, Feature? feature)
+    {
+        if (value == null)
+            throw new InvalidValueException(feature, value);
+    }
+
+    /// <summary>
+    /// Assures none of <paramref name="safeNodes">list's</paramref> members are <c>null</c>.
+    /// </summary>
+    /// <param name="safeNodes">Value to guard against <c>null</c>.</param>
+    /// <param name="link">Link <paramref name="safeNodes"/> originates from.</param>
+    /// <typeparam name="T">Type of members of <paramref name="safeNodes"/>.</typeparam>
+    /// <exception cref="InvalidValueException">If any member of <paramref name="safeNodes"/> is <c>null</c>.</exception>
+    protected void AssureNotNullMembers<T>(IList<T> safeNodes, Link? link)
+    {
+        foreach (var node in safeNodes)
+        {
+            if (node == null)
+            {
+                throw new InvalidValueException(link, node);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Assures all of <paramref name="annotations"/> are instances of <see cref="Annotation"/>,
+    /// and can annotate <c>this</c> node's <see cref="IReadableNode.GetClassifier">classifier</see>.
+    /// </summary>
+    /// <param name="annotations">Annotations to check.</param>
+    /// <exception cref="InvalidValueException">
+    /// If <paramref name="annotations"/> is <c>null</c>, contains any <c>null</c>,
+    /// contains any non-<see cref="Annotation"/> instance,
+    /// or contains any annotation that cannot annotate <c>this</c> node's <see cref="IReadableNode.GetClassifier">classifier</see>.
+    /// </exception>
+    protected List<T> AssureAnnotations([NotNull] IList<IAnnotationInstance>? annotations)
+    {
+        AssureNotNull(annotations, null);
+        AssureNotNullMembers(annotations, null);
+        var result = new List<T>(annotations.Count);
+        foreach (var a in annotations)
+        {
+            if (!(a is T t && a.GetClassifier() is Annotation ann && ann.CanAnnotate(GetClassifier())))
+                throw new InvalidValueException(null, a);
+            result.Add(t);
+        }
+
         return result;
     }
 
