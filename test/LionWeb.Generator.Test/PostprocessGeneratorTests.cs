@@ -18,18 +18,14 @@
 namespace LionWeb.Generator.Test;
 
 using Core.M1;
-using Core.M2;
 using Core.M3;
 using Core.Test.Languages.Generated.V2024_1.MultiInheritLang;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using GeneratorExtensions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Annotation = Core.M3.Annotation;
-using Classifier = Core.M3.Classifier;
 
 [TestClass]
 public class PostprocessGeneratorTests
@@ -46,22 +42,8 @@ public class PostprocessGeneratorTests
         };
 
         var compilationUnit = generator.Generate();
-        var correlator = generator.Correlator;
 
-        var classifiersWithoutSpecializations = language.Entities
-            .OfType<Classifier>()
-            .Where(c => !c.AllSpecializations([language]).Any())
-            .Select(c => correlator.FindAll<IClassifierToMainCorrelation>(c).Single());
-
-        foreach (var correlation in classifiersWithoutSpecializations)
-        {
-            var typeDeclaration = correlation.LookupIn(compilationUnit);
-            compilationUnit = compilationUnit.ReplaceNode(
-                typeDeclaration,
-                typeDeclaration
-                    .AddModifiers(Token(SyntaxKind.SealedKeyword))
-            );
-        }
+        compilationUnit = compilationUnit.SealClassifiers(generator.Correlator, [language]);
 
         var path = Path.GetTempFileName();
         try

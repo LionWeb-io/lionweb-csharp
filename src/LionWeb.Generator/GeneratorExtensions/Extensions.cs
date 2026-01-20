@@ -17,6 +17,7 @@
 
 namespace LionWeb.Generator.GeneratorExtensions;
 
+using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -113,6 +114,34 @@ public static class Extensions
                     ))
                 );
             }
+        }
+
+        return compilationUnit;
+    }
+
+    /// <summary>
+    /// Adds `sealed` keyword to all classes inside <paramref name="compilationUnit"/>
+    /// that are generated from non-specialized <see cref="Classifier"/>s.
+    /// Looks through all <see cref="languages"/> to find specializations. 
+    /// </summary>
+    /// <returns>Modified version of <paramref name="compilationUnit"/>.</returns>
+    public static CompilationUnitSyntax SealClassifiers(this CompilationUnitSyntax compilationUnit,
+        Correlator correlator, List<Language> languages)
+    {
+        var classifiersWithoutSpecializations = languages
+            .SelectMany(l => l.Entities)
+            .OfType<Classifier>()
+            .Where(c => !c.AllSpecializations(languages).Any())
+            .Select(c => correlator.FindAll<IClassifierToMainCorrelation>(c).Single());
+
+        foreach (var correlation in classifiersWithoutSpecializations)
+        {
+            var typeDeclaration = correlation.LookupIn(compilationUnit);
+            compilationUnit = compilationUnit.ReplaceNode(
+                typeDeclaration,
+                typeDeclaration
+                    .AddModifiers(Token(SyntaxKind.SealedKeyword))
+            );
         }
 
         return compilationUnit;
