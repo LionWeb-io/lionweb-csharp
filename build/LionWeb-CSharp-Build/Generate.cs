@@ -226,39 +226,12 @@ CompilationUnitSyntax AddM2DeprecatedAnnotations(CompilationUnitSyntax compilati
         .Where(pair => pair is { ann: not null })
         .ToDictionary(
             pair => pair.keyed,
-            pair =>
-            {
-                var creation = ObjectCreationExpression(IdentifierName(nameof(Deprecated)))
-                    .WithArgumentList(ArgumentList(SingletonSeparatedList(
-                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression,
-                            Literal($"deprecatedAnnotation{i}")))
-                    )));
-
-                var setProperties = pair.ann!
-                    .CollectAllSetFeatures()
-                    .OfType<Property>()
-                    .ToList();
-
-                if (setProperties.Count > 0)
-                {
-                    creation = creation.WithInitializer(InitializerExpression(
-                        SyntaxKind.ObjectInitializerExpression,
-                        SeparatedList<ExpressionSyntax>(
-                            setProperties
-                                .Select(p => AssignmentExpression(
-                                    SyntaxKind.SimpleAssignmentExpression,
-                                    IdentifierName(p.Name.ToFirstUpper()),
-                                    LiteralExpression(SyntaxKind.StringLiteralExpression,
-                                        Literal((string)pair.ann.Get(p)))
-                                )),
-                            [Token(SyntaxKind.CommaToken)]
-                        )
-                    ));
-                }
-
-                return CollectionExpression(
-                    SingletonSeparatedList<CollectionElementSyntax>(ExpressionElement(creation)));
-            });
+            pair => NodeBuilder.Join(
+                new NodeBuilder(pair.ann!)
+                    .WithNodeId($"deprecatedAnnotation{i++}")
+                    .Build()
+            )
+        );
 
     return compilationUnitSyntax
         .AddUsing(specificLanguage.GetType())

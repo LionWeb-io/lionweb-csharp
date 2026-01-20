@@ -8,6 +8,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ## [0.4.0] - tbd
 ### Added
+* Introduced `NodeBuilder` to emit Roslyn AST that creates a LionWeb node instance. 
 * Added Generator extension to mark non-specialized Classifiers as `sealed`.
 * Added Generator extension to add annotations to generated M2 types.
 * Enable attaching annotations to generated M2 types.
