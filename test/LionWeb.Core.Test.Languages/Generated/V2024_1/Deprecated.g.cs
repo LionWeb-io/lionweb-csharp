@@ -36,7 +36,7 @@ public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [DeprAnnotation, DeprConcept, DeprEnum, DeprIface, DeprNoComment];
+        public override IReadOnlyList<LanguageEntity> Entities => [DeprAnnotation, DeprConcept, DeprDatatype, DeprEnum, DeprIface, DeprNoComment];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 

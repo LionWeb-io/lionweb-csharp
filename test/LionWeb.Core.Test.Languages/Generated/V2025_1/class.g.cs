@@ -40,7 +40,7 @@ public partial class ClassLanguage : LanguageBase<IClassFactory>
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [@enum, @if, @interface, @out, @partial, @record, @struct, @var];
+        public override IReadOnlyList<LanguageEntity> Entities => [@base, @enum, @if, @interface, @out, @partial, @record, @struct, @var];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 

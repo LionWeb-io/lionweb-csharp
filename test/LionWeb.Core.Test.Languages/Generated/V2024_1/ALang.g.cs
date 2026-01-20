@@ -33,7 +33,7 @@ public partial class ALangLanguage : LanguageBase<IALangFactory>
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [AConcept, AEnum];
+        public override IReadOnlyList<LanguageEntity> Entities => [AConcept, AEnum, CustomPrimitiveType];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BLangLanguage.Instance];
 
