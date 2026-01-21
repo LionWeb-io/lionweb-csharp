@@ -74,7 +74,7 @@ public partial class ShapesLanguage : LanguageBase<IShapesFactory>
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [BillOfMaterials, Circle, CompositeShape, Coord, Documentation, Geometry, IShape, Line, MaterialGroup, MatterState, OffsetDuplicate, ReferenceGeometry, Shape];
+        public override IReadOnlyList<LanguageEntity> Entities => [BillOfMaterials, Circle, CompositeShape, Coord, Documentation, Geometry, IShape, Line, MaterialGroup, MatterState, OffsetDuplicate, ReferenceGeometry, Shape, Time];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 

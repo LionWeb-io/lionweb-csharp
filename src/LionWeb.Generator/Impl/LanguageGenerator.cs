@@ -86,7 +86,7 @@ internal class LanguageGenerator(GeneratorInputParameters generatorInputParamete
     private PropertyDeclarationSyntax GenEntities() =>
         ReadOnlyProperty("Entities", AsType(typeof(IReadOnlyList<LanguageEntity>)),
                 Collection(
-                    Language.Entities.Where(e => e is not PrimitiveType).Ordered()
+                    Language.Entities.Ordered()
                         .Select(AsProperty)
                 )
             )

@@ -95,6 +95,16 @@ public static class M1Extensions
     }
 
     /// <summary>
+    /// Adds <paramref name="annotation"/> to <paramref name="self"/>'s <see cref="IWritableNode.AddAnnotations">annotations</see>
+    /// and returns <paramref name="self"/>.
+    /// </summary>
+    public static T WithAnnotation<T>(this T self, IAnnotationInstance annotation) where T : IWritableNode
+    {
+        self.AddAnnotations([(IWritableNode)annotation]);
+        return self;
+    }
+
+    /// <summary>
     /// Returns all the preceding siblings of the base node <param name="self"></param>
     /// Optionally includes <paramref name="self"/>.
     /// 

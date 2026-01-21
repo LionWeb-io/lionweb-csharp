@@ -20,6 +20,8 @@ namespace LionWeb.Generator.Impl;
 using Core;
 using Core.M2;
 using Core.M3;
+using GeneratorExtensions;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
@@ -64,10 +66,17 @@ internal class LanguageConstructorGenerator(GeneratorInputParameters generatorIn
 
         var result = new List<StatementSyntax>
         {
-            Assignment(LanguageFieldName(entity), NewLazy(
-                NewCall([entity.GetId().AsLiteral(), ThisExpression()],
-                    metaType, properties.ToArray())
-            ))
+            ExpressionStatement(
+                Correlate(new KeyedToLanguageConstructorCorrelation(entity),
+                    AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        IdentifierName(LanguageFieldName(entity)),
+                        NewLazy(
+                            NewCall([entity.GetId().AsLiteral(), ThisExpression()],
+                                metaType, properties.ToArray())
+                        ))
+                )
+            )
         };
 
         switch (entity)
@@ -202,26 +211,42 @@ internal class LanguageConstructorGenerator(GeneratorInputParameters generatorIn
 
         properties.Add(("Type", type));
 
-        return Assignment(LanguageFieldName(feature), NewLazy(
-            NewCall(
-                [feature.GetId().AsLiteral(), AsProperty(feature.GetFeatureClassifier()), ThisExpression()],
-                metaType,
-                properties.ToArray()
+        return ExpressionStatement(
+            Correlate(new KeyedToLanguageConstructorCorrelation(feature),
+                AssignmentExpression(
+                    SyntaxKind.SimpleAssignmentExpression,
+                    IdentifierName(LanguageFieldName(feature)),
+                    NewLazy(
+                        NewCall(
+                            [feature.GetId().AsLiteral(), AsProperty(feature.GetFeatureClassifier()), ThisExpression()],
+                            metaType,
+                            properties.ToArray()
+                        )
+                    )
+                )
             )
-        ));
+        );
     }
 
     private StatementSyntax LiteralConstructorInitialization(EnumerationLiteral literal)
     {
         var properties = KeyName(literal);
 
-        return Assignment(LanguageFieldName(literal), NewLazy(
-            NewCall(
-                [literal.GetId().AsLiteral(), AsProperty(literal.GetEnumeration()), ThisExpression()],
-                AsType(typeof(EnumerationLiteralBase<>), generics: LanguageType),
-                properties.ToArray()
+        return ExpressionStatement(
+            Correlate(new KeyedToLanguageConstructorCorrelation(literal),
+                AssignmentExpression(
+                    SyntaxKind.SimpleAssignmentExpression,
+                    IdentifierName(LanguageFieldName(literal)),
+                    NewLazy(
+                        NewCall(
+                            [literal.GetId().AsLiteral(), AsProperty(literal.GetEnumeration()), ThisExpression()],
+                            AsType(typeof(EnumerationLiteralBase<>), generics: LanguageType),
+                            properties.ToArray()
+                        )
+                    )
+                )
             )
-        ));
+        );
     }
 
     private StatementSyntax FieldConstructorInitialization(Field field)
@@ -230,13 +255,21 @@ internal class LanguageConstructorGenerator(GeneratorInputParameters generatorIn
 
         properties.Add(("Type", AsProperty(field.Type)));
 
-        return Assignment(LanguageFieldName(field), NewLazy(
-            NewCall(
-                [field.GetId().AsLiteral(), AsProperty(field.GetStructuredDataType()), ThisExpression()],
-                AsType(typeof(FieldBase<>), generics: LanguageType),
-                properties.ToArray()
+        return ExpressionStatement(
+            Correlate(new KeyedToLanguageConstructorCorrelation(field),
+                AssignmentExpression(
+                    SyntaxKind.SimpleAssignmentExpression,
+                    IdentifierName(LanguageFieldName(field)),
+                    NewLazy(
+                        NewCall(
+                            [field.GetId().AsLiteral(), AsProperty(field.GetStructuredDataType()), ThisExpression()],
+                            AsType(typeof(FieldBase<>), generics: LanguageType),
+                            properties.ToArray()
+                        )
+                    )
+                )
             )
-        ));
+        );
     }
 
     private List<(string, ExpressionSyntax)> KeyName(IKeyed keyed) =>

@@ -58,7 +58,7 @@ public partial class CustomPrimitiveTypeLangLanguage : LanguageBase<ICustomPrimi
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [PrimitiveConcept, Sdt];
+        public override IReadOnlyList<LanguageEntity> Entities => [Bool, Boolean, CustomEnumType, CustomEqualityType, CustomNestedType, CustomReferenceType, CustomType, Int, Integer, PrimitiveConcept, Sdt, String];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 

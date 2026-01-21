@@ -212,18 +212,6 @@ public abstract partial class NodeBase
     }
 
     /// <summary>
-    /// Assures <paramref name="value"/> is not <c>null</c>.
-    /// </summary>
-    /// <param name="value">Value to guard against <c>null</c>.</param>
-    /// <param name="feature">Feature <paramref name="value"/> originates from.</param>
-    /// <exception cref="InvalidValueException">If <paramref name="value"/> is <c>null</c>.</exception>
-    protected void AssureNotNull([NotNull] object? value, Feature? feature)
-    {
-        if (value == null)
-            throw new InvalidValueException(feature, value);
-    }
-
-    /// <summary>
     /// Assures <paramref name="value"/>'s is not <c>null</c> and its <see cref="ReferenceTarget.Target"/> is <c>null</c> or <typeparamref name="T"/>.
     /// </summary>
     /// <param name="value">Value to guard against <c>null</c>.</param>
@@ -249,24 +237,6 @@ public abstract partial class NodeBase
             return;
 
         throw new InvalidValueException(feature, value);
-    }
-
-    /// <summary>
-    /// Assures none of <paramref name="safeNodes">list's</paramref> members are <c>null</c>.
-    /// </summary>
-    /// <param name="safeNodes">Value to guard against <c>null</c>.</param>
-    /// <param name="link">Link <paramref name="safeNodes"/> originates from.</param>
-    /// <typeparam name="T">Type of members of <paramref name="safeNodes"/>.</typeparam>
-    /// <exception cref="InvalidValueException">If any member of <paramref name="safeNodes"/> is <c>null</c>.</exception>
-    protected void AssureNotNullMembers<T>(IList<T> safeNodes, Link? link)
-    {
-        foreach (var node in safeNodes)
-        {
-            if (node == null)
-            {
-                throw new InvalidValueException(link, node);
-            }
-        }
     }
 
     /// <summary>
@@ -339,31 +309,6 @@ public abstract partial class NodeBase
         RemoveAll(safeNodes, copy, null);
         if (copy.Count == 0)
             throw new InvalidValueException(link, safeNodes);
-    }
-
-    /// <summary>
-    /// Assures all of <paramref name="annotations"/> are instances of <see cref="Annotation"/>,
-    /// and can annotate <c>this</c> node's <see cref="IReadableNode.GetClassifier">classifier</see>.
-    /// </summary>
-    /// <param name="annotations">Annotations to check.</param>
-    /// <exception cref="InvalidValueException">
-    /// If <paramref name="annotations"/> is <c>null</c>, contains any <c>null</c>,
-    /// contains any non-<see cref="Annotation"/> instance,
-    /// or contains any annotation that cannot annotate <c>this</c> node's <see cref="IReadableNode.GetClassifier">classifier</see>.
-    /// </exception>
-    protected List<IWritableNode> AssureAnnotations([NotNull] IList<INode>? annotations)
-    {
-        AssureNotNull(annotations, null);
-        AssureNotNullMembers(annotations, null);
-        var result = new List<IWritableNode>(annotations.Count);
-        foreach (var a in annotations)
-        {
-            if (!(a?.GetClassifier() is Annotation ann && ann.CanAnnotate(GetClassifier())))
-                throw new InvalidValueException(null, a);
-            result.Add(a);
-        }
-
-        return result;
     }
 
     /// <summary>

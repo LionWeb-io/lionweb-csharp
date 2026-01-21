@@ -43,6 +43,15 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
         _language = language;
     }
 
+    /// <inheritdoc cref="GetAnnotations"/>
+    public IReadOnlyList<IAnnotationInstance> Annotations { get; init; } = [];
+
+    /// <inheritdoc cref="ReadableNodeBase{T}.GetAnnotations"/>
+    public override IReadOnlyList<IReadableNode> GetAnnotations() => Annotations;
+
+    /// <inheritdoc />
+    public override IReadOnlyList<IReadableNode> GetAnnotationsRaw() => Annotations;
+
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
     [

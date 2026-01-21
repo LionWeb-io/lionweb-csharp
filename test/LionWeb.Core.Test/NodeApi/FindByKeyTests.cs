@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi;
 
+using Languages.Generated.V2024_1.CustomPrimitiveTypeLang;
 using Languages.Generated.V2024_1.SDTLang;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M2;
@@ -71,6 +72,14 @@ public class FindByKeyTests
         var language = LionWebVersions.v2024_1.BuiltIns;
         var actual = language.FindByKey<PrimitiveType>(language.Boolean.Key);
         Assert.AreSame(language.Boolean, actual);
+    }
+
+    [TestMethod]
+    public void PrimitiveType_generated()
+    {
+        var language = CustomPrimitiveTypeLangLanguage.Instance;
+        var actual = language.FindByKey<PrimitiveType>(language.CustomType.Key);
+        Assert.AreSame(language.CustomType, actual);
     }
 
     [TestMethod]
