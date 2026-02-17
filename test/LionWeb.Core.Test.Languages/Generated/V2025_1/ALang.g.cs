@@ -119,7 +119,7 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 /// crip
 ///    tion</summary>
 /// <seealso href="https://example.com/abc?u=i#x"/>
-/// keyed description
+/// <summary>keyed description</summary>
 /// <seealso cref = "ALangLanguage"/>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
 public partial class AConcept : ConceptInstanceBase
@@ -183,7 +183,7 @@ public partial class AConcept : ConceptInstanceBase
 	}
 
 	private ReferenceTarget? _bRef = null;
-	/// bRef desc
+	/// <summary>bRef desc</summary>
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
@@ -191,7 +191,7 @@ public partial class AConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept? BRef { get => ReferenceTargetNonNullTarget<LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept>(_bRef, ALangLanguage.Instance.AConcept_BRef); set => SetBRef(value); }
 
-	/// bRef desc
+	/// <summary>bRef desc</summary>
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
@@ -215,7 +215,7 @@ public partial class AConcept : ConceptInstanceBase
 		return true;
 	}
 
-	/// bRef desc
+	/// <summary>bRef desc</summary>
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
@@ -369,13 +369,13 @@ public partial class AConcept : ConceptInstanceBase
 	}
 }
 
-/// enum description
+/// <summary>enum description</summary>
 /// <seealso cref = "ALangLanguage"/>
 /// <seealso cref = "AConcept"/>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AEnum")]
 public enum AEnum
 {
-	/// left desc
+	/// <summary>left desc</summary>
     	/// <seealso cref = "AEnum"/>
         [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-left")]
 	left,
