@@ -15,7 +15,7 @@ using global::System;
 using global::System.Collections.Generic;
 using global::System.Diagnostics.CodeAnalysis;
 
-/// bLang desc
+/// <summary>bLang desc</summary>
 /// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
 [LionCoreLanguage(Key = "key-BLang", Version = "2")]
 public partial class BLangLanguage : LanguageBase<IBLangFactory>
@@ -119,7 +119,7 @@ public partial class BConcept : ConceptInstanceBase
 		return true;
 	}
 
-	/// enum desc
+	/// <summary>enum desc</summary>
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
     	/// <remarks>Required Property</remarks>
@@ -128,7 +128,7 @@ public partial class BConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum AEnumProp { get => _aEnumProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_AEnumProp); set => SetAEnumProp(value); }
 
-	/// enum desc
+	/// <summary>enum desc</summary>
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
     	/// <remarks>Required Property</remarks>
@@ -138,7 +138,7 @@ public partial class BConcept : ConceptInstanceBase
 		return aEnumProp != null;
 	}
 
-	/// enum desc
+	/// <summary>enum desc</summary>
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
     	/// <remarks>Required Property</remarks>

@@ -143,7 +143,7 @@ internal abstract class GeneratorBase
 
         var keyedDocumentation = VersionSpecifics.GetKeyedDocumentation(keyed);
         if (keyedDocumentation != null)
-            result.AddRange(XdocLine(keyedDocumentation));
+            result.AddRange(XdocLine(keyedDocumentation, "summary"));
 
         var keyedSeeAlso = VersionSpecifics.GetKeyedSeeAlso(keyed).OfType<IKeyed>().ToList();
         if (keyedSeeAlso.Count != 0)
