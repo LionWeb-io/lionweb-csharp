@@ -404,7 +404,7 @@ public class DeltaCommandToNotificationMapper
             parent,
             reference,
             addReferenceCommand.Index,
-            ToTarget(addReferenceCommand.NewTarget, addReferenceCommand.NewResolveInfo),
+            ToTarget(addReferenceCommand.NewReference, addReferenceCommand.NewResolveInfo),
             ToNotificationId(addReferenceCommand)
         );
     }
@@ -430,7 +430,7 @@ public class DeltaCommandToNotificationMapper
             parent,
             reference,
             changeReferenceCommand.Index,
-            ToTarget(changeReferenceCommand.NewTarget, changeReferenceCommand.NewResolveInfo),
+            ToTarget(changeReferenceCommand.NewReference, changeReferenceCommand.NewResolveInfo),
             ReferenceTarget.FromNode(parent.Get(reference) as IReadableNode),
             ToNotificationId(changeReferenceCommand)
         );

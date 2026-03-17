@@ -226,7 +226,7 @@ public record AddReference(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? NewTarget,
+    TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
@@ -236,7 +236,7 @@ public record DeleteReference(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? DeletedTarget,
+    TargetNode? DeletedReference,
     ResolveInfo? DeletedResolveInfo,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
@@ -246,9 +246,9 @@ public record ChangeReference(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? OldTarget,
+    TargetNode? OldReference,
     ResolveInfo? OldResolveInfo,
-    TargetNode? NewTarget,
+    TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos

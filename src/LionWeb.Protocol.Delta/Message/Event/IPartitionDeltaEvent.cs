@@ -1095,7 +1095,7 @@ public record ReferenceAdded(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? NewTarget,
+    TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
     CommandSource[]? OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
@@ -1109,7 +1109,7 @@ public record ReferenceDeleted(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? DeletedTarget,
+    TargetNode? DeletedReference,
     ResolveInfo? DeletedResolveInfo,
     CommandSource[]? OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
@@ -1123,9 +1123,9 @@ public record ReferenceChanged(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? NewTarget,
+    TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
-    TargetNode? OldTarget,
+    TargetNode? OldReference,
     ResolveInfo? OldResolveInfo,
     CommandSource[]? OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent

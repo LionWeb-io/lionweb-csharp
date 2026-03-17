@@ -58,9 +58,9 @@ public class DeltaCommandToDeltaEventMapper
             ReplaceAnnotation a => new AnnotationReplaced(a.NewAnnotation,a.ReplacedAnnotation, [], a.Parent, a.Index, OriginCommands(a), []),
             MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), []),
             MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), []),
-            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, OriginCommands(a), []),
-            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, a.DeletedTarget, a.DeletedResolveInfo, OriginCommands(a), []),
-            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, a.OldTarget, a.OldResolveInfo, OriginCommands(a), []),
+            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewReference, a.NewResolveInfo, OriginCommands(a), []),
+            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, a.DeletedReference, a.DeletedResolveInfo, OriginCommands(a), []),
+            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewReference, a.NewResolveInfo, a.OldReference, a.OldResolveInfo, OriginCommands(a), []),
             AddPartition a => new PartitionAdded(a.NewPartition, /*TODO*/ null, OriginCommands(a), []),
             DeletePartition a => new PartitionDeleted(a.DeletedPartition, /*TODO*/[], OriginCommands(a), []),
             _ => throw new ArgumentException($"{nameof(DeltaCommandToDeltaEventMapper)} does not support {deltaCommand.GetType().Name}!")
