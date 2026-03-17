@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional.GenericApi;
 
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2026_1.Shapes.M2;
 
 [TestClass]
 public class NullTests

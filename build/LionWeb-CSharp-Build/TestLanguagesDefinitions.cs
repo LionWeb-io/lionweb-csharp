@@ -736,16 +736,14 @@ public class TestLanguagesDefinitions
             "V2023_1",
             "V2024_1",
             "V2024_1_Compatible",
-            "V2025_1",
-            "V2025_1_Compatible",
+            "V2026_1",
+            "V2026_1_Compatible",
             "VersionSpecific",
             "_builtIns",
             "result",
             // "v2023_1",
             // "v2024_1",
             // "v2024_1_Compatible",
-            // "v2025_1",
-            // "v2025_1_Compatible",
             ..typeof(ReadableNodeBase<>).GetMembers(bindingFlags)
                 .Concat(typeof(NodeBase).GetMembers(bindingFlags))
                 .OfType<MethodInfo>()

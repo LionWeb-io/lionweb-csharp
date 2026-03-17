@@ -28,8 +28,8 @@ public interface ISpecificLanguage : Language
         IVersion2023_1 => Specific.V2023_1.SpecificLanguage.Instance,
         IVersion2024_1 => Specific.V2024_1.SpecificLanguage.Instance,
         IVersion2024_1_Compatible => Specific.V2024_1.SpecificLanguage.Instance,
-        IVersion2025_1 => Specific.V2025_1.SpecificLanguage.Instance,
-        IVersion2025_1_Compatible => Specific.V2025_1.SpecificLanguage.Instance,
+        IVersion2026_1 => Specific.V2026_1.SpecificLanguage.Instance,
+        IVersion2026_1_Compatible => Specific.V2026_1.SpecificLanguage.Instance,
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
     

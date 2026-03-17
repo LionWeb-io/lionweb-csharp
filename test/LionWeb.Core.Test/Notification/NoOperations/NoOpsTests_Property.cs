@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.NoOperationsTests;
 
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2026_1.Shapes.M2;
 
 [TestClass]
 public class NoOpsTests_Property : NotificationTestsBase

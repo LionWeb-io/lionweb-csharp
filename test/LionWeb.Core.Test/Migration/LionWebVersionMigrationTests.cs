@@ -60,8 +60,8 @@ public class LionWebVersionMigrationTests
     public async Task Migrate2023_1_to_2025_1()
     {
         LionWebVersions inputVersion = LionWebVersions.v2023_1;
-        LionWebVersions targetVersionCompatible = LionWebVersions.v2025_1_Compatible;
-        LionWebVersions targetVersion = LionWebVersions.v2025_1;
+        LionWebVersions targetVersionCompatible = LionWebVersions.v2026_1_Compatible;
+        LionWebVersions targetVersion = LionWebVersions.v2026_1;
 
         DynamicLanguage language = CreateLanguage2023(inputVersion, out DynamicInterface iface,
             out DynamicConcept concept, out DynamicAnnotation ann, out DynamicEnumeration enm,
@@ -87,8 +87,8 @@ public class LionWebVersionMigrationTests
     public async Task Migrate2024_1_to_2025_1()
     {
         LionWebVersions inputVersion = LionWebVersions.v2024_1;
-        LionWebVersions targetVersionCompatible = LionWebVersions.v2025_1_Compatible;
-        LionWebVersions targetVersion = LionWebVersions.v2025_1;
+        LionWebVersions targetVersionCompatible = LionWebVersions.v2026_1_Compatible;
+        LionWebVersions targetVersion = LionWebVersions.v2026_1;
 
         DynamicLanguage language = CreateLanguage2024(inputVersion, out DynamicInterface iface,
             out DynamicProperty propString, out DynamicConcept concept, out DynamicEnumeration enm,

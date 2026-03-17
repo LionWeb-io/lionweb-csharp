@@ -80,7 +80,7 @@ public abstract class JsonTestsBase
         new(Chunk(), false, QueryId(), AdditionalInfos());
 
     protected static SignOnRequest CreateSignOnRequest() =>
-        new(LionWebVersions.v2025_1.VersionString, ClientId(), QueryId(), RepositoryId(), AdditionalInfos());
+        new(LionWebVersions.v2026_1.VersionString, ClientId(), QueryId(), RepositoryId(), AdditionalInfos());
 
     protected static SignOnResponse CreateSignOnResponse() =>
         new(ParticipationId(), QueryId(), AdditionalInfos());

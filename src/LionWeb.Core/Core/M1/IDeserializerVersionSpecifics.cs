@@ -22,8 +22,8 @@ using M3;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
-using VersionSpecific.V2025_1_Compatible;
-using VersionSpecific.V2025_1;
+using VersionSpecific.V2026_1_Compatible;
+using VersionSpecific.V2026_1;
 
 /// Externalized logic of <see cref="IDeserializer"/>, specific to one version of LionWeb standard.
 public interface IDeserializerVersionSpecifics : IVersionSpecifics
@@ -37,8 +37,8 @@ public interface IDeserializerVersionSpecifics : IVersionSpecifics
         IVersion2023_1 => new DeserializerVersionSpecifics_2023_1<T, H>(deserializer,metaInfo,handler),
         IVersion2024_1 => new DeserializerVersionSpecifics_2024_1<T, H>(deserializer,metaInfo,handler),
         IVersion2024_1_Compatible => new DeserializerVersionSpecifics_2024_1_Compatible<T, H>(deserializer,metaInfo,handler),
-        IVersion2025_1 => new DeserializerVersionSpecifics_2025_1<T, H>(deserializer,metaInfo,handler),
-        IVersion2025_1_Compatible => new DeserializerVersionSpecifics_2025_1_Compatible<T, H>(deserializer,metaInfo,handler),
+        IVersion2026_1 => new DeserializerVersionSpecifics_2026_1<T, H>(deserializer,metaInfo,handler),
+        IVersion2026_1_Compatible => new DeserializerVersionSpecifics_2026_1_Compatible<T, H>(deserializer,metaInfo,handler),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
