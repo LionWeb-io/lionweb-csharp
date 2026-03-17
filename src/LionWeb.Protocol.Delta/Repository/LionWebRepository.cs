@@ -174,7 +174,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     private IDeltaQueryResponse ListPartitions(ListPartitionsRequest listPartitionsRequest)
     {
         DeltaSerializationChunk chunk = Serialize(_forest.Partitions);
-        return new ListPartitionsResponse(chunk, listPartitionsRequest.QueryId, null);
+        return new ListPartitionsResponse(chunk, false, listPartitionsRequest.QueryId, null);
     }
 
     private IDeltaQueryResponse SignOn(IClientInfo clientInfo, SignOnRequest signOnRequest)
@@ -216,7 +216,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     {
         clientInfo.NotifyAboutParitionCreation = subscribeToChangingPartitionsRequest.Creation;
         clientInfo.NotifyAboutParitionDeletion = subscribeToChangingPartitionsRequest.Deletion;
-        clientInfo.SubscribeCreatedParitions = subscribeToChangingPartitionsRequest.Partitions;
+        clientInfo.SubscribeCreatedParitions = subscribeToChangingPartitionsRequest.Creation;
 
         return new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
     }

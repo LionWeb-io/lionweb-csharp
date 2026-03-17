@@ -22,11 +22,11 @@ public interface IForestDeltaCommand : IDeltaCommand;
 public record AddPartition(
     DeltaSerializationChunk NewPartition,
     CommandId CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IForestDeltaCommand;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaCommandBase(CommandId, AdditionalInfos), IForestDeltaCommand;
 
 public record DeletePartition(
     TargetNode DeletedPartition,
     CommandId CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IForestDeltaCommand;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaCommandBase(CommandId, AdditionalInfos), IForestDeltaCommand;

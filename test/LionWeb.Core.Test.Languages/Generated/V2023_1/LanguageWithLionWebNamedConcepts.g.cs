@@ -232,14 +232,14 @@ public partial class LanguageWithLionWebNamedConceptsLanguage : LanguageBase<ILa
 		_v2023_1 = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-V2023_1", this) { Key = "key-V2023_1", Name = "V2023_1", Abstract = false, Partition = false });
 		_v2024_1 = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-V2024_1", this) { Key = "key-V2024_1", Name = "V2024_1", Abstract = false, Partition = false });
 		_v2024_1_Compatible = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-V2024_1_Compatible", this) { Key = "key-V2024_1_Compatible", Name = "V2024_1_Compatible", Abstract = false, Partition = false });
-		_v2025_1 = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-V2025_1", this) { Key = "key-V2025_1", Name = "V2025_1", Abstract = false, Partition = false });
-		_v2025_1_Compatible = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-V2025_1_Compatible", this) { Key = "key-V2025_1_Compatible", Name = "V2025_1_Compatible", Abstract = false, Partition = false });
+		_v2026_1 = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-V2026_1", this) { Key = "key-V2026_1", Name = "V2026_1", Abstract = false, Partition = false });
+		_v2026_1_Compatible = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-V2026_1_Compatible", this) { Key = "key-V2026_1_Compatible", Name = "V2026_1_Compatible", Abstract = false, Partition = false });
 		_versionSpecific = new(() => new ConceptBase<LanguageWithLionWebNamedConceptsLanguage>("id-VersionSpecific", this) { Key = "key-VersionSpecific", Name = "VersionSpecific", Abstract = false, Partition = false });
 		_factory = new LanguageWithLionWebNamedConceptsFactory(this);
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<global::LionWeb.Core.M3.LanguageEntity> Entities => [_builtIns_, Abstract, AbstractBaseNodeFactory, Add, AddAnnotations, AddAnnotationsRaw, AddChildRaw, AddContainmentsRaw, AddInternal, AddOptionalMultipleContainment, AddOptionalMultipleReference, AddReferencesRaw, AddRequiredMultipleContainment, AddRequiredMultipleReference, AnnotatesLazy, Annotation, AnnotationBase, AnnotationInstanceBase, AnnotationRemover, ArgumentOutOfRangeException, AsList, AsNonEmptyReadOnly, AssureAnnotations, AssureInRange, AssureNonEmpty, AssureNoSelfMove, AssureNotClearing, AssureNotNull, AssureNotNullInstance, AssureNotNullMembers, AssureNullableInstance, AttachChild, Bool, Boolean, Char, Character, Classifier, CodeAnalysis, CollectAllSetFeatures_, Collections, Concept, ConceptBase, ConceptInstanceBase, Containment, ContainmentBase, ContainmentRemover, Core, Datatype, DatatypeBase, Decimal, DetachChild, DetachChildInternal, DetachFromParent, Diagnostics, Enum, Enumeration, EnumerationBase, EnumerationLiteral, EnumerationLiteralBase, Equals_, ExchangeChildRaw, ExchangeChildrenRaw, FeaturesLazy, Field, FieldBase, FieldsLazy, Finalize, Generic, Get_, get__builtIns, get__m3, GetAnnotation, GetAnnotations_, GetAnnotationsRaw_, GetClassifier_, GetConcept_, GetContainmentOf, GetHashCode_, GetId_, GetInternal, GetParent_, GetPartitionNotificationProducer, GetRequiredNonNullReferences, GetRequiredNullableReferences, GetRequiredReference, GetType_, IEnumerable, IFieldValues, ImplementsLazy, INamed, INamedWritable, INode, INodeFactory, Insert, InsertAnnotations, InsertAnnotationsRaw, InsertChildRaw, InsertContainmentsRaw, InsertInternal, InsertOptionalMultipleContainment, InsertOptionalMultipleReference, InsertReferencesRaw, InsertRequiredMultipleContainment, InsertRequiredMultipleReference, Instance_, Integer, Interface, InterfaceBase, InvalidValueException, IPartitionInstance, IReadableNode, IReadOnlyList, IsInRange, IStructuredDataTypeInstance, IWritableNode, Key_, Language, LanguageBase, LanguageEntity, Lazy, Link, LionCoreFeature, LionCoreFeatureKind, LionCoreLanguage, LionCoreMetaPointer, LionWeb, LionWebVersions, List, LiteralsLazy, M2, M3, MemberwiseClone_, Multiple, Name_, Notification, NotNullWhenAttribute, Optional, Partition, Pipe, PrimitiveType, PrimitiveTypeBase, Property, PropertyBase, Reference, ReferenceBase, ReferenceEquals_, ReferenceRemover, ReferenceTargetNonNullTarget, ReferenceTargetNonNullTargets, ReferenceTargetNullableTarget, ReferenceTargetNullableTargets, Remove, RemoveAll, RemoveAnnotations, RemoveAnnotationsRaw, RemoveChildRaw, RemoveContainmentsRaw, RemoveInternal, RemoveOptionalMultipleContainment, RemoveOptionalMultipleReference, RemoveReferencesRaw, RemoveRequiredMultipleContainment, RemoveRequiredMultipleReference, RemoveSelfParent, RemoveSelfParentRaw, result, Set, SetContainmentRaw, SetInternal, SetInternalAnnotation, SetName, SetNameRaw, SetOptionalMultipleContainment, SetOptionalMultipleReference, SetOptionalReferenceTypeProperty, SetOptionalSingleContainment, SetOptionalSingleReference, SetOptionalValueTypeProperty, SetParentInternal, SetParentNull, SetPropertyRaw, SetRaw, SetReferenceRaw, SetReferencesRaw, SetRequiredMultipleContainment, SetRequiredMultipleReference, SetRequiredReferenceTypeProperty, SetRequiredSingleContainment, SetRequiredSingleReference, SetRequiredValueTypeProperty, SetSelfParent, SetSelfParentRaw, String, StructuredDataType, StructuredDataTypeBase, System, ToString_, TryGet_, TryGetContainmentRaw_, TryGetContainmentsRaw_, TryGetName_, TryGetPropertyRaw_, TryGetReference, TryGetReferenceRaw_, TryGetReferencesRaw_, Type, UnsetFeatureException, UnsetFieldException, UnsupportedClassifierException, UnsupportedEnumerationLiteralException, UnsupportedStructuredDataTypeException, Utilities, V2023_1, V2024_1, V2024_1_Compatible, V2025_1, V2025_1_Compatible, VersionSpecific];
+        public override IReadOnlyList<global::LionWeb.Core.M3.LanguageEntity> Entities => [_builtIns_, Abstract, AbstractBaseNodeFactory, Add, AddAnnotations, AddAnnotationsRaw, AddChildRaw, AddContainmentsRaw, AddInternal, AddOptionalMultipleContainment, AddOptionalMultipleReference, AddReferencesRaw, AddRequiredMultipleContainment, AddRequiredMultipleReference, AnnotatesLazy, Annotation, AnnotationBase, AnnotationInstanceBase, AnnotationRemover, ArgumentOutOfRangeException, AsList, AsNonEmptyReadOnly, AssureAnnotations, AssureInRange, AssureNonEmpty, AssureNoSelfMove, AssureNotClearing, AssureNotNull, AssureNotNullInstance, AssureNotNullMembers, AssureNullableInstance, AttachChild, Bool, Boolean, Char, Character, Classifier, CodeAnalysis, CollectAllSetFeatures_, Collections, Concept, ConceptBase, ConceptInstanceBase, Containment, ContainmentBase, ContainmentRemover, Core, Datatype, DatatypeBase, Decimal, DetachChild, DetachChildInternal, DetachFromParent, Diagnostics, Enum, Enumeration, EnumerationBase, EnumerationLiteral, EnumerationLiteralBase, Equals_, ExchangeChildRaw, ExchangeChildrenRaw, FeaturesLazy, Field, FieldBase, FieldsLazy, Finalize, Generic, Get_, get__builtIns, get__m3, GetAnnotation, GetAnnotations_, GetAnnotationsRaw_, GetClassifier_, GetConcept_, GetContainmentOf, GetHashCode_, GetId_, GetInternal, GetParent_, GetPartitionNotificationProducer, GetRequiredNonNullReferences, GetRequiredNullableReferences, GetRequiredReference, GetType_, IEnumerable, IFieldValues, ImplementsLazy, INamed, INamedWritable, INode, INodeFactory, Insert, InsertAnnotations, InsertAnnotationsRaw, InsertChildRaw, InsertContainmentsRaw, InsertInternal, InsertOptionalMultipleContainment, InsertOptionalMultipleReference, InsertReferencesRaw, InsertRequiredMultipleContainment, InsertRequiredMultipleReference, Instance_, Integer, Interface, InterfaceBase, InvalidValueException, IPartitionInstance, IReadableNode, IReadOnlyList, IsInRange, IStructuredDataTypeInstance, IWritableNode, Key_, Language, LanguageBase, LanguageEntity, Lazy, Link, LionCoreFeature, LionCoreFeatureKind, LionCoreLanguage, LionCoreMetaPointer, LionWeb, LionWebVersions, List, LiteralsLazy, M2, M3, MemberwiseClone_, Multiple, Name_, Notification, NotNullWhenAttribute, Optional, Partition, Pipe, PrimitiveType, PrimitiveTypeBase, Property, PropertyBase, Reference, ReferenceBase, ReferenceEquals_, ReferenceRemover, ReferenceTargetNonNullTarget, ReferenceTargetNonNullTargets, ReferenceTargetNullableTarget, ReferenceTargetNullableTargets, Remove, RemoveAll, RemoveAnnotations, RemoveAnnotationsRaw, RemoveChildRaw, RemoveContainmentsRaw, RemoveInternal, RemoveOptionalMultipleContainment, RemoveOptionalMultipleReference, RemoveReferencesRaw, RemoveRequiredMultipleContainment, RemoveRequiredMultipleReference, RemoveSelfParent, RemoveSelfParentRaw, result, Set, SetContainmentRaw, SetInternal, SetInternalAnnotation, SetName, SetNameRaw, SetOptionalMultipleContainment, SetOptionalMultipleReference, SetOptionalReferenceTypeProperty, SetOptionalSingleContainment, SetOptionalSingleReference, SetOptionalValueTypeProperty, SetParentInternal, SetParentNull, SetPropertyRaw, SetRaw, SetReferenceRaw, SetReferencesRaw, SetRequiredMultipleContainment, SetRequiredMultipleReference, SetRequiredReferenceTypeProperty, SetRequiredSingleContainment, SetRequiredSingleReference, SetRequiredValueTypeProperty, SetSelfParent, SetSelfParentRaw, String, StructuredDataType, StructuredDataTypeBase, System, ToString_, TryGet_, TryGetContainmentRaw_, TryGetContainmentsRaw_, TryGetName_, TryGetPropertyRaw_, TryGetReference, TryGetReferenceRaw_, TryGetReferencesRaw_, Type, UnsetFeatureException, UnsetFieldException, UnsupportedClassifierException, UnsupportedEnumerationLiteralException, UnsupportedStructuredDataTypeException, Utilities, V2023_1, V2024_1, V2024_1_Compatible, V2026_1, V2026_1_Compatible, VersionSpecific];
 	/// <inheritdoc/>
         public override IReadOnlyList<global::LionWeb.Core.M3.Language> DependsOn => [];
 
@@ -900,11 +900,11 @@ public partial class LanguageWithLionWebNamedConceptsLanguage : LanguageBase<ILa
 	private readonly Lazy<global::LionWeb.Core.M3.Concept> _v2024_1_Compatible;
 	public global::LionWeb.Core.M3.Concept V2024_1_Compatible => _v2024_1_Compatible.Value;
 
-	private readonly Lazy<global::LionWeb.Core.M3.Concept> _v2025_1;
-	public global::LionWeb.Core.M3.Concept V2025_1 => _v2025_1.Value;
+	private readonly Lazy<global::LionWeb.Core.M3.Concept> _v2026_1;
+	public global::LionWeb.Core.M3.Concept V2026_1 => _v2026_1.Value;
 
-	private readonly Lazy<global::LionWeb.Core.M3.Concept> _v2025_1_Compatible;
-	public global::LionWeb.Core.M3.Concept V2025_1_Compatible => _v2025_1_Compatible.Value;
+	private readonly Lazy<global::LionWeb.Core.M3.Concept> _v2026_1_Compatible;
+	public global::LionWeb.Core.M3.Concept V2026_1_Compatible => _v2026_1_Compatible.Value;
 
 	private readonly Lazy<global::LionWeb.Core.M3.Concept> _versionSpecific;
 	public global::LionWeb.Core.M3.Concept VersionSpecific => _versionSpecific.Value;
@@ -1342,10 +1342,10 @@ public partial interface ILanguageWithLionWebNamedConceptsFactory : global::Lion
 	public V2024_1 CreateV2024_1();
 	public V2024_1_Compatible NewV2024_1_Compatible(string id);
 	public V2024_1_Compatible CreateV2024_1_Compatible();
-	public V2025_1 NewV2025_1(string id);
-	public V2025_1 CreateV2025_1();
-	public V2025_1_Compatible NewV2025_1_Compatible(string id);
-	public V2025_1_Compatible CreateV2025_1_Compatible();
+	public V2026_1 NewV2026_1(string id);
+	public V2026_1 CreateV2026_1();
+	public V2026_1_Compatible NewV2026_1_Compatible(string id);
+	public V2026_1_Compatible CreateV2026_1_Compatible();
 	public VersionSpecific NewVersionSpecific(string id);
 	public VersionSpecific CreateVersionSpecific();
 }
@@ -1791,10 +1791,10 @@ public class LanguageWithLionWebNamedConceptsFactory : global::LionWeb.Core.M2.A
 			return NewV2024_1(id);
 		if (_language.V2024_1_Compatible.EqualsIdentity(classifier))
 			return NewV2024_1_Compatible(id);
-		if (_language.V2025_1.EqualsIdentity(classifier))
-			return NewV2025_1(id);
-		if (_language.V2025_1_Compatible.EqualsIdentity(classifier))
-			return NewV2025_1_Compatible(id);
+		if (_language.V2026_1.EqualsIdentity(classifier))
+			return NewV2026_1(id);
+		if (_language.V2026_1_Compatible.EqualsIdentity(classifier))
+			return NewV2026_1_Compatible(id);
 		if (_language.VersionSpecific.EqualsIdentity(classifier))
 			return NewVersionSpecific(id);
 		throw new global::LionWeb.Core.UnsupportedClassifierException(classifier);
@@ -2242,10 +2242,10 @@ public class LanguageWithLionWebNamedConceptsFactory : global::LionWeb.Core.M2.A
 	public virtual V2024_1 CreateV2024_1() => NewV2024_1(GetNewId());
 	public virtual V2024_1_Compatible NewV2024_1_Compatible(string id) => new(id);
 	public virtual V2024_1_Compatible CreateV2024_1_Compatible() => NewV2024_1_Compatible(GetNewId());
-	public virtual V2025_1 NewV2025_1(string id) => new(id);
-	public virtual V2025_1 CreateV2025_1() => NewV2025_1(GetNewId());
-	public virtual V2025_1_Compatible NewV2025_1_Compatible(string id) => new(id);
-	public virtual V2025_1_Compatible CreateV2025_1_Compatible() => NewV2025_1_Compatible(GetNewId());
+	public virtual V2026_1 NewV2026_1(string id) => new(id);
+	public virtual V2026_1 CreateV2026_1() => NewV2026_1(GetNewId());
+	public virtual V2026_1_Compatible NewV2026_1_Compatible(string id) => new(id);
+	public virtual V2026_1_Compatible CreateV2026_1_Compatible() => NewV2026_1_Compatible(GetNewId());
 	public virtual VersionSpecific NewVersionSpecific(string id) => new(id);
 	public virtual VersionSpecific CreateVersionSpecific() => NewVersionSpecific(GetNewId());
 }
@@ -4615,26 +4615,26 @@ public partial class V2024_1_Compatible : global::LionWeb.Core.ConceptInstanceBa
         public override global::LionWeb.Core.M3.Concept GetConcept() => LanguageWithLionWebNamedConceptsLanguage.Instance.V2024_1_Compatible;
 }
 
-[global::LionWeb.Core.M2.LionCoreMetaPointer(Language = typeof(LanguageWithLionWebNamedConceptsLanguage), Key = "key-V2025_1")]
-public partial class V2025_1 : global::LionWeb.Core.ConceptInstanceBase
+[global::LionWeb.Core.M2.LionCoreMetaPointer(Language = typeof(LanguageWithLionWebNamedConceptsLanguage), Key = "key-V2026_1")]
+public partial class V2026_1 : global::LionWeb.Core.ConceptInstanceBase
 {
-	public V2025_1(string id) : base(id)
+	public V2026_1(string id) : base(id)
 	{
 	}
 
 	/// <inheritdoc/>
-        public override global::LionWeb.Core.M3.Concept GetConcept() => LanguageWithLionWebNamedConceptsLanguage.Instance.V2025_1;
+        public override global::LionWeb.Core.M3.Concept GetConcept() => LanguageWithLionWebNamedConceptsLanguage.Instance.V2026_1;
 }
 
-[global::LionWeb.Core.M2.LionCoreMetaPointer(Language = typeof(LanguageWithLionWebNamedConceptsLanguage), Key = "key-V2025_1_Compatible")]
-public partial class V2025_1_Compatible : global::LionWeb.Core.ConceptInstanceBase
+[global::LionWeb.Core.M2.LionCoreMetaPointer(Language = typeof(LanguageWithLionWebNamedConceptsLanguage), Key = "key-V2026_1_Compatible")]
+public partial class V2026_1_Compatible : global::LionWeb.Core.ConceptInstanceBase
 {
-	public V2025_1_Compatible(string id) : base(id)
+	public V2026_1_Compatible(string id) : base(id)
 	{
 	}
 
 	/// <inheritdoc/>
-        public override global::LionWeb.Core.M3.Concept GetConcept() => LanguageWithLionWebNamedConceptsLanguage.Instance.V2025_1_Compatible;
+        public override global::LionWeb.Core.M3.Concept GetConcept() => LanguageWithLionWebNamedConceptsLanguage.Instance.V2026_1_Compatible;
 }
 
 [global::LionWeb.Core.M2.LionCoreMetaPointer(Language = typeof(LanguageWithLionWebNamedConceptsLanguage), Key = "key-VersionSpecific")]

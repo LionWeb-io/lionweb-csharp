@@ -29,7 +29,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
     {
         await _aClient.SignOn(RepoId);
         
-        var partitions = await _aClient.ListPartitions();
+        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
         Assert.AreEqual(0, partitions.Count);
     }
 
@@ -42,7 +42,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         var part0 = new Geometry("partition");
         _aForest.AddPartitions([part0]);
         _aClient.WaitForReceived(1);
-        var partitions = await _aClient.ListPartitions();
+        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
         Assert.HasCount(1, partitions);
 
         AssertEquals(part0, partitions[0]);
@@ -65,7 +65,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SubscribeToPartitionContents(part1.GetId());
         WaitForReceived(1);
 
-        var partitions = await _aClient.ListPartitions();
+        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
         Assert.HasCount(2, partitions);
 
         AssertEquals(part0, partitions[0]);
@@ -88,7 +88,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         _aForest.AddPartitions([part0]);
         _aClient.WaitForReceived(1);
 
-        var partitions = await _aClient.ListPartitions();
+        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
         Assert.HasCount(1, partitions);
         var actual = (TestPartition)partitions[0];
 

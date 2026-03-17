@@ -88,7 +88,7 @@ public class DeltaEventToNotificationMapper
         if (deletedNode is null or IPartitionInstance)
             return new PartitionDeletedNotification((IPartitionInstance)deletedNode!, ToNotificationId(partitionDeleted));
 
-        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.ProtocolMessages, deletedNode));
+        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.AdditionalInfos, deletedNode));
     }
 
     #endregion
@@ -369,7 +369,7 @@ public class DeltaEventToNotificationMapper
             parent,
             reference,
             referenceAddedEvent.Index,
-            ToTarget(referenceAddedEvent.NewTarget, referenceAddedEvent.NewResolveInfo),
+            ToTarget(referenceAddedEvent.NewReference, referenceAddedEvent.NewResolveInfo),
             ToNotificationId(referenceAddedEvent)
         );
     }
@@ -382,7 +382,7 @@ public class DeltaEventToNotificationMapper
             parent,
             reference,
             referenceDeletedEvent.Index,
-            ToTarget(referenceDeletedEvent.DeletedTarget, referenceDeletedEvent.DeletedResolveInfo),
+            ToTarget(referenceDeletedEvent.DeletedReference, referenceDeletedEvent.DeletedResolveInfo),
             ToNotificationId(referenceDeletedEvent)
         );
     }
@@ -395,8 +395,8 @@ public class DeltaEventToNotificationMapper
             parent,
             reference,
             referenceChangedEvent.Index,
-            ToTarget(referenceChangedEvent.NewTarget, referenceChangedEvent.NewResolveInfo),
-            ToTarget(referenceChangedEvent.OldTarget, referenceChangedEvent.OldResolveInfo),
+            ToTarget(referenceChangedEvent.NewReference, referenceChangedEvent.NewResolveInfo),
+            ToTarget(referenceChangedEvent.OldReference, referenceChangedEvent.OldResolveInfo),
             ToNotificationId(referenceChangedEvent)
         );
     }

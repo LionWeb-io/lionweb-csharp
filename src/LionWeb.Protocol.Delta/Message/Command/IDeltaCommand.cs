@@ -30,8 +30,8 @@ public interface IDeltaCommand : IDeltaContent
 
 public abstract record DeltaCommandBase(
     CommandId? CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaContentBase(ProtocolMessages), IDeltaCommand
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaContentBase(AdditionalInfos), IDeltaCommand
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -80,8 +80,8 @@ public abstract record DeltaCommandBase(
 public record CompositeCommand(
     IDeltaCommand[] Parts,
     CommandId CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IDeltaCommand
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaCommandBase(CommandId, AdditionalInfos), IDeltaCommand
 {
     /// <inheritdoc />
     public virtual bool Equals(CompositeCommand? other)

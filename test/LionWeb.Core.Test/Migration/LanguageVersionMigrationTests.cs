@@ -23,7 +23,7 @@ using Languages.Generated.V2024_1.SDTLang;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using System.Text;
-using SDTLangLanguage = Languages.Generated.V2025_1.SDTLang.SDTLangLanguage;
+using SDTLangLanguage = Languages.Generated.V2026_1.SDTLang.SDTLangLanguage;
 
 [TestClass]
 public class LanguageVersionMigrationTests

@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.NodeApi.Dynamic;
 
 using Languages.Generated.V2024_1.Multi.M2;
 using Languages.Generated.V2024_1.Shapes.M2;
-using Languages.Generated.V2025_1.Circular.A;
+using Languages.Generated.V2026_1.Circular.A;
 using M3;
 
 [TestClass]

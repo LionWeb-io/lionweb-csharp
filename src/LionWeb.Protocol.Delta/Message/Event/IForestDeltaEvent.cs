@@ -27,7 +27,7 @@ public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
     TargetNode AffectedNode,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IForestDeltaEvent
 {
     /// <remarks>Don't delete: We need the <see cref="JsonIgnoreAttribute"/></remarks>
     [JsonIgnore]
@@ -62,7 +62,7 @@ public record PartitionDeleted(
     TargetNode DeletedPartition,
     TargetNode[] DeletedDescendants,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IForestDeltaEvent
 {
     /// <inheritdoc />
     [JsonIgnore]

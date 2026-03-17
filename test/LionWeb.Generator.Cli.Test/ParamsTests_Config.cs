@@ -389,6 +389,6 @@ public class ParamsTests_Config : ParamsTestsBase
         
         Assert.Contains(c => c.LionWebVersion == LionWebVersions.v2023_1.VersionString, generator.Configurations);
         Assert.Contains(c => c.LionWebVersion == LionWebVersions.v2024_1.VersionString, generator.Configurations);
-        Assert.Contains(c => c.LionWebVersion == LionWebVersions.v2025_1.VersionString, generator.Configurations);
+        Assert.Contains(c => c.LionWebVersion == LionWebVersions.v2026_1.VersionString, generator.Configurations);
     }
 }

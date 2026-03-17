@@ -26,6 +26,8 @@ using Message.Query;
 
 public abstract class JsonTestsBase
 {
+    private const int _defaultDepthLimit = 9;
+    
     private static int _nextNodeId;
     private static int _nextKey;
     private static int _nextPropertyValue;
@@ -50,50 +52,50 @@ public abstract class JsonTestsBase
     #region Query
 
     protected static SubscribeToChangingPartitionsRequest CreateSubscribeToChangingPartitionsRequest() =>
-        new(true, false, false, QueryId(), ProtocolMessages());
+        new(true, false, QueryId(), AdditionalInfos());
 
     protected static SubscribeToChangingPartitionsResponse CreateSubscribeToChangingPartitionsResponse() =>
-        new(QueryId(), ProtocolMessages());
+        new(QueryId(), AdditionalInfos());
 
     protected static SubscribeToPartitionContentsRequest CreateSubscribeToPartitionContentsRequest() =>
-        new(TargetNode(), QueryId(), ProtocolMessages());
+        new(TargetNode(), QueryId(), AdditionalInfos());
 
     protected static SubscribeToPartitionContentsResponse CreateSubscribeToPartitionContentsResponse() =>
-        new(Chunk(), QueryId(), ProtocolMessages());
+        new(Chunk(), QueryId(), AdditionalInfos());
 
     protected static UnsubscribeFromPartitionContentsRequest CreateUnsubscribeFromPartitionContentsRequest() =>
-        new(TargetNode(), QueryId(), ProtocolMessages());
+        new(TargetNode(), QueryId(), AdditionalInfos());
 
     protected static UnsubscribeFromPartitionContentsResponse CreateUnsubscribeFromPartitionContentsResponse() =>
-        new(QueryId(), ProtocolMessages());
+        new(QueryId(), AdditionalInfos());
 
-    protected static GetAvailableIdsRequest CreateGetAvailableIdsRequest() => new(3, QueryId(), ProtocolMessages());
+    protected static GetAvailableIdsRequest CreateGetAvailableIdsRequest() => new(3, QueryId(), AdditionalInfos());
 
     protected static GetAvailableIdsResponse CreateGetAvailableIdsResponse() =>
-        new([TargetNode(), TargetNode()], QueryId(), ProtocolMessages());
+        new([TargetNode(), TargetNode()], QueryId(), AdditionalInfos());
 
-    protected static ListPartitionsRequest CreateListPartitionsRequest() => new(QueryId(), ProtocolMessages());
+    protected static ListPartitionsRequest CreateListPartitionsRequest() => new(_defaultDepthLimit, QueryId(), AdditionalInfos());
 
     protected static ListPartitionsResponse CreateListPartitionsResponse() =>
-        new(Chunk(), QueryId(), ProtocolMessages());
+        new(Chunk(), false, QueryId(), AdditionalInfos());
 
     protected static SignOnRequest CreateSignOnRequest() =>
-        new(LionWebVersions.v2025_1.VersionString, ClientId(), QueryId(), RepositoryId(), ProtocolMessages());
+        new(LionWebVersions.v2026_1.VersionString, ClientId(), QueryId(), RepositoryId(), AdditionalInfos());
 
     protected static SignOnResponse CreateSignOnResponse() =>
-        new(ParticipationId(), QueryId(), ProtocolMessages());
+        new(ParticipationId(), QueryId(), AdditionalInfos());
 
     protected static SignOffRequest CreateSignOffRequest() =>
-        new(QueryId(), ProtocolMessages());
+        new(QueryId(), AdditionalInfos());
 
     protected static SignOffResponse CreateSignOffResponse() =>
-        new(QueryId(), ProtocolMessages());
+        new(QueryId(), AdditionalInfos());
 
     protected static ReconnectRequest CreateReconnectRequest() =>
-        new(ParticipationId(), Sequence(), QueryId(), ProtocolMessages());
+        new(ParticipationId(), Sequence(), QueryId(), AdditionalInfos());
 
     protected static ReconnectResponse CreateReconnectResponse() =>
-        new(Sequence(), QueryId(), ProtocolMessages());
+        new(Sequence(), QueryId(), AdditionalInfos());
     
     protected static IEnumerable<object[]> CollectQueryMessages() =>
     [
@@ -122,98 +124,98 @@ public abstract class JsonTestsBase
     #region Partitions
 
     protected static AddPartition CreateAddPartition() =>
-        new(Chunk(), CommandId(), ProtocolMessages());
+        new(Chunk(), CommandId(), AdditionalInfos());
 
     protected static DeletePartition CreateDeletePartition() =>
-        new(TargetNode(), CommandId(), ProtocolMessages());
+        new(TargetNode(), CommandId(), AdditionalInfos());
 
     #endregion
 
     #region Nodes
 
     protected static ChangeClassifier CreateChangeClassifier() =>
-        new(TargetNode(), MetaPointer(), CommandId(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), CommandId(), AdditionalInfos());
 
     #endregion
 
     #region Properties
 
     protected static AddProperty CreateAddProperty() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), CommandId(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), PropertyValue(), CommandId(), AdditionalInfos());
 
     protected static DeleteProperty CreateDeleteProperty() =>
-        new(TargetNode(), MetaPointer(), CommandId(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), CommandId(), AdditionalInfos());
 
     protected static ChangeProperty CreateChangeProperty() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), CommandId(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), PropertyValue(), CommandId(), AdditionalInfos());
 
     #endregion
 
     #region Children
 
     protected static AddChild CreateAddChild() =>
-        new(TargetNode(), Chunk(), MetaPointer(), Index(), CommandId(), ProtocolMessages());
+        new(TargetNode(), Chunk(), MetaPointer(), Index(), CommandId(), AdditionalInfos());
 
     protected static DeleteChild CreateDeleteChild() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static ReplaceChild CreateReplaceChild() =>
         new(Chunk(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static MoveChildFromOtherContainment CreateMoveChildFromOtherContainment() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static MoveChildFromOtherContainmentInSameParent CreateMoveChildFromOtherContainmentInSameParent() =>
         new(MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static MoveChildInSameContainment CreateMoveChildInSameContainment() =>
-        new(Index(), TargetNode(), CommandId(), ProtocolMessages());
+        new(Index(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildFromOtherContainment CreateMoveAndReplaceChildFromOtherContainment() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            TargetNode(), CommandId(), ProtocolMessages());
+            TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildFromOtherContainmentInSameParent
         CreateMoveAndReplaceChildFromOtherContainmentInSameParent() =>
         new(MetaPointer(), Index(), TargetNode(),
-            TargetNode(), CommandId(), ProtocolMessages());
+            TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildInSameContainment CreateMoveAndReplaceChildInSameContainment() =>
         new(Index(), TargetNode(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     #endregion
 
     #region Annotations
 
     protected static AddAnnotation CreateAddAnnotation() =>
-        new(TargetNode(), Chunk(), Index(), CommandId(), ProtocolMessages());
+        new(TargetNode(), Chunk(), Index(), CommandId(), AdditionalInfos());
 
     protected static DeleteAnnotation CreateDeleteAnnotation() =>
-        new(TargetNode(), Index(), TargetNode(), CommandId(), ProtocolMessages());
+        new(TargetNode(), Index(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static ReplaceAnnotation CreateReplaceAnnotation() =>
         new(Chunk(), TargetNode(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static MoveAnnotationFromOtherParent CreateMoveAnnotationFromOtherParent() =>
         new(TargetNode(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static MoveAnnotationInSameParent CreateMoveAnnotationInSameParent() =>
-        new(Index(), TargetNode(), CommandId(), ProtocolMessages());
+        new(Index(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceAnnotationFromOtherParent CreateMoveAndReplaceAnnotationFromOtherParent() =>
         new(TargetNode(), Index(), TargetNode(), TargetNode(),
-            CommandId(), ProtocolMessages());
+            CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceAnnotationInSameParent CreateMoveAndReplaceAnnotationInSameParent() =>
         new(Index(), TargetNode(), TargetNode(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     #endregion
 
@@ -221,15 +223,15 @@ public abstract class JsonTestsBase
 
     protected static AddReference CreateAddReference() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static DeleteReference CreateDeleteReference() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
+            AdditionalInfos());
 
     protected static ChangeReference CreateChangeReference() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(),
-            ResolveInfo(), CommandId(), ProtocolMessages());
+            ResolveInfo(), CommandId(), AdditionalInfos());
 
     #endregion
 
@@ -239,7 +241,7 @@ public abstract class JsonTestsBase
             CreateDeleteChild(),
             CreateDeleteAnnotation(),
             CreateDeleteReference()
-        ], CommandId(), ProtocolMessages());
+        ], CommandId(), AdditionalInfos());
 
 
     protected static IEnumerable<object[]> CollectCommandMessages() =>
@@ -281,31 +283,31 @@ public abstract class JsonTestsBase
     protected static PartitionAdded CreatePartitionAdded()
     {
         var chunk = Chunk();
-        return new(chunk, chunk.Nodes.First().Id, Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        return new(chunk, chunk.Nodes.First().Id, Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
     }
 
     protected static PartitionDeleted CreatePartitionDeleted() =>
-        new(TargetNode(), Descendants(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new(TargetNode(), Descendants(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
 
     #region Nodes
 
     protected static ClassifierChanged CreateClassifierChanged() =>
-        new(TargetNode(), MetaPointer(), MetaPointer(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new(TargetNode(), MetaPointer(), MetaPointer(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
 
     #region Properties
 
     protected static PropertyAdded CreatePropertyAdded() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static PropertyDeleted CreatePropertyDeleted() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static PropertyChanged CreatePropertyChanged() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), PropertyValue(), Origin(), ProtocolMessages())
+        new(TargetNode(), MetaPointer(), PropertyValue(), PropertyValue(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
@@ -315,86 +317,86 @@ public abstract class JsonTestsBase
     #region Children
 
     protected static ChildAdded CreateChildAdded() =>
-        new(TargetNode(), Chunk(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        new(TargetNode(), Chunk(), MetaPointer(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static ChildDeleted CreateChildDeleted() =>
-        new(TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        new(TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static ChildReplaced CreateChildReplaced() =>
-        new(Chunk(), TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        new(Chunk(), TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static ChildMovedFromOtherContainment CreateChildMovedFromOtherContainment() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(),
-            ProtocolMessages()) { SequenceNumber = Sequence() };
+            AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static ChildMovedFromOtherContainmentInSameParent CreateChildMovedFromOtherContainmentInSameParent() =>
-        new(MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        new(MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static ChildMovedInSameContainment CreateChildMovedInSameContainment() =>
-        new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static ChildMovedAndReplacedFromOtherContainment CreateChildMovedAndReplacedFromOtherContainment() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(),
-            Descendants(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+            Descendants(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static ChildMovedAndReplacedFromOtherContainmentInSameParent
         CreateChildMovedAndReplacedFromOtherContainmentInSameParent() =>
         new(MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(),
-            Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+            Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static ChildMovedAndReplacedInSameContainment CreateChildMovedAndReplacedInSameContainment() =>
         new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(), Origin(),
-            ProtocolMessages()) { SequenceNumber = Sequence() };
+            AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
 
     #region Annotations
 
     protected static AnnotationAdded CreateAnnotationAdded() =>
-        new(TargetNode(), Chunk(), Index(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new(TargetNode(), Chunk(), Index(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static AnnotationDeleted CreateAnnotationDeleted() =>
-        new(TargetNode(), Descendants(), TargetNode(), Index(), Origin(), ProtocolMessages())
+        new(TargetNode(), Descendants(), TargetNode(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static AnnotationReplaced CreateAnnotationReplaced() =>
-        new(Chunk(), TargetNode(), Descendants(), TargetNode(), Index(), Origin(), ProtocolMessages())
+        new(Chunk(), TargetNode(), Descendants(), TargetNode(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static AnnotationMovedFromOtherParent CreateAnnotationMovedFromOtherParent() =>
-        new(TargetNode(), Index(), TargetNode(), TargetNode(), Index(), Origin(), ProtocolMessages())
+        new(TargetNode(), Index(), TargetNode(), TargetNode(), Index(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static AnnotationMovedInSameParent CreateAnnotationMovedInSameParent() =>
-        new(Index(), TargetNode(), TargetNode(), Index(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new(Index(), TargetNode(), TargetNode(), Index(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static AnnotationMovedAndReplacedFromOtherParent CreateAnnotationMovedAndReplacedFromOtherParent() =>
         new(TargetNode(), Index(), TargetNode(), TargetNode(), Index(), TargetNode(), Descendants(), Origin(),
-            ProtocolMessages()) { SequenceNumber = Sequence() };
+            AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static AnnotationMovedAndReplacedInSameParent CreateAnnotationMovedAndReplacedInSameParent() =>
-        new(Index(), TargetNode(), TargetNode(), Index(), TargetNode(), Descendants(), Origin(), ProtocolMessages())
+        new(Index(), TargetNode(), TargetNode(), Index(), TargetNode(), Descendants(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
@@ -404,20 +406,20 @@ public abstract class JsonTestsBase
     #region References
 
     protected static ReferenceAdded CreateReferenceAdded() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static ReferenceDeleted CreateReferenceDeleted() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
     protected static ReferenceChanged CreateReferenceChanged() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(), ResolveInfo(), Origin(),
-            ProtocolMessages()) { SequenceNumber = Sequence() };
+            AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
 
@@ -430,13 +432,13 @@ public abstract class JsonTestsBase
             CreateChildDeleted(),
             CreateAnnotationDeleted(),
             CreateReferenceDeleted()
-        ], ProtocolMessages()) { SequenceNumber = Sequence() };
+        ], AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static NoOpEvent CreateNoOpEvent() =>
-        new(Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new(Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static ErrorEvent CreateError() =>
-        new("myError", "very nice message", Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+        new("myError", "very nice message", Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
 
@@ -508,10 +510,10 @@ public abstract class JsonTestsBase
     private static NodeId CreateKey() =>
         (++_nextKey).ToString();
 
-    protected static ProtocolMessage[] ProtocolMessages() =>
+    protected static AdditionalInfo[] AdditionalInfos() =>
     [
-        new ProtocolMessage("MyKind", "MyMessage",
-            [new ProtocolMessageData("key0", "value0"), new ProtocolMessageData("key1", "value1")]
+        new AdditionalInfo("MyKind", "MyMessage",
+            [new AdditionalInfoData("key0", "value0"), new AdditionalInfoData("key1", "value1")]
         )
     ];
 
