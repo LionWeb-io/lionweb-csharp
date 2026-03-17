@@ -31,6 +31,7 @@ using Delta.Repository;
 public abstract class RepositoryTestsBase
 {
     protected const RepositoryId RepoId = "myRepo";
+    protected const int DefaultDepthLimit = 7;
     
     private readonly IForest _repositoryForest;
     protected readonly LionWebTestRepository _repository;

@@ -274,12 +274,14 @@ public record GetAvailableIdsResponse(
 #region ListPartitions
 
 public record ListPartitionsRequest(
+    DepthLimit DepthLimit,
     QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
 
 public record ListPartitionsResponse(
     DeltaSerializationChunk Partitions,
+    SplitFlag Split,
     QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse;

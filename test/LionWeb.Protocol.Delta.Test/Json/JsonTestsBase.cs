@@ -26,6 +26,8 @@ using Message.Query;
 
 public abstract class JsonTestsBase
 {
+    private const int _defaultDepthLimit = 9;
+    
     private static int _nextNodeId;
     private static int _nextKey;
     private static int _nextPropertyValue;
@@ -72,10 +74,10 @@ public abstract class JsonTestsBase
     protected static GetAvailableIdsResponse CreateGetAvailableIdsResponse() =>
         new([TargetNode(), TargetNode()], QueryId(), AdditionalInfos());
 
-    protected static ListPartitionsRequest CreateListPartitionsRequest() => new(QueryId(), AdditionalInfos());
+    protected static ListPartitionsRequest CreateListPartitionsRequest() => new(_defaultDepthLimit, QueryId(), AdditionalInfos());
 
     protected static ListPartitionsResponse CreateListPartitionsResponse() =>
-        new(Chunk(), QueryId(), AdditionalInfos());
+        new(Chunk(), false, QueryId(), AdditionalInfos());
 
     protected static SignOnRequest CreateSignOnRequest() =>
         new(LionWebVersions.v2025_1.VersionString, ClientId(), QueryId(), RepositoryId(), AdditionalInfos());

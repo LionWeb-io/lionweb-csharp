@@ -250,10 +250,10 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             new GetAvailableIdsRequest(count, QueryId(), null));
 
     /// <inheritdoc />
-    public override async Task<List<IPartitionInstance>> ListPartitions()
+    public override async Task<List<IPartitionInstance>> ListPartitions(DepthLimit depthLimit)
     {
         var response =
-            await Query<ListPartitionsResponse, ListPartitionsRequest>(new ListPartitionsRequest(QueryId(), null));
+            await Query<ListPartitionsResponse, ListPartitionsRequest>(new ListPartitionsRequest(depthLimit, QueryId(), null));
         Log($"ListPartitions response: {response}");
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
