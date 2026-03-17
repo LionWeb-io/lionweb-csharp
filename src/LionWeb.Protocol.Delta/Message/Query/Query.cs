@@ -90,7 +90,6 @@ public interface ISubscriptionDeltaQuery : IDeltaQuery;
 public record SubscribeToChangingPartitionsRequest(
     bool Creation,
     bool Deletion,
-    bool Partitions,
     QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;

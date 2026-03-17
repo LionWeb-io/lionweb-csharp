@@ -59,7 +59,7 @@ public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        await _bClient.SubscribeToChangingPartitions(true, true, true);
+        await _bClient.SubscribeToChangingPartitions(true, true);
         
         _aForest.AddPartitions([new Geometry("geo")]);
         WaitForReceived(1);

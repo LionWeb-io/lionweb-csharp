@@ -115,7 +115,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToChangingPartitionsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToChangingPartitionsResponse"/></returns>
-    public abstract Task SubscribeToChangingPartitions(bool creation, bool deletion, bool partitions);
+    public abstract Task SubscribeToChangingPartitions(bool creation, bool deletion);
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsResponse"/></returns>

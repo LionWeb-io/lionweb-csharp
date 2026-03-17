@@ -86,7 +86,7 @@ public class RepositorySignOnTests : RepositoryTestsBase
     {
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
-        await _bClient.SubscribeToChangingPartitions(true, true, true);
+        await _bClient.SubscribeToChangingPartitions(true, true);
         
         var participationId = _aClient.ParticipationId;
 

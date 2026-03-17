@@ -52,7 +52,7 @@ public abstract class JsonTestsBase
     #region Query
 
     protected static SubscribeToChangingPartitionsRequest CreateSubscribeToChangingPartitionsRequest() =>
-        new(true, false, false, QueryId(), AdditionalInfos());
+        new(true, false, QueryId(), AdditionalInfos());
 
     protected static SubscribeToChangingPartitionsResponse CreateSubscribeToChangingPartitionsResponse() =>
         new(QueryId(), AdditionalInfos());

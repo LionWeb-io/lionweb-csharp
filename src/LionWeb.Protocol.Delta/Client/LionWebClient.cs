@@ -173,9 +173,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     /// <inheritdoc />
     public override async Task<SubscribeToChangingPartitionsResponse> SubscribeToChangingPartitions(bool creation,
-        bool deletion, bool partitions) =>
+        bool deletion) =>
         await Query<SubscribeToChangingPartitionsResponse, SubscribeToChangingPartitionsRequest>(
-            new SubscribeToChangingPartitionsRequest(creation, deletion, partitions, QueryId(), null));
+            new SubscribeToChangingPartitionsRequest(creation, deletion, QueryId(), null));
 
 
     /// <inheritdoc />

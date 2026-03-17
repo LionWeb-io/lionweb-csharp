@@ -216,7 +216,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     {
         clientInfo.NotifyAboutParitionCreation = subscribeToChangingPartitionsRequest.Creation;
         clientInfo.NotifyAboutParitionDeletion = subscribeToChangingPartitionsRequest.Deletion;
-        clientInfo.SubscribeCreatedParitions = subscribeToChangingPartitionsRequest.Partitions;
+        clientInfo.SubscribeCreatedParitions = subscribeToChangingPartitionsRequest.Creation;
 
         return new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
     }
