@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - tbd
+### Added
+### Fixed
+### Changed
+* renamed ProtocolMessage -> AdditionalInfo [#430](https://github.com/LionWeb-io/specification/issues/430)
+* renamed properties xxxTarget -> xxxReference in Reference-related delta messages
+* added ListPartitions parameters depthLimit + split
+* renamed LionWeb 2025.1 -> 2026.1
+
+### Removed
+* removed SubscribeToChangingPartitions partitions parameter [#425](https://github.com/LionWeb-io/specification/issues/425)
+
+### Deprecated
+### Security
 
 ## [0.4.0] - 2026-01-21
 ### Added
