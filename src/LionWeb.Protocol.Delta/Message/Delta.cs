@@ -75,10 +75,10 @@ public record DeltaSerializationChunk(SerializedNode[] Nodes)
     }
 }
 
-public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageData[]? Data)
+public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoData[]? Data)
 {
     /// <inheritdoc />
-    public virtual bool Equals(ProtocolMessage? other)
+    public virtual bool Equals(AdditionalInfo? other)
     {
         if (other is null)
         {
@@ -125,10 +125,10 @@ public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageD
     }
 }
 
-public record ProtocolMessageData(MessageDataKey Key, string Value)
+public record AdditionalInfoData(AdditionalInfoDataKey Key, string Value)
 {
     /// <inheritdoc />
-    public virtual bool Equals(ProtocolMessageData? other)
+    public virtual bool Equals(AdditionalInfoData? other)
     {
         if (other is null)
         {
@@ -162,7 +162,7 @@ public interface IDeltaError
 
 public interface IDeltaContent
 {
-    ProtocolMessage[]? ProtocolMessages { get; }
+    AdditionalInfo[]? AdditionalInfos { get; }
 
     [JsonIgnore]
     ParticipationId InternalParticipationId { get; set; }
@@ -174,7 +174,7 @@ public interface IDeltaContent
     string Id { get; }
 }
 
-public abstract record DeltaContentBase(ProtocolMessage[]? ProtocolMessages) : IDeltaContent
+public abstract record DeltaContentBase(AdditionalInfo[]? AdditionalInfos) : IDeltaContent
 {
     [JsonIgnore]
     public ParticipationId InternalParticipationId { get; set; }
@@ -182,7 +182,7 @@ public abstract record DeltaContentBase(ProtocolMessage[]? ProtocolMessages) : I
     [JsonIgnore]
     public abstract string Id { get; }
 
-    public virtual ProtocolMessage[]? ProtocolMessages { get; init; } = ProtocolMessages;
+    public virtual AdditionalInfo[]? AdditionalInfos { get; init; } = AdditionalInfos;
 
     /// <inheritdoc />
     public virtual bool Equals(DeltaContentBase? other)
@@ -197,22 +197,22 @@ public abstract record DeltaContentBase(ProtocolMessage[]? ProtocolMessages) : I
             return true;
         }
 
-        return ProtocolMessages.ArrayEquals(other.ProtocolMessages);
+        return AdditionalInfos.ArrayEquals(other.AdditionalInfos);
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
-        hashCode.ArrayHashCode(ProtocolMessages);
+        hashCode.ArrayHashCode(AdditionalInfos);
         return hashCode.ToHashCode();
     }
 
     protected virtual bool PrintMembers(StringBuilder builder)
     {
-        builder.Append(nameof(ProtocolMessages));
+        builder.Append(nameof(AdditionalInfos));
         builder.Append(" = ");
-        builder.ArrayPrintMembers(ProtocolMessages);
+        builder.ArrayPrintMembers(AdditionalInfos);
 
         return true;
     }

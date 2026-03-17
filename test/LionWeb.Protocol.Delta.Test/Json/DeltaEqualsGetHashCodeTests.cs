@@ -32,9 +32,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void AddProperty_Different_Self()
     {
         var a = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
         var b = new AddProperty("b", new MetaPointer("myLang", "v0", "key"), "x", "aa",
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -44,9 +44,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void AddProperty_Different_Generic()
     {
         var a = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
         var b = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
-            CreateProtocolMessages("msgB"));
+            CreateAdditionalInfos("msgB"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -56,9 +56,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void AddProperty_Same()
     {
         var a = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
         var b = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
@@ -68,11 +68,11 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void CompositeCommand_Different_Self()
     {
         var a = new CompositeCommand([
-            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], "cc", CreateProtocolMessages("msgAA"));
+            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateAdditionalInfos("msgA")),
+        ], "cc", CreateAdditionalInfos("msgAA"));
         var b = new CompositeCommand([
-            new DeleteProperty("b", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], "cc", CreateProtocolMessages("msgAA"));
+            new DeleteProperty("b", new MetaPointer("myLang", "v0", "key"), "x", CreateAdditionalInfos("msgA")),
+        ], "cc", CreateAdditionalInfos("msgAA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -82,11 +82,11 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void CompositeCommand_Different_Generic()
     {
         var a = new CompositeCommand([
-            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], "cc", CreateProtocolMessages("msgAA"));
+            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateAdditionalInfos("msgA")),
+        ], "cc", CreateAdditionalInfos("msgAA"));
         var b = new CompositeCommand([
-            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], "cc", CreateProtocolMessages("msgBB"));
+            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateAdditionalInfos("msgA")),
+        ], "cc", CreateAdditionalInfos("msgBB"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -96,11 +96,11 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void CompositeCommand_Same()
     {
         var a = new CompositeCommand([
-            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], "cc", CreateProtocolMessages("msgAA"));
+            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateAdditionalInfos("msgA")),
+        ], "cc", CreateAdditionalInfos("msgAA"));
         var b = new CompositeCommand([
-            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], "cc", CreateProtocolMessages("msgAA"));
+            new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateAdditionalInfos("msgA")),
+        ], "cc", CreateAdditionalInfos("msgAA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
@@ -114,9 +114,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void PropertyAdded_Different_Self()
     {
         var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
         var b = new PropertyAdded("b", new MetaPointer("myLang", "v0", "key"), "vv",  [new CommandSource("x", "y")],
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -126,9 +126,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void PropertyAdded_Different_Generic()
     {
         var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
         var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("z", "y")],
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -138,9 +138,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     public void PropertyAdded_Same()
     {
         var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
         var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-            CreateProtocolMessages("msgA"));
+            CreateAdditionalInfos("msgA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
@@ -152,13 +152,13 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
         var a = new CompositeEvent(
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-                CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+                CreateAdditionalInfos("msgA")),
+        ], CreateAdditionalInfos("msgAA"));
         var b = new CompositeEvent(
         [
             new PropertyDeleted("b", new MetaPointer("myLang", "v0", "key"), "vv",  [new CommandSource("x", "y")],
-                CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+                CreateAdditionalInfos("msgA")),
+        ], CreateAdditionalInfos("msgAA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -170,13 +170,13 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
         var a = new CompositeEvent(
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-                CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+                CreateAdditionalInfos("msgA")),
+        ], CreateAdditionalInfos("msgAA"));
         var b = new CompositeEvent(
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "z")],
-                CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+                CreateAdditionalInfos("msgA")),
+        ], CreateAdditionalInfos("msgAA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -188,13 +188,13 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
         var a = new CompositeEvent(
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-                CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+                CreateAdditionalInfos("msgA")),
+        ], CreateAdditionalInfos("msgAA"));
         var b = new CompositeEvent(
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
-                CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+                CreateAdditionalInfos("msgA")),
+        ], CreateAdditionalInfos("msgAA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
@@ -207,8 +207,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void SubscribePartitionRequest_Different_Self()
     {
-        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
-        var b = new SubscribeToPartitionContentsRequest("b", "x", CreateProtocolMessages("msgA"));
+        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateAdditionalInfos("msgA"));
+        var b = new SubscribeToPartitionContentsRequest("b", "x", CreateAdditionalInfos("msgA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -217,8 +217,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void SubscribePartitionRequest_Different_Generic()
     {
-        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
-        var b = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgB"));
+        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateAdditionalInfos("msgA"));
+        var b = new SubscribeToPartitionContentsRequest("a", "x", CreateAdditionalInfos("msgB"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -227,8 +227,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void SubscribePartitionRequest_Same()
     {
-        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
-        var b = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
+        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateAdditionalInfos("msgA"));
+        var b = new SubscribeToPartitionContentsRequest("a", "x", CreateAdditionalInfos("msgA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
@@ -237,8 +237,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void ReconnectResponse_Different_Self()
     {
-        var a = new ReconnectResponse(1, "q", CreateProtocolMessages("msgA"));
-        var b = new ReconnectResponse(2, "q", CreateProtocolMessages("msgA"));
+        var a = new ReconnectResponse(1, "q", CreateAdditionalInfos("msgA"));
+        var b = new ReconnectResponse(2, "q", CreateAdditionalInfos("msgA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -247,8 +247,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void ReconnectResponse_Different_Generic()
     {
-        var a = new ReconnectResponse(1, "q", CreateProtocolMessages("msgA"));
-        var b = new ReconnectResponse(1, "q", CreateProtocolMessages("msgB"));
+        var a = new ReconnectResponse(1, "q", CreateAdditionalInfos("msgA"));
+        var b = new ReconnectResponse(1, "q", CreateAdditionalInfos("msgB"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -257,8 +257,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void ReconnectResponse_Same()
     {
-        var a = new ReconnectResponse(1, "q", CreateProtocolMessages("msgA"));
-        var b = new ReconnectResponse(1, "q", CreateProtocolMessages("msgA"));
+        var a = new ReconnectResponse(1, "q", CreateAdditionalInfos("msgA"));
+        var b = new ReconnectResponse(1, "q", CreateAdditionalInfos("msgA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
@@ -267,8 +267,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void GetAvailableIdsResponse_Different_Self()
     {
-        var a = new GetAvailableIdsResponse(["a", "b"], "q", CreateProtocolMessages("msgA"));
-        var b = new GetAvailableIdsResponse(["a"], "q", CreateProtocolMessages("msgA"));
+        var a = new GetAvailableIdsResponse(["a", "b"], "q", CreateAdditionalInfos("msgA"));
+        var b = new GetAvailableIdsResponse(["a"], "q", CreateAdditionalInfos("msgA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -277,8 +277,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void GetAvailableIdsResponse_Different_Generic()
     {
-        var a = new GetAvailableIdsResponse(["a", "b"], "q", CreateProtocolMessages("msgA"));
-        var b = new GetAvailableIdsResponse(["a", "b"], "q", CreateProtocolMessages("msgB"));
+        var a = new GetAvailableIdsResponse(["a", "b"], "q", CreateAdditionalInfos("msgA"));
+        var b = new GetAvailableIdsResponse(["a", "b"], "q", CreateAdditionalInfos("msgB"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -287,8 +287,8 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void GetAvailableIdsResponse_Same()
     {
-        var a = new GetAvailableIdsResponse(["a", "b"], "q", CreateProtocolMessages("msgA"));
-        var b = new GetAvailableIdsResponse(["a", "b"], "q", CreateProtocolMessages("msgA"));
+        var a = new GetAvailableIdsResponse(["a", "b"], "q", CreateAdditionalInfos("msgA"));
+        var b = new GetAvailableIdsResponse(["a", "b"], "q", CreateAdditionalInfos("msgA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
@@ -296,10 +296,10 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
 
     #endregion
 
-    private ProtocolMessage[] CreateProtocolMessages(string message) =>
+    private AdditionalInfo[] CreateAdditionalInfos(string message) =>
     [
-        new ProtocolMessage("MyKind", message,
-            [new ProtocolMessageData("key0", "value0"), new ProtocolMessageData("key1", "value1")]
+        new AdditionalInfo("MyKind", message,
+            [new AdditionalInfoData("key0", "value0"), new AdditionalInfoData("key1", "value1")]
         )
     ];
 }

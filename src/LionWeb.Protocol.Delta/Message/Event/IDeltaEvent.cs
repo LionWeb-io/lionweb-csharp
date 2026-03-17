@@ -38,7 +38,7 @@ public interface IDeltaEvent : IDeltaContent
 
 public abstract record DeltaEventBase(
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaContentBase(ProtocolMessages), IDeltaEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaContentBase(AdditionalInfos), IDeltaEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -105,7 +105,7 @@ public abstract record DeltaEventBase(
 public record CompositeEvent : DeltaEventBase, IDeltaEvent
 {
     public CompositeEvent(IDeltaEvent[] Parts,
-        ProtocolMessage[]? ProtocolMessages) : base(null, ProtocolMessages)
+        AdditionalInfo[]? AdditionalInfos) : base(null, AdditionalInfos)
     {
         this.Parts = Parts;
     }
@@ -163,9 +163,9 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
     {
         // do NOT call base.PrintMembers(), as we omit OriginCommands
 
-        builder.Append(nameof(ProtocolMessages));
+        builder.Append(nameof(AdditionalInfos));
         builder.Append(" = ");
-        builder.ArrayPrintMembers(ProtocolMessages);
+        builder.ArrayPrintMembers(AdditionalInfos);
 
         builder.Append(", ");
 
@@ -184,7 +184,7 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
 public record NoOpEvent(
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -195,7 +195,7 @@ public record ErrorEvent(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent, IDeltaError
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaEvent, IDeltaError
 {
     /// <inheritdoc />
     [JsonIgnore]

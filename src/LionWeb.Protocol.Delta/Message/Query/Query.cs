@@ -34,8 +34,8 @@ public interface IDeltaQueryResponse : IDeltaQuery;
 
 public abstract record DeltaQueryBase(
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaContentBase(ProtocolMessages)
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaContentBase(AdditionalInfos)
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -92,13 +92,13 @@ public record SubscribeToChangingPartitionsRequest(
     bool Deletion,
     bool Partitions,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryRequest;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record SubscribeToChangingPartitionsResponse(
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryResponse;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -107,14 +107,14 @@ public record SubscribeToChangingPartitionsResponse(
 public record SubscribeToPartitionContentsRequest(
     TargetNode Partition,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryRequest;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record SubscribeToPartitionContentsResponse(
     DeltaSerializationChunk Contents,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryResponse;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -123,13 +123,13 @@ public record SubscribeToPartitionContentsResponse(
 public record UnsubscribeFromPartitionContentsRequest(
     TargetNode Partition,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryRequest;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record UnsubscribeFromPartitionContentsResponse(
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryResponse;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -146,8 +146,8 @@ public record SignOnRequest(
     ClientId ClientId,
     QueryId QueryId,
     RepositoryId RepositoryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -157,8 +157,8 @@ public record SignOnRequest(
 public record SignOnResponse(
     ParticipationId ParticipationId,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -166,13 +166,13 @@ public record SignOnResponse(
 
 public record SignOffRequest(
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest;
 
 public record SignOffResponse(
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryResponse
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -187,8 +187,8 @@ public record ReconnectRequest(
     ParticipationId ParticipationId,
     EventSequenceNumber LastReceivedSequenceNumber,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -198,8 +198,8 @@ public record ReconnectRequest(
 public record ReconnectResponse(
     EventSequenceNumber LastSentSequenceNumber,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryResponse
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -219,14 +219,14 @@ public interface IMiscellaneousDeltaQuery : IDeltaQuery;
 public record GetAvailableIdsRequest(
     int count,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
 
 public record GetAvailableIdsResponse(
     FreeId[] Ids,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryResponse
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse
 {
     /// <inheritdoc />
     public virtual bool Equals(GetAvailableIdsResponse? other)
@@ -275,14 +275,14 @@ public record GetAvailableIdsResponse(
 
 public record ListPartitionsRequest(
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
 
 public record ListPartitionsResponse(
     DeltaSerializationChunk Partitions,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryResponse;
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -292,8 +292,8 @@ public record ErrorResponse(
     ErrorCode ErrorCode,
     string Message,
     QueryId QueryId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaContentBase(ProtocolMessages), IDeltaQueryResponse, IDeltaError
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaContentBase(AdditionalInfos), IDeltaQueryResponse, IDeltaError
 {
     /// <inheritdoc />
     [JsonIgnore]

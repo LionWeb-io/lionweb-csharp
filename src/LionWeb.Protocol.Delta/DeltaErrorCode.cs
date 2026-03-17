@@ -46,10 +46,10 @@ public static class DeltaErrorCodeExtensions
     }, args);
 
     public static ErrorEvent AsError(this DeltaErrorCode errorCode, CommandSource[]? originCommands,
-        ProtocolMessage[]? protocolMessages, params object[] args) =>
-        new ErrorEvent(errorCode.ToString(), GetMessage(errorCode, args), originCommands, protocolMessages);
+        AdditionalInfo[]? additionalInfos, params object[] args) =>
+        new ErrorEvent(errorCode.ToString(), GetMessage(errorCode, args), originCommands, additionalInfos);
 
     public static ErrorResponse AsErrorResponse(this DeltaErrorCode errorCode, QueryId queryId,
-        ProtocolMessage[]? protocolMessages, params object[] args) =>
-        new ErrorResponse(errorCode.ToString(), GetMessage(errorCode, args), queryId, protocolMessages);
+        AdditionalInfo[]? additionalInfos, params object[] args) =>
+        new ErrorResponse(errorCode.ToString(), GetMessage(errorCode, args), queryId, additionalInfos);
 }

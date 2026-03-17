@@ -88,7 +88,7 @@ public class DeltaEventToNotificationMapper
         if (deletedNode is null or IPartitionInstance)
             return new PartitionDeletedNotification((IPartitionInstance)deletedNode!, ToNotificationId(partitionDeleted));
 
-        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.ProtocolMessages, deletedNode));
+        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.AdditionalInfos, deletedNode));
     }
 
     #endregion
