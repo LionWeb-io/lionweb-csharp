@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.4.1] - 2026-03-17
+## [0.4.2] - 2026-03-17
 ### Added
 ### Fixed
 ### Changed
@@ -17,6 +17,15 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Removed
 * removed SubscribeToChangingPartitions partitions parameter [#425](https://github.com/LionWeb-io/specification/issues/425)
 
+### Deprecated
+### Security
+
+## [0.4.1] - 2026-02-19
+### Added
+### Fixed
+* Generate proper Xdoc XML summary tags
+### Changed
+### Removed
 ### Deprecated
 ### Security
 
