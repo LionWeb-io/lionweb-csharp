@@ -45,7 +45,8 @@ public partial class TestLanguageLanguage : LanguageBase<ITestLanguageFactory>
 		_secondTestEnumeration_literal1 = new(() => new EnumerationLiteralBase<TestLanguageLanguage>("SecondTestEnumeration-literal1", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal1", Name = "literal1" });
 		_secondTestEnumeration_literal2 = new(() => new EnumerationLiteralBase<TestLanguageLanguage>("SecondTestEnumeration-literal2", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal2", Name = "literal2" });
 		_secondTestEnumeration_literal3 = new(() => new EnumerationLiteralBase<TestLanguageLanguage>("SecondTestEnumeration-literal3", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal3", Name = "literal3" });
-		_testAnnotation = new(() => new AnnotationBase<TestLanguageLanguage>("TestAnnotation", this) { Key = "TestAnnotation", Name = "TestAnnotation", AnnotatesLazy = new(() => _builtIns.Node), ImplementsLazy = new(() => [_builtIns.INamed]) });
+		_testAnnotation = new(() => new AnnotationBase<TestLanguageLanguage>("TestAnnotation", this) { Key = "TestAnnotation", Name = "TestAnnotation", AnnotatesLazy = new(() => _builtIns.Node), ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [TestAnnotation_ref]) });
+		_testAnnotation_ref = new(() => new ReferenceBase<TestLanguageLanguage>("TestAnnotation-ref", TestAnnotation, this) { Key = "TestAnnotation-ref", Name = "ref", Optional = false, Multiple = false, Type = _builtIns.Node });
 		_testEnumeration = new(() => new EnumerationBase<TestLanguageLanguage>("TestEnumeration", this) { Key = "TestEnumeration", Name = "TestEnumeration", LiteralsLazy = new(() => [TestEnumeration_literal1, TestEnumeration_literal2, TestEnumeration_literal3]) });
 		_testEnumeration_literal1 = new(() => new EnumerationLiteralBase<TestLanguageLanguage>("TestEnumeration-literal1", TestEnumeration, this) { Key = "TestEnumeration-literal1", Name = "literal1" });
 		_testEnumeration_literal2 = new(() => new EnumerationLiteralBase<TestLanguageLanguage>("TestEnumeration-literal2", TestEnumeration, this) { Key = "TestEnumeration-literal2", Name = "literal2" });
@@ -141,6 +142,9 @@ public partial class TestLanguageLanguage : LanguageBase<ITestLanguageFactory>
 
 	private readonly Lazy<Annotation> _testAnnotation;
 	public Annotation TestAnnotation => _testAnnotation.Value;
+
+	private readonly Lazy<Reference> _testAnnotation_ref;
+	public Reference TestAnnotation_ref => _testAnnotation_ref.Value;
 
 	private readonly Lazy<Enumeration> _testEnumeration;
 	public Enumeration TestEnumeration => _testEnumeration.Value;
@@ -1597,6 +1601,42 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		return this;
 	}
 
+	private ReferenceTarget? _ref = null;
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "TestAnnotation-ref")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	public IReadableNode Ref { get => ReferenceTargetNonNullTarget<IReadableNode>(_ref, TestLanguageLanguage.Instance.TestAnnotation_ref) ?? throw new UnsetFeatureException(TestLanguageLanguage.Instance.TestAnnotation_ref); set => SetRef(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+        public bool TryGetRef([NotNullWhenAttribute(true)] out IReadableNode? @ref)
+	{
+		@ref = ReferenceTargetNullableTarget<IReadableNode>(_ref, TestLanguageLanguage.Instance.TestAnnotation_ref);
+		return @ref != null;
+	}
+
+	private TestAnnotation SetRef(ReferenceTarget? value)
+	{
+		SetRequiredSingleReference<IReadableNode>(value, TestLanguageLanguage.Instance.TestAnnotation_ref, _ref, SetRefRaw);
+		return this;
+	}
+
+	private bool SetRefRaw(ReferenceTarget? value)
+	{
+		if (value == _ref)
+			return false;
+		_ref = value;
+		return true;
+	}
+
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public TestAnnotation SetRef(IReadableNode value)
+	{
+		return SetRef(ReferenceTarget.FromNodeOptional(value));
+	}
+
 	public TestAnnotation(string id) : base(id)
 	{
 	}
@@ -1614,6 +1654,12 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 			return true;
 		}
 
+		if (TestLanguageLanguage.Instance.TestAnnotation_ref.EqualsIdentity(feature))
+		{
+			result = Ref;
+			return true;
+		}
+
 		return false;
 	}
 
@@ -1624,6 +1670,19 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
 			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected override bool TryGetReferenceRaw(Reference feature, out IReferenceTarget? result)
+	{
+		if (base.TryGetReferenceRaw(feature, out result))
+			return true;
+		if (TestLanguageLanguage.Instance.TestAnnotation_ref.EqualsIdentity(feature))
+		{
+			result = _ref;
 			return true;
 		}
 
@@ -1646,6 +1705,23 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 			throw new InvalidValueException(feature, value);
 		}
 
+		if (TestLanguageLanguage.Instance.TestAnnotation_ref.EqualsIdentity(feature))
+		{
+			if (value is IReadableNode v)
+			{
+				SetRef(v);
+				return true;
+			}
+
+			if (value is ReferenceTarget target)
+			{
+				SetRef(target);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		return false;
 	}
 
@@ -1658,12 +1734,23 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		return false;
 	}
 
+	protected override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
+	{
+		if (base.SetReferenceRaw(feature, value))
+			return true;
+		if (TestLanguageLanguage.Instance.TestAnnotation_ref.EqualsIdentity(feature))
+			return SetRefRaw(value);
+		return false;
+	}
+
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (TryGetName(out _))
 			result.Add(_builtIns.INamed_name);
+		if (TryGetRef(out _))
+			result.Add(TestLanguageLanguage.Instance.TestAnnotation_ref);
 		return result;
 	}
 }

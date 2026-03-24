@@ -20,6 +20,7 @@ namespace LionWeb.Core.Test.Deserialization;
 using Core.Serialization;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M2;
 using M3;
@@ -524,5 +525,53 @@ public class DeserializationTests
         Assert.AreSame(v2, nodes[1].GetClassifier().GetLanguage());
         Assert.AreSame(v3, nodes[2].GetClassifier().GetLanguage());
         Assert.AreSame(v3, nodes[3].GetClassifier().GetLanguage());
+    }
+
+    [TestMethod]
+    public void referenceToM2()
+    {
+        SerializationChunk serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = _lionWebVersion.VersionString,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "TestLanguage", Version = "0" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("TestLanguage", "0", "TestAnnotation"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("TestLanguage", "0", "TestAnnotation-ref"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "DataTypeTestConcept-booleanValue_0_1" }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                }
+            ]
+        };
+
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(TestLanguageLanguage.Instance)
+            .WithLanguageReferences()
+            .Build()
+            .Deserialize(serializationChunk);
+        Assert.AreEqual(1, nodes.Count);
+        var node = nodes[0];
+        Assert.IsInstanceOfType<TestAnnotation>(node);
+        Assert.IsNull(node.GetParent());
+        Assert.AreSame(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, ((TestAnnotation)node).Ref);
     }
 }
