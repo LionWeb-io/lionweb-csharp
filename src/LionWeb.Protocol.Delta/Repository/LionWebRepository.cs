@@ -45,6 +45,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
                 .WithLanguages(languages)
+                .WithLanguageReferences()
                 .WithHandler(new DeltaDeserializerHandler(unresolvedReferencesManager))
             ;
 

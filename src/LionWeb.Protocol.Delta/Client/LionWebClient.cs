@@ -59,6 +59,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         _deserializerBuilder = new DeserializerBuilder()
             .WithLionWebVersion(lionWebVersion)
             .WithLanguages(languages)
+            .WithLanguageReferences()
             .WithHandler(new DeltaDeserializerHandler(unresolvedReferencesManager));
 
         forest.GetNotificationSender()?.ConnectTo(unresolvedReferencesManager);
@@ -258,6 +259,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
             .WithLanguages(_languages)
+            .WithLanguageReferences()
             .WithHandler(new NoFeaturesDeserializationHandler())
             .Build();
         return deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();

@@ -27,7 +27,8 @@ public class DeserializerBuilder
     private readonly HashSet<IReadableNode> _dependentNodes = new();
     private CompressedIdConfig _compressedIdConfig = new();
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
-    
+    private bool _languageReferences = false;
+
     /// <inheritdoc cref="WithLionWebVersion"/>
     public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
     
@@ -57,6 +58,13 @@ public class DeserializerBuilder
             WithLanguage(language);
         }
 
+        return this;
+    }
+
+    /// Enables references to language elements of <see cref="IDeserializer.RegisterInstantiatedLanguage">instantiated languages</see>.
+    public DeserializerBuilder WithLanguageReferences(bool languageReferences = true)
+    {
+        _languageReferences = languageReferences;
         return this;
     }
 
@@ -127,6 +135,10 @@ public class DeserializerBuilder
         }
 
         result.RegisterDependentNodes(_dependentNodes);
+
+        if (_languageReferences)
+            result.RegisterDependentNodes(_languages.Keys.SelectMany(k =>
+                M1Extensions.Descendants<IReadableNode>(k, true, true)));
 
         return result;
     }
