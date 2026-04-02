@@ -230,7 +230,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         {
             return new SubscribeToPartitionContentsResponse(
                 Serialize(M1Extensions.Descendants<IReadableNode>(partition, true, true)),
-                subscribeToPartitionContentsRequest.QueryId, null);
+                false, subscribeToPartitionContentsRequest.QueryId, null);
         }
 
         return DeltaErrorCode.UnknownPartition.AsErrorResponse(subscribeToPartitionContentsRequest.QueryId, null,

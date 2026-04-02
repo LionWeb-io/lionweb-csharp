@@ -136,6 +136,7 @@ public class NotificationToDeltaEventMapper
             ToDeltaChunk(childAddedNotification.NewChild),
             childAddedNotification.Containment.ToMetaPointer(),
             childAddedNotification.Index,
+            false,
             ToCommandSources(childAddedNotification),
             []
         );
@@ -159,6 +160,7 @@ public class NotificationToDeltaEventMapper
             childReplacedNotification.Parent.GetId(),
             childReplacedNotification.Containment.ToMetaPointer(),
             childReplacedNotification.Index,
+            false,
             ToCommandSources(childReplacedNotification),
             []
         );
@@ -244,6 +246,7 @@ public class NotificationToDeltaEventMapper
             annotationAddedNotification.Parent.GetId(),
             ToDeltaChunk(annotationAddedNotification.NewAnnotation),
             annotationAddedNotification.Index,
+            false,
             ToCommandSources(annotationAddedNotification),
             []
         );
@@ -265,6 +268,7 @@ public class NotificationToDeltaEventMapper
             ToDescendants(annotationReplacedNotification.ReplacedAnnotation),
             annotationReplacedNotification.Parent.GetId(),
             annotationReplacedNotification.Index,
+            false,
             ToCommandSources(annotationReplacedNotification),
             []
         );

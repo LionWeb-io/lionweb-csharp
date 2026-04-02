@@ -74,6 +74,7 @@ public class NotificationToDeltaCommandMapper
     private AddPartition OnPartitionAdded(PartitionAddedNotification partitionAddedNotification) =>
         new(
             ToDeltaChunk(partitionAddedNotification.NewPartition),
+            false,
             ToCommandId(partitionAddedNotification),
             []
         );
@@ -130,6 +131,7 @@ public class NotificationToDeltaCommandMapper
             ToDeltaChunk(childAddedNotification.NewChild),
             childAddedNotification.Containment.ToMetaPointer(),
             childAddedNotification.Index,
+            false,
             ToCommandId(childAddedNotification),
             []
         );
@@ -151,6 +153,7 @@ public class NotificationToDeltaCommandMapper
             childReplacedNotification.Containment.ToMetaPointer(),
             childReplacedNotification.Index,
             childReplacedNotification.ReplacedChild.GetId(),
+            false,
             ToCommandId(childReplacedNotification),
             []
         );
@@ -219,6 +222,7 @@ public class NotificationToDeltaCommandMapper
             annotationAddedNotification.Parent.GetId(),
             ToDeltaChunk(annotationAddedNotification.NewAnnotation),
             annotationAddedNotification.Index,
+            false,
             ToCommandId(annotationAddedNotification),
             []
         );
@@ -238,6 +242,7 @@ public class NotificationToDeltaCommandMapper
             annotationReplacedNotification.Parent.GetId(),
             annotationReplacedNotification.Index,
             annotationReplacedNotification.ReplacedAnnotation.GetId(),
+            false,
             ToCommandId(annotationReplacedNotification),
             []
         );

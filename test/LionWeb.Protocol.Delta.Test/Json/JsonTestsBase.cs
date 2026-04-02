@@ -35,6 +35,7 @@ public abstract class JsonTestsBase
     private static Index _nextIndex;
     private static int _nextQueryId;
     private static EventSequenceNumber _nextSequence;
+    private static ContinuedChunkSequenceNumber _nextChunkSequence;
     private static int _nextCommandId;
 
     protected JsonTestsBase()
@@ -61,7 +62,7 @@ public abstract class JsonTestsBase
         new(TargetNode(), QueryId(), AdditionalInfos());
 
     protected static SubscribeToPartitionContentsResponse CreateSubscribeToPartitionContentsResponse() =>
-        new(Chunk(), QueryId(), AdditionalInfos());
+        new(Chunk(), Split(), QueryId(), AdditionalInfos());
 
     protected static UnsubscribeFromPartitionContentsRequest CreateUnsubscribeFromPartitionContentsRequest() =>
         new(TargetNode(), QueryId(), AdditionalInfos());
@@ -77,7 +78,12 @@ public abstract class JsonTestsBase
     protected static ListPartitionsRequest CreateListPartitionsRequest() => new(_defaultDepthLimit, QueryId(), AdditionalInfos());
 
     protected static ListPartitionsResponse CreateListPartitionsResponse() =>
-        new(Chunk(), false, QueryId(), AdditionalInfos());
+        new(Chunk(), Split(), QueryId(), AdditionalInfos());
+
+    protected static ListAndSubscribePartitionsRequest CreateListAndSubscribePartitionsRequest() => new(QueryId(), AdditionalInfos());
+
+    protected static ListAndSubscribePartitionsResponse CreateListAndSubscribePartitionsResponse() =>
+        new(Chunk(), Split(), QueryId(), AdditionalInfos());
 
     protected static SignOnRequest CreateSignOnRequest() =>
         new(LionWebVersions.v2026_1.VersionString, ClientId(), QueryId(), RepositoryId(), AdditionalInfos());
@@ -96,6 +102,9 @@ public abstract class JsonTestsBase
 
     protected static ReconnectResponse CreateReconnectResponse() =>
         new(Sequence(), QueryId(), AdditionalInfos());
+
+    protected static ChunkedQueryResponse CreateChunkedQueryResponse() =>
+        new(Chunk(), true, ChunkSequence(), QueryId(), AdditionalInfos());
     
     protected static IEnumerable<object[]> CollectQueryMessages() =>
     [
@@ -109,12 +118,15 @@ public abstract class JsonTestsBase
         [CreateGetAvailableIdsResponse()],
         [CreateListPartitionsRequest()],
         [CreateListPartitionsResponse()],
+        [CreateListAndSubscribePartitionsRequest()],
+        [CreateListAndSubscribePartitionsResponse()],
         [CreateSignOnRequest()],
         [CreateSignOnResponse()],
         [CreateSignOffRequest()],
         [CreateSignOffResponse()],
         [CreateReconnectRequest()],
-        [CreateReconnectResponse()]
+        [CreateReconnectResponse()],
+        [CreateChunkedQueryResponse()]
     ];
 
     #endregion
@@ -124,7 +136,7 @@ public abstract class JsonTestsBase
     #region Partitions
 
     protected static AddPartition CreateAddPartition() =>
-        new(Chunk(), CommandId(), AdditionalInfos());
+        new(Chunk(), Split(), CommandId(), AdditionalInfos());
 
     protected static DeletePartition CreateDeletePartition() =>
         new(TargetNode(), CommandId(), AdditionalInfos());
@@ -154,14 +166,14 @@ public abstract class JsonTestsBase
     #region Children
 
     protected static AddChild CreateAddChild() =>
-        new(TargetNode(), Chunk(), MetaPointer(), Index(), CommandId(), AdditionalInfos());
+        new(TargetNode(), Chunk(), MetaPointer(), Index(), Split(), CommandId(), AdditionalInfos());
 
     protected static DeleteChild CreateDeleteChild() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
     protected static ReplaceChild CreateReplaceChild() =>
-        new(Chunk(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
+        new(Chunk(), TargetNode(), MetaPointer(), Index(), TargetNode(), Split(), CommandId(),
             AdditionalInfos());
 
     protected static MoveChildFromOtherContainment CreateMoveChildFromOtherContainment() =>
@@ -193,13 +205,13 @@ public abstract class JsonTestsBase
     #region Annotations
 
     protected static AddAnnotation CreateAddAnnotation() =>
-        new(TargetNode(), Chunk(), Index(), CommandId(), AdditionalInfos());
+        new(TargetNode(), Chunk(), Index(), Split(), CommandId(), AdditionalInfos());
 
     protected static DeleteAnnotation CreateDeleteAnnotation() =>
         new(TargetNode(), Index(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static ReplaceAnnotation CreateReplaceAnnotation() =>
-        new(Chunk(), TargetNode(), Index(), TargetNode(), CommandId(),
+        new(Chunk(), TargetNode(), Index(), TargetNode(), Split(), CommandId(),
             AdditionalInfos());
 
     protected static MoveAnnotationFromOtherParent CreateMoveAnnotationFromOtherParent() =>
@@ -243,6 +255,8 @@ public abstract class JsonTestsBase
             CreateDeleteReference()
         ], CommandId(), AdditionalInfos());
 
+    protected static ChunkedCommand CreateChunkedCommand() =>
+        new(Chunk(), false, ChunkSequence(), CommandId(), AdditionalInfos());
 
     protected static IEnumerable<object[]> CollectCommandMessages() =>
     [
@@ -271,7 +285,8 @@ public abstract class JsonTestsBase
         [CreateAddReference()],
         [CreateDeleteReference()],
         [CreateChangeReference()],
-        [CreateCompositeCommand()]
+        [CreateCompositeCommand()],
+        [CreateChunkedCommand()]
     ];
 
     #endregion
@@ -317,7 +332,7 @@ public abstract class JsonTestsBase
     #region Children
 
     protected static ChildAdded CreateChildAdded() =>
-        new(TargetNode(), Chunk(), MetaPointer(), Index(), Origin(), AdditionalInfos())
+        new(TargetNode(), Chunk(), MetaPointer(), Index(), Split(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
@@ -329,7 +344,7 @@ public abstract class JsonTestsBase
         };
 
     protected static ChildReplaced CreateChildReplaced() =>
-        new(Chunk(), TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(), AdditionalInfos())
+        new(Chunk(), TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Split(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
@@ -368,7 +383,7 @@ public abstract class JsonTestsBase
     #region Annotations
 
     protected static AnnotationAdded CreateAnnotationAdded() =>
-        new(TargetNode(), Chunk(), Index(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
+        new(TargetNode(), Chunk(), Index(), Split(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static AnnotationDeleted CreateAnnotationDeleted() =>
         new(TargetNode(), Descendants(), TargetNode(), Index(), Origin(), AdditionalInfos())
@@ -377,7 +392,7 @@ public abstract class JsonTestsBase
         };
 
     protected static AnnotationReplaced CreateAnnotationReplaced() =>
-        new(Chunk(), TargetNode(), Descendants(), TargetNode(), Index(), Origin(), AdditionalInfos())
+        new(Chunk(), TargetNode(), Descendants(), TargetNode(), Index(), Split(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
@@ -437,8 +452,11 @@ public abstract class JsonTestsBase
     protected static NoOpEvent CreateNoOpEvent() =>
         new(Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
-    protected static ErrorEvent CreateError() =>
+    protected static ErrorEvent CreateErrorEvent() =>
         new("myError", "very nice message", Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
+
+    protected static ChunkedEvent CreateChunkedEvent() =>
+        new(Chunk(), false, ChunkSequence(), Sequence(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
 
@@ -471,7 +489,8 @@ public abstract class JsonTestsBase
         [CreateReferenceChanged()],
         [CreateCompositeEvent()],
         [CreateNoOpEvent()],
-        [CreateError()]
+        [CreateErrorEvent()],
+        [CreateChunkedEvent()]
     ];
 
     #endregion
@@ -509,6 +528,9 @@ public abstract class JsonTestsBase
 
     private static NodeId CreateKey() =>
         (++_nextKey).ToString();
+    
+    protected static SplitFlag Split() =>
+        false;
 
     protected static AdditionalInfo[] AdditionalInfos() =>
     [
@@ -532,6 +554,9 @@ public abstract class JsonTestsBase
 
     protected static EventSequenceNumber Sequence() =>
         _nextSequence++;
+
+    protected static ContinuedChunkSequenceNumber ChunkSequence() =>
+        _nextChunkSequence++;
 
     protected static CommandSource[] Origin() =>
     [

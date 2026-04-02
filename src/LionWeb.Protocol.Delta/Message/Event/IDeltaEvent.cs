@@ -195,11 +195,34 @@ public record ErrorEvent(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[]? OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaEvent, IDeltaError
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaError
 {
     /// <inheritdoc />
     [JsonIgnore]
     public override HashSet<TargetNode> AffectedNodes => [];
+}
+
+public record ChunkedEvent(
+    DeltaSerializationChunk Chunk,
+    ContinuedChunkCompletedFlag ContinuedChunkCompleted,
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
+    EventSequenceNumber ChunkedEventSequenceNumber,
+    AdditionalInfo[]? AdditionalInfos) : DeltaContentBase(AdditionalInfos), IDeltaEvent, IContinuedChunk
+{
+    /// <inheritdoc />
+    public EventSequenceNumber SequenceNumber { get; set; }
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public CommandSource[]? OriginCommands => null;
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override string Id => ChunkedEventSequenceNumber + "__" + SequenceNumber;
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public HashSet<TargetNode> AffectedNodes => [];
 }
 
 #endregion

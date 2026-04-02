@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta.Message.Command;
 
 using Core.Serialization;
+using System.Text.Json.Serialization;
 
 public interface IPartitionDeltaCommand : IDeltaCommand;
 
@@ -79,9 +80,15 @@ public record AddChild(
     DeltaSerializationChunk NewChild,
     MetaPointer Containment,
     Index Index,
+    SplitFlag Split,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
+) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewChild;
+}
 
 public record DeleteChild(
     TargetNode Parent,
@@ -98,9 +105,15 @@ public record ReplaceChild(
     MetaPointer Containment,
     Index Index,
     TargetNode ReplacedChild,
+    SplitFlag Split,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
+) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewChild;
+}
 
 public record MoveChildFromOtherContainment(
     TargetNode NewParent,
@@ -163,9 +176,15 @@ public record AddAnnotation(
     TargetNode Parent,
     DeltaSerializationChunk NewAnnotation,
     Index Index,
+    SplitFlag Split,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
+) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewAnnotation;
+}
 
 public record DeleteAnnotation(
     TargetNode Parent,
@@ -180,9 +199,15 @@ public record ReplaceAnnotation(
     TargetNode Parent,
     Index Index,
     TargetNode ReplacedAnnotation,
+    SplitFlag Split,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
+) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewAnnotation;
+}
 
 public record MoveAnnotationFromOtherParent(
     TargetNode NewParent,

@@ -122,12 +122,17 @@ public record ChildAdded(
     DeltaSerializationChunk NewChild,
     MetaPointer Containment,
     Index Index,
+    SplitFlag Split,
     CommandSource[]? OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent, ISplittableMessage
 {
     /// <inheritdoc />
     [JsonIgnore]
     public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewChild;
 }
 
 public record ChildDeleted(
@@ -218,12 +223,17 @@ public record ChildReplaced(
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
+    SplitFlag Split,
     CommandSource[]? OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent, ISplittableMessage
 {
     /// <inheritdoc />
     [JsonIgnore]
     public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewChild;
 
     /// <inheritdoc />
     public virtual bool Equals(ChildReplaced? other)
@@ -698,12 +708,17 @@ public record AnnotationAdded(
     TargetNode Parent,
     DeltaSerializationChunk NewAnnotation,
     Index Index,
+    SplitFlag Split,
     CommandSource[]? OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent, ISplittableMessage
 {
     /// <inheritdoc />
     [JsonIgnore]
     public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewAnnotation;
 }
 
 public record AnnotationDeleted(
@@ -785,12 +800,17 @@ public record AnnotationReplaced(
     TargetNode[] ReplacedDescendants,
     TargetNode Parent,
     Index Index,
+    SplitFlag Split,
     CommandSource[]? OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent, ISplittableMessage
 {
     /// <inheritdoc />
     [JsonIgnore]
     public override HashSet<NodeId> AffectedNodes => [Parent];
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewAnnotation;
 
     /// <inheritdoc />
     public virtual bool Equals(AnnotationReplaced? other)

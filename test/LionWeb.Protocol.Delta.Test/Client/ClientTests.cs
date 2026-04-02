@@ -123,6 +123,7 @@ public class ClientTests
             ]),
             TestLanguageLanguage.Instance.TestPartition_data.ToMetaPointer(),
             0,
+            false,
             [new CommandSource(_clientInfo.ParticipationId, "cmdX")],
             null
         ) { SequenceNumber = sequenceNumber };

@@ -33,4 +33,7 @@ global using MessageKind = string;
 global using MessageDataKey = string;
 global using EventSequenceNumber = long;
 global using SemanticPropertyValue = object;
+global using ContinuedChunkSequenceNumber = long;
+global using ContinuedChunkCompletedFlag = bool;
+global using SplitFlag = bool;
 global using SharedKeyedMap = System.Collections.Generic.Dictionary<LionWeb.Core.M1.CompressedMetaPointer, LionWeb.Core.M3.IKeyed>;

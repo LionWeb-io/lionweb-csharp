@@ -111,9 +111,15 @@ public record SubscribeToPartitionContentsRequest(
 
 public record SubscribeToPartitionContentsResponse(
     DeltaSerializationChunk Contents,
+    SplitFlag Split,
     QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => Contents;
+}
 
 #endregion
 
@@ -283,11 +289,39 @@ public record ListPartitionsResponse(
     SplitFlag Split,
     QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => Partitions;
+}
+
+#endregion
+
+#region ListAndSubscribePartitions
+
+public record ListAndSubscribePartitionsRequest(
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
+
+public record ListAndSubscribePartitionsResponse(
+    DeltaSerializationChunk Partitions,
+    SplitFlag Split,
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => Partitions;
+}
 
 #endregion
 
 #endregion
+
+#region Special responses
 
 public record ErrorResponse(
     ErrorCode ErrorCode,
@@ -300,3 +334,18 @@ public record ErrorResponse(
     [JsonIgnore]
     public override string Id => QueryId;
 }
+
+public record ChunkedQueryResponse(
+    DeltaSerializationChunk Chunk,
+    ContinuedChunkCompletedFlag ContinuedChunkCompleted,
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaContentBase(AdditionalInfos), IDeltaQueryResponse, IContinuedChunk
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override string Id => QueryId;
+}
+
+#endregion

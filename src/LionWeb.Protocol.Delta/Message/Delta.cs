@@ -160,6 +160,19 @@ public interface IDeltaError
     string Message { get; }
 }
 
+public interface ISplittableMessage
+{
+    DeltaSerializationChunk Chunk { get; }
+    SplitFlag Split { get; }
+}
+
+public interface IContinuedChunk
+{
+    DeltaSerializationChunk Chunk { get; }
+    ContinuedChunkCompletedFlag ContinuedChunkCompleted { get; }
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber { get; }
+}
+
 public interface IDeltaContent
 {
     AdditionalInfo[]? AdditionalInfos { get; }

@@ -17,13 +17,21 @@
 
 namespace LionWeb.Protocol.Delta.Message.Command;
 
+using System.Text.Json.Serialization;
+
 public interface IForestDeltaCommand : IDeltaCommand;
 
 public record AddPartition(
     DeltaSerializationChunk NewPartition,
+    SplitFlag Split,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaCommandBase(CommandId, AdditionalInfos), IForestDeltaCommand;
+) : DeltaCommandBase(CommandId, AdditionalInfos), IForestDeltaCommand, ISplittableMessage
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public DeltaSerializationChunk Chunk => NewPartition;
+}
 
 public record DeletePartition(
     TargetNode DeletedPartition,

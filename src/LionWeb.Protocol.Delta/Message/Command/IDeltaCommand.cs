@@ -122,3 +122,11 @@ public record CompositeCommand(
         return true;
     }
 }
+
+public record ChunkedCommand(
+    DeltaSerializationChunk Chunk,
+    ContinuedChunkCompletedFlag ContinuedChunkCompleted,
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
+    CommandId CommandId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaCommandBase(CommandId, AdditionalInfos), IContinuedChunk;

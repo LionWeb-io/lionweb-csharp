@@ -34,4 +34,6 @@ global using AdditionalInfoDataKey = string;
 global using EventSequenceNumber = long;
 global using SemanticPropertyValue = object;
 global using ErrorCode = string;
+global using ContinuedChunkSequenceNumber = long;
+global using ContinuedChunkCompletedFlag = bool;
 global using SharedKeyedMap = System.Collections.Generic.Dictionary<LionWeb.Core.M1.CompressedMetaPointer, LionWeb.Core.M3.IKeyed>;

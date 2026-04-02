@@ -49,6 +49,9 @@ public class JsonSchemaCompatibilityTests : JsonTestsBase
         {
             OutputFormat = OutputFormat.List
         });
-        Assert.IsTrue(evaluationResults.IsValid, serialized);
+        Assert.IsTrue(evaluationResults is { IsValid: true, HasErrors: false }, serialized + "\n\n" + string.Join("\n", evaluationResults
+            .Details
+            .SelectMany(d => d?.Errors?.Values ?? [])
+        ));
     }
 }
