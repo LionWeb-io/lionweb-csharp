@@ -4,7 +4,6 @@
         <AssemblyName>LionWeb-CSharp-Generator-Cli</AssemblyName>
         <Title>LionWeb-CSharp-Generator-Cli</Title>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>LionWeb</PackageTags>
         <RootNamespace>LionWeb.Generator.Cli</RootNamespace>
