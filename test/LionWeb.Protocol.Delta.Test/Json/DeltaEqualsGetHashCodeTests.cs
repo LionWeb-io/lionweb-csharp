@@ -153,12 +153,12 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
                 CreateAdditionalInfos("msgA")),
-        ], CreateAdditionalInfos("msgAA"));
+        ], [new CommandSource("partAA", "cmdAA")], CreateAdditionalInfos("msgAA"));
         var b = new CompositeEvent(
         [
             new PropertyDeleted("b", new MetaPointer("myLang", "v0", "key"), "vv",  [new CommandSource("x", "y")],
                 CreateAdditionalInfos("msgA")),
-        ], CreateAdditionalInfos("msgAA"));
+        ], [new CommandSource("partAA", "cmdAA")], CreateAdditionalInfos("msgAA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -171,12 +171,12 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
                 CreateAdditionalInfos("msgA")),
-        ], CreateAdditionalInfos("msgAA"));
+        ], [new CommandSource("partAA", "cmdAA")], CreateAdditionalInfos("msgAA"));
         var b = new CompositeEvent(
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "z")],
                 CreateAdditionalInfos("msgA")),
-        ], CreateAdditionalInfos("msgAA"));
+        ], [new CommandSource("partAA", "cmdAA")], CreateAdditionalInfos("msgAA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -189,12 +189,12 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
                 CreateAdditionalInfos("msgA")),
-        ], CreateAdditionalInfos("msgAA"));
+        ], [new CommandSource("partAA", "cmdAA")], CreateAdditionalInfos("msgAA"));
         var b = new CompositeEvent(
         [
             new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
                 CreateAdditionalInfos("msgA")),
-        ], CreateAdditionalInfos("msgAA"));
+        ], [new CommandSource("partAA", "cmdAA")], CreateAdditionalInfos("msgAA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());

@@ -86,7 +86,7 @@ public abstract class JsonTestsBase
         new(Chunk(), Split(), QueryId(), AdditionalInfos());
 
     protected static SignOnRequest CreateSignOnRequest() =>
-        new(LionWebVersions.v2026_1.VersionString, ClientId(), QueryId(), RepositoryId(), AdditionalInfos());
+        new(DeltaProtocolVersion(), ClientId(), QueryId(), RepositoryId(), AdditionalInfos());
 
     protected static SignOnResponse CreateSignOnResponse() =>
         new(ParticipationId(), QueryId(), AdditionalInfos());
@@ -98,7 +98,7 @@ public abstract class JsonTestsBase
         new(QueryId(), AdditionalInfos());
 
     protected static ReconnectRequest CreateReconnectRequest() =>
-        new(ParticipationId(), Sequence(), QueryId(), AdditionalInfos());
+        new(ParticipationId(), Sequence(), DeltaProtocolVersion(), ClientId(), RepositoryId(), QueryId(), AdditionalInfos());
 
     protected static ReconnectResponse CreateReconnectResponse() =>
         new(Sequence(), QueryId(), AdditionalInfos());
@@ -447,7 +447,7 @@ public abstract class JsonTestsBase
             CreateChildDeleted(),
             CreateAnnotationDeleted(),
             CreateReferenceDeleted()
-        ], AdditionalInfos()) { SequenceNumber = Sequence() };
+        ], Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static NoOpEvent CreateNoOpEvent() =>
         new(Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
@@ -569,6 +569,9 @@ public abstract class JsonTestsBase
 
     private static ParticipationId ParticipationId() =>
         "myParticipation";
+
+    private static string DeltaProtocolVersion() =>
+        LionWebVersions.v2026_1.VersionString;
 
     private static ClientId ClientId() =>
         "iAmTheClient";

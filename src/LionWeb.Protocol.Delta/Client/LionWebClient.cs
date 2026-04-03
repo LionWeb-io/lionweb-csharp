@@ -236,7 +236,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         if(SignedIn)
             throw new DeltaException(DeltaErrorCode.AlreadySignedOn.AsErrorResponse(null, null));
 
-        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId, EventSequenceNumber, QueryId(), null));
+        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId, EventSequenceNumber, _lionWebVersion.VersionString, ClientId, RepositoryId, QueryId(), null));
         ParticipationId = participationId;
         return response;
     }

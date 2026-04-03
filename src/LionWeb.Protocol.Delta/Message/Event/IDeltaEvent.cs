@@ -102,32 +102,15 @@ public abstract record DeltaEventBase(
 
 #region Miscellaneous
 
-public record CompositeEvent : DeltaEventBase, IDeltaEvent
+public record CompositeEvent(
+    IDeltaEvent[] Parts,
+    CommandSource[]? OriginCommands,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos)
 {
-    public CompositeEvent(IDeltaEvent[] Parts,
-        AdditionalInfo[]? AdditionalInfos) : base(null, AdditionalInfos)
-    {
-        this.Parts = Parts;
-    }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override string Id => string.Join("--", Parts.Select(e => e.Id));
-
     /// <inheritdoc />
     [JsonIgnore]
     public override HashSet<TargetNode> AffectedNodes => Parts.SelectMany(p => p.AffectedNodes).ToHashSet();
-
-    public IDeltaEvent[] Parts { get; init; }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override CommandSource[]? OriginCommands =>
-        Parts.SelectMany(e => e.OriginCommands ?? []).ToArray();
 
     /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)

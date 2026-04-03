@@ -149,8 +149,8 @@ public interface IParticipationDeltaQuery : IDeltaQuery;
 public record SignOnRequest(
     string DeltaProtocolVersion,
     ClientId ClientId,
-    QueryId QueryId,
     RepositoryId RepositoryId,
+    QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest
 {
@@ -191,6 +191,9 @@ public record SignOffResponse(
 public record ReconnectRequest(
     ParticipationId ParticipationId,
     EventSequenceNumber LastReceivedSequenceNumber,
+    string DeltaProtocolVersion,
+    ClientId ClientId,
+    RepositoryId RepositoryId,
     QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest

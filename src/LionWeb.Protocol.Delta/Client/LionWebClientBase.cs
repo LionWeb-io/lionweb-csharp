@@ -37,12 +37,19 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly ConcurrentDictionary<INotificationId, bool> _ownNotifications = [];
 
     protected ParticipationId? _participationId;
+    protected RepositoryId? _repositoryId;
     private readonly ClientId? _clientId;
 
     protected internal ParticipationId ParticipationId
     {
         get => _participationId ?? throw new InvalidOperationException($"{nameof(ParticipationId)} not set");
         set => _participationId = value;
+    }
+
+    protected internal RepositoryId RepositoryId
+    {
+        get => _repositoryId ?? throw new InvalidOperationException($"{nameof(RepositoryId)} not set");
+        set => _repositoryId = value;
     }
 
     protected virtual bool SignedIn => _participationId != null;
