@@ -22,6 +22,7 @@ using M3;
 using Notification.Partition;
 using Notification.Pipe;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// A generic implementation of <see cref="INode"/> that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
@@ -84,26 +85,8 @@ public class DynamicNode : NodeBase
     /// <inheritdoc />
     protected override bool GetInternal(Feature? feature, out object? result)
     {
-        if (feature == null)
-        {
-            result = GetAnnotations();
+        if (TryGet(feature, out result))
             return true;
-        }
-
-        if (_settings.TryGetValue(feature, out var setting))
-        {
-            if (setting is ReferenceTarget target)
-            {
-                result = target.Target;
-                if (result is null && feature is Reference { Optional: false })
-                    throw new UnsetFeatureException(feature);
-            } else
-            {
-                result = setting;
-            }
-
-            return true;
-        }
 
         result = feature switch
         {
@@ -114,6 +97,34 @@ public class DynamicNode : NodeBase
             _ => throw new UnknownFeatureException(this.GetClassifier(), feature)
         };
         return true;
+    }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (feature == null)
+        {
+            value = GetAnnotations();
+            return true;
+        }
+
+        if (_settings.TryGetValue(feature, out var setting))
+        {
+            if (setting is ReferenceTarget target)
+            {
+                value = target.Target;
+                if (value is null)
+                    return false;
+            } else
+            {
+                value = setting;
+            }
+
+            return true;
+        }
+
+        value = null;
+        return false;
     }
 
     /// <inheritdoc />
