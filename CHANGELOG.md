@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Fixed
 * `LenientNode.DetachFromParent()` didn't work if parent had more than one containment [#194](https://github.com/LionWeb-io/lionweb-csharp/issues/194).
 ### Changed
+* Bumped Utf8JsonAsyncStreamReader dependency to v2.1.0 [#193](https://github.com/LionWeb-io/lionweb-csharp/issues/193).
 ### Removed
 ### Deprecated
 ### Security
