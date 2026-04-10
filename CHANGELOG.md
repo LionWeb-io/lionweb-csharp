@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.4] - 2026-04-10
+### Added
+### Fixed
+* `LenientNode.DetachFromParent()` didn't work if parent had more than one containment [#194](https://github.com/LionWeb-io/lionweb-csharp/issues/194).
+### Changed
+* Bumped Utf8JsonAsyncStreamReader dependency to v2.1.0 [#193](https://github.com/LionWeb-io/lionweb-csharp/issues/193).
+### Removed
+### Deprecated
+### Security
+
 ## [0.4.3] - 2026-03-24
 ### Added
 * added deserializer builder option for references to M2 elements

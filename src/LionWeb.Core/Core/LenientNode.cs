@@ -470,13 +470,13 @@ public class LenientNode : NodeBase, INode
         {
             switch (value)
             {
-                case IReadableNode:
+                case IReadableNode n when n == child:
                     RemoveFeature(key);
                     return true;
                 case IList list:
                     Index index = list.IndexOf(child);
                     if (index == -1)
-                        return false;
+                        continue;
 
                     list.RemoveAt(index);
                     if (list.Count == 0)

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Dynamic;
 
 using M3;
+using System.Collections;
 
 [TestClass]
 public class SetFeaturesTests:DynamicNodeTestsBase
@@ -269,6 +270,67 @@ public class SetFeaturesTests:DynamicNodeTestsBase
 
     #endregion
 
+    #region several
+
+    [TestMethod]
+    public void SeveralContainments_DetachFromParent_OtherSingleAndMultiple()
+    {
+        var child = newCircle("c");
+        var parent = newCompositeShape("id");
+        parent.Set(CompositeShape_evilPart, newLine("lA"));
+        parent.Set(CompositeShape_disabledParts, new List<IReadableNode> { newLine("LB") });
+        parent.Set(CompositeShape_parts, new List<IReadableNode> { child });
+        Assert.IsTrue(parent.TryGet(CompositeShape_parts, out var valueBefore));
+        Assert.IsInstanceOfType<IEnumerable>(valueBefore);
+        Assert.HasCount(1, ((IEnumerable)valueBefore).Cast<object>());
+        child.DetachFromParent();
+        Assert.IsNull(child.GetParent());
+        Assert.IsFalse(parent.TryGet(CompositeShape_parts, out var valueAfter));
+        Assert.IsNull(valueAfter);
+    }
+
+    [TestMethod]
+    public void SeveralContainments_DetachFromParent_OtherSingle()
+    {
+        var child0 = newCircle("c0");
+        var child1 = newCircle("c1");
+        var parent = newCompositeShape("id");
+        parent.Set(CompositeShape_evilPart, newLine("lA"));
+        parent.Set(CompositeShape_parts, new List<IReadableNode> { child0, child1 });
+        Assert.IsTrue(parent.TryGet(CompositeShape_parts, out var valueBefore));
+        Assert.IsInstanceOfType<IEnumerable>(valueBefore);
+        Assert.HasCount(2, ((IEnumerable)valueBefore).Cast<object>());
+        child0.DetachFromParent();
+        Assert.IsNull(child0.GetParent());
+        Assert.IsTrue(parent.TryGet(CompositeShape_parts, out var valueAfter));
+        Assert.IsInstanceOfType<IEnumerable>(valueAfter);
+        var objectsAfter = ((IEnumerable)valueAfter).Cast<object>().ToList();
+        Assert.HasCount(1, objectsAfter);
+        Assert.AreSame(child1, objectsAfter.First());
+    }
+
+    [TestMethod]
+    public void SeveralContainments_DetachFromParent_OtherMultiple()
+    {
+        var child0 = newCircle("c0");
+        var child1 = newCircle("c1");
+        var parent = newCompositeShape("id");
+        parent.Set(CompositeShape_disabledParts, new List<IReadableNode> { newLine("LB") });
+        parent.Set(CompositeShape_parts, new List<IReadableNode> { child0, child1 });
+        Assert.IsTrue(parent.TryGet(CompositeShape_parts, out var valueBefore));
+        Assert.IsInstanceOfType<IEnumerable>(valueBefore);
+        Assert.HasCount(2, ((IEnumerable)valueBefore).Cast<object>());
+        child1.DetachFromParent();
+        Assert.IsNull(child1.GetParent());
+        Assert.IsTrue(parent.TryGet(CompositeShape_parts, out var valueAfter));
+        Assert.IsInstanceOfType<IEnumerable>(valueAfter);
+        var objectsAfter = ((IEnumerable)valueAfter).Cast<object>().ToList();
+        Assert.HasCount(1, objectsAfter);
+        Assert.AreSame(child0, objectsAfter.First());
+    }
+
+    #endregion
+    
     #endregion
 
     #region reference
