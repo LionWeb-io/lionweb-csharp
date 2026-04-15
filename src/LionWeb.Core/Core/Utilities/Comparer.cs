@@ -446,7 +446,7 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         return SetParent(result, new ContainmentDifference(left, leftCont, right));
     }
 
-    private List<IDifference> SetParent(List<IDifference> result, IContainerDifference parent)
+    protected List<IDifference> SetParent(List<IDifference> result, IContainerDifference parent)
     {
         if (result.Count != 0)
         {
