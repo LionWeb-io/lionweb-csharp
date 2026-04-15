@@ -7,6 +7,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ## [next] - tbd
 ### Added
+* Added `INotificationPipe.Disconnect()`, symmetric to `ConnectTo()`
 ### Fixed
 ### Changed
 * Changed `Comparer.SetParent()` visibility to _protected_ to ease custom comparer implementations.

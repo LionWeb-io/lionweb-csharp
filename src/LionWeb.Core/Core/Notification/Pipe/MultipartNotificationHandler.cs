@@ -84,4 +84,8 @@ public class MultipartNotificationHandler : INotificationHandler
     /// <inheritdoc />
     public void ConnectTo(INotificationReceiver to) =>
         ((INotificationSender)this).Subscribe(to);
+
+    /// <inheritdoc />
+    public void Disconnect(INotificationReceiver to) => 
+        ((INotificationSender)this).Unsubscribe(to);
 }

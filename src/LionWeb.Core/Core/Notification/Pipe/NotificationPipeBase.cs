@@ -40,6 +40,10 @@ public abstract class NotificationPipeBase : INotificationFilter, INotificationS
         ((INotificationSender)this).Subscribe(to);
     
     /// <inheritdoc />
+    public void Disconnect(INotificationReceiver to) => 
+        ((INotificationSender)this).Unsubscribe(to);
+
+    /// <inheritdoc />
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);

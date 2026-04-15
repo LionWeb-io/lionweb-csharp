@@ -44,6 +44,11 @@ public interface INotificationSender : INotificationPipe
     /// <remarks>Equivalent to C# <c>event += to</c>.</remarks>
     void ConnectTo(INotificationReceiver to);
 
+    /// Notifications <see cref="INotificationSender.Send">sent</see> by <c>this</c>
+    /// will <b>NOT</b> be <see cref="INotificationReceiver.Receive">received</see> by <paramref name="to"/> anymore.
+    /// <remarks>Equivalent to C# <c>event -= to</c>.</remarks>
+    void Disconnect(INotificationReceiver to);
+
     /// This notification sender wants to send <paramref name="notification"/>.
     /// Only this notification sender should use this method.
     /// <remarks>Equivalent to <see cref="EventHandler.Invoke"/>.</remarks>

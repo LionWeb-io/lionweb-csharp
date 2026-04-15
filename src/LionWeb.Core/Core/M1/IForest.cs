@@ -195,7 +195,7 @@ public class Forest : IForest
     {
         if (partition.GetNotificationProducer() is { } partitionProducer)
         {
-            partitionProducer.Unsubscribe(_notificationForwarder);
+            partitionProducer.Disconnect(_notificationForwarder);
         }
     }
 
