@@ -95,7 +95,7 @@ public interface IForest
 }
 
 /// <inheritdoc />
-public class Forest : IForest
+public class Forest : IForest, IDisposable
 {
     private readonly HashSet<IPartitionInstance> _partitions;
     private readonly IForestNotificationProducer _notificationProducer;
@@ -147,6 +147,17 @@ public class Forest : IForest
 
         ConnectToPartition(partition);
         return true;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        foreach (var partition in _partitions)
+        {
+            partition.GetNotificationProducer()?.Disconnect(_notificationForwarder);
+        }
+        _notificationForwarder.Dispose();
+        _notificationProducer.Dispose();
     }
 
     private void ProducePartitionAddedNotification(INotificationId? notificationId, IPartitionInstance partition) =>

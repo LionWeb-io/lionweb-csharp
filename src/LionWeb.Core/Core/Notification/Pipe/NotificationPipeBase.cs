@@ -135,7 +135,9 @@ public abstract class NotificationPipeBase : INotificationFilter, INotificationS
         var allSubtypes = _allSubtypes[notificationType];
         foreach (var subtype in allSubtypes)
         {
-            _subscribedNotifications[subtype]--;
+            var newCount = --_subscribedNotifications[subtype];
+            if (newCount == 0)
+                _subscribedNotifications.Remove(subtype);
         }
     }
 
