@@ -368,8 +368,22 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
         throw new UnsupportedNodeTypeException(child, nameof(child));
     }
 
+    bool IWritableNode.DetachChild(IWritableNode child)
+    {
+        if (child is T t)
+        {
+            return DetachChild(t, false);
+        }
+
+        throw new UnsupportedNodeTypeException(child, nameof(child));
+    }
+
+    /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode)"/>
+    protected internal bool DetachChild(T child);
+
     /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode, bool)"/>
-    protected internal bool DetachChild(T child, bool notify);
+    protected internal bool DetachChild(T child, bool notify) =>
+        DetachChild(child);
 
     /// <inheritdoc/>
     Containment? IWritableNode.GetContainmentOf(IWritableNode child)
