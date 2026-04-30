@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Added
 ### Fixed
 * `IWritableNode.DetachFromParent()` emits a notification.
+* `UnresolvedReferencesManager` now handles deleted nodes and reference edits.
 ### Changed
 ### Removed
 ### Deprecated

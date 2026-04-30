@@ -20,7 +20,7 @@ namespace LionWeb.Protocol.Delta;
 using Core.M1;
 
 /// <inheritdoc />
-public class LoggingUnresolvedReferencesManager(Action<string> logger) : UnresolvedReferencesManager
+public class LoggingUnresolvedReferencesManager(Action<string> logger, bool registerAddedUnresolvedReferences = false) : UnresolvedReferencesManager(registerAddedUnresolvedReferences)
 {
     /// <inheritdoc />
     protected override void Log(string message) => logger(message);
