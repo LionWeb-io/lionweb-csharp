@@ -464,14 +464,16 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (LionWeb.Core.Test.Languages.Generated.V2026_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(c))
 		{
 			_cont = null;
+			if (notify)
+				NotifyRemoveFromParent<INode>(child, LionWeb.Core.Test.Languages.Generated.V2026_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
 			return true;
 		}
 

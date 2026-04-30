@@ -213,14 +213,16 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment.EqualsIdentity(c))
 		{
 			_ifaceContainment = null;
+			if (notify)
+				NotifyRemoveFromParent<INode>(child, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
 			return true;
 		}
 

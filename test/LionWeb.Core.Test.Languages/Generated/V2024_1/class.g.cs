@@ -458,14 +458,16 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ClassLanguage.Instance.record_double.EqualsIdentity(c))
 		{
 			_double = null;
+			if (notify)
+				NotifyRemoveFromParent<@interface>(child, ClassLanguage.Instance.record_double);
 			return true;
 		}
 

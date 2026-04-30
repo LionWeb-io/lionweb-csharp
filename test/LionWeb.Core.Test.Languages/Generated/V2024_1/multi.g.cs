@@ -260,14 +260,14 @@ public partial class Container : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _libraries, MultiLanguage.Instance.Container_libraries);
+			RemoveSelfParent((LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library)child, _libraries, MultiLanguage.Instance.Container_libraries, null, notify ? ContainmentRemover<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(MultiLanguage.Instance.Container_libraries) : null);
 			return true;
 		}
 
