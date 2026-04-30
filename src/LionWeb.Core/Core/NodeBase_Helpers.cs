@@ -33,18 +33,18 @@ public abstract partial class NodeBase
         _parent = parent;
 
     /// <inheritdoc />
-    bool IWritableNode<INode>.DetachChild(INode child, bool notify) =>
-        DetachChild(child, notify);
+    [Obsolete("Use DetachChild(INode, bool)")]
+    bool IWritableNode<INode>.DetachChild(INode child) =>
+        DetachChild(child);
 
     /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode)"/>
     [Obsolete("Use DetachChild(INode, bool)")]
     protected virtual bool DetachChild(INode child) =>
-        _annotations.Remove(child);
+        DetachChild((INode)child, false) || _annotations.Remove(child);
 
     /// <inheritdoc />
-    [Obsolete("Use DetachChild(IWritableNode, bool)")]
-    public virtual bool DetachChild(IWritableNode child) =>
-        DetachChild((INode)child, false) || DetachChild((INode)child);
+    bool IWritableNode<INode>.DetachChild(INode child, bool notify) =>
+        DetachChild(child, notify);
 
     /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode, bool)"/>
     protected virtual bool DetachChild(INode child, bool notify)
