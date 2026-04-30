@@ -147,8 +147,7 @@ public class DeletedTests : ReplicatorTestsBase
     }
 
     /// <summary>
-    /// This test confirms that no notification is generated from DetachFromParent method
-    /// TODO: This is a known bug, we want to have a notification emitted.
+    /// This test confirms that a notification is generated from DetachFromParent method.
     /// </summary>
     [TestMethod]
     public void Single_uses_detach_from_parent()
@@ -163,7 +162,14 @@ public class DeletedTests : ReplicatorTestsBase
 
         deleted.DetachFromParent();
 
-        Assert.AreEqual(0, notificationObserver.Notifications.Count);
+        Assert.AreEqual(1, notificationObserver.Notifications.Count);
+        var notification = notificationObserver.Notifications.First();
+        Assert.IsInstanceOfType<ChildDeletedNotification>(notification);
+        var deletedNotification = (ChildDeletedNotification)notification;
+        Assert.AreSame(origin, deletedNotification.Parent);
+        Assert.AreSame(deleted, deletedNotification.DeletedChild);
+        Assert.AreEqual(0, deletedNotification.Index);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, deletedNotification.Containment);
     }
 
     [TestMethod]

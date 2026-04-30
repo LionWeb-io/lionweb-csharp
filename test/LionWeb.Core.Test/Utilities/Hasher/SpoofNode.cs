@@ -50,8 +50,10 @@ class SpoofNode(string id) : IShape
     public void Remove(Link? link, IEnumerable<IReadableNode> nodes) {}
 
     public void SetParent(INode? parent) { }
+    
+    public bool DetachChild(IWritableNode child) => false;
 
-    public bool DetachChild(INode child) => false;
+    public bool DetachChild(INode child, bool notify = false) => false;
 
     public Containment? GetContainmentOf(INode child) => null;
 
