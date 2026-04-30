@@ -84,7 +84,6 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("Should emit ChildMovedAndReplacedFromOtherContainmentNotification")]
     public void Multiple()
     {
         var moved = new LinkTestConcept("moved");

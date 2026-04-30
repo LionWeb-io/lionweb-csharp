@@ -84,7 +84,6 @@ public class TwowayTests : TwowayReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("issue with replaceWith")]
     public void ChildAdded_Single()
     {
         var node = new LinkTestConcept("a");
@@ -218,7 +217,6 @@ public class TwowayTests : TwowayReplicatorTestsBase
     #region ChildReplaced
 
     [TestMethod]
-    [Ignore("issue with replaceWith")]
     public void ChildReplaced_Single()
     {
         var node = new LinkTestConcept("a") { Containment_0_1 = new LinkTestConcept("replaced") { Name = "a" } };
@@ -237,7 +235,6 @@ public class TwowayTests : TwowayReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("issue with replaceWith")]
     public void ChildReplaced_Deep()
     {
         var node = new TestPartition("a");

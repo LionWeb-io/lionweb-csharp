@@ -26,7 +26,6 @@ using M1;
 public class MovedAndReplacedFromOtherParentTests : ReplicatorTestsBase
 {
     [TestMethod]
-    [Ignore("Should emit AnnotationMovedAndReplacedFromOtherParentNotification")]
     public void Multiple_Only()
     {
         var replaced = new TestAnnotation("replaced");

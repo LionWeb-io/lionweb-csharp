@@ -26,7 +26,6 @@ using M1;
 public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
 {
     [TestMethod]
-    [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]
     public void Backward()
     {
         var replacement = new LinkTestConcept("replacement");
@@ -70,7 +69,6 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]
     public void Forward()
     {
         var replacement = new LinkTestConcept("replacement");
