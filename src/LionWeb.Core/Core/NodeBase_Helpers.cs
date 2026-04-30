@@ -33,12 +33,36 @@ public abstract partial class NodeBase
         _parent = parent;
 
     /// <inheritdoc />
-    bool IWritableNode<INode>.DetachChild(INode child) =>
-        DetachChild(child);
+    bool IWritableNode<INode>.DetachChild(INode child, bool notify) =>
+        DetachChild(child, notify);
 
-    /// <inheritdoc cref="IWritableNode.DetachChild"/>
+    /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode)"/>
+    [Obsolete("Use DetachChild(INode, bool)")]
     protected virtual bool DetachChild(INode child) =>
         _annotations.Remove(child);
+
+    /// <inheritdoc />
+    [Obsolete("Use DetachChild(IWritableNode, bool)")]
+    public virtual bool DetachChild(IWritableNode child) =>
+        DetachChild((INode)child, false) || DetachChild((INode)child);
+
+    /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode, bool)"/>
+    protected virtual bool DetachChild(INode child, bool notify)
+    {
+        var index = _annotations.IndexOf(child);
+        if (index < 0)
+            return false;
+        
+        _annotations.RemoveAt(index);
+
+        if (!notify)
+            return true;
+
+        var notificationProducer = GetPartitionNotificationProducer();
+        if (notificationProducer is not null)
+            notificationProducer.ProduceNotification(new AnnotationDeletedNotification(child, this, index, notificationProducer.CreateNotificationId()));
+        return true;
+    }
 
     /// <summary>
     /// Unsets <paramref name="child">child's</paramref> parent, if applicable. 
@@ -124,13 +148,33 @@ public abstract partial class NodeBase
     /// <param name="node">Node to remove from <paramref name="storage"/>.</param>
     /// <param name="storage">Storage potentially containing <paramref name="node"/>.</param>
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
-    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    /// <param name="notificationId">
+    /// <b>Obsolete, do not use!</b>
+    /// The notification ID of the notification that triggers this action.
+    /// </param>
+    /// <param name="remover">
+    ///     Optional Action to call for <paramref name="node"/>.
+    ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
+    /// </param>
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if <paramref name="node"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
-    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, INotificationId? notificationId = null)
+    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, INotificationId? notificationId = null, Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover = null)
         where T : class, INode =>
-        RemoveSelfParent(AsList<T>(node, link), storage, link, notificationId: notificationId);
+        RemoveSelfParent(AsList<T>(node, link), storage, link, remover);
+
+    /// <summary>
+    /// Invokes <see cref="ContainmentRemover"/> if this node's partition has a <see cref="GetPartitionNotificationProducer"/>.
+    /// </summary>
+    protected void NotifyRemoveFromParent<T>(INode child, Containment containment)
+        where T : class, INode
+    {
+        var notificationProducer = GetPartitionNotificationProducer();
+        if (notificationProducer is null || child is not T typedChild)
+            return;
+
+        ContainmentRemover<T>(containment)(notificationProducer, 0, typedChild, notificationProducer.CreateNotificationId());
+    }
 
     /// <summary>
     /// Removes all members of <paramref name="list"/> from <paramref name="storage"/>, and sets their parent to <c>null</c>.
@@ -143,7 +187,10 @@ public abstract partial class NodeBase
     ///     Optional Action to call for each removed element of <paramref name="list"/>.
     ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
     /// </param>
-    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    /// <param name="notificationId">
+    /// <b>Obsolete, do not use!</b>
+    /// The notification ID of the notification that triggers this action.
+    /// </param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
@@ -337,7 +384,10 @@ public abstract partial class NodeBase
     ///     Optional Action to call for each removed element of <paramref name="safeNodes"/>.
     ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
     /// </param>
-    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    /// <param name="notificationId">
+    /// <b>Obsolete, do not use!</b>
+    /// The notification ID of the notification that triggers this action.
+    /// </param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     protected void RemoveAll<T>(List<T?> safeNodes, List<T> storage,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,

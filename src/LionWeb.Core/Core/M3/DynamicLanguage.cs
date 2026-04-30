@@ -114,9 +114,9 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
 
     /// <inheritdoc />
-    protected override bool DetachChild(INode child)
+    protected override bool DetachChild(INode child, bool notify)
     {
-        if (base.DetachChild(child))
+        if (base.DetachChild(child, notify))
         {
             return true;
         }

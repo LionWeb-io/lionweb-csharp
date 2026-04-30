@@ -41,7 +41,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     {
         if (_parent != null)
         {
-            _parent.DetachChild(this);
+            _parent.DetachChild(this, true);
             _parent = null;
         }
     }

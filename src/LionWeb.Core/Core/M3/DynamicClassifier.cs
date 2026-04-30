@@ -46,9 +46,9 @@ public abstract class DynamicClassifier(NodeId id, LionWebVersions lionWebVersio
     private bool RemoveFeaturesRaw(DynamicFeature? value) => RemoveChildRaw(value, _features);
 
     /// <inheritdoc />
-    protected override bool DetachChild(INode child)
+    protected override bool DetachChild(INode child, bool notify)
     {
-        if (base.DetachChild(child))
+        if (base.DetachChild(child, notify))
         {
             return true;
         }
