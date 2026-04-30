@@ -49,9 +49,9 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
 
 
     /// <inheritdoc />
-    protected override bool DetachChild(INode child)
+    protected override bool DetachChild(INode child, bool notify)
     {
-        if (base.DetachChild(child))
+        if (base.DetachChild(child, notify))
         {
             return true;
         }

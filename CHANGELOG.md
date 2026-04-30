@@ -10,9 +10,11 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `INode.ReverseInPlace(containment)` and `INode.ReverseInPlace(reference)`.
 ### Fixed
 * Indexes for `ChildMovedInSameContainmentNotification` were sometimes off. 
+* `IWritableNode.DetachFromParent()` emits a notification.
 ### Changed
 ### Removed
 ### Deprecated
+* `IWritableNode.DetachChild(IWritableNode child)` -- use `DetachChild(IWritableNode child, bool notify)` instead.
 ### Security
 
 ## [0.4.5] - 2026-04-16

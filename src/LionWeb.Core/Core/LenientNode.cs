@@ -461,9 +461,9 @@ public class LenientNode : NodeBase, INode
     }
 
     /// <inheritdoc />
-    protected override bool DetachChild(INode child)
+    protected override bool DetachChild(INode child, bool notify)
     {
-        if (base.DetachChild(child))
+        if (base.DetachChild(child, notify))
             return true;
 
         foreach (var (key, value) in _featureValues.Where(pair => pair.feature is Containment))
