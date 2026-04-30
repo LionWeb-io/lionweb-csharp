@@ -48,7 +48,7 @@ public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitte
         if (!IsActive())
             return;
 
-        if (_oldTarget == _newTarget || ReferenceEquals(_oldTarget?.Target, _newTarget?.Target))
+        if (_oldTarget == _newTarget)
             return;
         
         switch (_oldTarget, _newTarget)

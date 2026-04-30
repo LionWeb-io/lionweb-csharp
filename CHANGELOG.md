@@ -11,6 +11,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Fixed
 * Indexes for `ChildMovedInSameContainmentNotification` were sometimes off. 
 * `IWritableNode.DetachFromParent()` emits a notification.
+* `UnresolvedReferencesManager` now handles deleted nodes and reference edits.
 ### Changed
 ### Removed
 ### Deprecated
