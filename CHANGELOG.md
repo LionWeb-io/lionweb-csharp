@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.6] - tbd
+### Added
+### Fixed
+* `IWritableNode.DetachFromParent()` emits a notification.
+* `UnresolvedReferencesManager` now handles deleted nodes and reference edits.
+### Changed
+### Removed
+### Deprecated
+* `IWritableNode.DetachChild(IWritableNode child)` -- use `DetachChild(IWritableNode child, bool notify)` instead.
+### Security
+
 ## [0.4.5] - 2026-04-16
 ### Added
 * Added `INotificationPipe.Disconnect()`, symmetric to `ConnectTo()`

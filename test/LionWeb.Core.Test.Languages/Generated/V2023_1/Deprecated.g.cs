@@ -503,14 +503,14 @@ public partial class DeprConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+			RemoveSelfParent((DeprIface)child, _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild, null, notify ? ContainmentRemover<DeprIface>(DeprecatedLanguage.Instance.DeprConcept_deprChild) : null);
 			return true;
 		}
 

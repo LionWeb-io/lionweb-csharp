@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test;
 
 using Languages;
+using M1;
 using M2;
 
 [TestClass]
@@ -42,5 +43,21 @@ public class BackwardsCompatibilityTests
         var annotationB = new TestAnnotation("annotationB");
         parent.Set(null, new List<INode> { annotationB });
         Assert.AreSame(annotationB, parent.GetAnnotations().First());
+    }
+
+    [TestMethod]
+    public void NoRawDetach()
+    {
+        var child = new LinkTestConcept("child");
+        var annotation = new TestAnnotation("annotationA");
+        var parent = new LinkTestConcept("parent") { Containment_0_1 = child }.WithAnnotation(annotation);
+        
+        child.DetachFromParent();
+        Assert.IsNull(parent.Containment_0_1);
+        Assert.AreSame(annotation, parent.GetAnnotations()[0]);
+        
+        annotation.DetachFromParent();
+        Assert.IsNull(parent.Containment_0_1);
+        Assert.IsEmpty(parent.GetAnnotations());
     }
 }

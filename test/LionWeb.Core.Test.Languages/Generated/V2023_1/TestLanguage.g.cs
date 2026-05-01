@@ -1514,32 +1514,36 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1.EqualsIdentity(c))
 		{
 			_containment_0_1 = null;
+			if (notify)
+				NotifyRemoveFromParent<LinkTestConcept>(child, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1);
 			return true;
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
+			RemoveSelfParent((LinkTestConcept)child, _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, null, notify ? ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n) : null);
 			return true;
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(c))
 		{
 			_containment_1 = null;
+			if (notify)
+				NotifyRemoveFromParent<LinkTestConcept>(child, TestLanguageLanguage.Instance.LinkTestConcept_containment_1);
 			return true;
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
+			RemoveSelfParent((LinkTestConcept)child, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null, notify ? ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n) : null);
 			return true;
 		}
 
@@ -2071,20 +2075,22 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (TestLanguageLanguage.Instance.TestPartition_data.EqualsIdentity(c))
 		{
 			_data = null;
+			if (notify)
+				NotifyRemoveFromParent<DataTypeTestConcept>(child, TestLanguageLanguage.Instance.TestPartition_data);
 			return true;
 		}
 
 		if (TestLanguageLanguage.Instance.TestPartition_links.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _links, TestLanguageLanguage.Instance.TestPartition_links);
+			RemoveSelfParent((LinkTestConcept)child, _links, TestLanguageLanguage.Instance.TestPartition_links, null, notify ? ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.TestPartition_links) : null);
 			return true;
 		}
 

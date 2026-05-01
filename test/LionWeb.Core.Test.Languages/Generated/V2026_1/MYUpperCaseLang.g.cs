@@ -408,14 +408,16 @@ public partial class MYConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment.EqualsIdentity(c))
 		{
 			_mYContainment = null;
+			if (notify)
+				NotifyRemoveFromParent<INode>(child, MYUpperCaseLangLanguage.Instance.MYConcept_MYContainment);
 			return true;
 		}
 

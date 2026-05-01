@@ -49,9 +49,9 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     private bool RemoveFieldsRaw(DynamicField? value) => RemoveChildRaw(value, _fields);
 
     /// <inheritdoc />
-    protected override bool DetachChild(INode child)
+    protected override bool DetachChild(INode child, bool notify)
     {
-        if (base.DetachChild(child))
+        if (base.DetachChild(child, notify))
         {
             return true;
         }

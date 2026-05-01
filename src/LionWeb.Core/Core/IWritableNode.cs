@@ -32,7 +32,13 @@ public interface IWritableNode : IReadableNode
     /// </summary>
     /// <param name="child">The child node to detach.</param>
     /// <returns><c>true</c> if <paramref name="child"/> was contained in any of <c>this</c> node's containment, <c>false</c> otherwise.</returns>
+    [Obsolete("Use DetachChild(IWritableNode, bool)")]
     protected internal bool DetachChild(IWritableNode child);
+
+    /// <inheritdoc cref="DetachChild(IWritableNode)"/>
+    /// <param name="notify">Whether we should send an <see cref="LionWeb.Core.Notification.INotification"/> about the change.</param>
+    protected internal bool DetachChild(IWritableNode child, bool notify)  =>
+        DetachChild(child);
 
     /// Removes <c>this</c> node from its <see cref="IReadableNode.GetParent">parents'</see> containments.
     /// After completion, <c>this</c> node does not have a parent, and the former parent does not contain <c>this</c> node anymore.
@@ -352,18 +358,32 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     protected internal void SetParent(T? parent);
 
     /// <inheritdoc/>
-    bool IWritableNode.DetachChild(IWritableNode child)
+    bool IWritableNode.DetachChild(IWritableNode child, bool notify)
     {
         if (child is T t)
         {
-            return DetachChild(t);
+            return DetachChild(t, notify);
         }
 
         throw new UnsupportedNodeTypeException(child, nameof(child));
     }
 
-    /// <inheritdoc cref="IWritableNode.DetachChild"/>
+    bool IWritableNode.DetachChild(IWritableNode child)
+    {
+        if (child is T t)
+        {
+            return DetachChild(t, false);
+        }
+
+        throw new UnsupportedNodeTypeException(child, nameof(child));
+    }
+
+    /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode)"/>
     protected internal bool DetachChild(T child);
+
+    /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode, bool)"/>
+    protected internal bool DetachChild(T child, bool notify) =>
+        DetachChild(child);
 
     /// <inheritdoc/>
     Containment? IWritableNode.GetContainmentOf(IWritableNode child)
