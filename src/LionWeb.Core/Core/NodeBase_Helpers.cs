@@ -44,7 +44,7 @@ public abstract partial class NodeBase
 
     /// <inheritdoc />
     bool IWritableNode<INode>.DetachChild(INode child, bool notify) =>
-        DetachChild(child, notify);
+        DetachChild(child, notify) || DetachChild(child);
 
     /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode, bool)"/>
     protected virtual bool DetachChild(INode child, bool notify)
