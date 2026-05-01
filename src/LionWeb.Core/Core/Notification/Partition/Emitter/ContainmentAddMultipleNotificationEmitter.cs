@@ -23,6 +23,7 @@ using M3;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : INode
 {
+    private readonly List<T> _existingValues;
     private Index _newIndex;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
@@ -46,6 +47,7 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
         Index? startIndex = null,
         INotificationId? notificationId = null) : base(containment, destinationParent, addedValues)
     {
+        _existingValues = existingValues;
         _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
     }
     
@@ -65,9 +67,8 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                     break;
 
                 case not null when old.Parent != DestinationParent:
-                    var notificationId = GetNotificationId();
                     var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, _newIndex, added,
-                        old.Parent, old.Containment, old.Index, notificationId);
+                        old.Parent, old.Containment, old.Index, GetNotificationId());
                     ProduceOriginMoveNotification(old, notification);
                     ProduceNotification(notification);
                     break;
@@ -77,14 +78,13 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment == Containment:
-                    if (old.Index < _newIndex)
+                    if (_newIndex ==  _existingValues.Count)
                         _newIndex--;
                     if (old.Index == _newIndex)
                         break;
                     
                     ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added,
-                        DestinationParent,
-                        old.Containment, old.Index, GetNotificationId()));
+                        DestinationParent, old.Containment, old.Index, GetNotificationId()));
 
                     break;
 

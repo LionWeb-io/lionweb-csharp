@@ -19,6 +19,7 @@ namespace LionWeb.Core.M1;
 
 using M2;
 using M3;
+using Notification.Partition;
 using System.Collections;
 
 /// <summary>
@@ -144,6 +145,71 @@ public static class M1Extensions
     /// <inheritdoc cref="NodeReplacer{T}" />
     public static T ReplaceWith<T>(this INode self, T replacement) where T : INode =>
         new NotifyingNodeReplacer<T>(self, replacement).Replace();
+
+    /// <summary>
+    /// Reverses <paramref name="containmentToReverse"/> inside <paramref name="self"/> without ever detaching the contained children.
+    /// </summary>
+    /// <param name="self">Node that has feature <paramref name="containmentToReverse"/>.</param>
+    /// <param name="containmentToReverse"><see cref="Link.Multiple"/> containment inside <paramref name="self"/>.</param>
+    /// <exception cref="InvalidFeatureException">If <paramref name="containmentToReverse"/> is a single containment or doesn't exist inside <paramref name="self"/>.</exception>
+    public static void ReverseInPlace(this INode self, Containment containmentToReverse)
+    {
+        if (!self.TryGetContainmentsRaw(containmentToReverse, out var children))
+            throw new InvalidFeatureException(containmentToReverse);
+
+        if (children.Count <= 1)
+            return;
+
+        var middleIndex = children.Count / 2;
+        for (int i = 0, j = children.Count - 1; i < middleIndex; i++, j--)
+        {
+            var temp = children[i];
+            var child = children[j];
+            self.Insert(containmentToReverse, i, [child]);
+            self.Insert(containmentToReverse, j, [temp]);
+        }
+    }
+
+    /// <summary>
+    /// Reverses <paramref name="referenceToReverse"/> inside <paramref name="self"/>.
+    /// </summary>
+    /// <param name="self">Node that has feature <paramref name="referenceToReverse"/>.</param>
+    /// <param name="referenceToReverse"><see cref="Link.Multiple"/> reference inside <paramref name="self"/>.</param>
+    /// <exception cref="InvalidFeatureException">If <paramref name="referenceToReverse"/> is a single reference or doesn't exist inside <paramref name="self"/>.</exception>
+    public static void ReverseInPlace(this INode self, Reference referenceToReverse)
+    {
+        if (!self.TryGetReferencesRaw(referenceToReverse, out var targets))
+            throw new InvalidFeatureException(referenceToReverse);
+
+        if (targets.Count <= 1)
+            return;
+
+        var notificationProducer = self.GetPartition()?.GetNotificationProducer();
+        var middleIndex = targets.Count / 2;
+        for (int i = 0, j = targets.Count - 1; i < middleIndex; i++, j--)
+        {
+            var temp = (ReferenceTarget)targets[i];
+            var target = (ReferenceTarget)targets[j];
+            self.RemoveReferencesRaw(referenceToReverse, target);
+            self.InsertReferencesRaw(referenceToReverse, i, target);
+            if (notificationProducer is not null)
+            {
+                notificationProducer.ProduceNotification(new ReferenceDeletedNotification(self, referenceToReverse, j, target, notificationProducer.CreateNotificationId()));
+                notificationProducer.ProduceNotification(new ReferenceAddedNotification(self, referenceToReverse, i, target, notificationProducer.CreateNotificationId()));
+            }
+
+            if (!self.TryGetReferencesRaw(referenceToReverse, out var currentTargets) || ReferenceEquals(currentTargets[j], temp))
+                continue;
+
+            self.RemoveReferencesRaw(referenceToReverse, temp);
+            self.InsertReferencesRaw(referenceToReverse, j, temp);
+            if (notificationProducer is not null)
+            {
+                notificationProducer.ProduceNotification(new ReferenceDeletedNotification(self, referenceToReverse, i + 1, temp, notificationProducer.CreateNotificationId()));
+                notificationProducer.ProduceNotification(new ReferenceAddedNotification(self, referenceToReverse, j, temp, notificationProducer.CreateNotificationId()));
+            }
+        }
+    }
 
     #region Descendants
 

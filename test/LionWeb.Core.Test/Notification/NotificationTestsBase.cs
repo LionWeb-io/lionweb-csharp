@@ -54,16 +54,16 @@ public abstract class NotificationTestsBase
             }
         }
     }
+}
 
-    protected class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
-    {
-        public int Count => Notifications.Count;
+public class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
+{
+    public int Count => Notifications.Count;
 
-        public List<INotification> Notifications { get; } = [];
+    public List<INotification> Notifications { get; } = [];
 
-        public void Receive(INotificationSender correspondingSender, INotification notification) =>
-            Notifications.Add(notification);
-    }
+    public void Receive(INotificationSender correspondingSender, INotification notification) =>
+        Notifications.Add(notification);
 }
 
 /// <summary>
