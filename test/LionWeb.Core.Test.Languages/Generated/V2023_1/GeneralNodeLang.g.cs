@@ -833,32 +833,36 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment);
+			RemoveSelfParent((INode)child, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, null, notify ? ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment) : null);
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _multipleOptionalContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment);
+			RemoveSelfParent((INode)child, _multipleOptionalContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, null, notify ? ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment) : null);
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleContainment.EqualsIdentity(c))
 		{
 			_singleContainment = null;
+			if (notify)
+				NotifyRemoveFromParent<INode>(child, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleContainment);
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalContainment.EqualsIdentity(c))
 		{
 			_singleOptionalContainment = null;
+			if (notify)
+				NotifyRemoveFromParent<INode>(child, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleOptionalContainment);
 			return true;
 		}
 

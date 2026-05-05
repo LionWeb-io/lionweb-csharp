@@ -749,26 +749,28 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+			RemoveSelfParent((MaterialGroup)child, _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups, null, notify ? ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_altGroups) : null);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_defaultGroup.EqualsIdentity(c))
 		{
 			_defaultGroup = null;
+			if (notify)
+				NotifyRemoveFromParent<MaterialGroup>(child, ShapesLanguage.Instance.BillOfMaterials_defaultGroup);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
+			RemoveSelfParent((MaterialGroup)child, _groups, ShapesLanguage.Instance.BillOfMaterials_groups, null, notify ? ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_groups) : null);
 			return true;
 		}
 
@@ -966,14 +968,16 @@ public partial class Circle : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.Circle_center.EqualsIdentity(c))
 		{
 			_center = null;
+			if (notify)
+				NotifyRemoveFromParent<Coord>(child, ShapesLanguage.Instance.Circle_center);
 			return true;
 		}
 
@@ -1323,26 +1327,28 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+			RemoveSelfParent((IShape)child, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_disabledParts) : null);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.CompositeShape_evilPart.EqualsIdentity(c))
 		{
 			_evilPart = null;
+			if (notify)
+				NotifyRemoveFromParent<IShape>(child, ShapesLanguage.Instance.CompositeShape_evilPart);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+			RemoveSelfParent((IShape)child, _parts, ShapesLanguage.Instance.CompositeShape_parts, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_parts) : null);
 			return true;
 		}
 
@@ -1978,20 +1984,22 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.Geometry_documentation.EqualsIdentity(c))
 		{
 			_documentation = null;
+			if (notify)
+				NotifyRemoveFromParent<Documentation>(child, ShapesLanguage.Instance.Geometry_documentation);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _shapes, ShapesLanguage.Instance.Geometry_shapes);
+			RemoveSelfParent((IShape)child, _shapes, ShapesLanguage.Instance.Geometry_shapes, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.Geometry_shapes) : null);
 			return true;
 		}
 
@@ -2198,20 +2206,24 @@ public partial class Line : Shape, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.Line_end.EqualsIdentity(c))
 		{
 			_end = null;
+			if (notify)
+				NotifyRemoveFromParent<Coord>(child, ShapesLanguage.Instance.Line_end);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.Line_start.EqualsIdentity(c))
 		{
 			_start = null;
+			if (notify)
+				NotifyRemoveFromParent<Coord>(child, ShapesLanguage.Instance.Line_start);
 			return true;
 		}
 
@@ -2537,14 +2549,16 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.MaterialGroup_defaultShape.EqualsIdentity(c))
 		{
 			_defaultShape = null;
+			if (notify)
+				NotifyRemoveFromParent<IShape>(child, ShapesLanguage.Instance.MaterialGroup_defaultShape);
 			return true;
 		}
 
@@ -2927,26 +2941,32 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.OffsetDuplicate_docs.EqualsIdentity(c))
 		{
 			_docs = null;
+			if (notify)
+				NotifyRemoveFromParent<Documentation>(child, ShapesLanguage.Instance.OffsetDuplicate_docs);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.OffsetDuplicate_offset.EqualsIdentity(c))
 		{
 			_offset = null;
+			if (notify)
+				NotifyRemoveFromParent<Coord>(child, ShapesLanguage.Instance.OffsetDuplicate_offset);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.OffsetDuplicate_secretDocs.EqualsIdentity(c))
 		{
 			_secretDocs = null;
+			if (notify)
+				NotifyRemoveFromParent<Documentation>(child, ShapesLanguage.Instance.OffsetDuplicate_secretDocs);
 			return true;
 		}
 
@@ -3511,20 +3531,22 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
+			RemoveSelfParent((Coord)child, _fixpoints, ShapesLanguage.Instance.IShape_fixpoints, null, notify ? ContainmentRemover<Coord>(ShapesLanguage.Instance.IShape_fixpoints) : null);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.Shape_shapeDocs.EqualsIdentity(c))
 		{
 			_shapeDocs = null;
+			if (notify)
+				NotifyRemoveFromParent<Documentation>(child, ShapesLanguage.Instance.Shape_shapeDocs);
 			return true;
 		}
 

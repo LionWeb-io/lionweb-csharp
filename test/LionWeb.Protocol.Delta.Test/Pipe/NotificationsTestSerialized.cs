@@ -191,30 +191,32 @@ public class NotificationsTestSerialized : DeltaTestsBase
         AssertEquals(originalForest.Partitions, clonedForest.Partitions);
     }
 
-    // TODO: Not yet possible: https://github.com/LionWeb-io/lionweb-integration-testing/issues/85
-    // [TestMethod]
-    // public void AnnotationAdded_ForwardReference()
-    // {
-    //     var originalPartition = new LinkTestConcept("partition");
-    //
-    //     var clonedPartition = CreateDeltaReplicator(originalPartition);
-    //
-    //     var notificationObserver = new NotificationObserver();
-    //     originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
-    //
-    //     var referencedAnnotation = new TestAnnotation("referencedAnnotation");
-    //     var childWithForwardReference = new LinkTestConcept("childWithForwardReference")
-    //     {
-    //         AnnotationReference =  referencedAnnotation
-    //     };
-    //
-    // originalPartition.Containment_0_1 = childWithForwardReference;
-    //     originalPartition.AddAnnotations([referencedAnnotation]);
-    //
-    //     Assert.AreEqual(2, notificationObserver.Count);
-    //     Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
-    //     Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[1]);
-    //
-    //     AssertEquals([originalPartition], [clonedPartition]);
-    // }
+    [TestMethod]
+    public void AnnotationAdded_ForwardReference()
+    {
+        var originalParent = new LinkTestConcept("parent");
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        var originalForest = new Forest();
+        originalForest.AddPartitions([originalPartition]);
+    
+        var clonedPartition = CreateDeltaReplicator(originalPartition);
+    
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+    
+        var referencedAnnotation = new TestAnnotation("referencedAnnotation");
+        var annWithForwardReference = new TestAnnotation("annWithForwardReference")
+        {
+            Ref =  referencedAnnotation
+        };
+    
+        originalParent.AddAnnotations([annWithForwardReference]);
+        annWithForwardReference.ReplaceWith(referencedAnnotation);
+    
+        Assert.AreEqual(2, notificationObserver.Count);
+        Assert.IsInstanceOfType<AnnotationAddedNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<AnnotationReplacedNotification>(notificationObserver.Notifications[1]);
+    
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
 }

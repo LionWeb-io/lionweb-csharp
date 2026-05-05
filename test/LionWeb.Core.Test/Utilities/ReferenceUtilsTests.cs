@@ -53,7 +53,6 @@ public class ReferenceUtilsTests
     }
 
     [TestMethod]
-    [Ignore("Needs TestLanguage to support reference from annotation")]
     public void finds_a_reference_from_an_annotation()
     {
         var language = TestLanguageLanguage.Instance;
@@ -63,8 +62,7 @@ public class ReferenceUtilsTests
 
         var line = (new ExampleModels(_lionWebVersion).ExampleLine(language) as LinkTestConcept)!;
         var bom = factory.CreateTestAnnotation();
-        // TODO: Add reference from annotation to circle
-        //bom.AddMaterials([circle]);
+        bom.Ref = circle;
         line.AddAnnotations([bom]);
 
         var geometry = factory.CreateTestPartition();
@@ -73,8 +71,7 @@ public class ReferenceUtilsTests
         CollectionAssert.AreEqual(
             new List<ReferenceValue>
             {
-                // TODO: Add reference from annotation to circle
-                // new (bom, language.BillOfMaterials_materials, 0, circle)
+                new (bom, language.TestAnnotation_ref, null, circle)
             },
             ReferenceUtils.FindIncomingReferences(circle, [bom]).ToList()
         );

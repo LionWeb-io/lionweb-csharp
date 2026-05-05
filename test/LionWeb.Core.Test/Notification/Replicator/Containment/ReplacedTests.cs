@@ -86,7 +86,6 @@ public class ReplacedTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("Should emit ChildReplacedNotification")]
     public void Multiple_Only()
     {
         var replaced = new LinkTestConcept("replaced");
@@ -143,7 +142,6 @@ public class ReplacedTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("Should emit ChildReplacedNotification")]
     public void Multiple_First()
     {
         var replaced = new LinkTestConcept("replaced");
@@ -197,7 +195,6 @@ public class ReplacedTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("Should emit ChildReplacedNotification")]
     public void Multiple_Last()
     {
         var replaced = new LinkTestConcept("replaced");

@@ -18,6 +18,7 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
+using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,12 +53,12 @@ internal class ContainmentMethodsGenerator(Classifier classifier, GeneratorInput
     #region DetachChild
 
     private MemberDeclarationSyntax GenDetachChild() =>
-        Method("DetachChild", AsType(typeof(bool)), [Param("child", AsType(typeof(INode)))])
+        Method("DetachChild", AsType(typeof(bool)), [Param("child", AsType(typeof(INode))), Param("notify", AsType(typeof(bool)))])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.DetachChild(child)"),
+                    IfStatement(ParseExpression("base.DetachChild(child, notify)"),
                         ReturnTrue()),
                     ParseStatement("Containment? c = GetContainmentOf(child);")
                 }.Concat(ContainmentsToImplement.Select(GenDetachChild))
@@ -66,27 +67,37 @@ internal class ContainmentMethodsGenerator(Classifier classifier, GeneratorInput
 
     private StatementSyntax GenDetachChild(Containment containment)
     {
-        StatementSyntax statement = containment.Multiple switch
+        List<StatementSyntax> statements = containment.Multiple switch
         {
-            true => RemoveSelfParentCall(containment),
-            false => Assignment(FeatureField(containment).ToString(), Null())
+            true => [RemoveSelfParentCall(containment)],
+            false =>
+            [
+                Assignment(FeatureField(containment).ToString(), Null()),
+                IfStatement(
+                    IdentifierName("notify"),
+                    ExpressionStatement(CallGeneric("NotifyRemoveFromParent", AsType(containment.GetFeatureType(), writeable: true), IdentifierName("child"), MetaProperty(containment)))
+                )
+            ]
         };
 
         return IfStatement(InvocationExpression(
                 MemberAccess(MetaProperty(containment), IdentifierName("EqualsIdentity")),
                 AsArguments([IdentifierName("c")])),
-            AsStatements([
-                statement,
-                ReturnTrue()
-            ])
+            AsStatements(statements.Append(ReturnTrue()))
         );
     }
 
     private ExpressionStatementSyntax RemoveSelfParentCall(Containment containment) =>
         ExpressionStatement(Call("RemoveSelfParent",
-            IdentifierName("child"),
+            CastExpression(AsType(containment.GetFeatureType(), writeable: true), IdentifierName("child")),
             FeatureField(containment),
-            MetaProperty(containment)
+            MetaProperty(containment),
+            Null(),
+            ConditionalExpression(
+                IdentifierName("notify"),
+                CallGeneric("ContainmentRemover", AsType(containment.GetFeatureType(), writeable: true), MetaProperty(containment)),
+                Null()
+            )
         ));
 
     private ReturnStatementSyntax ReturnTrue() =>

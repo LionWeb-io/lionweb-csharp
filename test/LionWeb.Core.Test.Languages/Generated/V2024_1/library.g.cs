@@ -825,14 +825,14 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
+        protected override bool DetachChild(INode child, bool notify)
 	{
-		if (base.DetachChild(child))
+		if (base.DetachChild(child, notify))
 			return true;
 		Containment? c = GetContainmentOf(child);
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(c))
 		{
-			RemoveSelfParent(child, _books, LibraryLanguage.Instance.Library_books);
+			RemoveSelfParent((Book)child, _books, LibraryLanguage.Instance.Library_books, null, notify ? ContainmentRemover<Book>(LibraryLanguage.Instance.Library_books) : null);
 			return true;
 		}
 
