@@ -56,7 +56,6 @@ public abstract class LionWebExceptionBase : ArgumentException
 /// <param name="id">Invalid id.</param>
 public class InvalidIdException(NodeId? id) : LionWebExceptionBase($"Invalid node id: {id}", "id");
 
-
 /// <summary>
 /// Both <paramref name="a"/> and <paramref name="b"/> have the same node id.
 /// </summary>
@@ -76,6 +75,13 @@ public class InvalidValueException(Feature? feature, object? value) : LionWebExc
     not null =>
         $"{feature.GetClassifier().Name} {feature.Name} of type {feature.GetFeatureType().Name} cannot have value '{value ?? "null"}'"
 });
+
+/// <summary>
+/// Trying to use a <see cref="Feature"/> in an invalid context.
+/// </summary>
+/// <param name="feature">Feature trying to use.</param>
+public class InvalidFeatureException(Feature feature) 
+    : LionWebExceptionBase($"{feature.GetClassifier().Name} {feature.Name} of type {feature.GetFeatureType().Name} cannot be used here");
 
 /// <summary>
 /// Trying to retrieve a <see cref="Feature"/> that hasn't been set yet.
@@ -238,5 +244,5 @@ public class VersionMismatchException(LionWebVersions versionA, LionWebVersions 
 /// </summary>
 /// <param name="notification">The invalid notification</param>
 /// <param name="message">Additional message</param>
-public class InvalidNotificationException(INotification notification, string message): 
+public class InvalidNotificationException(INotification notification, string message) :
     LionWebExceptionBase($"Invalid notification: {message}. Notification: {notification}");
