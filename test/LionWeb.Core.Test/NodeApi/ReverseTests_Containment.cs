@@ -45,7 +45,7 @@ public class ReverseTests_Containment
     }
     
     [TestMethod]
-    public void Reverse1()
+    public void Reverse1Child()
     {
         var child = new LinkTestConcept("child");
         var parent = new LinkTestConcept("parent") {Containment_0_n = [child]};
@@ -60,7 +60,7 @@ public class ReverseTests_Containment
     }
     
     [TestMethod]
-    public void Reverse2()
+    public void Reverse2Children()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -79,7 +79,7 @@ public class ReverseTests_Containment
     }
     
     [TestMethod]
-    public void Reverse3()
+    public void Reverse3Children()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -100,7 +100,7 @@ public class ReverseTests_Containment
     }
     
     [TestMethod]
-    public void Reverse4()
+    public void Reverse4Children()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -123,7 +123,7 @@ public class ReverseTests_Containment
     }
     
     [TestMethod]
-    public void Reverse5()
+    public void Reverse5Children()
     {
         var childA = new LinkTestConcept("childA");
         var childB = new LinkTestConcept("childB");
@@ -148,7 +148,7 @@ public class ReverseTests_Containment
     }
 
     [TestMethod]
-    public void ReverseSingle_Empty()
+    public void ReverseSingle_Empty_Throws()
     {
         var parent = new LinkTestConcept("parent");
         var partition = new TestPartition("partition") {Links = [parent]};
@@ -162,7 +162,7 @@ public class ReverseTests_Containment
     }
 
     [TestMethod]
-    public void ReverseSingle_Set()
+    public void ReverseSingle_Set_Throws()
     {
         var child = new LinkTestConcept("child");
         var parent = new LinkTestConcept("parent") {Containment_0_1 = child};

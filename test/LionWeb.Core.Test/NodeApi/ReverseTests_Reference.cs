@@ -45,7 +45,7 @@ public class ReverseTests_Reference
     }
     
     [TestMethod]
-    public void Reverse1()
+    public void Reverse1Target()
     {
         var target = new LinkTestConcept("target");
         var parent = new LinkTestConcept("parent") {Reference_0_n = [target]};
@@ -60,7 +60,7 @@ public class ReverseTests_Reference
     }
     
     [TestMethod]
-    public void Reverse2()
+    public void Reverse2Targets()
     {
         var targetA = new LinkTestConcept("targetA");
         var targetB = new LinkTestConcept("targetB");
@@ -80,7 +80,7 @@ public class ReverseTests_Reference
     }
     
     [TestMethod]
-    public void Reverse3()
+    public void Reverse3Targets()
     {
         var targetA = new LinkTestConcept("targetA");
         var targetB = new LinkTestConcept("targetB");
@@ -104,7 +104,7 @@ public class ReverseTests_Reference
     }
     
     [TestMethod]
-    public void Reverse4()
+    public void Reverse4Targets()
     {
         var targetA = new LinkTestConcept("targetA");
         var targetB = new LinkTestConcept("targetB");
@@ -132,7 +132,7 @@ public class ReverseTests_Reference
     }
     
     [TestMethod]
-    public void Reverse5()
+    public void Reverse5Targets()
     {
         var targetA = new LinkTestConcept("targetA");
         var targetB = new LinkTestConcept("targetB");
@@ -164,7 +164,7 @@ public class ReverseTests_Reference
     }
 
     [TestMethod]
-    public void ReverseSingle_Empty()
+    public void ReverseSingle_Empty_Throws()
     {
         var parent = new LinkTestConcept("parent");
         var partition = new TestPartition("partition") {Links = [parent]};
@@ -178,7 +178,7 @@ public class ReverseTests_Reference
     }
 
     [TestMethod]
-    public void ReverseSingle_Set()
+    public void ReverseSingle_Set_Throws()
     {
         var target = new LinkTestConcept("target");
         var parent = new LinkTestConcept("parent") {Reference_0_1 = target};
