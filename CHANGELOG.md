@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Fixed
 ### Changed
 * Enabled AOT-optimized JSON (de)serialization for delta messages.
+* Delta message JSON are not formatted (pretty-printed) anymore. 
 ### Removed
 ### Deprecated
 ### Security

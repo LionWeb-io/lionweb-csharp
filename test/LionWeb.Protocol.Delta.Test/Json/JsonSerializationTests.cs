@@ -19,6 +19,7 @@ namespace LionWeb.Protocol.Delta.Test.Json;
 
 using Message;
 using Message.Event;
+using System.Text.RegularExpressions;
 
 [TestClass]
 public class JsonSerializationTests : JsonTestsBase
@@ -36,7 +37,16 @@ public class JsonSerializationTests : JsonTestsBase
         // see https://github.com/LionWeb-io/specification/issues/351
         if (delta is CompositeEvent ce)
             delta = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber };
-        
+
         Assert.AreEqual(delta, deserialized);
+    }
+
+    [TestMethod]
+    public void NoPrettyPrinting()
+    {
+        var deltaSerializer = new DeltaSerializer();
+        var serialized = deltaSerializer.Serialize(CreateAddChild());
+
+        Assert.IsFalse(Regex.IsMatch(serialized, "\\s"), serialized);
     }
 }
