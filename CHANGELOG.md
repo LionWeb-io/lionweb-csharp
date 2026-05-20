@@ -8,6 +8,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.4.7] - tbd
 ### Added
 ### Fixed
+* Use nodeId-compatible strings for commandId everywhere.
 ### Changed
 * Enabled AOT-optimized JSON (de)serialization for delta messages.
 * Delta message JSON are not formatted (pretty-printed) anymore.

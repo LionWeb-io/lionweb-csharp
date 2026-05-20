@@ -27,4 +27,16 @@ public interface INotification
 }
 
 /// ID of a notification in the LionWeb notification system.
-public interface INotificationId;
+public interface INotificationId
+{
+    /// <summary>
+    /// Participation id, if available; <c>null</c> otherwise.
+    /// </summary>
+    string? ParticipationId { get; }
+    
+    /// <summary>
+    /// CommandId, must be set.
+    /// </summary>
+    string CommandId { get; }
+    
+};
