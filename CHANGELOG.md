@@ -12,6 +12,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Enabled AOT-optimized JSON (de)serialization for delta messages.
 * Delta message JSON are not formatted (pretty-printed) anymore. 
 ### Removed
+* Removed `DeltaProtocolTypeResolver` (superseded by AOT-optimized `LionWebDeltaSerializerContext`)
 ### Deprecated
 ### Security
 
