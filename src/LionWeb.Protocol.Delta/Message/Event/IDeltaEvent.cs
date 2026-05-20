@@ -23,7 +23,15 @@ using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
-public record CommandSource(ParticipationId ParticipationId, CommandId CommandId);
+public record CommandSource(ParticipationId ParticipationId, CommandId CommandId)
+{
+    /// <summary>
+    /// Represents this command source as NodeId-compatible string.
+    /// </summary>
+    /// <returns></returns>
+    public string AsId() =>
+        ParticipationId + "__" + CommandId;
+};
 
 /// <remarks>
 /// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> in lockstep.
@@ -116,7 +124,7 @@ public abstract record DeltaEventBase(
 {
     /// <inheritdoc />
     [JsonIgnore]
-    public override string Id => string.Join("__", OriginCommands.Select(x => x.ToString()));
+    public override string Id => string.Join("___", OriginCommands.Select(x => x.AsId()));
 
     /// <inheritdoc />
     public virtual EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;

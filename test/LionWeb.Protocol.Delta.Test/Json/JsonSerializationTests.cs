@@ -17,6 +17,12 @@
 
 namespace LionWeb.Protocol.Delta.Test.Json;
 
+using Core.Notification;
+using Core.Notification.Partition;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
+using Core.Utilities;
+using Delta.Client;
+using Delta.Repository;
 using Message;
 using Message.Command;
 using Message.Event;
@@ -64,7 +70,7 @@ public class JsonSerializationTests : JsonTestsBase
         // see https://github.com/LionWeb-io/specification/issues/351
         if (@event is CompositeEvent ce)
             @event = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber };
-        
+
         var deltaSerializer = new DeltaSerializer();
         var compositeEvent = new CompositeEvent([@event], []);
         var serialized = deltaSerializer.Serialize(compositeEvent);
@@ -81,5 +87,58 @@ public class JsonSerializationTests : JsonTestsBase
         var serialized = deltaSerializer.Serialize(CreateAddChild());
 
         Assert.IsFalse(Regex.IsMatch(serialized, "\\s"), serialized);
+    }
+
+    [TestMethod]
+    public void SerializeNumericNotificationId()
+    {
+        var notification = new PropertyAddedNotification(new DataTypeTestConcept("nodeId"), TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, true,
+            new NumericNotificationId("myBase", 23));
+
+        var lionWebVersion = TestLanguageLanguage.Instance.LionWebVersion;
+        var deltaSerializer = new DeltaSerializer();
+
+        var deltaCommand = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(notification);
+        Assert.IsTrue(IdUtils.IsValid(deltaCommand.Id));
+        Assert.IsTrue(IdUtils.IsValid(deltaCommand.CommandId!));
+        var serializedCommand = deltaSerializer.Serialize(deltaCommand);
+        Assert.AreEqual(
+            """{"messageKind":"AddProperty","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","commandId":"1","additionalInfos":[]}""",
+            serializedCommand);
+
+        var deltaEvent = new NotificationToDeltaEventMapper(new ParticipationIdProvider(), lionWebVersion).Map(notification);
+        Assert.IsTrue(IdUtils.IsValid(deltaEvent.Id));
+        Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].CommandId));
+        Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].ParticipationId));
+        var serializedEvent = deltaSerializer.Serialize(deltaEvent);
+        Assert.AreEqual(
+            """{"messageKind":"PropertyAdded","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","sequenceNumber":-1,"originCommands":[{"participationId":"participationId1","commandId":"myBase__23"}],"additionalInfos":[]}""",
+            serializedEvent);
+    }
+
+    [TestMethod]
+    public void SerializeParticipationNotificationId()
+    {
+        var notification = new PropertyAddedNotification(new DataTypeTestConcept("nodeId"), TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, true,
+            new ParticipationNotificationId("myParticipation", "myCommand"));
+
+        var lionWebVersion = TestLanguageLanguage.Instance.LionWebVersion;
+        var deltaSerializer = new DeltaSerializer();
+
+        var deltaCommand = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(notification);
+        Assert.IsTrue(IdUtils.IsValid(deltaCommand.Id));
+        Assert.IsTrue(IdUtils.IsValid(deltaCommand.CommandId!));
+        var serializedCommand = deltaSerializer.Serialize(deltaCommand);
+        Assert.AreEqual(
+            """{"messageKind":"AddProperty","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","commandId":"myCommand","additionalInfos":[]}""",
+            serializedCommand);
+        var deltaEvent = new NotificationToDeltaEventMapper(new ParticipationIdProvider(), lionWebVersion).Map(notification);
+        Assert.IsTrue(IdUtils.IsValid(deltaEvent.Id));
+        Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].CommandId));
+        Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].ParticipationId));
+        var serializedEvent = deltaSerializer.Serialize(deltaEvent);
+        Assert.AreEqual(
+            """{"messageKind":"PropertyAdded","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","sequenceNumber":-1,"originCommands":[{"participationId":"myParticipation","commandId":"myCommand"}],"additionalInfos":[]}""",
+            serializedEvent);
     }
 }

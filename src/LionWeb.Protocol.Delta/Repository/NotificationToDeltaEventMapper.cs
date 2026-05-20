@@ -342,20 +342,6 @@ public class NotificationToDeltaEventMapper
     private TargetNode[] ToDescendants(IReadableNode node) =>
         M1Extensions.Descendants(node, false, true).Select(n => n.GetId()).ToArray();
 
-    private CommandSource[] ToCommandSources(INotification notification)
-    {
-        ParticipationId participationId;
-        EventId commandId;
-        if (notification.NotificationId is ParticipationNotificationId pei)
-        {
-            participationId = pei.ParticipationId;
-            commandId = pei.CommandId;
-        } else
-        {
-            participationId = _participationIdProvider.Create();
-            commandId = notification.NotificationId.ToString();
-        }
-
-        return [new CommandSource(participationId, commandId)];
-    }
+    private CommandSource[] ToCommandSources(INotification notification) => 
+        [new(notification.NotificationId.ParticipationId ?? _participationIdProvider.Create(), notification.NotificationId.CommandId)];
 }

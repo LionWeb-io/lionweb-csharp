@@ -23,6 +23,12 @@ using Utilities;
 public record NumericNotificationId(string Base, int Id) : INotificationId
 {
     /// <inheritdoc />
+    public string? ParticipationId => null;
+
+    /// <inheritdoc />
+    public string CommandId => Base + "__" + Id;
+
+    /// <inheritdoc />
     public virtual bool Equals(NumericNotificationId? other)
     {
         if (other is null)
