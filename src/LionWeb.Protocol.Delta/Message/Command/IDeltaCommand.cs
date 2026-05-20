@@ -23,6 +23,78 @@ using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
+/// <remarks>
+/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> in lockstep.
+/// </remarks> 
+#region Command
+
+[JsonDerivedType(typeof(CompositeCommand), nameof(CompositeCommand))]
+
+#region Forest
+
+[JsonDerivedType(typeof(AddPartition), nameof(AddPartition))]
+[JsonDerivedType(typeof(DeletePartition), nameof(DeletePartition))]
+
+#endregion
+
+#region Partition
+
+#region Annotation
+
+[JsonDerivedType(typeof(AddAnnotation), nameof(AddAnnotation))]
+[JsonDerivedType(typeof(DeleteAnnotation), nameof(DeleteAnnotation))]
+[JsonDerivedType(typeof(MoveAndReplaceAnnotationFromOtherParent), nameof(MoveAndReplaceAnnotationFromOtherParent))]
+[JsonDerivedType(typeof(MoveAndReplaceAnnotationInSameParent), nameof(MoveAndReplaceAnnotationInSameParent))]
+[JsonDerivedType(typeof(MoveAnnotationFromOtherParent), nameof(MoveAnnotationFromOtherParent))]
+[JsonDerivedType(typeof(MoveAnnotationInSameParent), nameof(MoveAnnotationInSameParent))]
+[JsonDerivedType(typeof(ReplaceAnnotation), nameof(ReplaceAnnotation))]
+
+#endregion
+
+#region Feature
+
+#region Containment
+
+[JsonDerivedType(typeof(AddChild), nameof(AddChild))]
+[JsonDerivedType(typeof(DeleteChild), nameof(DeleteChild))]
+[JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainment), nameof(MoveAndReplaceChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainmentInSameParent), nameof(MoveAndReplaceChildFromOtherContainmentInSameParent))]
+[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainment), nameof(MoveAndReplaceChildInSameContainment))]
+[JsonDerivedType(typeof(MoveChildFromOtherContainment), nameof(MoveChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveChildFromOtherContainmentInSameParent), nameof(MoveChildFromOtherContainmentInSameParent))]
+[JsonDerivedType(typeof(MoveChildInSameContainment), nameof(MoveChildInSameContainment))]
+[JsonDerivedType(typeof(ReplaceChild), nameof(ReplaceChild))]
+
+#endregion
+
+#region Property
+
+[JsonDerivedType(typeof(AddProperty), nameof(AddProperty))]
+[JsonDerivedType(typeof(ChangeProperty), nameof(ChangeProperty))]
+[JsonDerivedType(typeof(DeleteProperty), nameof(DeleteProperty))]
+
+#endregion
+
+#region Reference
+
+[JsonDerivedType(typeof(AddReference), nameof(AddReference))]
+[JsonDerivedType(typeof(ChangeReference), nameof(ChangeReference))]
+[JsonDerivedType(typeof(DeleteReference), nameof(DeleteReference))]
+
+#endregion
+
+#endregion
+
+#region Node
+
+[JsonDerivedType(typeof(ChangeClassifier), nameof(ChangeClassifier))]
+
+#endregion
+
+#endregion
+
+#endregion
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface IDeltaCommand : IDeltaContent
 {
     CommandId? CommandId { get; }
