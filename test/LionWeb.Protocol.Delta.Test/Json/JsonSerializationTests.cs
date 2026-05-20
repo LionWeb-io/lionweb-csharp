@@ -18,16 +18,17 @@
 namespace LionWeb.Protocol.Delta.Test.Json;
 
 using Message;
+using Message.Command;
 using Message.Event;
 using System.Text.RegularExpressions;
 
 [TestClass]
 public class JsonSerializationTests : JsonTestsBase
 {
-    private static IEnumerable<object[]> GetTestData() => CollectAllMessages();
+    private static IEnumerable<object[]> CollectAllDeltaMessages() => CollectAllMessages();
 
     [TestMethod]
-    [DynamicData(nameof(GetTestData), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(CollectAllDeltaMessages), DynamicDataSourceType.Method)]
     public void Serialization(IDeltaContent delta)
     {
         var deltaSerializer = new DeltaSerializer();
@@ -39,6 +40,38 @@ public class JsonSerializationTests : JsonTestsBase
             delta = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber };
 
         Assert.AreEqual(delta, deserialized);
+    }
+
+    private static IEnumerable<object[]> CollectMessagesInsideCompositeCommand() => CollectCommandMessages();
+
+    [TestMethod]
+    [DynamicData(nameof(CollectMessagesInsideCompositeCommand), DynamicDataSourceType.Method)]
+    public void CompositeCommandSerialization(IDeltaCommand command)
+    {
+        var deltaSerializer = new DeltaSerializer();
+        var compositeCommand = new CompositeCommand([command], "compositeCommandId", []);
+        var serialized = deltaSerializer.Serialize(compositeCommand);
+        var deserialized = deltaSerializer.Deserialize<CompositeCommand>(serialized);
+        Assert.AreEqual(compositeCommand, deserialized);
+    }
+
+    private static IEnumerable<object[]> CollectMessagesInsideCompositeEvent() => CollectEventMessages();
+
+    [TestMethod]
+    [DynamicData(nameof(CollectMessagesInsideCompositeEvent), DynamicDataSourceType.Method)]
+    public void CompositeEventSerialization(IDeltaEvent @event)
+    {
+        // see https://github.com/LionWeb-io/specification/issues/351
+        if (@event is CompositeEvent ce)
+            @event = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber };
+        
+        var deltaSerializer = new DeltaSerializer();
+        var compositeEvent = new CompositeEvent([@event], []);
+        var serialized = deltaSerializer.Serialize(compositeEvent);
+        var deserialized = deltaSerializer.Deserialize<CompositeEvent>(serialized);
+        deserialized.SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber;
+
+        Assert.AreEqual(compositeEvent, deserialized);
     }
 
     [TestMethod]
