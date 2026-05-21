@@ -25,6 +25,80 @@ using System.Text.Json.Serialization;
 
 public record CommandSource(ParticipationId ParticipationId, CommandId CommandId);
 
+/// <remarks>
+/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> in lockstep.
+/// </remarks> 
+#region Event
+
+[JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
+[JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
+[JsonDerivedType(typeof(NoOpEvent), nameof(NoOpEvent))]
+
+#region Forest
+
+[JsonDerivedType(typeof(PartitionAdded), nameof(PartitionAdded))]
+[JsonDerivedType(typeof(PartitionDeleted), nameof(PartitionDeleted))]
+
+#endregion
+
+#region Partition
+
+#region Annotation
+
+[JsonDerivedType(typeof(AnnotationAdded), nameof(AnnotationAdded))]
+[JsonDerivedType(typeof(AnnotationDeleted), nameof(AnnotationDeleted))]
+[JsonDerivedType(typeof(AnnotationMovedAndReplacedFromOtherParent), nameof(AnnotationMovedAndReplacedFromOtherParent))]
+[JsonDerivedType(typeof(AnnotationMovedAndReplacedInSameParent), nameof(AnnotationMovedAndReplacedInSameParent))]
+[JsonDerivedType(typeof(AnnotationMovedFromOtherParent), nameof(AnnotationMovedFromOtherParent))]
+[JsonDerivedType(typeof(AnnotationMovedInSameParent), nameof(AnnotationMovedInSameParent))]
+[JsonDerivedType(typeof(AnnotationReplaced), nameof(AnnotationReplaced))]
+
+#endregion
+
+#region Feature
+
+#region Containment
+
+[JsonDerivedType(typeof(ChildAdded), nameof(ChildAdded))]
+[JsonDerivedType(typeof(ChildDeleted), nameof(ChildDeleted))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedFromOtherContainment), nameof(ChildMovedAndReplacedFromOtherContainment))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedFromOtherContainmentInSameParent), nameof(ChildMovedAndReplacedFromOtherContainmentInSameParent))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedInSameContainment), nameof(ChildMovedAndReplacedInSameContainment))]
+[JsonDerivedType(typeof(ChildMovedFromOtherContainment), nameof(ChildMovedFromOtherContainment))]
+[JsonDerivedType(typeof(ChildMovedFromOtherContainmentInSameParent), nameof(ChildMovedFromOtherContainmentInSameParent))]
+[JsonDerivedType(typeof(ChildMovedInSameContainment), nameof(ChildMovedInSameContainment))]
+[JsonDerivedType(typeof(ChildReplaced), nameof(ChildReplaced))]
+
+#endregion
+
+#region Property
+
+[JsonDerivedType(typeof(PropertyAdded), nameof(PropertyAdded))]
+[JsonDerivedType(typeof(PropertyChanged), nameof(PropertyChanged))]
+[JsonDerivedType(typeof(PropertyDeleted), nameof(PropertyDeleted))]
+
+#endregion
+
+#region Reference
+
+[JsonDerivedType(typeof(ReferenceAdded), nameof(ReferenceAdded))]
+[JsonDerivedType(typeof(ReferenceChanged), nameof(ReferenceChanged))]
+[JsonDerivedType(typeof(ReferenceDeleted), nameof(ReferenceDeleted))]
+
+#endregion
+
+#endregion
+
+#region Node
+
+[JsonDerivedType(typeof(ClassifierChanged), nameof(ClassifierChanged))]
+
+#endregion
+
+#endregion
+
+#endregion
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface IDeltaEvent : IDeltaContent
 {
     public const EventSequenceNumber DefaultEventSequenceNumber = -1;
