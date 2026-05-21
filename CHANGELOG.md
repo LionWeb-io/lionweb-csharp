@@ -26,6 +26,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `IWritableNode.DetachFromParent()` emits a notification.
 * `UnresolvedReferencesManager` now handles deleted nodes and reference edits.
 ### Changed
+* Made `Comparer.RegisterSurplusFeature()` accessible to customization.
 ### Removed
 ### Deprecated
 * `IWritableNode.DetachChild(IWritableNode child)` -- use `DetachChild(IWritableNode child, bool notify)` instead.
