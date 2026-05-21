@@ -256,37 +256,44 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
                 rightFeatureDict.Remove(leftFeature);
             } else
             {
-                result.AddRange(
-                    RegisterSurplusFeature(left, right, leftFeature, true,
-                        (leftP, feature, rightP, parent) =>
-                            new UnsetFeatureRightDifference(leftP, feature, rightP) { Parent = parent },
-                        (leftOwner, rightOwner, link, surplus, parent) =>
-                            new LeftSurplusNodeDifference(leftOwner, rightOwner, link, surplus) { Parent = parent }));
+                result.AddRange(RegisterLeftSurplusFeature(left, right, leftFeature));
             }
         }
 
         foreach (var remainingRightFeature in rightFeatureDict.Keys)
         {
-            result.AddRange(
-                RegisterSurplusFeature(left, right, remainingRightFeature, false,
-                    (leftP, feature, rightP, parent) =>
-                        new UnsetFeatureLeftDifference(leftP, feature, rightP) { Parent = parent },
-                    (leftOwner, rightOwner, link, surplus, parent) =>
-                        new RightSurplusNodeDifference(leftOwner, rightOwner, link, surplus) { Parent = parent }));
+            result.AddRange(RegisterRightSurplusFeature(left, right, remainingRightFeature));
         }
 
         return result;
     }
 
+    /// Registers <paramref name="rightFeature"/> to be present in <paramref name="right"/>, but not in <paramref name="left"/>.
+    protected static List<IDifference> RegisterRightSurplusFeature(IReadableNode left, IReadableNode right, Feature rightFeature) =>
+        RegisterSurplusFeature(left, right, rightFeature, false, right.Get(rightFeature),
+            (leftP, feature, rightP, parent) =>
+                new UnsetFeatureLeftDifference(leftP, feature, rightP) { Parent = parent },
+            (leftOwner, rightOwner, link, surplus, parent) =>
+                new RightSurplusNodeDifference(leftOwner, rightOwner, link, surplus) { Parent = parent });
+
+    /// Registers <paramref name="leftFeature"/> to be present in <paramref name="left"/>, but not in <paramref name="right"/>.
+    protected static List<IDifference> RegisterLeftSurplusFeature(IReadableNode left, IReadableNode right, Feature leftFeature) =>
+        RegisterSurplusFeature(left, right, leftFeature, true, left.Get(leftFeature),
+            (leftP, feature, rightP, parent) =>
+                new UnsetFeatureRightDifference(leftP, feature, rightP) { Parent = parent },
+            (leftOwner, rightOwner, link, surplus, parent) =>
+                new LeftSurplusNodeDifference(leftOwner, rightOwner, link, surplus) { Parent = parent });
+
     /// <summary>
     /// We want to be sure the logic for left and right surplus features is the same.
     /// As the logic is extensive, we parameterize the side we're working on.
     /// </summary>
-    private static List<IDifference> RegisterSurplusFeature(
+    protected static List<IDifference> RegisterSurplusFeature(
         IReadableNode left,
         IReadableNode right,
         Feature feature,
         bool useLeft,
+        object? value,
         Func<IReadableNode, Feature, IReadableNode, IContainerDifference?, IUnsetFeatureDifference> unsetFactory,
         Func<IReadableNode, IReadableNode, Link, IReadableNode, IContainerDifference?, ISurplusNodeDifference> surplusFactory
     )
@@ -309,8 +316,6 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         result.Add(unsetFactory(left, feature, right, parent));
         if (feature is Link { Multiple: true } link)
         {
-            var owner = useLeft ? left : right;
-            var value = owner.Get(feature);
             if (value is ICollection coll)
             {
                 (int leftCount, int rightCount) = useLeft ? (coll.Count, 0) : (0, coll.Count);
