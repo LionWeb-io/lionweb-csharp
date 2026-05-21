@@ -20,24 +20,23 @@ namespace LionWeb.Core.Serialization;
 using M1;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Json.Stream;
 
 /// <summary>
 /// Utility methods for working with JSON.
 /// </summary>
 public static class JsonUtils
 {
-    private static readonly JsonSerializerOptions _readOptions = LionWebJsonSerializerContext.Default.Options;
+    private static readonly LionWebJsonSerializerContext _readContext = LionWebJsonSerializerContext.Default;
 
     /// Parses <paramref name="json"/> as JSON.
     public static T ReadJsonFromString<T>(string json) =>
-        JsonSerializer.Deserialize<T>(json, _readOptions)!;
+        (T)JsonSerializer.Deserialize(json, typeof(T), _readContext)!;
 
-    private static readonly JsonSerializerOptions _writeOptions = _readOptions;
+    private static readonly LionWebJsonSerializerContext _writeContext = _readContext;
 
     /// Returns <paramref name="data"/> rendered as JSON.
-    public static string WriteJsonToString(object data) =>
-        JsonSerializer.Serialize(data, _writeOptions);
+    public static string WriteJsonToString<T>(T data) =>
+        JsonSerializer.Serialize(data, typeof(T), _writeContext);
 
     /// Writes <paramref name="data"/> to a file at <paramref name="path"/>.
     public static void WriteJsonToFile(string path, object data) =>
@@ -60,7 +59,7 @@ public static class JsonUtils
             Nodes = serializer.Serialize(nodes),
             Languages = serializer.UsedLanguages
         };
-        JsonSerializer.Serialize(utf8JsonStream, data, _writeOptions);
+        JsonSerializer.Serialize(utf8JsonStream, data, typeof(LazySerializationChunk), _writeContext);
     }
 
     /// <summary>
@@ -80,7 +79,7 @@ public static class JsonUtils
             Nodes = serializer.Serialize(nodes),
             Languages = serializer.UsedLanguages
         };
-        await JsonSerializer.SerializeAsync(utf8JsonStream, data, _writeOptions);
+        await JsonSerializer.SerializeAsync(utf8JsonStream, data, typeof(LazySerializationChunk), _writeContext);
     }
 
     /// <summary>
@@ -97,7 +96,7 @@ public static class JsonUtils
         Stream utf8JsonStream,
         IDeserializer deserializer,
         Action<string>? lionWebVersionChecker = null
-    ) => await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
+    ) => await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, _readContext.Options);
 
     internal static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(
         Stream utf8JsonStream,
@@ -124,7 +123,7 @@ public static class JsonUtils
         Stream utf8JsonStream,
         IDeserializer deserializer,
         Action<string>? lionWebVersionChecker = null
-    ) => ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
+    ) => ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, _readContext.Options);
 
     internal static List<IReadableNode> ReadNodesFromStream(
         Stream utf8JsonStream,
