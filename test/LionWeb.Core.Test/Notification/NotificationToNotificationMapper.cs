@@ -59,6 +59,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
+            CompositeNotification a => OnComposite(a),
             _ => throw new ArgumentException($"{notification.GetType().Name} is not implemented")
         };
 
@@ -456,6 +457,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
         throw new InvalidOperationException($"Unknown target node with id: {nodeId}");
     }
+
+    private CompositeNotification OnComposite(CompositeNotification notification) => new(notification.Parts.Select(Map), notification.NotificationId);
 
     private T CloneNode<T>(T node) where T : IReadableNode => (T)SameIdCloner.Clone((INode)node);
 }

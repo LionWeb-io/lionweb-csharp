@@ -132,6 +132,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case ReferenceChangedNotification e:
                 OnRemoteReferenceChanged(e);
                 break;
+            case CompositeNotification e:
+                OnRemoteComposite(correspondingSender, e);
+                break;
             default:
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
@@ -430,7 +433,15 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #endregion
 
-    /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    private void OnRemoteComposite(INotificationSender correspondingSender, CompositeNotification e)
+    {
+        foreach (var item in e.Parts)
+        {
+            Receive(correspondingSender, item);
+        }
+    }
+
+    /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>.
     protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
     {
         var notificationId = notification.NotificationId;

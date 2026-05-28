@@ -71,6 +71,7 @@ public class DeltaEventToNotificationMapper
             ReferenceAdded a => OnReferenceAdded(a),
             ReferenceDeleted a => OnReferenceDeleted(a),
             ReferenceChanged a => OnReferenceChanged(a),
+            CompositeEvent a => OnComposite(a),
             _ => throw new ArgumentException($"{nameof(DeltaEventToNotificationMapper)} does not support {deltaEvent.GetType().Name}!")
         };
 
@@ -415,6 +416,8 @@ public class DeltaEventToNotificationMapper
     }
 
     #endregion
+
+    private CompositeNotification OnComposite(CompositeEvent compositeEvent) => new(compositeEvent.Parts.Select(Map), ToNotificationId(compositeEvent));
 
     private static INotificationId ToNotificationId(IDeltaEvent deltaEvent) =>
         new ParticipationNotificationId(deltaEvent.InternalParticipationId,

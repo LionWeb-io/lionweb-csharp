@@ -66,6 +66,7 @@ public class NotificationToDeltaEventMapper
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
+            CompositeNotification a => OnComposite(a),
             _ => throw new ArgumentException($"{nameof(NotificationToDeltaEventMapper)} does not support {notification.GetType().Name}!")
         };
 
@@ -332,6 +333,8 @@ public class NotificationToDeltaEventMapper
         );
 
     #endregion
+
+    private CompositeEvent OnComposite(CompositeNotification a) => new([.. a.Parts.Select(Map)], []);
 
     private DeltaSerializationChunk ToDeltaChunk(IReadableNode node)
     {

@@ -19,6 +19,9 @@ namespace LionWeb.Core.Test.Notification.Replicator;
 
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Forest;
+using LionWeb.Core.Notification.Pipe;
 
 [TestClass]
 public class ForestTests : ReplicatorTestsBase
@@ -288,4 +291,23 @@ public class ForestTests : ReplicatorTestsBase
     }
 
     #endregion
+
+    [TestMethod]
+    public void Composite_PartitionsAdded()
+    {
+        var nodeA = new TestPartition("a");
+        var nodeB = new TestPartition("b");
+        var originalForest = new Forest();
+        var clonedForest = new Forest();
+
+        CreateForestReplicator(clonedForest, originalForest);
+
+        var composite = new CompositeNotification(new NumericNotificationId("composite", 1));
+        composite.AddPart(new PartitionAddedNotification(nodeA, new NumericNotificationId("composite", 1)));
+        composite.AddPart(new PartitionAddedNotification(nodeB, new NumericNotificationId("composite", 2)));
+
+        ((INotificationProducer)originalForest.GetNotificationSender()!).ProduceNotification(composite);
+
+        AssertEquals([nodeA, nodeB], clonedForest.Partitions);
+    }
 }
