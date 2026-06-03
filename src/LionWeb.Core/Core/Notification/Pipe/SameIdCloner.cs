@@ -29,8 +29,23 @@ public class SameIdCloner : Cloner
     }
 
     /// <inheritdoc cref="Cloner.Clone()"/>
-    public static new T Clone<T>(T node) where T : class, INode =>
+    public new static T Clone<T>(T node) where T : class, INode =>
         (T)new SameIdCloner([node]).Clone()[node];
+
+    /// <inheritdoc cref="Cloner.Clone()"/>
+    public new static IEnumerable<INode> Clone(IEnumerable<INode> nodes)
+    {
+        HashSet<INode> hashSet;
+        if (nodes is HashSet<INode> set)
+        {
+            hashSet = set;
+        } else
+        {
+            hashSet = [..nodes];
+        }
+
+        return FilterCorresponding(hashSet, new SameIdCloner(hashSet).Clone());
+    }
 
     /// <inheritdoc />
     protected override NodeId GetNewId(INode remoteNode) =>
