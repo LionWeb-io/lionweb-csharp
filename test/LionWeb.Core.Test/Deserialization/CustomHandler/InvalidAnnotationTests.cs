@@ -53,9 +53,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["annotation"],
                 },
 
@@ -63,10 +60,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "annotation",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -98,9 +91,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["annotation"],
                 },
 
@@ -108,10 +98,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "annotation",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -145,9 +131,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["annotation"],
                 },
 
@@ -155,10 +138,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "annotation",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -192,9 +171,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["annotation"],
                 },
 
@@ -202,10 +178,6 @@ public class InvalidAnnotationTests
                 {
                     Id = "annotation",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };

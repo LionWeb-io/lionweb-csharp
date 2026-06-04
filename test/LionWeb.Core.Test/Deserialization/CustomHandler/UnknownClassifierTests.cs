@@ -53,10 +53,6 @@ public class UnknownClassifierTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-unknown-classifier"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -92,10 +88,6 @@ public class UnknownClassifierTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "0", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -129,10 +121,6 @@ public class UnknownClassifierTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-unknown-classifier"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };

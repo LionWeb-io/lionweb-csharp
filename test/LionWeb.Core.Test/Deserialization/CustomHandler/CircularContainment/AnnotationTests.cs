@@ -51,7 +51,6 @@ public class AnnotationTests : CircularContainmentTestBase
                             Containment = new MetaPointer("key-Shapes", "1", "key-default-group"), Children = []
                         }
                     ],
-                    References = [],
                     Annotations = ["A"],
                     Parent = "A"
                 },
@@ -94,7 +93,6 @@ public class AnnotationTests : CircularContainmentTestBase
                 {
                     Id = "A",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment()
@@ -102,17 +100,12 @@ public class AnnotationTests : CircularContainmentTestBase
                             Containment = new MetaPointer("key-Shapes", "1", "key-default-group"), Children = ["B"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = "B"
                 },
                 new SerializedNode
                 {
                     Id = "B",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-MaterialGroup"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations =
                     [
                         "A"
@@ -164,7 +157,6 @@ public class AnnotationTests : CircularContainmentTestBase
                 {
                     Id = "A",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-MaterialGroup"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment()
@@ -172,8 +164,6 @@ public class AnnotationTests : CircularContainmentTestBase
                             Containment = new MetaPointer("key-Shapes", "1", "key-default-shape"), Children = ["B"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
 
@@ -181,9 +171,6 @@ public class AnnotationTests : CircularContainmentTestBase
                 {
                     Id = "B",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["C"],
                     Parent = "A"
                 },
@@ -192,7 +179,6 @@ public class AnnotationTests : CircularContainmentTestBase
                 {
                     Id = "C",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment()
@@ -200,8 +186,6 @@ public class AnnotationTests : CircularContainmentTestBase
                             Containment = new MetaPointer("key-Shapes", "1", "key-default-group"), Children = ["A"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = "B"
                 },
             ]

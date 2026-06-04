@@ -232,18 +232,11 @@ public class InstanceTests : LionWebVersionsTestBase
                             Targets = [new SerializedReferenceTarget { Reference = "b" }]
                         }
                     ],
-                    Properties = [],
-                    Containments = [],
-                    Annotations = []
                 },
                 new SerializedNode
                 {
                     Id = "b",
                     Classifier = new MetaPointer(lang24.Key, lang24.Version, "key-myConcept"),
-                    References = [],
-                    Properties = [],
-                    Containments = [],
-                    Annotations = []
                 }
             ]
         };
@@ -290,18 +283,11 @@ public class InstanceTests : LionWebVersionsTestBase
                             Targets = [new SerializedReferenceTarget { Reference = "b" }]
                         }
                     ],
-                    Properties = [],
-                    Containments = [],
-                    Annotations = []
                 },
                 new SerializedNode
                 {
                     Id = "b",
                     Classifier = new MetaPointer(lang24.Key, lang24.Version, "key-myConcept"),
-                    References = [],
-                    Properties = [],
-                    Containments = [],
-                    Annotations = []
                 }
             ]
         };
@@ -368,18 +354,11 @@ public class InstanceTests : LionWebVersionsTestBase
                             Targets = [new SerializedReferenceTarget { Reference = "b" }]
                         }
                     ],
-                    Properties = [],
-                    Containments = [],
-                    Annotations = []
                 },
                 new SerializedNode
                 {
                     Id = "b",
                     Classifier = new MetaPointer(lang23.Key, lang23.Version, "key-myConcept"),
-                    References = [],
-                    Properties = [],
-                    Containments = [],
-                    Annotations = []
                 }
             ]
         };

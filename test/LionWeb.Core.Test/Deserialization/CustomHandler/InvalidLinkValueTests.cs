@@ -61,7 +61,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -70,18 +69,12 @@ public class InvalidLinkValueTests
                             Children = ["invalid-child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "invalid-child",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -114,7 +107,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -123,18 +115,12 @@ public class InvalidLinkValueTests
                             Children = ["invalid-child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "invalid-child",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -169,7 +155,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -178,18 +163,12 @@ public class InvalidLinkValueTests
                             Children = ["invalid-child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "invalid-child",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -221,7 +200,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -230,18 +208,12 @@ public class InvalidLinkValueTests
                             Children = ["child1", "child2"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child1",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "foo"
                 },
 
@@ -249,10 +221,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "child2",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "foo"
                 }
             ]
@@ -287,7 +255,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -296,18 +263,12 @@ public class InvalidLinkValueTests
                             Children = ["child1", "child2"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child1",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "foo"
                 },
 
@@ -315,10 +276,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "child2",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "foo"
                 }
             ]
@@ -355,7 +312,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -364,18 +320,12 @@ public class InvalidLinkValueTests
                             Children = ["child1", "child2"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child1",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "foo"
                 },
 
@@ -383,10 +333,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "child2",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "foo"
                 }
             ]
@@ -423,8 +369,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("library", "1", "Book"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -436,17 +380,12 @@ public class InvalidLinkValueTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "book_1",
                     Classifier = new MetaPointer("library", "1", "Book"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -479,8 +418,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("library", "1", "Book"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -492,17 +429,12 @@ public class InvalidLinkValueTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "book_1",
                     Classifier = new MetaPointer("library", "1", "Book"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -537,8 +469,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -551,27 +481,18 @@ public class InvalidLinkValueTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_1",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_2",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -604,8 +525,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -618,27 +537,18 @@ public class InvalidLinkValueTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_1",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_2",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -673,8 +583,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -687,27 +595,18 @@ public class InvalidLinkValueTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_1",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_2",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -748,8 +647,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -763,37 +660,24 @@ public class InvalidLinkValueTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_1",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_2",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "ref_3",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -838,7 +722,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "geo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -847,18 +730,12 @@ public class InvalidLinkValueTests
                             Children = ["child-circle", "child-line", "child-invalid"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child-circle",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "geo"
                 },
 
@@ -866,10 +743,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "child-line",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "geo"
                 },
 
@@ -877,10 +750,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "child-invalid",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "geo"
                 },
             ]
@@ -920,7 +789,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "geo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -929,18 +797,12 @@ public class InvalidLinkValueTests
                             Children = ["child-invalid", "child-circle", "child-line"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child-circle",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "geo"
                 },
 
@@ -948,10 +810,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "child-line",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "geo"
                 },
 
@@ -959,10 +817,6 @@ public class InvalidLinkValueTests
                 {
                     Id = "child-invalid",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "geo"
                 },
             ]

@@ -84,8 +84,6 @@ public class DeserializationNameTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -97,7 +95,6 @@ public class DeserializationNameTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -113,9 +110,6 @@ public class DeserializationNameTests
                             Value = "targetName"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -131,9 +125,6 @@ public class DeserializationNameTests
                             Value = "targetName"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 }
             ]
@@ -189,8 +180,6 @@ public class DeserializationNameTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -202,7 +191,6 @@ public class DeserializationNameTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -218,9 +206,6 @@ public class DeserializationNameTests
                             Value = "otherName"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -236,9 +221,6 @@ public class DeserializationNameTests
                             Value = "targetName"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 }
             ]

@@ -53,7 +53,6 @@ public class DuplicateContainmentTests
                 {
                     Id = "A",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment()
@@ -61,25 +60,18 @@ public class DuplicateContainmentTests
                             Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "B",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "C",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment()
@@ -87,8 +79,6 @@ public class DuplicateContainmentTests
                             Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]
@@ -134,7 +124,6 @@ public class DuplicateContainmentTests
                 {
                     Id = "A",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment()
@@ -142,25 +131,18 @@ public class DuplicateContainmentTests
                             Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "B",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "C",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment()
@@ -168,8 +150,6 @@ public class DuplicateContainmentTests
                             Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]
@@ -215,9 +195,6 @@ public class DuplicateContainmentTests
                 {
                     Id = "A",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations =
                     [
                         "B"
@@ -228,19 +205,12 @@ public class DuplicateContainmentTests
                 {
                     Id = "B",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "C",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations =
                     [
                         "B"
@@ -290,9 +260,6 @@ public class DuplicateContainmentTests
                 {
                     Id = "A",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations =
                     [
                         "B"
@@ -303,19 +270,12 @@ public class DuplicateContainmentTests
                 {
                     Id = "B",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "C",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations =
                     [
                         "B"

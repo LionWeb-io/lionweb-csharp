@@ -91,7 +91,6 @@ public class EmptyFeatureSerializationTests : SerializationTestsBase
                             Reference = lang.OffsetDuplicate_altSource.ToMetaPointer(), Targets = []
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -106,9 +105,6 @@ public class EmptyFeatureSerializationTests : SerializationTestsBase
                         },
                         new SerializedProperty { Property = lang.Documentation_text.ToMetaPointer(), Value = null },
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "od"
                 },
                 new SerializedNode
@@ -133,8 +129,6 @@ public class EmptyFeatureSerializationTests : SerializationTestsBase
                         },
                         new SerializedContainment { Containment = lang.Shape_shapeDocs.ToMetaPointer(), Children = [] },
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 }
             ]
@@ -196,27 +190,18 @@ public class EmptyFeatureSerializationTests : SerializationTestsBase
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "docs",
                     Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.Documentation.Key),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "od"
                 },
                 new SerializedNode
                 {
                     Id = "circle",
                     Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.Circle.Key),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 }
             ]

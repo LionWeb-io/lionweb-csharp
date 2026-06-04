@@ -62,9 +62,6 @@ public class UnknownDatatypeTests
                             Property = new MetaPointer("key-myLang", "1", "key-wallClockTime"), Value = "17:43"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -114,9 +111,6 @@ public class UnknownDatatypeTests
                             Property = new MetaPointer("key-myLang", "1", "key-wallClockTime"), Value = "17:43"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };

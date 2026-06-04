@@ -53,7 +53,6 @@ public class UnresolvableChildTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -62,8 +61,6 @@ public class UnresolvableChildTests
                             Children = ["unresolvable-child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -94,7 +91,6 @@ public class UnresolvableChildTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -103,8 +99,6 @@ public class UnresolvableChildTests
                             Children = ["unresolvable-child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -137,7 +131,6 @@ public class UnresolvableChildTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -146,8 +139,6 @@ public class UnresolvableChildTests
                             Children = ["unresolvable-child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };

@@ -114,10 +114,6 @@ public class ClientTests
                 {
                     Id = "doc",
                     Classifier = TestLanguageLanguage.Instance.DataTypeTestConcept.ToMetaPointer(),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = _repositoryPartition.GetId()
                 }
             ]),

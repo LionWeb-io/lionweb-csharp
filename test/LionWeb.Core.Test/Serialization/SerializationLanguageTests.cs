@@ -256,8 +256,6 @@ public class LanguageSerializationTests
                             Children = ["testDuplicateNodeId", "otherNodeId"]
                         }
                     ],
-                    Annotations = [],
-                    References = []
                 },
                 new SerializedNode
                 {
@@ -286,9 +284,6 @@ public class LanguageSerializationTests
                             Value = "false"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "testDuplicateNodeId"
                 },
                 new SerializedNode
@@ -309,9 +304,6 @@ public class LanguageSerializationTests
                             Value = "key-myAnnotation"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "testDuplicateNodeId"
                 }
             ]

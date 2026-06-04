@@ -60,9 +60,6 @@ public class InvalidPropertyValueTests
                             Property = new MetaPointer("key-Shapes", "1", "key-x"), Value = "expects an integer"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -103,9 +100,6 @@ public class InvalidPropertyValueTests
                             Property = new MetaPointer("key-Shapes", "1", "key-x"), Value = "expects an integer"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -146,9 +140,6 @@ public class InvalidPropertyValueTests
                             Property = new MetaPointer("key-Shapes", "1", "key-x"), Value = "expects an integer"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
