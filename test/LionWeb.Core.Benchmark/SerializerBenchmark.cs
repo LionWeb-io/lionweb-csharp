@@ -21,12 +21,11 @@ using BenchmarkDotNet.Attributes;
 using M1;
 using Serialization;
 using System.Text.Json;
-using Test.Languages.Generated.V2024_1.Shapes.M2;
+using Test.Languages.Generated.V2024_1.TestLanguage;
 using Test.Serialization;
 
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
-[TestClass]
 public class SerializerBenchmark : SerializerBenchmarkBase
 {
     private IEnumerable<INode> _nodes;
@@ -39,7 +38,6 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public async Task Serialize_Stream_Async()
     {
         await using Stream stream = File.Create(_streamFile);
@@ -55,7 +53,6 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Serialize_Stream()
     {
         using Stream stream = File.Create(_streamFile);
@@ -71,7 +68,6 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public async Task Serialize_Stream_Async_Aot()
     {
         await using Stream stream = File.Create(_streamFile);
@@ -87,7 +83,6 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Serialize_Stream_Aot()
     {
         using Stream stream = File.Create(_streamFile);
@@ -103,7 +98,6 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Serialize_String()
     {
         var output = JsonSerializer.Serialize((object)new SerializerBuilder()
@@ -115,7 +109,6 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Serialize_String_Aot()
     {
         var output = JsonSerializer.Serialize((object)new SerializerBuilder()
@@ -128,9 +121,9 @@ public class SerializerBenchmark : SerializerBenchmarkBase
 
     private static IEnumerable<INode> CreateNodes(long count)
     {
-        Line? lastLine = null;
-        Circle? lastCircle = null;
-        Coord? lastCoord = null;
+        LinkTestConcept? lastLine = null;
+        LinkTestConcept? lastCircle = null;
+        LinkTestConcept? lastCoord = null;
         for (long l = 0; l < count; l++)
         {
             var id = $"id{l}_{StringRandomizer.RandomLength()}";
@@ -144,22 +137,22 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             INode result;
             if (lastCoord == null || l % 2 == 0)
             {
-                lastCoord = new Coord(id);
+                lastCoord = new LinkTestConcept(id);
                 result = lastCoord;
             } else if (l % 3 == 0)
             {
-                lastLine = new Line(id) { Start = lastCoord };
+                lastLine = new LinkTestConcept(id) { Containment_0_1 = lastCoord };
                 result = lastLine;
             } else if (l % 17 == 0)
             {
-                lastCircle = new Circle(id) { Center = lastCoord };
+                lastCircle = new LinkTestConcept(id) { Containment_1 = lastCoord };
                 result = lastCircle;
             } else if (l % 37 == 0)
             {
-                result = new Geometry(id) { Shapes = [lastLine!, lastCircle!] };
+                result = new LinkTestConcept(id) { Containment_0_n = [lastLine!, lastCircle!] };
             } else
             {
-                lastCoord = new Coord(id);
+                lastCoord = new LinkTestConcept(id);
                 result = lastCoord;
             }
 
