@@ -17,7 +17,11 @@
 
 namespace LionWeb.Test.Run;
 
+using Core;
+using Core.Benchmark;
+using Core.M1;
 using Core.Serialization;
+using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 public class SerializedNodeTest
 {
@@ -55,6 +59,13 @@ public class SerializedNodeTest
             { "Target_Info", new  SerializedReferenceTarget() {ResolveInfo = "ref text"} },
             { "Target_Filled", new  SerializedReferenceTarget() {ResolveInfo = "ref text", Reference = "ref"} },
         };
+
+    public void SerializeNodes(Stream stream) => 
+        JsonUtils.WriteNodesToStream(stream, new SerializerBuilder().WithLionWebVersion(LionWebVersions.Current).Build(), SerializerBenchmark.CreateNodes(32_000));
+
+    public List<IReadableNode> DeserializeNodes(Stream stream) => 
+        JsonUtils.ReadNodesFromStream(stream, new DeserializerBuilder().WithLionWebVersion(LionWebVersions.Current).WithLanguage(TestLanguageLanguage.Instance).Build());
+
 
     private static MetaPointer Classifier() => new("myLang", "0", "myKey");
     private static MetaPointer Property() => new("myLang", "0", "myProp");

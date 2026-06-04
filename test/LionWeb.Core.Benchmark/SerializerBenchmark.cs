@@ -119,7 +119,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         File.WriteAllText(_stringFile, output);
     }
 
-    private static IEnumerable<INode> CreateNodes(long count)
+    public static IEnumerable<INode> CreateNodes(long count)
     {
         LinkTestConcept? lastLine = null;
         LinkTestConcept? lastCircle = null;

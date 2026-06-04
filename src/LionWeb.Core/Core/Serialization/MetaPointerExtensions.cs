@@ -23,6 +23,14 @@ using M3;
 /// Utilities to arbitrate between M2 and MetaPointers.
 public static class MetaPointerExtensions
 {
+    /// Represents <paramref name="keyed"/> as MetaPointer.
+    public static MetaPointer ToMetaPointer(this IKeyed keyed) => keyed switch
+    {
+        LanguageEntity e => e.ToMetaPointer(),
+        Feature f => f.ToMetaPointer(),
+        Field f => f.ToMetaPointer()
+    };
+
     /// Represents <paramref name="entity"/> as MetaPointer.
     public static MetaPointer ToMetaPointer(this LanguageEntity entity)
     {
