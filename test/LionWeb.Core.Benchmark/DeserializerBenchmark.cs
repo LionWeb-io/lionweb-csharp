@@ -24,7 +24,6 @@ using System.Text.Json;
 
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
-[TestClass]
 public class DeserializerBenchmark : SerializerBenchmarkBase
 {
     [Benchmark]
@@ -84,7 +83,6 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Deserialize_String()
     {
         var input = JsonSerializer.Deserialize<SerializationChunk>(File.ReadAllText(_stringFile), _simpleOptions)!;
