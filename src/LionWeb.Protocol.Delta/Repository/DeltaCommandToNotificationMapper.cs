@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
 using Core.M1;
-using Core.M2;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
@@ -163,7 +162,7 @@ public class DeltaCommandToNotificationMapper
         var containment = ToContainment(command.Containment, parent);
 
         return new ChildDeletedNotification(
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[command.Index],
+            ToNode(command.DeletedChild),
             parent,
             containment,
             command.Index,
@@ -177,7 +176,7 @@ public class DeltaCommandToNotificationMapper
         var containment = ToContainment(command.Containment, parent);
         return new ChildReplacedNotification(
             Deserialize(command.NewChild),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[command.Index],
+            ToNode(command.ReplacedChild),
             parent,
             containment,
             command.Index,
@@ -189,7 +188,9 @@ public class DeltaCommandToNotificationMapper
         MoveChildFromOtherContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
-        var oldParent = (IWritableNode)movedChild.GetParent();
+        var oldParent = (IWritableNode?)movedChild.GetParent();
+        if (oldParent is null)
+            throw new LionWebMappingException(nameof(command.MovedChild), movedChild);
         var newParent = ToNode(command.NewParent);
         var oldContainment = oldParent.GetContainmentOf(movedChild);
         var newContainment = ToContainment(command.NewContainment, newParent);
@@ -211,7 +212,9 @@ public class DeltaCommandToNotificationMapper
         MoveAndReplaceChildFromOtherContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
-        var oldParent = (IWritableNode)movedChild.GetParent();
+        var oldParent = (IWritableNode?)movedChild.GetParent();
+        if (oldParent is null)
+            throw new LionWebMappingException(nameof(command.MovedChild), movedChild);
         var oldContainment = oldParent.GetContainmentOf(movedChild);
         var newParent = ToNode(command.NewParent);
         var newContainment = ToContainment(command.NewContainment, newParent);
@@ -237,7 +240,9 @@ public class DeltaCommandToNotificationMapper
     {
         var movedChild = ToNode(command.MovedChild);
         var replacedChild = ToNode(command.ReplacedChild);
-        var parent = (IWritableNode)replacedChild.GetParent();
+        var parent = (IWritableNode?)replacedChild.GetParent();
+        if (parent is null)
+            throw new LionWebMappingException(nameof(command.ReplacedChild), replacedChild);
         var newContainment = ToContainment(command.NewContainment, parent);
         var oldContainment = parent.GetContainmentOf(movedChild);
         var oldIndex = GetChildIndex(parent, oldContainment, movedChild);
@@ -258,7 +263,9 @@ public class DeltaCommandToNotificationMapper
         MoveChildFromOtherContainmentInSameParent command)
     {
         var movedChild = ToNode(command.MovedChild);
-        var parent = (IWritableNode)movedChild.GetParent();
+        var parent = (IWritableNode?)movedChild.GetParent();
+        if (parent is null)
+            throw new LionWebMappingException(nameof(command.MovedChild), movedChild);
         var oldContainment = parent.GetContainmentOf(movedChild);
         var newContainment = ToContainment(command.NewContainment, parent);
         var oldIndex = GetChildIndex(parent, oldContainment, movedChild);
@@ -277,7 +284,9 @@ public class DeltaCommandToNotificationMapper
     private ChildMovedAndReplacedInSameContainmentNotification OnMoveAndReplaceChildInSameContainment(MoveAndReplaceChildInSameContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
-        var parent = (IWritableNode)movedChild.GetParent();
+        var parent = (IWritableNode?)movedChild.GetParent();
+        if (parent is null)
+            throw new LionWebMappingException(nameof(command.MovedChild), movedChild);
         var containment = parent.GetContainmentOf(movedChild);
         var oldIndex = GetChildIndex(parent, containment, movedChild);
 
@@ -295,7 +304,9 @@ public class DeltaCommandToNotificationMapper
     private ChildMovedInSameContainmentNotification OnMoveChildInSameContainment(MoveChildInSameContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
-        var parent = (IWritableNode)movedChild.GetParent();
+        var parent = (IWritableNode?)movedChild.GetParent();
+        if (parent is null)
+            throw new LionWebMappingException(nameof(command.MovedChild), movedChild);
         var containment = parent.GetContainmentOf(movedChild);
         var oldIndex = GetChildIndex(parent, containment, movedChild);
 
@@ -358,7 +369,7 @@ public class DeltaCommandToNotificationMapper
     private AnnotationDeletedNotification OnDeleteAnnotation(DeleteAnnotation deleteAnnotationCommand)
     {
         var parent = ToNode(deleteAnnotationCommand.Parent);
-        var deletedAnnotation = parent.GetAnnotations()[deleteAnnotationCommand.Index];
+        var deletedAnnotation = ToNode(deleteAnnotationCommand.DeletedAnnotation);
         return new AnnotationDeletedNotification(
             deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
             parent,
@@ -372,7 +383,7 @@ public class DeltaCommandToNotificationMapper
         var parent = ToNode(command.Parent);
         return new AnnotationReplacedNotification(
             Deserialize(command.NewAnnotation),
-            M2Extensions.AsAnnotations<IWritableNode>(parent.GetAnnotations()).ToList()[command.Index],
+            ToNode(command.ReplacedAnnotation),
             parent,
             command.Index,
             ToNotificationId(command)
@@ -383,7 +394,9 @@ public class DeltaCommandToNotificationMapper
         MoveAnnotationFromOtherParent moveAnnotationCommand)
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
-        var oldParent = (IWritableNode)movedAnnotation.GetParent();
+        var oldParent = (IWritableNode?)movedAnnotation.GetParent();
+        if (oldParent is null)
+            throw new LionWebMappingException(nameof(moveAnnotationCommand.MovedAnnotation), movedAnnotation);
         var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
         var newParent = ToNode(moveAnnotationCommand.NewParent);
@@ -401,7 +414,9 @@ public class DeltaCommandToNotificationMapper
         MoveAnnotationInSameParent moveAnnotationCommand)
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
-        var parent = (IWritableNode)movedAnnotation.GetParent();
+        var parent = (IWritableNode?)movedAnnotation.GetParent();
+        if (parent is null)
+            throw new LionWebMappingException(nameof(moveAnnotationCommand.MovedAnnotation), movedAnnotation);
         var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
         return new AnnotationMovedInSameParentNotification(
@@ -417,7 +432,9 @@ public class DeltaCommandToNotificationMapper
         MoveAndReplaceAnnotationFromOtherParent moveAnnotationCommand)
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
-        var oldParent = (IWritableNode)movedAnnotation.GetParent();
+        var oldParent = (IWritableNode?)movedAnnotation.GetParent();
+        if (oldParent is null)
+            throw new LionWebMappingException(nameof(moveAnnotationCommand.MovedAnnotation), movedAnnotation);
         var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
         var newParent = ToNode(moveAnnotationCommand.NewParent);
@@ -436,7 +453,9 @@ public class DeltaCommandToNotificationMapper
         MoveAndReplaceAnnotationInSameParent moveAnnotationCommand)
     {
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
-        var parent = (IWritableNode)movedAnnotation.GetParent();
+        var parent = (IWritableNode?)movedAnnotation.GetParent();
+        if (parent is null)
+            throw new LionWebMappingException(nameof(moveAnnotationCommand.MovedAnnotation), movedAnnotation);
         var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
         return new AnnotationMovedAndReplacedInSameParentNotification(
@@ -474,7 +493,7 @@ public class DeltaCommandToNotificationMapper
             parent,
             reference,
             deleteReferenceCommand.Index,
-            ReferenceTarget.FromNode(parent.Get(reference) as IReadableNode),
+            ToTarget(deleteReferenceCommand.DeletedReference, deleteReferenceCommand.DeletedResolveInfo),
             ToNotificationId(deleteReferenceCommand)
         );
     }
@@ -488,7 +507,7 @@ public class DeltaCommandToNotificationMapper
             reference,
             changeReferenceCommand.Index,
             ToTarget(changeReferenceCommand.NewReference, changeReferenceCommand.NewResolveInfo),
-            ReferenceTarget.FromNode(parent.Get(reference) as IReadableNode),
+            ToTarget(changeReferenceCommand.OldReference, changeReferenceCommand.OldResolveInfo),
             ToNotificationId(changeReferenceCommand)
         );
     }
