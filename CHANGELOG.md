@@ -11,6 +11,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Introduced `M2Extensions.AsAnnotations()`
 * * Added `INotificationFilter.Handles()`, as we don't care about which notification type we're handling.
 ### Fixed
+* Mappers support all kinds of messages (except `ChangeClassifier`).
 ### Changed
 * Made `SerializedNode` and related record members non-required.
 * Optimizations to `Serializer`.
