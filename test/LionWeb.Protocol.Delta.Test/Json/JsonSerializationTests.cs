@@ -43,7 +43,7 @@ public class JsonSerializationTests : JsonTestsBase
 
         // see https://github.com/LionWeb-io/specification/issues/351
         if (delta is CompositeEvent ce)
-            delta = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber };
+            delta = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber, OriginCommands = null};
 
         Assert.AreEqual(delta, deserialized);
     }
@@ -69,10 +69,10 @@ public class JsonSerializationTests : JsonTestsBase
     {
         // see https://github.com/LionWeb-io/specification/issues/351
         if (@event is CompositeEvent ce)
-            @event = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber };
+            @event = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber, OriginCommands = null};
 
         var deltaSerializer = new DeltaSerializer();
-        var compositeEvent = new CompositeEvent([@event], []);
+        var compositeEvent = new CompositeEvent([@event], null, []);
         var serialized = deltaSerializer.Serialize(compositeEvent);
         var deserialized = deltaSerializer.Deserialize<CompositeEvent>(serialized);
         deserialized.SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber;

@@ -435,7 +435,17 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     
     #endregion
 
-    private T LookUpNode<T>(T node) where T : IReadableNode
+    private CompositeNotification OnComposite(CompositeNotification notification)
+    {
+        var mapper = new InterdependentNotificationToNotificationMapper(sharedNodeMap);
+
+        return new(
+            notification.Parts.Select(mapper.Map),
+            notification.NotificationId
+        );
+    }
+
+    private protected virtual T LookUpNode<T>(T node) where T : IReadableNode
     {
         var nodeId = node.GetId();
         if (sharedNodeMap.TryGetValue(nodeId, out var result))
@@ -449,7 +459,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         throw new InvalidOperationException($"Unknown node with id: {nodeId}");
     }
 
-    private ReferenceTarget LookUpNode(IReferenceTarget target)
+    private protected virtual ReferenceTarget LookUpNode(IReferenceTarget target)
     {
         var nodeId = target.TargetId;
         if (sharedNodeMap.TryGetValue(nodeId, out var result))
@@ -458,7 +468,53 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         throw new InvalidOperationException($"Unknown target node with id: {nodeId}");
     }
 
-    private CompositeNotification OnComposite(CompositeNotification notification) => new(notification.Parts.Select(Map), notification.NotificationId);
+    private protected virtual T CloneNode<T>(T node) where T : IReadableNode =>
+        (T)SameIdCloner.Clone((INode)node);
+}
 
-    private T CloneNode<T>(T node) where T : IReadableNode => (T)SameIdCloner.Clone((INode)node);
+internal class InterdependentNotificationToNotificationMapper(SharedNodeMap sharedNodeMap) : NotificationToNotificationMapper(sharedNodeMap)
+{
+    private readonly SharedNodeMap _interdependentNodeMap = new();
+ 
+    private protected override T LookUpNode<T>(T node)
+    {
+        var nodeId = node.GetId();
+        if (sharedNodeMap.TryGetValue(nodeId, out var result))
+        {
+            if (result is T w)
+                return w;
+
+            throw new UnsupportedNodeTypeException(result, nameof(result));
+        }
+        
+        if (_interdependentNodeMap.TryGetValue(nodeId, out var local))
+        {
+            if (local is T w)
+                return w;
+
+            throw new UnsupportedNodeTypeException(local, nameof(local));
+        }
+
+        throw new InvalidOperationException($"Unknown node with id: {nodeId}");
+    }
+
+    private protected override ReferenceTarget LookUpNode(IReferenceTarget target)
+    {
+        var nodeId = target.TargetId;
+
+        if (sharedNodeMap.TryGetValue(nodeId, out var result))
+            return new ReferenceTarget(target.ResolveInfo, target.TargetId, result);
+
+        if (_interdependentNodeMap.TryGetValue(nodeId, out var local))
+            return new ReferenceTarget(target.ResolveInfo, target.TargetId, local);
+
+        throw new InvalidOperationException($"Unknown target node with id: {nodeId}");
+    }
+
+    private protected override T CloneNode<T>(T node)
+    {
+        var result = (T)SameIdCloner.Clone((INode)node);
+        _interdependentNodeMap.RegisterNode(result);
+        return result;
+    }
 }

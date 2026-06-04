@@ -187,14 +187,15 @@ public abstract record DeltaEventBase(
 public record CompositeEvent : DeltaEventBase, IDeltaEvent
 {
     public CompositeEvent(IDeltaEvent[] Parts,
-        AdditionalInfo[]? AdditionalInfos) : base(null, AdditionalInfos)
+        CommandSource[]? OriginCommands,
+        AdditionalInfo[]? AdditionalInfos) : base(OriginCommands, AdditionalInfos)
     {
         this.Parts = Parts;
     }
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override string Id => string.Join("--", Parts.Select(e => e.Id));
+    public override string Id => base.Id;
 
     /// <inheritdoc />
     [JsonIgnore]
@@ -208,8 +209,7 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override CommandSource[]? OriginCommands =>
-        Parts.SelectMany(e => e.OriginCommands ?? []).ToArray();
+    public override CommandSource[]? OriginCommands => base.OriginCommands;
 
     /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)

@@ -56,16 +56,19 @@ public class NotificationToDeltaCommandMapper
                 OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a =>
-                OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedInSameContainmentNotification a => OnChildMovedAndReplacedInSameContainment(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
             AnnotationReplacedNotification a => OnAnnotationReplaced(a),
             AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParentNotification a => OnAnnotationMovedInSameParent(a),
+            AnnotationMovedAndReplacedFromOtherParentNotification a => OnAnnotationMovedAndReplacedFromOtherParent(a),
+            AnnotationMovedAndReplacedInSameParentNotification a => OnAnnotationMovedAndReplacedInSameParent(a),
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
+            CompositeNotification a => OnComposite(a),
             _ => throw new ArgumentException($"{nameof(NotificationToDeltaCommandMapper)} does not support {notification.GetType().Name}!")
         };
 
@@ -201,6 +204,16 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
+    private MoveAndReplaceChildInSameContainment OnChildMovedAndReplacedInSameContainment(
+        ChildMovedAndReplacedInSameContainmentNotification childMovedNotification) =>
+        new(
+            childMovedNotification.NewIndex,
+            childMovedNotification.ReplacedChild.GetId(),
+            childMovedNotification.MovedChild.GetId(),
+            ToCommandId(childMovedNotification),
+            []
+        );
+
     private MoveChildInSameContainment OnChildMovedInSameContainment(
         ChildMovedInSameContainmentNotification childMovedNotification) =>
         new(
@@ -261,6 +274,27 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
+    private MoveAndReplaceAnnotationFromOtherParent
+        OnAnnotationMovedAndReplacedFromOtherParent(AnnotationMovedAndReplacedFromOtherParentNotification annotationMovedNotification) =>
+        new(
+            annotationMovedNotification.NewParent.GetId(),
+            annotationMovedNotification.NewIndex,
+            annotationMovedNotification.ReplacedAnnotation.GetId(),
+            annotationMovedNotification.MovedAnnotation.GetId(),
+            ToCommandId(annotationMovedNotification),
+            []
+        );
+
+    private MoveAndReplaceAnnotationInSameParent OnAnnotationMovedAndReplacedInSameParent(
+        AnnotationMovedAndReplacedInSameParentNotification annotationMovedNotification) =>
+        new(
+            annotationMovedNotification.NewIndex,
+            annotationMovedNotification.ReplacedAnnotation.GetId(),
+            annotationMovedNotification.MovedAnnotation.GetId(),
+            ToCommandId(annotationMovedNotification),
+            []
+        );
+
     #endregion
 
     #region References
@@ -301,6 +335,13 @@ public class NotificationToDeltaCommandMapper
         );
 
     #endregion
+
+    private CompositeCommand OnComposite(CompositeNotification compositeNotification) =>
+        new(
+            compositeNotification.Parts.Select(Map).ToArray(),
+            ToCommandId(compositeNotification),
+            []
+        );
 
     private SerializedReferenceTarget ToDelta(IReferenceTarget target) =>
         new SerializedReferenceTarget { Reference = target.TargetId, ResolveInfo = target.ResolveInfo };

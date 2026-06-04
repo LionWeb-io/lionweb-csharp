@@ -61,13 +61,15 @@ public class DeltaEventToNotificationMapper
             ChildMovedFromOtherContainmentInSameParent a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainment a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainment a => OnChildMovedAndReplacedFromOtherContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentInSameParent a =>
-                OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedInSameContainment a => OnChildMovedAndReplacedInSameContainment(a),
             AnnotationAdded a => OnAnnotationAdded(a),
             AnnotationDeleted a => OnAnnotationDeleted(a),
             AnnotationReplaced a => OnAnnotationReplaced(a),
             AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParent a => OnAnnotationMovedInSameParent(a),
+            AnnotationMovedAndReplacedFromOtherParent a => OnAnnotationMovedAndReplacedFromOtherParent(a),
+            AnnotationMovedAndReplacedInSameParent a => OnAnnotationMovedAndReplacedInSameParent(a),
             ReferenceAdded a => OnReferenceAdded(a),
             ReferenceDeleted a => OnReferenceDeleted(a),
             ReferenceChanged a => OnReferenceChanged(a),
@@ -269,6 +271,23 @@ public class DeltaEventToNotificationMapper
         );
     }
 
+    private ChildMovedAndReplacedInSameContainmentNotification OnChildMovedAndReplacedInSameContainment(
+        ChildMovedAndReplacedInSameContainment childMovedEvent)
+    {
+        var parent = ToNode(childMovedEvent.Parent);
+        var movedChild = ToNode(childMovedEvent.MovedChild);
+        var containment = ToContainment(childMovedEvent.Containment, parent);
+        return new ChildMovedAndReplacedInSameContainmentNotification(
+            childMovedEvent.NewIndex,
+            movedChild,
+            parent,
+            containment,
+            ToNode(childMovedEvent.ReplacedChild),
+            childMovedEvent.OldIndex,
+            ToNotificationId(childMovedEvent)
+        );
+    }
+
     private ChildMovedInSameContainmentNotification OnChildMovedInSameContainment(
         ChildMovedInSameContainment childMovedEvent)
     {
@@ -358,6 +377,38 @@ public class DeltaEventToNotificationMapper
         );
     }
 
+    private AnnotationMovedAndReplacedFromOtherParentNotification OnAnnotationMovedAndReplacedFromOtherParent(
+        AnnotationMovedAndReplacedFromOtherParent annotationMovedEvent)
+    {
+        var oldParent = ToNode(annotationMovedEvent.OldParent);
+        var newParent = ToNode(annotationMovedEvent.NewParent);
+        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        return new AnnotationMovedAndReplacedFromOtherParentNotification(
+            newParent,
+            annotationMovedEvent.NewIndex,
+            movedAnnotation,
+            oldParent,
+            annotationMovedEvent.OldIndex,
+            ToNode(annotationMovedEvent.ReplacedAnnotation),
+            ToNotificationId(annotationMovedEvent)
+        );
+    }
+
+    private AnnotationMovedAndReplacedInSameParentNotification OnAnnotationMovedAndReplacedInSameParent(
+        AnnotationMovedAndReplacedInSameParent annotationMovedEvent)
+    {
+        var parent = ToNode(annotationMovedEvent.Parent);
+        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        return new AnnotationMovedAndReplacedInSameParentNotification(
+            annotationMovedEvent.NewIndex,
+            movedAnnotation,
+            parent,
+            annotationMovedEvent.OldIndex,
+            ToNode(annotationMovedEvent.ReplacedAnnotation),
+            ToNotificationId(annotationMovedEvent)
+        );
+    }
+
     #endregion
 
     #region References
@@ -417,21 +468,21 @@ public class DeltaEventToNotificationMapper
 
     #endregion
 
-    private CompositeNotification OnComposite(CompositeEvent compositeEvent) => new(compositeEvent.Parts.Select(Map), ToNotificationId(compositeEvent));
+    private CompositeNotification OnComposite(CompositeEvent compositeEvent)
+    {
+        var mapper = new InterdependentDeltaEventToNotificationMapper(_sharedNodeMap, _sharedKeyedMap, _deserializerBuilder);
+
+        return new(
+            compositeEvent.Parts.Select(mapper.Map),
+            ToNotificationId(compositeEvent)
+        );
+    }
 
     private static INotificationId ToNotificationId(IDeltaEvent deltaEvent) =>
         new ParticipationNotificationId(deltaEvent.InternalParticipationId,
             string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
 
-    private IWritableNode ToNode(TargetNode nodeId)
-    {
-        if (TryToNode(nodeId, out var w))
-            return w;
-
-        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
-    }
-
-    private bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
+    private protected bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
     {
         if (_sharedNodeMap.TryGetValue(nodeId, out var n) && n is IWritableNode w)
         {
@@ -451,10 +502,18 @@ public class DeltaEventToNotificationMapper
         throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
     }
 
-    private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    private protected virtual IWritableNode ToNode(TargetNode nodeId)
+    {
+        if (TryToNode(nodeId, out var w))
+            return w;
+
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+    }
+
+    private protected virtual IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-        
+
         var node = nodes.FirstOrDefault();
         if (node is not IWritableNode w)
         {
@@ -462,6 +521,32 @@ public class DeltaEventToNotificationMapper
         }
 
         return w;
+    }
+}
 
+internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder)
+    : DeltaEventToNotificationMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+{
+    private readonly SharedNodeMap _interdependentNodeMap = new();
+
+    private protected override IWritableNode ToNode(TargetNode nodeId)
+    {
+        if (TryToNode(nodeId, out var w))
+            return w;
+
+        if (_interdependentNodeMap.TryGetValue(nodeId, out var node))
+        {
+            if (node is IWritableNode wr)
+                return wr;
+        }
+
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+    }
+
+    private protected override IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    {
+        var result = base.Deserialize(deltaChunk);
+        _interdependentNodeMap.RegisterNode(result);
+        return result;
     }
 }

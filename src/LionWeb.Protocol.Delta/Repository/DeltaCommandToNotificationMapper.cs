@@ -31,7 +31,7 @@ using System.Collections;
 
 public class DeltaCommandToNotificationMapper
 {
-    private readonly SharedNodeMap _sharedNodeMap;
+    private protected readonly SharedNodeMap _sharedNodeMap;
     private readonly SharedKeyedMap _sharedKeyedMap;
     private readonly DeserializerBuilder _deserializerBuilder;
 
@@ -61,16 +61,19 @@ public class DeltaCommandToNotificationMapper
             MoveChildFromOtherContainmentInSameParent a => OnMoveChildFromOtherContainmentInSameParent(a),
             MoveChildInSameContainment a => OnMoveChildInSameContainment(a),
             MoveAndReplaceChildFromOtherContainment a => OnMoveAndReplaceChildFromOtherContainment(a),
-            MoveAndReplaceChildFromOtherContainmentInSameParent a =>
-                OnMoveAndReplaceChildFromOtherContainmentInSameParent(a),
+            MoveAndReplaceChildFromOtherContainmentInSameParent a => OnMoveAndReplaceChildFromOtherContainmentInSameParent(a),
+            MoveAndReplaceChildInSameContainment a => OnMoveAndReplaceChildInSameContainment(a),
             AddAnnotation a => OnAddAnnotation(a),
             DeleteAnnotation a => OnDeleteAnnotation(a),
             ReplaceAnnotation a => OnReplaceAnnotation(a),
             MoveAnnotationFromOtherParent a => OnMoveAnnotationFromOtherParent(a),
             MoveAnnotationInSameParent a => OnMoveAnnotationInSameParent(a),
+            MoveAndReplaceAnnotationFromOtherParent a => OnMoveAndReplaceAnnotationFromOtherParent(a),
+            MoveAndReplaceAnnotationInSameParent a => OnMoveAndReplaceAnnotationInSameParent(a),
             AddReference a => OnAddReference(a),
             DeleteReference a => OnDeleteReference(a),
             ChangeReference a => OnChangeReference(a),
+            CompositeCommand a => OnComposite(a),
             _ => throw new ArgumentException($"{nameof(DeltaCommandToNotificationMapper)} does not support {command.GetType().Name}!")
         };
 
@@ -89,7 +92,7 @@ public class DeltaCommandToNotificationMapper
         );
 
     #endregion
-    
+
     #region Properties
 
     private PropertyAddedNotification OnAddProperty(AddProperty addPropertyCommand)
@@ -271,6 +274,24 @@ public class DeltaCommandToNotificationMapper
         );
     }
 
+    private ChildMovedAndReplacedInSameContainmentNotification OnMoveAndReplaceChildInSameContainment(MoveAndReplaceChildInSameContainment command)
+    {
+        var movedChild = ToNode(command.MovedChild);
+        var parent = (IWritableNode)movedChild.GetParent();
+        var containment = parent.GetContainmentOf(movedChild);
+        var oldIndex = GetChildIndex(parent, containment, movedChild);
+
+        return new ChildMovedAndReplacedInSameContainmentNotification(
+            command.NewIndex,
+            movedChild,
+            parent,
+            containment,
+            ToNode(command.ReplacedChild),
+            oldIndex,
+            ToNotificationId(command)
+        );
+    }
+
     private ChildMovedInSameContainmentNotification OnMoveChildInSameContainment(MoveChildInSameContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
@@ -364,7 +385,7 @@ public class DeltaCommandToNotificationMapper
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
         var oldParent = (IWritableNode)movedAnnotation.GetParent();
         var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
-        
+
         var newParent = ToNode(moveAnnotationCommand.NewParent);
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
@@ -382,12 +403,48 @@ public class DeltaCommandToNotificationMapper
         var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
         var parent = (IWritableNode)movedAnnotation.GetParent();
         var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
-        
+
         return new AnnotationMovedInSameParentNotification(
             moveAnnotationCommand.NewIndex,
             movedAnnotation,
             parent,
             oldIndex,
+            ToNotificationId(moveAnnotationCommand)
+        );
+    }
+
+    private AnnotationMovedAndReplacedFromOtherParentNotification OnMoveAndReplaceAnnotationFromOtherParent(
+        MoveAndReplaceAnnotationFromOtherParent moveAnnotationCommand)
+    {
+        var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
+        var oldParent = (IWritableNode)movedAnnotation.GetParent();
+        var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
+
+        var newParent = ToNode(moveAnnotationCommand.NewParent);
+        return new AnnotationMovedAndReplacedFromOtherParentNotification(
+            newParent,
+            moveAnnotationCommand.NewIndex,
+            movedAnnotation,
+            oldParent,
+            oldIndex,
+            ToNode(moveAnnotationCommand.ReplacedAnnotation),
+            ToNotificationId(moveAnnotationCommand)
+        );
+    }
+
+    private AnnotationMovedAndReplacedInSameParentNotification OnMoveAndReplaceAnnotationInSameParent(
+        MoveAndReplaceAnnotationInSameParent moveAnnotationCommand)
+    {
+        var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
+        var parent = (IWritableNode)movedAnnotation.GetParent();
+        var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
+
+        return new AnnotationMovedAndReplacedInSameParentNotification(
+            moveAnnotationCommand.NewIndex,
+            movedAnnotation,
+            parent,
+            oldIndex,
+            ToNode(moveAnnotationCommand.ReplacedAnnotation),
             ToNotificationId(moveAnnotationCommand)
         );
     }
@@ -451,10 +508,28 @@ public class DeltaCommandToNotificationMapper
 
     #endregion
 
+    private CompositeNotification OnComposite(CompositeCommand compositeCommand)
+    {
+        var mapper = new InterdependentDeltaCommandToNotificationMapper(_sharedNodeMap, _sharedKeyedMap, _deserializerBuilder);
+
+        return new(
+            compositeCommand.Parts.Select(mapper.Map),
+            ToNotificationId(compositeCommand)
+        );
+    }
+
     private static INotificationId ToNotificationId(IDeltaCommand command) =>
         new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
 
-    private IWritableNode ToNode(TargetNode nodeId)
+    private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
+    {
+        if (_sharedKeyedMap.TryGetValue(deltaReference, out var e) && e is T c)
+            return c;
+
+        throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
+    }
+
+    private protected virtual IWritableNode ToNode(TargetNode nodeId)
     {
         if (_sharedNodeMap.TryGetValue(nodeId, out var node))
         {
@@ -467,15 +542,7 @@ public class DeltaCommandToNotificationMapper
         throw new InvalidOperationException($"Unknown node with id: {nodeId}");
     }
 
-    private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
-    {
-        if (_sharedKeyedMap.TryGetValue(deltaReference, out var e) && e is T c)
-            return c;
-
-        throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
-    }
-
-    private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    private protected virtual IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
 
@@ -486,5 +553,39 @@ public class DeltaCommandToNotificationMapper
         }
 
         return w;
+    }
+}
+
+internal class InterdependentDeltaCommandToNotificationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder)
+    : DeltaCommandToNotificationMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+{
+    private readonly SharedNodeMap _interdependentNodeMap = new();
+
+    private protected override IWritableNode ToNode(TargetNode nodeId)
+    {
+        if (_sharedNodeMap.TryGetValue(nodeId, out var node))
+        {
+            if (node is IWritableNode w)
+                return w;
+
+            throw new UnsupportedNodeTypeException(node, nameof(node));
+        }
+
+        if (_interdependentNodeMap.TryGetValue(nodeId, out node))
+        {
+            if (node is IWritableNode w)
+                return w;
+
+            throw new UnsupportedNodeTypeException(node, nameof(node));
+        }
+
+        throw new InvalidOperationException($"Unknown node with id: {nodeId}");
+    }
+
+    private protected override IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    {
+        var result = base.Deserialize(deltaChunk);
+        _interdependentNodeMap.RegisterNode(result);
+        return result;
     }
 }
