@@ -127,6 +127,9 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     public virtual void AddAnnotations(IEnumerable<INode> annotations)
     {
         var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
+        if (safeAnnotations.Count == 0)
+            return;
+        
         List<INode> writableAnnotations = WritableAnnotations();
         int index = Math.Max(writableAnnotations.Count - 1, 0);
         foreach (var safeAnnotation in safeAnnotations)

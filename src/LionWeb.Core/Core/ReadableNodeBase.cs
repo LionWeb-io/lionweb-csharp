@@ -61,12 +61,12 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     public T? GetParent() => _parent;
 
     /// <inheritdoc cref="IReadableNode.GetAnnotations()"/>
-    // ReSharper disable once InconsistentNaming
+    /// <remarks>This used to be protected. Use <see cref="ReadOnlyAnnotations"/> or <see cref="WritableAnnotations"/> instead.</remarks>
     private List<T>? _annotations;
 
     protected IReadOnlyList<T> ReadOnlyAnnotations() => _annotations is not null ? _annotations.AsReadOnly() : [];
     
-    protected List<T> WritableAnnotations() => _annotations is not null ? _annotations : _annotations = [];
+    protected List<T> WritableAnnotations() => _annotations ??= [];
 
 
     /// <inheritdoc />

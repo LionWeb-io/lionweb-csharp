@@ -44,7 +44,7 @@ public partial class Deserializer
 
     private void InstallContainments(NodeId nodeId)
     {
-        if (!_containmentsByOwnerId.TryGetValue(nodeId, out var containments))
+        if (!_containmentsByOwnerId.TryGetValue(nodeId, out var containments) || containments.Length == 0)
             return;
 
         IWritableNode node = _deserializedNodesById[nodeId];
@@ -68,7 +68,7 @@ public partial class Deserializer
 
     private void InstallReferences(NodeId nodeId)
     {
-        if (!_referencesByOwnerId.TryGetValue(nodeId, out var references))
+        if (!_referencesByOwnerId.TryGetValue(nodeId, out var references) || references.Length == 0)
             return;
 
         InstallReferences(nodeId, references);
@@ -80,7 +80,7 @@ public partial class Deserializer
 
     private void InstallAnnotations(NodeId nodeId)
     {
-        if (!_annotationsByOwnerId.TryGetValue(nodeId, out var annotationIds))
+        if (!_annotationsByOwnerId.TryGetValue(nodeId, out var annotationIds) || annotationIds.Length == 0)
             return;
 
         IWritableNode node = _deserializedNodesById[nodeId];

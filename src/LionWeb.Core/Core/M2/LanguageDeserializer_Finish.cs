@@ -115,6 +115,11 @@ public partial class LanguageDeserializer
         }
     }
 
-    private void InstallAnnotationReferences(IDeserializer deserializer, SerializedNode serializedNode) =>
+    private void InstallAnnotationReferences(IDeserializer deserializer, SerializedNode serializedNode)
+    {
+        if (serializedNode.References.Length == 0)
+            return;
+        
         deserializer.InstallNodeReferences(serializedNode.Id, serializedNode.References.Select(r => r));
+    }
 }
