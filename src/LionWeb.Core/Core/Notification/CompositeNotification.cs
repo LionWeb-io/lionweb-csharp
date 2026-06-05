@@ -119,10 +119,4 @@ public record CompositeNotification : IForestNotification, IPartitionNotificatio
 
         return true;
     }
-
-    public void Deconstruct(out IReadOnlyList<INotification> Parts, out INotificationId NotificationId)
-    {
-        Parts = this.Parts;
-        NotificationId = this.NotificationId;
-    }
 }

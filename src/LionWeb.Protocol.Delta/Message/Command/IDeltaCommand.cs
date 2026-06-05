@@ -97,11 +97,11 @@ using System.Text.Json.Serialization;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface IDeltaCommand : IDeltaContent
 {
-    CommandId? CommandId { get; }
+    CommandId CommandId { get; }
 }
 
 public abstract record DeltaCommandBase(
-    CommandId? CommandId,
+    CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaContentBase(AdditionalInfos), IDeltaCommand
 {
@@ -153,7 +153,7 @@ public record CompositeCommand(
     IDeltaCommand[] Parts,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaCommandBase(CommandId, AdditionalInfos), IDeltaCommand
+) : DeltaCommandBase(CommandId, AdditionalInfos)
 {
     /// <inheritdoc />
     public virtual bool Equals(CompositeCommand? other)

@@ -368,7 +368,7 @@ public class MapperTests : DeltaTestsBase
         var parent = new LinkTestConcept("parent") { Containment_0_n = [other, moved] };
         List<IReadableNode> nodes = [parent, replaced];
 
-        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of ReplacedChild[replaced] unset",
+        Assert.ContainsSingle(e => e.Message.StartsWith("Invalid notification: Replaced node index 0 out of range (size: 0) in containment containment_1_n"),
             Test<MoveAndReplaceChildFromOtherContainmentInSameParent, ChildMovedAndReplacedFromOtherContainmentInSameParent>(nodes,
                 new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(NewContainment, 0, moved, parent, OldContainment, 1, replaced, _notificationIdProvider.Create())
             ));
@@ -383,11 +383,10 @@ public class MapperTests : DeltaTestsBase
         var parent = new LinkTestConcept("parent") { Containment_0_n = [other], Containment_1_n = [replaced] };
         List<IReadableNode> nodes = [parent, moved];
 
-        var failedException = Assert.ThrowsExactly<AssertFailedException>(() => Test<MoveAndReplaceChildFromOtherContainmentInSameParent, ChildMovedAndReplacedFromOtherContainmentInSameParent>(nodes,
-            new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(NewContainment, 0, moved, parent, OldContainment, 1, replaced, _notificationIdProvider.Create())
-        ));
-
-        Assert.AreEqual("Assert.AreEqual failed. Expected:<containment_0_n>. Actual:<(null)>. ", failedException.Message);
+        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset",
+            Test<MoveAndReplaceChildFromOtherContainmentInSameParent, ChildMovedAndReplacedFromOtherContainmentInSameParent>(nodes,
+                new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(NewContainment, 0, moved, parent, OldContainment, 1, replaced, _notificationIdProvider.Create())
+            ));
     }
 
     [TestMethod]
@@ -832,6 +831,10 @@ public class MapperTests : DeltaTestsBase
                     }
 
                     break;
+                
+                case (INotificationId, INotificationId):
+                    break;
+                
                 default:
                     Assert.AreEqual(ex, act);
                     break;

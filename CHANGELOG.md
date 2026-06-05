@@ -24,6 +24,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Multiple link fields in generated classes are not initialized by default anymore, but only on first access. No change to external behavior, but saves some memory.
 * Removed `ReadableNodeBase._m3`.
 * Changed `ReadableNodeBase._annotations` to _private_; use `ReadOnlyAnnotations()` / WritableAnnotations() instead.
+* Marked `IDeltaEvent.OriginCommands` non-nullable.
 ### Removed
 * Removed `sender` parameter from most notification pipe classes, as it's not used.
 * Removed `INotificationSender.Send()`.

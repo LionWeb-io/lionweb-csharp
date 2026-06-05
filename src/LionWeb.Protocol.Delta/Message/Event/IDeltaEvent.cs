@@ -113,13 +113,13 @@ public interface IDeltaEvent : IDeltaContent
 
     EventSequenceNumber SequenceNumber { get; set; }
 
-    CommandSource[]? OriginCommands { get; }
+    CommandSource[] OriginCommands { get; }
 
     [JsonIgnore] HashSet<TargetNode> AffectedNodes { get; }
 }
 
 public abstract record DeltaEventBase(
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaContentBase(AdditionalInfos), IDeltaEvent
 {
     /// <inheritdoc />
@@ -130,7 +130,7 @@ public abstract record DeltaEventBase(
     public virtual EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;
 
     /// <inheritdoc />
-    public virtual CommandSource[]? OriginCommands { get; init; } = OriginCommands;
+    public virtual CommandSource[] OriginCommands { get; init; } = OriginCommands;
 
     /// <inheritdoc />
     [JsonIgnore]
@@ -187,7 +187,7 @@ public abstract record DeltaEventBase(
 public record CompositeEvent : DeltaEventBase, IDeltaEvent
 {
     public CompositeEvent(IDeltaEvent[] Parts,
-        CommandSource[]? OriginCommands,
+        CommandSource[] OriginCommands,
         AdditionalInfo[]? AdditionalInfos) : base(OriginCommands, AdditionalInfos)
     {
         this.Parts = Parts;
@@ -209,7 +209,7 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override CommandSource[]? OriginCommands => base.OriginCommands;
+    public override CommandSource[] OriginCommands => base.OriginCommands;
 
     /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)
@@ -265,7 +265,7 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 }
 
 public record NoOpEvent(
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaEvent
 {
     /// <inheritdoc />
@@ -276,7 +276,7 @@ public record NoOpEvent(
 public record ErrorEvent(
     ErrorCode ErrorCode,
     string Message,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaEvent, IDeltaError
 {
     /// <inheritdoc />
