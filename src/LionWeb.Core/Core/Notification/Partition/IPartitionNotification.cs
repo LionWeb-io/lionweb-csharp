@@ -505,6 +505,15 @@ public record AnnotationMovedAndReplacedInSameParentNotification(
 
 #region References
 
+public interface IReferenceNotification : IPartitionNotification
+{
+    IWritableNode Parent { get; }
+        Reference Reference { get; }
+    Index Index { get; }
+    IReferenceTarget Target { get; }
+    
+}
+
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
@@ -514,13 +523,16 @@ public record ReferenceAddedNotification(
     Reference Reference,
     Index Index,
     IReferenceTarget NewTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId) : APartitionNotification(NotificationId), IReferenceNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override IWritableNode ContextNode => Parent;
+
+    /// <inheritdoc />
+    public IReferenceTarget Target => NewTarget;
 }
 
 /// <param name="Parent"></param>
@@ -532,13 +544,16 @@ public record ReferenceDeletedNotification(
     Reference Reference,
     Index Index,
     IReferenceTarget DeletedTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId) : APartitionNotification(NotificationId), IReferenceNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override IWritableNode ContextNode => Parent;
+
+    /// <inheritdoc />
+    public IReferenceTarget Target => DeletedTarget;
 }
 
 /// <param name="Parent"></param>
@@ -552,13 +567,16 @@ public record ReferenceChangedNotification(
     Index Index,
     IReferenceTarget NewTarget,
     IReferenceTarget OldTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId) : APartitionNotification(NotificationId), IReferenceNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override IWritableNode ContextNode => Parent;
+
+    /// <inheritdoc />
+    public IReferenceTarget Target => OldTarget;
 }
 
 #endregion

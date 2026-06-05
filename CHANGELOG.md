@@ -10,8 +10,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Small cli project to run profilers.
 * Introduced `M2Extensions.AsAnnotations()`
 * * Added `INotificationFilter.Handles()`, as we don't care about which notification type we're handling.
+* `IReferenceNotification` grouping interface.
 ### Fixed
-* Mappers support all kinds of messages (except `ChangeClassifier`).
+* Mappers + replicator support all kinds of messages (except `ChangeClassifier`).
 ### Changed
 * Made `SerializedNode` and related record members non-required.
 * Optimizations to `Serializer`.
