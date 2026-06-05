@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta;
 
 using Core.M1;
 using Message;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

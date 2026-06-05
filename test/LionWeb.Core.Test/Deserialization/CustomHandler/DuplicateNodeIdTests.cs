@@ -81,27 +81,18 @@ public class DuplicateNodeIdTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "ChildFirst",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "RefFirst",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -139,27 +130,18 @@ public class DuplicateNodeIdTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "ChildSecond",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "RefSecond",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]
@@ -235,27 +217,18 @@ public class DuplicateNodeIdTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "ChildFirst",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "RefFirst",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -293,27 +266,18 @@ public class DuplicateNodeIdTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "ChildSecond",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "RefSecond",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]
@@ -402,27 +366,18 @@ public class DuplicateNodeIdTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "ChildFirst",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "RefFirst",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
@@ -460,27 +415,18 @@ public class DuplicateNodeIdTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "ChildSecond",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "A"
                 },
                 new SerializedNode
                 {
                     Id = "RefSecond",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]

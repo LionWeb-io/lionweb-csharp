@@ -46,10 +46,6 @@ public class DeserializationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "bar"
                 }
             ]
@@ -82,7 +78,6 @@ public class DeserializationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -90,8 +85,6 @@ public class DeserializationTests
                             Containment = new MetaPointer("key-Shapes", "1", "key-shapes"), Children = ["bar"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 }
             ]
@@ -124,7 +117,6 @@ public class DeserializationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -136,15 +128,12 @@ public class DeserializationTests
                             ]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode()
                 {
                     Id = "bar",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
                     Containments = [], // should have an offset:Coord but can leave that one off
                     References =
                     [
@@ -157,7 +146,6 @@ public class DeserializationTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = "foo"
                 }
             ]
@@ -196,7 +184,6 @@ public class DeserializationTests
                 {
                     Id = "bar",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
                     Containments = [], // should have an offset:Coord but can leave that one off
                     References =
                     [
@@ -209,7 +196,6 @@ public class DeserializationTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 }
             ]
@@ -246,9 +232,6 @@ public class DeserializationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations =
                     [
                         "lizard"
@@ -328,20 +311,12 @@ public class DeserializationTests
                 {
                     Id = "A-id",
                     Classifier = new MetaPointer("langA", "1", "key-A-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "B-id",
                     Classifier = new MetaPointer("langB", "2", "key-B-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 }
             ]
@@ -388,40 +363,24 @@ public class DeserializationTests
                 {
                     Id = "A-id",
                     Classifier = new MetaPointer("lang", "x", "key-A-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "B-id",
                     Classifier = new MetaPointer("lang", "x", "key-B-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "C-id",
                     Classifier = new MetaPointer("lang", "x", "key-C-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "D-id",
                     Classifier = new MetaPointer("lang", "x", "key-D-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]
@@ -472,40 +431,24 @@ public class DeserializationTests
                 {
                     Id = "A-id",
                     Classifier = new MetaPointer("lang", "x", "key-A-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "B-id",
                     Classifier = new MetaPointer("lang", "x", "key-B-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "C-id",
                     Classifier = new MetaPointer("lang", "x", "key-C-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "D-id",
                     Classifier = new MetaPointer("lang", "x", "key-D-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]
@@ -543,8 +486,6 @@ public class DeserializationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("TestLanguage", "0", "TestAnnotation"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -556,7 +497,6 @@ public class DeserializationTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 }
             ]

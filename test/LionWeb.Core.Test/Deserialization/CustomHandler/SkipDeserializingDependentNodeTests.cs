@@ -53,7 +53,6 @@ public class SkipDeserializingDependentNodeTests
                 {
                     Id = "bar",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -62,8 +61,6 @@ public class SkipDeserializingDependentNodeTests
                             Children = ["repeated-id"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
 
@@ -71,10 +68,6 @@ public class SkipDeserializingDependentNodeTests
                 {
                     Id = "repeated-id",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = "bar"
                 },
             ]
@@ -113,8 +106,6 @@ public class SkipDeserializingDependentNodeTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -126,17 +117,12 @@ public class SkipDeserializingDependentNodeTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "repeated-id",
                     Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };

@@ -335,8 +335,6 @@ public class SerializationTests : SerializationTestsBase
                     Id = "parent",
                     Classifier = lang.LinkTestConcept.ToMetaPointer(),
                     Parent = null,
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -375,7 +373,6 @@ public class SerializationTests : SerializationTestsBase
                             ]
                         }
                     ],
-                    Annotations = []
                 },
                 new SerializedNode
                 {
@@ -388,10 +385,7 @@ public class SerializationTests : SerializationTestsBase
                         {
                             Property = _lionWebVersion.BuiltIns.INamed_name.ToMetaPointer(), Value = "TargetName"
                         }
-                    ],
-                    Containments = [],
-                    References = [],
-                    Annotations = []
+                    ]
                 }
             ]
         };
@@ -478,26 +472,36 @@ public class SerializationTests : SerializationTestsBase
 
     internal class SerializationChunkOrderedEqualityComparer : IEqualityComparer<SerializationChunk>
     {
-        public bool Equals(SerializationChunk? x, SerializationChunk? y) =>
-            string.Equals(x.SerializationFormatVersion, y.SerializationFormatVersion, StringComparison.InvariantCulture)
-            && x.Languages.OrderBy(l => l.Key).SequenceEqual(y.Languages.OrderBy(l => l.Key))
-            && x.Nodes.OrderBy(n => n.Id)
-                .SequenceEqual(y.Nodes.OrderBy(n => n.Id), new SerializationNodeOrderedEqualityComparer());
+        public bool Equals(SerializationChunk? x, SerializationChunk? y)
+        {
+            if (x == null || y == null)
+                return x == y;
+
+            return string.Equals(x.SerializationFormatVersion, y.SerializationFormatVersion, StringComparison.InvariantCulture)
+                   && x.Languages.OrderBy(l => l.Key).SequenceEqual(y.Languages.OrderBy(l => l.Key))
+                   && x.Nodes.OrderBy(n => n.Id)
+                       .SequenceEqual(y.Nodes.OrderBy(n => n.Id), new SerializationNodeOrderedEqualityComparer());
+        }
 
         public int GetHashCode(SerializationChunk obj) => obj.GetHashCode();
     }
 
     internal class SerializationNodeOrderedEqualityComparer : IEqualityComparer<SerializedNode>
     {
-        public bool Equals(SerializedNode? x, SerializedNode? y) =>
-            string.Equals(x.Id, y.Id, StringComparison.InvariantCulture) &&
-            x.Classifier.Equals(y.Classifier) &&
-            x.Properties.OrderBy(p => p.Property.Key).SequenceEqual(y.Properties.OrderBy(p => p.Property.Key)) &&
-            x.Containments.OrderBy(c => c.Containment.Key)
-                .SequenceEqual(y.Containments.OrderBy(c => c.Containment.Key)) &&
-            x.References.OrderBy(r => r.Reference.Key).SequenceEqual(y.References.OrderBy(r => r.Reference.Key)) &&
-            x.Annotations.ArrayEquals(y.Annotations) &&
-            string.Equals(x.Parent, y.Parent, StringComparison.InvariantCulture);
+        public bool Equals(SerializedNode? x, SerializedNode? y)
+        {
+            if (x == null || y == null)
+                return x == y;
+            
+            return string.Equals(x.Id, y.Id, StringComparison.InvariantCulture) &&
+                   x.Classifier.Equals(y.Classifier) &&
+                   x.Properties.OrderBy(p => p.Property.Key).SequenceEqual(y.Properties.OrderBy(p => p.Property.Key)) &&
+                   x.Containments.OrderBy(c => c.Containment.Key)
+                       .SequenceEqual(y.Containments.OrderBy(c => c.Containment.Key)) &&
+                   x.References.OrderBy(r => r.Reference.Key).SequenceEqual(y.References.OrderBy(r => r.Reference.Key)) &&
+                   x.Annotations.ArrayEquals(y.Annotations) &&
+                   string.Equals(x.Parent, y.Parent, StringComparison.InvariantCulture);
+        }
 
         public int GetHashCode(SerializedNode obj) => obj.GetHashCode();
     }

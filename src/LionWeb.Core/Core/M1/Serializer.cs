@@ -32,8 +32,9 @@ public class Serializer : ISerializer
     private readonly ILionCoreLanguage _m3;
     private readonly IBuiltInsLanguage _builtIns;
     private readonly ISerializerVersionSpecifics _versionSpecifics;
-    private readonly HashSet<Language> _usedLanguages = new();
+    private readonly HashSet<Language> _usedLanguages = [];
     private readonly ISerializerHandler _handler = new SerializerExceptionHandler();
+    private readonly Dictionary<IKeyed, MetaPointer> _metaPointers = [];
 
     /// <inheritdoc cref="ISerializer"/>
     public Serializer(LionWebVersions lionWebVersion)
@@ -155,7 +156,7 @@ public class Serializer : ISerializer
         return new()
         {
             Id = node.GetId(),
-            Classifier = classifier.ToMetaPointer(),
+            Classifier = ToMetaPointer(classifier),
             Properties = properties.Select(pair => SerializeProperty(node, pair.Key, pair.Value))
                 .ToArray(),
             Containments = containmentsSingle
@@ -236,7 +237,7 @@ public class Serializer : ISerializer
         RegisterUsedLanguage(containment.GetLanguage());
         return new SerializedContainment
         {
-            Containment = containment.ToMetaPointer(), Children = children.Select(child => child.GetId()).ToArray()
+            Containment = ToMetaPointer(containment), Children = children.Select(child => child.GetId()).ToArray()
         };
     }
 
@@ -266,7 +267,7 @@ public class Serializer : ISerializer
         RegisterUsedLanguage(reference.GetLanguage());
         return new SerializedReference
         {
-            Reference = reference.ToMetaPointer(), Targets = targets.Select(SerializeReferenceTarget).ToArray()
+            Reference = ToMetaPointer(reference), Targets = targets.Select(SerializeReferenceTarget).ToArray()
         };
     }
 
@@ -335,6 +336,16 @@ public class Serializer : ISerializer
 
         private bool IsLionCore(Feature? feature) =>
             feature?.GetLanguage().Key is ILionCoreLanguage.LanguageKey or IBuiltInsLanguage.LanguageKey;
+    }
+
+    private MetaPointer ToMetaPointer(IKeyed keyed)
+    {
+        if (_metaPointers.TryGetValue(keyed, out var result))
+            return result;
+
+        result = keyed.ToMetaPointer();
+        _metaPointers[keyed] = result;
+        return result;
     }
 
     #endregion

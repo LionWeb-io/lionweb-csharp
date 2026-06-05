@@ -57,8 +57,6 @@ public class InvalidFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -66,7 +64,6 @@ public class InvalidFeatureTests
                             Reference = new MetaPointer("key-Shapes", "1", "key-r"), Targets = []
                         }
                     ],
-                    Annotations = [],
                 },
             ]
         };
@@ -102,8 +99,6 @@ public class InvalidFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -118,17 +113,12 @@ public class InvalidFeatureTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "center",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -163,8 +153,6 @@ public class InvalidFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -179,17 +167,12 @@ public class InvalidFeatureTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "center",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -228,8 +211,6 @@ public class InvalidFeatureTests
                 {
                     Id = "A",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -241,17 +222,12 @@ public class InvalidFeatureTests
                             ]
                         }
                     ],
-                    Annotations = [],
                     Parent = null
                 },
                 new SerializedNode
                 {
                     Id = "RefFirst",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                     Parent = null
                 },
             ]

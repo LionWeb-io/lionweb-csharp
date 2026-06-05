@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>LionWeb.Test.Run</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <NoWarn>1591</NoWarn>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
+      <ProjectReference Include="..\LionWeb.Core.Benchmark\LionWeb.Core.Benchmark.csproj" />
+      <ProjectReference Include="..\LionWeb.Core.Test.Languages\LionWeb.Core.Test.Languages.csproj" />
+    </ItemGroup>
+
+</Project>

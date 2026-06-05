@@ -52,7 +52,6 @@ public class UnknownFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -61,18 +60,12 @@ public class UnknownFeatureTests
                             Children = ["child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -102,7 +95,6 @@ public class UnknownFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -111,18 +103,12 @@ public class UnknownFeatureTests
                             Children = ["child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -153,7 +139,6 @@ public class UnknownFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
                     Containments =
                     [
                         new SerializedContainment
@@ -162,18 +147,12 @@ public class UnknownFeatureTests
                             Children = ["child"]
                         }
                     ],
-                    References = [],
-                    Annotations = [],
                 },
 
                 new SerializedNode
                 {
                     Id = "child",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -211,9 +190,6 @@ public class UnknownFeatureTests
                             Property = new MetaPointer("key-Shapes", "1", "key-unknown-property"), Value = "1"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -253,9 +229,6 @@ public class UnknownFeatureTests
                             Property = new MetaPointer("key-Shapes", "1", "key-unknown-property"), Value = "1"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -289,8 +262,6 @@ public class UnknownFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("library", "1", "Book"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -302,7 +273,6 @@ public class UnknownFeatureTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
@@ -316,9 +286,6 @@ public class UnknownFeatureTests
                             Property = new MetaPointer("library", "1", "library_Writer_name"), Value = "author-name"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };
@@ -351,8 +318,6 @@ public class UnknownFeatureTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("library", "1", "Book"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -364,7 +329,6 @@ public class UnknownFeatureTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 },
 
                 new SerializedNode
@@ -378,9 +342,6 @@ public class UnknownFeatureTests
                             Property = new MetaPointer("library", "1", "library_Writer_name"), Value = "author-name"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 },
             ]
         };

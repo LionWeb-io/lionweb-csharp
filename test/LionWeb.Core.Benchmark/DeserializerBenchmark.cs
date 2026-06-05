@@ -24,12 +24,9 @@ using System.Text.Json;
 
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
-[TestClass]
-[Ignore("must run after SerializerBenchmark")]
 public class DeserializerBenchmark : SerializerBenchmarkBase
 {
     [Benchmark]
-    [TestMethod]
     public async Task Deserialize_Stream_Async()
     {
         await using Stream stream = File.OpenRead(_streamFile);
@@ -44,7 +41,6 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public async Task Deserialize_Stream_Async_Aot()
     {
         await using Stream stream = File.OpenRead(_streamFile);
@@ -59,7 +55,6 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Deserialize_Stream()
     {
         using Stream stream = File.OpenRead(_streamFile);
@@ -74,7 +69,6 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Deserialize_Stream_Aot()
     {
         using Stream stream = File.OpenRead(_streamFile);
@@ -89,7 +83,6 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Deserialize_String()
     {
         var input = JsonSerializer.Deserialize<SerializationChunk>(File.ReadAllText(_stringFile), _simpleOptions)!;
@@ -102,7 +95,6 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    [TestMethod]
     public void Deserialize_String_Aot()
     {
         var input = JsonSerializer.Deserialize<SerializationChunk>(File.ReadAllText(_stringFile), _aotOptions)!;

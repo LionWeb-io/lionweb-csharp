@@ -20,14 +20,14 @@ namespace LionWeb.Core.Benchmark;
 using M3;
 using Serialization;
 using System.Text.Json;
-using Test.Languages.Generated.V2024_1.Shapes.M2;
+using Test.Languages.Generated.V2024_1.TestLanguage;
 
 public class SerializerBenchmarkBase
 {
     protected readonly Language _language;
     protected readonly LionWebVersions _lionWebVersion;
 
-    public SerializerBenchmarkBase() : this(ShapesLanguage.Instance, LionWebVersions.Current)
+    public SerializerBenchmarkBase() : this(TestLanguageLanguage.Instance, LionWebVersions.Current)
     {
     }
 

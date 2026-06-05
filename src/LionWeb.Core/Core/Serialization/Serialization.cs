@@ -26,6 +26,10 @@ using System.Text;
 /// </summary>
 public record SerializationChunk
 {
+    public required string SerializationFormatVersion { get; init; }
+    public required SerializedLanguageReference[] Languages { get; init; }
+    public required SerializedNode[] Nodes { get; init; }
+
     /// <inheritdoc />
     public virtual bool Equals(SerializationChunk? other)
     {
@@ -75,10 +79,6 @@ public record SerializationChunk
 
         return true;
     }
-
-    public required string SerializationFormatVersion { get; init; }
-    public required SerializedLanguageReference[] Languages { get; init; }
-    public required SerializedNode[] Nodes { get; init; }
 }
 
 public record SerializedLanguageReference
@@ -89,6 +89,18 @@ public record SerializedLanguageReference
 
 public record SerializedNode
 {
+    public required string Id { get; init; }
+    public required MetaPointer Classifier { get; init; }
+
+    public SerializedProperty[] Properties { get; init; } = [];
+
+    public SerializedContainment[] Containments { get; init; } = [];
+    
+    public SerializedReference[] References { get; init; } = [];
+    
+    public string[] Annotations { get; init; } = [];
+    public string? Parent { get; init; }
+
     /// <inheritdoc />
     public virtual bool Equals(SerializedNode? other)
     {
@@ -165,14 +177,6 @@ public record SerializedNode
 
         return true;
     }
-
-    public required string Id { get; init; }
-    public required MetaPointer Classifier { get; init; }
-    public required SerializedProperty[] Properties { get; init; }
-    public required SerializedContainment[] Containments { get; init; }
-    public required SerializedReference[] References { get; init; }
-    public required string[] Annotations { get; init; }
-    public string? Parent { get; init; }
 }
 
 public record MetaPointer(string Language, string Version, string Key);
@@ -185,6 +189,9 @@ public record SerializedProperty
 
 public record SerializedContainment
 {
+    public required MetaPointer Containment { get; init; }
+    public string[] Children { get; init; } = [];
+
     /// <inheritdoc />
     public virtual bool Equals(SerializedContainment? other)
     {
@@ -226,9 +233,6 @@ public record SerializedContainment
         
         return true;
     }
-
-    public required MetaPointer Containment { get; init; }
-    public required string[] Children { get; init; }
 }
 
 public record SerializedReferenceTarget
@@ -239,6 +243,9 @@ public record SerializedReferenceTarget
 
 public record SerializedReference
 {
+    public required MetaPointer Reference { get; init; }
+    public SerializedReferenceTarget[] Targets { get; init; } = [];
+
     /// <inheritdoc />
     public virtual bool Equals(SerializedReference? other)
     {
@@ -280,7 +287,4 @@ public record SerializedReference
         
         return true;
     }
-
-    public required MetaPointer Reference { get; init; }
-    public required SerializedReferenceTarget[] Targets { get; init; }
 }

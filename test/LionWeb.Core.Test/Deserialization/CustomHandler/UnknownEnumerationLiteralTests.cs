@@ -62,9 +62,6 @@ public class UnknownEnumerationLiteralTests
                             Value = "unknown-enumeration-literal"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -105,9 +102,6 @@ public class UnknownEnumerationLiteralTests
                             Value = "unknown-enumeration-literal"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };
@@ -155,9 +149,6 @@ public class UnknownEnumerationLiteralTests
                             Value = "unknown-enumeration-literal"
                         }
                     ],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
                 }
             ]
         };

@@ -53,9 +53,6 @@ public class UnresolvableAnnotationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["unresolvable-annotation"],
                 }
             ]
@@ -87,9 +84,6 @@ public class UnresolvableAnnotationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["unresolvable-annotation"],
                 }
             ]
@@ -126,9 +120,6 @@ public class UnresolvableAnnotationTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
                     Annotations = ["unresolvable-annotation"],
                 }
             ]

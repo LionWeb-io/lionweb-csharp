@@ -498,10 +498,6 @@ public abstract class JsonTestsBase
         {
             Id = TargetNode(),
             Classifier = MetaPointer(),
-            Properties = [],
-            Containments = [],
-            References = [],
-            Annotations = []
         };
 
     protected static MetaPointer MetaPointer() =>

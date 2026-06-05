@@ -54,8 +54,6 @@ public class UnresolvableReferenceTargetTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -71,7 +69,6 @@ public class UnresolvableReferenceTargetTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 }
             ]
         };
@@ -102,8 +99,6 @@ public class UnresolvableReferenceTargetTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -119,7 +114,6 @@ public class UnresolvableReferenceTargetTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 }
             ]
         };
@@ -155,8 +149,6 @@ public class UnresolvableReferenceTargetTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -171,7 +163,6 @@ public class UnresolvableReferenceTargetTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 }
             ]
         };
@@ -208,8 +199,6 @@ public class UnresolvableReferenceTargetTests
                 {
                     Id = "foo",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
-                    Properties = [],
-                    Containments = [],
                     References =
                     [
                         new SerializedReference
@@ -225,7 +214,6 @@ public class UnresolvableReferenceTargetTests
                             ]
                         }
                     ],
-                    Annotations = [],
                 }
             ]
         };
