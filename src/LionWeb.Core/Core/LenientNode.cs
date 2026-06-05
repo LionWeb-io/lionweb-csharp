@@ -275,7 +275,8 @@ public class LenientNode : NodeBase, INode
         if (feature == null)
         {
             var annotations = M2Extensions.AsAnnotations<INode>(value).ToList();
-            RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
+            var writableAnnotations = WritableAnnotations();
+            RemoveSelfParent(writableAnnotations.ToList(), writableAnnotations, null, null);
             AddAnnotations(annotations);
             return true;
         }
@@ -501,7 +502,7 @@ public class LenientNode : NodeBase, INode
     public override void AddAnnotations(IEnumerable<INode> annotations)
     {
         var safeAnnotations = annotations?.ToList();
-        _annotations.AddRange(SetSelfParent(safeAnnotations, null));
+        WritableAnnotations().AddRange(SetSelfParent(safeAnnotations, null));
     }
 
     /// <inheritdoc cref="IWritableNode.AddAnnotationsRaw"/>
@@ -510,21 +511,22 @@ public class LenientNode : NodeBase, INode
         var node = (INode)annotation;
         AttachChild(node);
 
-        _annotations.Add(node);
+        WritableAnnotations().Add(node);
         return true;
     }
 
     /// <inheritdoc />
     public override void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
-        AssureInRange(index, _annotations);
+        var writableAnnotations = WritableAnnotations();
+        AssureInRange(index, writableAnnotations);
         var safeAnnotations = annotations?.ToList();
-        _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
+        writableAnnotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
     }
     
     /// <inheritdoc />
     public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null, null);
+        RemoveSelfParent(annotations?.ToList(), WritableAnnotations(), null, null);
 
     private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);
 

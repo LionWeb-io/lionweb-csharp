@@ -787,34 +787,37 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return this;
 	}
 
-	private bool SetContainment_0_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, _containment_0_n);
-	private bool AddContainment_0_nRaw(LinkTestConcept? value) => AddChildRaw(value, _containment_0_n);
-	private bool InsertContainment_0_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, _containment_0_n);
+	private bool SetContainment_0_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, WritableContainment_0_n());
+	private bool AddContainment_0_nRaw(LinkTestConcept? value) => AddChildRaw(value, WritableContainment_0_n());
+	private bool InsertContainment_0_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, WritableContainment_0_n());
 	private bool RemoveContainment_0_nRaw(LinkTestConcept? value) => RemoveChildRaw(value, _containment_0_n);
-	private readonly List<LinkTestConcept> _containment_0_n = [];
+	private List<LinkTestConcept>? _containment_0_n;
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-containment_0_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<LinkTestConcept> Containment_0_n { get => _containment_0_n.AsReadOnly(); init => AddContainment_0_n(value); }
+	public IReadOnlyList<LinkTestConcept> Containment_0_n { get => ReadOnlyContainment_0_n(); init => AddContainment_0_n(value); }
 
-	/// <remarks>Optional Multiple Containment</remarks>
+    private IReadOnlyList<LinkTestConcept> ReadOnlyContainment_0_n() => _containment_0_n is not null ? _containment_0_n.AsReadOnly() : [];
+    private List<LinkTestConcept> WritableContainment_0_n() => _containment_0_n is not null ? _containment_0_n : _containment_0_n = [];
+
+    /// <remarks>Optional Multiple Containment</remarks>
         public bool TryGetContainment_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> containment_0_n)
 	{
-		containment_0_n = _containment_0_n.AsReadOnly();
+		containment_0_n = ReadOnlyContainment_0_n();
 		return containment_0_n.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public LinkTestConcept AddContainment_0_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		AddOptionalMultipleContainment<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, _containment_0_n, AddContainment_0_nRaw);
+		AddOptionalMultipleContainment<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, WritableContainment_0_n(), AddContainment_0_nRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public LinkTestConcept InsertContainment_0_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		InsertOptionalMultipleContainment<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, _containment_0_n, InsertContainment_0_nRaw);
+		InsertOptionalMultipleContainment<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, WritableContainment_0_n(), InsertContainment_0_nRaw);
 		return this;
 	}
 
@@ -856,21 +859,24 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return this;
 	}
 
-	private bool SetContainment_1_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, _containment_1_n);
-	private bool AddContainment_1_nRaw(LinkTestConcept? value) => AddChildRaw(value, _containment_1_n);
-	private bool InsertContainment_1_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, _containment_1_n);
+	private bool SetContainment_1_nRaw(List<LinkTestConcept> nodes) => ExchangeChildrenRaw(nodes, WritableContainment_1_n());
+	private bool AddContainment_1_nRaw(LinkTestConcept? value) => AddChildRaw(value, WritableContainment_1_n());
+	private bool InsertContainment_1_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, WritableContainment_1_n());
 	private bool RemoveContainment_1_nRaw(LinkTestConcept? value) => RemoveChildRaw(value, _containment_1_n);
-	private readonly List<LinkTestConcept> _containment_1_n = [];
+	private List<LinkTestConcept>? _containment_1_n;
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Containment_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-containment_1_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = true)]
 	public IReadOnlyList<LinkTestConcept> Containment_1_n { get => AsNonEmptyReadOnly(_containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n); init => AddContainment_1_n(value); }
 
+    private IReadOnlyList<LinkTestConcept> ReadOnlyContainment_1_n() => _containment_1_n is not null ? _containment_1_n.AsReadOnly() : [];
+    private List<LinkTestConcept> WritableContainment_1_n() => _containment_1_n is not null ? _containment_1_n : _containment_1_n = [];
+
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetContainment_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> containment_1_n)
 	{
-		containment_1_n = _containment_1_n.AsReadOnly();
+		containment_1_n = ReadOnlyContainment_1_n();
 		return containment_1_n.Count != 0;
 	}
 
@@ -878,7 +884,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If both Containment_1_n and nodes are empty</exception>
         public LinkTestConcept AddContainment_1_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		AddRequiredMultipleContainment<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, _containment_1_n, AddContainment_1_nRaw);
+		AddRequiredMultipleContainment<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, WritableContainment_1_n(), AddContainment_1_nRaw);
 		return this;
 	}
 
@@ -887,7 +893,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Containment_1_n.Count</exception>
         public LinkTestConcept InsertContainment_1_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		InsertRequiredMultipleContainment<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, _containment_1_n, InsertContainment_1_nRaw);
+		InsertRequiredMultipleContainment<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, WritableContainment_1_n(), InsertContainment_1_nRaw);
 		return this;
 	}
 
@@ -932,29 +938,32 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return SetReference_0_1(ReferenceTarget.FromNodeOptional(value));
 	}
 
-	private readonly List<ReferenceTarget> _reference_0_n = [];
+	private List<ReferenceTarget>? _reference_0_n;
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_0_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<LinkTestConcept> Reference_0_n { get => ReferenceTargetNonNullTargets<LinkTestConcept>(_reference_0_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n); init => AddReference_0_n(value); }
 
+    private IReadOnlyList<ReferenceTarget> ReadOnlyReference_0_n() => _reference_0_n is not null ? _reference_0_n.AsReadOnly() : [];
+    private List<ReferenceTarget> WritableReference_0_n() => _reference_0_n is not null ? _reference_0_n : _reference_0_n = [];
+
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetReference_0_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_0_n) => TryGetReference<LinkTestConcept>(_reference_0_n, out reference_0_n);
-	private bool SetReference_0_nRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _reference_0_n);
-	private bool AddReference_0_nRaw(ReferenceTarget target) => AddReferencesRaw(target, _reference_0_n);
-	private bool InsertReference_0_nRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _reference_0_n);
+	private bool SetReference_0_nRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableReference_0_n());
+	private bool AddReference_0_nRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableReference_0_n());
+	private bool InsertReference_0_nRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableReference_0_n());
 	private bool RemoveReference_0_nRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _reference_0_n);
 	/// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept AddReference_0_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		AddOptionalMultipleReference<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, _reference_0_n, AddReference_0_nRaw);
+		AddOptionalMultipleReference<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, WritableReference_0_n(), AddReference_0_nRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public LinkTestConcept InsertReference_0_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		InsertOptionalMultipleReference<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, _reference_0_n, InsertReference_0_nRaw);
+		InsertOptionalMultipleReference<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, WritableReference_0_n(), InsertReference_0_nRaw);
 		return this;
 	}
 
@@ -1001,24 +1010,27 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return SetReference_1(ReferenceTarget.FromNodeOptional(value));
 	}
 
-	private readonly List<ReferenceTarget> _reference_1_n = [];
+	private List<ReferenceTarget>? _reference_1_n;
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Reference_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_1_n")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<LinkTestConcept> Reference_1_n { get => GetRequiredNonNullReferences<LinkTestConcept>(_reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value); }
 
+    private IReadOnlyList<ReferenceTarget> ReadOnlyReference_1_n() => _reference_1_n is not null ? _reference_1_n.AsReadOnly() : [];
+    private List<ReferenceTarget> WritableReference_1_n() => _reference_1_n is not null ? _reference_1_n : _reference_1_n = [];
+
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetReference_1_n([NotNullWhenAttribute(true)] out IReadOnlyList<LinkTestConcept> reference_1_n) => TryGetReference<LinkTestConcept>(_reference_1_n, out reference_1_n);
-	private bool SetReference_1_nRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _reference_1_n);
-	private bool AddReference_1_nRaw(ReferenceTarget target) => AddReferencesRaw(target, _reference_1_n);
-	private bool InsertReference_1_nRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _reference_1_n);
+	private bool SetReference_1_nRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableReference_1_n());
+	private bool AddReference_1_nRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableReference_1_n());
+	private bool InsertReference_1_nRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableReference_1_n());
 	private bool RemoveReference_1_nRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _reference_1_n);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Reference_1_n and nodes are empty</exception>
         public LinkTestConcept AddReference_1_n(IEnumerable<LinkTestConcept> nodes)
 	{
-		AddRequiredMultipleReference<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, _reference_1_n, AddReference_1_nRaw);
+		AddRequiredMultipleReference<LinkTestConcept>(nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, WritableReference_1_n(), AddReference_1_nRaw);
 		return this;
 	}
 
@@ -1027,7 +1039,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Reference_1_n.Count</exception>
         public LinkTestConcept InsertReference_1_n(int index, IEnumerable<LinkTestConcept> nodes)
 	{
-		InsertRequiredMultipleReference<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, _reference_1_n, InsertReference_1_nRaw);
+		InsertRequiredMultipleReference<LinkTestConcept>(index, nodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, WritableReference_1_n(), InsertReference_1_nRaw);
 		return this;
 	}
 
@@ -1145,13 +1157,13 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return true;
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature))
 		{
-			result = _containment_0_n;
+			result = ReadOnlyContainment_0_n();
 			return true;
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature))
 		{
-			result = _containment_1_n;
+			result = ReadOnlyContainment_1_n();
 			return true;
 		}
 
@@ -1183,13 +1195,13 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return true;
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(feature))
 		{
-			result = _reference_0_n;
+			result = ReadOnlyReference_0_n();
 			return true;
 		}
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(feature))
 		{
-			result = _reference_1_n;
+			result = ReadOnlyReference_1_n();
 			return true;
 		}
 
@@ -1225,7 +1237,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleContainment<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, _containment_0_n, SetContainment_0_nRaw);
+			SetOptionalMultipleContainment<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, WritableContainment_0_n(), SetContainment_0_nRaw);
 			return true;
 		}
 
@@ -1242,7 +1254,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleContainment<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, _containment_1_n, SetContainment_1_nRaw);
+			SetRequiredMultipleContainment<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, WritableContainment_1_n(), SetContainment_1_nRaw);
 			return true;
 		}
 
@@ -1265,7 +1277,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleReference<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, _reference_0_n, SetReference_0_nRaw);
+			SetOptionalMultipleReference<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, WritableReference_0_n(), SetReference_0_nRaw);
 			return true;
 		}
 
@@ -1288,7 +1300,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleReference<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, _reference_1_n, SetReference_1_nRaw);
+			SetRequiredMultipleReference<LinkTestConcept>(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, WritableReference_1_n(), SetReference_1_nRaw);
 			return true;
 		}
 
@@ -1529,7 +1541,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(c))
 		{
-			RemoveSelfParent((LinkTestConcept)child, _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, null, notify ? ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n) : null);
+			RemoveSelfParent((LinkTestConcept)child, WritableContainment_0_n(), TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, null, notify ? ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n) : null);
 			return true;
 		}
 
@@ -1543,7 +1555,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.EqualsIdentity(c))
 		{
-			RemoveSelfParent((LinkTestConcept)child, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null, notify ? ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n) : null);
+			RemoveSelfParent((LinkTestConcept)child, WritableContainment_1_n(), TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null, notify ? ContainmentRemover<LinkTestConcept>(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n) : null);
 			return true;
 		}
 
@@ -1558,11 +1570,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return result;
 		if (ReferenceEquals(_containment_0_1, child))
 			return TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1;
-		if (child is LinkTestConcept child1 && _containment_0_n.Contains(child1))
+		if (child is LinkTestConcept child1 && (_containment_0_n?.Contains(child1) ?? false))
 			return TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n;
 		if (ReferenceEquals(_containment_1, child))
 			return TestLanguageLanguage.Instance.LinkTestConcept_containment_1;
-		if (child is LinkTestConcept child3 && _containment_1_n.Contains(child3))
+		if (child is LinkTestConcept child3 && (_containment_1_n?.Contains(child3) ?? false))
 			return TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n;
 		return null;
 	}
