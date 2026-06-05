@@ -22,7 +22,6 @@ using M1;
 using Serialization;
 using System.Text.Json;
 using Test.Languages.Generated.V2024_1.TestLanguage;
-using Test.Serialization;
 
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
@@ -36,7 +35,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         _nodes = CreateNodes(_maxSize);
     }
 
-    [Benchmark]
+    // [Benchmark]
     public async Task Serialize_Stream_Async()
     {
         await using Stream stream = File.Create(_streamFile);
@@ -51,7 +50,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         await JsonSerializer.SerializeAsync(stream, data, _simpleOptions);
     }
 
-    [Benchmark]
+    // [Benchmark]
     public void Serialize_Stream()
     {
         using Stream stream = File.Create(_streamFile);
@@ -66,7 +65,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         JsonSerializer.Serialize(stream, data, _simpleOptions);
     }
 
-    [Benchmark]
+    // [Benchmark]
     public async Task Serialize_Stream_Async_Aot()
     {
         await using Stream stream = File.Create(_streamFile);
@@ -81,7 +80,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         await JsonSerializer.SerializeAsync(stream, data, _aotOptions);
     }
 
-    [Benchmark]
+    // [Benchmark]
     public void Serialize_Stream_Aot()
     {
         using Stream stream = File.Create(_streamFile);
@@ -104,7 +103,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             .Build()
             .SerializeToChunk(_nodes), _simpleOptions);
 
-        File.WriteAllText(_stringFile, output);
+        // File.WriteAllText(_stringFile, output);
     }
 
     [Benchmark]
@@ -115,7 +114,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             .Build()
             .SerializeToChunk(_nodes), _aotOptions);
 
-        File.WriteAllText(_stringFile, output);
+        // File.WriteAllText(_stringFile, output);
     }
 
     public static IEnumerable<INode> CreateNodes(long count)

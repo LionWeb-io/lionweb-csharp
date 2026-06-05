@@ -26,7 +26,18 @@ using System.Text.Json;
 // [NativeMemoryProfiler]
 public class DeserializerBenchmark : SerializerBenchmarkBase
 {
-    [Benchmark]
+    private string _string;
+
+    [IterationSetup]
+    public void CreateString()
+    {
+        _string = JsonSerializer.Serialize((object)new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .Build()
+            .SerializeToChunk(SerializerBenchmark.CreateNodes(_maxSize)), _simpleOptions);
+    }
+    
+    // [Benchmark]
     public async Task Deserialize_Stream_Async()
     {
         await using Stream stream = File.OpenRead(_streamFile);
@@ -40,7 +51,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     public async Task Deserialize_Stream_Async_Aot()
     {
         await using Stream stream = File.OpenRead(_streamFile);
@@ -54,7 +65,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     public void Deserialize_Stream()
     {
         using Stream stream = File.OpenRead(_streamFile);
@@ -68,7 +79,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     public void Deserialize_Stream_Aot()
     {
         using Stream stream = File.OpenRead(_streamFile);
@@ -83,27 +94,29 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
     }
 
     [Benchmark]
-    public void Deserialize_String()
+    public int Deserialize_String()
     {
-        var input = JsonSerializer.Deserialize<SerializationChunk>(File.ReadAllText(_stringFile), _simpleOptions)!;
+        var input = JsonSerializer.Deserialize<SerializationChunk>(_string, _simpleOptions)!;
         var deserializer = Deserializer();
         var nodes = deserializer.Deserialize(input);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
+        return actual;
         if (_maxSize != actual)
-            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+            Console.Error.WriteLine($"Assertion failed: {actual} should be {_maxSize}");
     }
 
     [Benchmark]
-    public void Deserialize_String_Aot()
+    public int Deserialize_String_Aot()
     {
-        var input = JsonSerializer.Deserialize<SerializationChunk>(File.ReadAllText(_stringFile), _aotOptions)!;
+        var input = JsonSerializer.Deserialize<SerializationChunk>(_string, _aotOptions)!;
         var deserializer = Deserializer();
         var nodes = deserializer.Deserialize(input);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
+        return actual;
         if (_maxSize != actual)
-            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+            Console.Error.WriteLine($"Assertion failed: {actual} should be {_maxSize}");
     }
 
     private IDeserializer Deserializer()

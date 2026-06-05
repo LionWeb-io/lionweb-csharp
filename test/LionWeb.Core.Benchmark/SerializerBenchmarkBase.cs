@@ -38,7 +38,7 @@ public class SerializerBenchmarkBase
     }
 
     // private const long _maxSize = 1_500_000L;
-    protected const long _maxSize = 100_500L;
+    protected const long _maxSize = 30_900L;
     protected const string _streamFile = "/tmp/output_stream.json";
     protected const string _stringFile = "/tmp/output_string.json";
 

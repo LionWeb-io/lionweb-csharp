@@ -14,8 +14,6 @@
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" />
       <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" />
-      <PackageReference Include="BenchmarkDotNet.TestAdapter" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" />
     </ItemGroup>
 
     <ItemGroup>
@@ -23,9 +21,6 @@
           <PrivateAssets>None</PrivateAssets>
       </ProjectReference>
       <ProjectReference Include="..\LionWeb.Core.Test.Languages\LionWeb.Core.Test.Languages.csproj">
-          <PrivateAssets>None</PrivateAssets>
-      </ProjectReference>
-      <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj">
           <PrivateAssets>None</PrivateAssets>
       </ProjectReference>
     </ItemGroup>
