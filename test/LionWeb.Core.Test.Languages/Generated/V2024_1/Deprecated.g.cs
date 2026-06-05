@@ -176,22 +176,24 @@ public partial class DeprAnnotation : AnnotationInstanceBase
 [Obsolete("deprConcept comment")]
 public partial class DeprConcept : ConceptInstanceBase
 {
-	private bool SetDeprChildRaw(List<DeprIface> nodes) => ExchangeChildrenRaw(nodes, _deprChild);
-	private bool AddDeprChildRaw(DeprIface? value) => AddChildRaw(value, _deprChild);
-	private bool InsertDeprChildRaw(int index, DeprIface? value) => InsertChildRaw(index, value, _deprChild);
+	private bool SetDeprChildRaw(List<DeprIface> nodes) => ExchangeChildrenRaw(nodes, WritableDeprChild());
+	private bool AddDeprChildRaw(DeprIface? value) => AddChildRaw(value, WritableDeprChild());
+	private bool InsertDeprChildRaw(int index, DeprIface? value) => InsertChildRaw(index, value, WritableDeprChild());
 	private bool RemoveDeprChildRaw(DeprIface? value) => RemoveChildRaw(value, _deprChild);
-	private readonly List<DeprIface> _deprChild = [];
+	private List<DeprIface>? _deprChild;
+	private IReadOnlyList<DeprIface> ReadOnlyDeprChild() => _deprChild is not null ? _deprChild.AsReadOnly() : [];
+	private List<DeprIface> WritableDeprChild() => _deprChild is not null ? _deprChild : _deprChild = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
 	[Obsolete("deprChild comment")]
-	public IReadOnlyList<DeprIface> DeprChild { get => _deprChild.AsReadOnly(); init => AddDeprChild(value); }
+	public IReadOnlyList<DeprIface> DeprChild { get => ReadOnlyDeprChild(); init => AddDeprChild(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete("deprChild comment")]
 	public bool TryGetDeprChild([NotNullWhenAttribute(true)] out IReadOnlyList<DeprIface> deprChild)
 	{
-		deprChild = _deprChild.AsReadOnly();
+		deprChild = ReadOnlyDeprChild();
 		return deprChild.Count != 0;
 	}
 
@@ -199,7 +201,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprChild comment")]
 	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
 	{
-		AddOptionalMultipleContainment<DeprIface>(nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild, _deprChild, AddDeprChildRaw);
+		AddOptionalMultipleContainment<DeprIface>(nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild, WritableDeprChild(), AddDeprChildRaw);
 		return this;
 	}
 
@@ -207,7 +209,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprChild comment")]
 	public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes)
 	{
-		InsertOptionalMultipleContainment<DeprIface>(index, nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild, _deprChild, InsertDeprChildRaw);
+		InsertOptionalMultipleContainment<DeprIface>(index, nodes, DeprecatedLanguage.Instance.DeprConcept_deprChild, WritableDeprChild(), InsertDeprChildRaw);
 		return this;
 	}
 
@@ -340,7 +342,7 @@ public partial class DeprConcept : ConceptInstanceBase
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
-			result = _deprChild;
+			result = ReadOnlyDeprChild();
 			return true;
 		}
 
@@ -367,7 +369,7 @@ public partial class DeprConcept : ConceptInstanceBase
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleContainment<DeprIface>(value, DeprecatedLanguage.Instance.DeprConcept_deprChild, _deprChild, SetDeprChildRaw);
+			SetOptionalMultipleContainment<DeprIface>(value, DeprecatedLanguage.Instance.DeprConcept_deprChild, WritableDeprChild(), SetDeprChildRaw);
 			return true;
 		}
 
@@ -510,7 +512,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		Containment? c = GetContainmentOf(child);
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(c))
 		{
-			RemoveSelfParent((DeprIface)child, _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild, null, notify ? ContainmentRemover<DeprIface>(DeprecatedLanguage.Instance.DeprConcept_deprChild) : null);
+			RemoveSelfParent((DeprIface)child, WritableDeprChild(), DeprecatedLanguage.Instance.DeprConcept_deprChild, null, notify ? ContainmentRemover<DeprIface>(DeprecatedLanguage.Instance.DeprConcept_deprChild) : null);
 			return true;
 		}
 
@@ -523,7 +525,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is DeprIface child0 && _deprChild.Contains(child0))
+		if (child is DeprIface child0 && (_deprChild?.Contains(child0) ?? false))
 			return DeprecatedLanguage.Instance.DeprConcept_deprChild;
 		return null;
 	}

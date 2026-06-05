@@ -129,7 +129,9 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		return this;
 	}
 
-	private readonly List<ReferenceTarget> _multivaluedRef = [];
+	private List<ReferenceTarget>? _multivaluedRef;
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMultivaluedRef() => _multivaluedRef is not null ? _multivaluedRef.AsReadOnly() : [];
+	private List<ReferenceTarget> WritableMultivaluedRef() => _multivaluedRef is not null ? _multivaluedRef : _multivaluedRef = [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultivaluedRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-multivaluedRef")]
@@ -138,15 +140,15 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<INamed> multivaluedRef) => TryGetReference<INamed>(_multivaluedRef, out multivaluedRef);
-	private bool SetMultivaluedRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _multivaluedRef);
-	private bool AddMultivaluedRefRaw(ReferenceTarget target) => AddReferencesRaw(target, _multivaluedRef);
-	private bool InsertMultivaluedRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _multivaluedRef);
+	private bool SetMultivaluedRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableMultivaluedRef());
+	private bool AddMultivaluedRefRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableMultivaluedRef());
+	private bool InsertMultivaluedRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableMultivaluedRef());
 	private bool RemoveMultivaluedRefRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _multivaluedRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
         public MyConcept AddMultivaluedRef(IEnumerable<INamed> nodes)
 	{
-		AddRequiredMultipleReference<INamed>(nodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, _multivaluedRef, AddMultivaluedRefRaw);
+		AddRequiredMultipleReference<INamed>(nodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, WritableMultivaluedRef(), AddMultivaluedRefRaw);
 		return this;
 	}
 
@@ -155,7 +157,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultivaluedRef.Count</exception>
         public MyConcept InsertMultivaluedRef(int index, IEnumerable<INamed> nodes)
 	{
-		InsertRequiredMultipleReference<INamed>(index, nodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, _multivaluedRef, InsertMultivaluedRefRaw);
+		InsertRequiredMultipleReference<INamed>(index, nodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, WritableMultivaluedRef(), InsertMultivaluedRefRaw);
 		return this;
 	}
 
@@ -267,7 +269,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 			return true;
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
 		{
-			result = _multivaluedRef;
+			result = ReadOnlyMultivaluedRef();
 			return true;
 		}
 
@@ -292,7 +294,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleReference<INamed>(value, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, _multivaluedRef, SetMultivaluedRefRaw);
+			SetRequiredMultipleReference<INamed>(value, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, WritableMultivaluedRef(), SetMultivaluedRefRaw);
 			return true;
 		}
 
