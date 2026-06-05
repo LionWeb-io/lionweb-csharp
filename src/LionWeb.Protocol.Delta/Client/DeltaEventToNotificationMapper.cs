@@ -525,6 +525,11 @@ public class DeltaEventToNotificationMapper
     }
 }
 
+/// <inheritdoc/>
+/// <summary>
+/// Variant of <see cref="DeltaEventToNotificationMapper"/>
+/// that resolves references to nodes that were created during mapping, but not yet added to <paramref name="sharedNodeMap"/>. 
+/// </summary>
 internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder)
     : DeltaEventToNotificationMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
