@@ -19,7 +19,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   Customizations of `IDeserializerHandler` might need to change the type of overloaded methods.
 * Simplified `INotificationPipe` and `NotificationPipeBase`.
 * Simplified NotificationEmitter classes.
+* Multiple link fields in generated classes are not initialized by default anymore, but only on first access. No change to external behavior, but saves some memory.
 * Removed `ReadableNodeBase._m3`.
+* Changed `ReadableNodeBase._annotations` to _private_; use `ReadOnlyAnnotations()` / WritableAnnotations() instead.
 ### Removed
 * Removed `sender` parameter from most notification pipe classes, as it's not used.
 * Removed `INotificationSender.Send()`.
