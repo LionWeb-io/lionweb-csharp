@@ -22,7 +22,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedReference = (CompressedMetaPointer, List<(ICompressedId? compressedId, ResolveInfo? resolveInfo)>);
+using CompressedReference = (CompressedMetaPointer, List<(ICompressedId? compressedId, ResolveInfo? resolveInfo)>?);
 
 /// <inheritdoc />
 /// <typeparam name="T">Type of node to return</typeparam>
@@ -146,8 +146,11 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNode node, Feature containment)
+    protected void InstallContainment(List<ICompressedId>? compressedChildrenIds, IWritableNode node, Feature containment)
     {
+        if (compressedChildrenIds is null)
+            return;
+        
         List<IWritableNode> children = compressedChildrenIds
             .Select<ICompressedId, IWritableNode?>(childId => FindChild(node, containment, childId))
             .Where(c => c != null)
@@ -300,6 +303,9 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
         foreach (var (compressedMetaPointer, targetEntries) in references)
         {
+            if (targetEntries is null)
+                continue;
+            
             var feature = _deserializerMetaInfo.FindFeature<Reference>(node, compressedMetaPointer);
             switch (feature)
             {
@@ -311,7 +317,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
                         targetEntries
                             .Select(e => e.compressedId)
                             .Where(i => i is not null)
-                            .ToList()!,
+                            .ToList(),
                         writable,
                         c
                     );
@@ -359,7 +365,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     {
         var target = FindReferenceTarget(targetId, resolveInfo);
         if (target is not null)
-            return new ReferenceTarget(resolveInfo, target?.GetId() ?? targetId?.Original, target);
+            return new ReferenceTarget(resolveInfo, target.GetId() ?? targetId?.Original, target);
 
         var defaultTarget = new ReferenceTarget(resolveInfo, targetId?.Original, null);
         return _handler.UnresolvableReferenceTarget(defaultTarget, reference, node);
@@ -370,7 +376,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     (
         Compress(r.Reference),
         r
-            .Targets
+            .Targets?
             .Select(t => (CompressOpt(t.Reference), t.ResolveInfo))
             .ToList()
     );

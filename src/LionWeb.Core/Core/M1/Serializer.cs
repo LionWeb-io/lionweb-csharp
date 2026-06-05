@@ -140,34 +140,39 @@ public class Serializer : ISerializer
 
         Dictionary<Feature, object?> properties = CollectProperties(featureValues);
         RemoveFromFeatureValues(properties.Keys);
+        var hasProperties = properties.Count != 0;
 
         Dictionary<Feature, IReadOnlyList<IReadableNode>?> containmentsMultiple = CollectContainmentsMultiple(featureValues);
         RemoveFromFeatureValues(containmentsMultiple.Keys);
         Dictionary<Feature, IReadableNode?> containmentsSingle = CollectContainmentsSingle(featureValues);
         RemoveFromFeatureValues(containmentsSingle.Keys);
+        var hasContainments = containmentsMultiple.Count != 0 || containmentsSingle.Count != 0;
 
         Dictionary<Feature, IReadOnlyList<ReferenceTarget>?> referencesMultiple = CollectReferencesMultiple(featureValues);
         RemoveFromFeatureValues(referencesMultiple.Keys);
         Dictionary<Feature, ReferenceTarget?> referencesSingle = CollectReferencesSingle(featureValues);
         RemoveFromFeatureValues(referencesSingle.Keys);
+        var hasReferences = referencesMultiple.Count != 0 || referencesSingle.Count != 0;
 
+        var hasAnnotations = node.GetAnnotations().Count != 0;
+        
         Debug.Assert(featureValues.Count == 0, $"remaining features: {featureValues}");
 
         return new()
         {
             Id = node.GetId(),
             Classifier = ToMetaPointer(classifier),
-            Properties = properties.Select(pair => SerializeProperty(node, pair.Key, pair.Value))
-                .ToArray(),
-            Containments = containmentsSingle
+            Properties = hasProperties ? properties.Select(pair => SerializeProperty(node, pair.Key, pair.Value))
+                .ToArray() : null,
+            Containments = hasContainments ? containmentsSingle
                 .Select(p => SerializeContainment(p.Value is not null ? [p.Value] : [], p.Key))
                 .Concat(containmentsMultiple.Select(p => SerializeContainment(p.Value ?? [], p.Key)))
-                .ToArray(),
-            References = referencesSingle.Select(p => SerializeReference(p.Value is not null ? [p.Value] : [], p.Key))
+                .ToArray() : null,
+            References = hasReferences ? referencesSingle.Select(p => SerializeReference(p.Value is not null ? [p.Value] : [], p.Key))
                 .Concat(referencesMultiple.Select(p => SerializeReference(p.Value ?? [], p.Key)))
-                .ToArray(),
-            Annotations = node.GetAnnotations().Select(SerializeAnnotationTarget)
-                .ToArray(),
+                .ToArray() : null,
+            Annotations = hasAnnotations ? node.GetAnnotations().Select(SerializeAnnotationTarget)
+                .ToArray() : null,
             Parent = node.GetParent()?.GetId()
         };
 

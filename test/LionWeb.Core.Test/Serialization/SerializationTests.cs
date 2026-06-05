@@ -495,14 +495,28 @@ public class SerializationTests : SerializationTestsBase
             
             return string.Equals(x.Id, y.Id, StringComparison.InvariantCulture) &&
                    x.Classifier.Equals(y.Classifier) &&
-                   x.Properties.OrderBy(p => p.Property.Key).SequenceEqual(y.Properties.OrderBy(p => p.Property.Key)) &&
-                   x.Containments.OrderBy(c => c.Containment.Key)
-                       .SequenceEqual(y.Containments.OrderBy(c => c.Containment.Key)) &&
-                   x.References.OrderBy(r => r.Reference.Key).SequenceEqual(y.References.OrderBy(r => r.Reference.Key)) &&
-                   x.Annotations.ArrayEquals(y.Annotations) &&
+                   (x.Properties?.OrderBy(p => p.Property.Key).SequenceEquals(y.Properties?.OrderBy(p => p.Property.Key)) ?? true) &&
+                   (x.Containments?.OrderBy(c => c.Containment.Key)
+                       .SequenceEquals(y.Containments?.OrderBy(c => c.Containment.Key)) ?? true) &&
+                   (x.References?.OrderBy(r => r.Reference.Key).SequenceEquals(y.References?.OrderBy(r => r.Reference.Key)) ?? true) &&
+                   (x.Annotations?.SequenceEquals(y.Annotations) ?? true) &&
                    string.Equals(x.Parent, y.Parent, StringComparison.InvariantCulture);
         }
 
         public int GetHashCode(SerializedNode obj) => obj.GetHashCode();
+    }
+}
+
+internal static class SequenceExtensions
+{
+    /// Deep-equals of two arrays.
+    public static bool SequenceEquals<T>(this IEnumerable<T>? left, IEnumerable<T>? right)
+    {
+        if (left == null || right == null)
+        {
+            return left == right;
+        }
+
+        return left.SequenceEqual(right);
     }
 }

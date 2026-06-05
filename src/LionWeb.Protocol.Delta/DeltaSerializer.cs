@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta;
 
 using Core.M1;
+using Core.Serialization;
 using Message;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -42,6 +43,10 @@ public class DeltaSerializer
 }
 
 /// Source generator for efficient, AOT-optimizable JSON (de)serialization of LionWeb delta messages.
-[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase
+    ,
+    Converters = [typeof(NullableArrayConverterFactory)]
+)]
 [JsonSerializable(typeof(IDeltaContent))]
 public partial class LionWebDeltaSerializerContext : JsonSerializerContext;

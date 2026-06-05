@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedContainment = (CompressedMetaPointer, List<ICompressedId>);
+using CompressedContainment = (CompressedMetaPointer, List<ICompressedId>?);
 
 public partial class Deserializer
 {
@@ -47,6 +47,9 @@ public partial class Deserializer
 
     private void DeserializeProperties(SerializedNode serializedNode, IWritableNode node)
     {
+        if (serializedNode.Properties is null)
+            return;
+        
         foreach (var serializedProperty in serializedNode.Properties)
         {
             var property = _deserializerMetaInfo.FindFeature<Property>(node, Compress(serializedProperty.Property));
@@ -69,7 +72,7 @@ public partial class Deserializer
 
     private void RegisterAnnotations(SerializedNode serializedNode, ICompressedId compressedId)
     {
-        if (serializedNode.Annotations.Length == 0)
+        if (serializedNode.Annotations is null || serializedNode.Annotations.Length == 0)
             return;
 
         _annotationsByOwnerId[compressedId] = serializedNode
@@ -80,18 +83,18 @@ public partial class Deserializer
 
     private void RegisterReferences(SerializedNode serializedNode, ICompressedId compressedId)
     {
-        if (serializedNode.References.Length == 0)
+        if (serializedNode.References is null || serializedNode.References.Length == 0)
             return;
 
         _referencesByOwnerId[compressedId] = serializedNode
-            .References
+            .References?
             .Select(Compress)
             .ToList();
     }
 
     private void RegisterContainments(SerializedNode serializedNode, ICompressedId compressedId)
     {
-        if (serializedNode.Containments.Length == 0)
+        if (serializedNode.Containments is null || serializedNode.Containments.Length == 0)
             return;
 
         _containmentsByOwnerId[compressedId] = serializedNode
@@ -103,8 +106,7 @@ public partial class Deserializer
     private CompressedContainment Compress(SerializedContainment c) =>
     (
         Compress(c.Containment),
-        c
-            .Children
+        c.Children?
             .Select(Compress)
             .ToList()
     );

@@ -92,10 +92,14 @@ internal abstract class NodeCreatorBase
         _versionSpecifics = versionSpecifics;
         _serializedNode = serializedNode;
         _id = id;
-        _serializedPropertiesByKey = serializedNode.Properties.ToDictionary(
-            serializedProperty => serializedProperty.Property.Key,
-            serializedProperty => serializedProperty.Value
-        );
+        if (serializedNode.Properties is not null)
+        {
+            _serializedPropertiesByKey = serializedNode.Properties.ToDictionary(
+                serializedProperty => serializedProperty.Property.Key,
+                serializedProperty => serializedProperty.Value
+            );
+        }
+
         _key = LookupString(LionCore.IKeyed_key);
         _name = LookupString(BuiltIns.INamed_name);
     }
@@ -211,8 +215,8 @@ internal abstract class ContainmentsInstallerBase(
             return serializedContainmentsLookup[containment.Key].Cast<T>();
 
         var serializedContainment =
-            serializedNode.Containments.FirstOrDefault(c => c.Containment.Matches(containment));
-        if (serializedContainment == null)
+            serializedNode.Containments?.FirstOrDefault(c => c.Containment.Matches(containment));
+        if (serializedContainment is null or { Children: null })
             return [];
 
         return serializedContainment.Children
@@ -280,7 +284,7 @@ internal abstract class ReferencesInstallerBase(
         }
 
         var serializedReference = FindSerializedReference(reference);
-        if (serializedReference == null)
+        if (serializedReference is null or { Targets: null })
             return null;
 
         if (serializedReference.Targets.Length == 1)
@@ -298,7 +302,7 @@ internal abstract class ReferencesInstallerBase(
             return serializedReferencesLookup[reference.Key].Cast<T>();
 
         var serializedReference = FindSerializedReference(reference);
-        if (serializedReference == null)
+        if (serializedReference is null or { Targets: null })
             return [];
 
         return serializedReference.Targets.Select(t => UnknownReference<T>(reference, t)).Where(t => t != null)!;
@@ -311,7 +315,7 @@ internal abstract class ReferencesInstallerBase(
             .OfType<Interface>();
 
     private SerializedReference? FindSerializedReference(Reference reference) =>
-        serializedNode.References
+        serializedNode.References?
             .FirstOrDefault(r => r.Reference.Matches(reference));
 
     private T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>

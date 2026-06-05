@@ -92,13 +92,13 @@ public record SerializedNode
     public required string Id { get; init; }
     public required MetaPointer Classifier { get; init; }
 
-    public SerializedProperty[] Properties { get; init; } = [];
+    public SerializedProperty[]? Properties { get; init; }
 
-    public SerializedContainment[] Containments { get; init; } = [];
+    public SerializedContainment[]? Containments { get; init; }
     
-    public SerializedReference[] References { get; init; } = [];
+    public SerializedReference[]? References { get; init; }
     
-    public string[] Annotations { get; init; } = [];
+    public string[]? Annotations { get; init; }
     public string? Parent { get; init; }
 
     /// <inheritdoc />
@@ -190,7 +190,7 @@ public record SerializedProperty
 public record SerializedContainment
 {
     public required MetaPointer Containment { get; init; }
-    public string[] Children { get; init; } = [];
+    public string[]? Children { get; init; }
 
     /// <inheritdoc />
     public virtual bool Equals(SerializedContainment? other)
@@ -244,7 +244,7 @@ public record SerializedReferenceTarget
 public record SerializedReference
 {
     public required MetaPointer Reference { get; init; }
-    public SerializedReferenceTarget[] Targets { get; init; } = [];
+    public SerializedReferenceTarget[]? Targets { get; init; }
 
     /// <inheritdoc />
     public virtual bool Equals(SerializedReference? other)

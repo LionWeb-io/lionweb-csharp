@@ -102,7 +102,7 @@ public class DeltaToStringTests : JsonTestsBase
     {
         var input = new SubscribeToPartitionContentsResponse(Chunk(), QueryId(), AdditionalInfos());
         Assert.AreEqual(
-            "SubscribeToPartitionContentsResponse { AdditionalInfos = [AdditionalInfo { Kind = MyKind, Message = MyMessage, Data = [AdditionalInfoData { Key = key0, Value = value0 }, AdditionalInfoData { Key = key1, Value = value1 }] }], QueryId = 1, Contents = DeltaSerializationChunk { Nodes = [SerializedNode { Id = 1, Classifier = MetaPointer { Language = myLang, Version = v0, Key = 1 }, Properties = [], Containments = [], References = [], Annotations = [], Parent =  }, SerializedNode { Id = 2, Classifier = MetaPointer { Language = myLang, Version = v0, Key = 2 }, Properties = [], Containments = [], References = [], Annotations = [], Parent =  }] } }",
+            "SubscribeToPartitionContentsResponse { AdditionalInfos = [AdditionalInfo { Kind = MyKind, Message = MyMessage, Data = [AdditionalInfoData { Key = key0, Value = value0 }, AdditionalInfoData { Key = key1, Value = value1 }] }], QueryId = 1, Contents = DeltaSerializationChunk { Nodes = [SerializedNode { Id = 1, Classifier = MetaPointer { Language = myLang, Version = v0, Key = 1 }, Properties = null, Containments = null, References = null, Annotations = null, Parent =  }, SerializedNode { Id = 2, Classifier = MetaPointer { Language = myLang, Version = v0, Key = 2 }, Properties = null, Containments = null, References = null, Annotations = null, Parent =  }] } }",
             input.ToString());
     }
 

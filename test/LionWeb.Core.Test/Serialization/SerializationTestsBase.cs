@@ -66,13 +66,13 @@ public abstract class SerializationTestsBase
             Assert.AreEqual(expectedNode.Id, actualNode.Id);
             Assert.AreEqual(expectedNode.Classifier, actualNode.Classifier);
             CollectionAssert.AreEqual(
-                expectedNode.Properties.OrderBy(p => p.Property.Key).ToList(),
-                actualNode.Properties.OrderBy(p => p.Property.Key).ToList()
+                expectedNode.Properties?.OrderBy(p => p.Property.Key).ToList(),
+                actualNode.Properties?.OrderBy(p => p.Property.Key).ToList()
             );
 
-            Assert.AreEqual(expectedNode.Containments.Length, actualNode.Containments.Length);
-            using var expectedContainments = expectedNode.Containments.OrderBy(c => c.Containment.Key).GetEnumerator();
-            using var actualContainments = actualNode.Containments.OrderBy(c => c.Containment.Key).GetEnumerator();
+            Assert.AreEqual(expectedNode.Containments?.Length, actualNode.Containments?.Length);
+            using var expectedContainments = (expectedNode.Containments?.OrderBy(c => c.Containment.Key) ?? Enumerable.Empty<SerializedContainment>()).GetEnumerator();
+            using var actualContainments = (actualNode.Containments?.OrderBy(c => c.Containment.Key) ?? Enumerable.Empty<SerializedContainment>()).GetEnumerator();
             while (expectedContainments.MoveNext() && actualContainments.MoveNext())
             {
                 var expectedContainment = expectedContainments.Current;
@@ -81,9 +81,9 @@ public abstract class SerializationTestsBase
                 CollectionAssert.AreEqual(expectedContainment.Children, actualContainment.Children);
             }
 
-            Assert.AreEqual(expectedNode.References.Length, actualNode.References.Length);
-            using var expectedReferences = expectedNode.References.OrderBy(r => r.Reference.Key).GetEnumerator();
-            using var actualReferences = actualNode.References.OrderBy(r => r.Reference.Key).GetEnumerator();
+            Assert.AreEqual(expectedNode.References?.Length, actualNode.References?.Length);
+            using var expectedReferences = (expectedNode.References?.OrderBy(r => r.Reference.Key) ?? Enumerable.Empty<SerializedReference>()).GetEnumerator();
+            using var actualReferences = (actualNode.References?.OrderBy(r => r.Reference.Key) ?? Enumerable.Empty<SerializedReference>()).GetEnumerator();
             while (expectedReferences.MoveNext() && actualReferences.MoveNext())
             {
                 var expectedReference = expectedReferences.Current;

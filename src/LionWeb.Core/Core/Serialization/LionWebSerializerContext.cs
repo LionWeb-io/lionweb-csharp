@@ -20,7 +20,11 @@ namespace LionWeb.Core.Serialization;
 using System.Text.Json.Serialization;
 
 /// Source generator for efficient, AOT-optimizable JSON (de)serialization of LionWeb chunks.
-[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase
+    ,
+    Converters = [typeof(NullableArrayConverterFactory)]
+)]
 [JsonSerializable(typeof(SerializationChunk))]
 [JsonSerializable(typeof(LazySerializationChunk))]
 public partial class LionWebJsonSerializerContext : JsonSerializerContext;
