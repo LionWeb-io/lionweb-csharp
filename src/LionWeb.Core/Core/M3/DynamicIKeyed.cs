@@ -29,11 +29,11 @@ public abstract class DynamicIKeyed(NodeId id, LionWebVersions lionWebVersion) :
 
     /// <inheritdoc />
     protected override IBuiltInsLanguage _builtIns =>
-        new Lazy<IBuiltInsLanguage>(() => lionWebVersion.BuiltIns).Value;
+        lionWebVersion.BuiltIns;
 
-    /// <inheritdoc />
-    protected override ILionCoreLanguage _m3 =>
-        new Lazy<ILionCoreLanguage>(() => lionWebVersion.LionCore).Value;
+    /// The <see cref="ILionCoreLanguage"/> variant used for this node.
+    protected virtual ILionCoreLanguage _m3 =>
+        lionWebVersion.LionCore;
 
     /// <inheritdoc />
     public MetaPointerKey Key

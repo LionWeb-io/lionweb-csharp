@@ -38,10 +38,12 @@ public abstract class LanguageBase<TNodeFactory>(NodeId id, LionWebVersions lion
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
     /// <inheritdoc />
-    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => LionWebVersion.BuiltIns).Value;
+    protected override IBuiltInsLanguage _builtIns =>
+        LionWebVersion.BuiltIns;
 
-    /// <inheritdoc />
-    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => LionWebVersion.LionCore).Value;
+    /// The <see cref="ILionCoreLanguage"/> variant used for this node.
+    protected virtual ILionCoreLanguage _m3 =>
+        LionWebVersion.LionCore;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>

@@ -30,12 +30,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
 {
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
     protected virtual IBuiltInsLanguage _builtIns =>
-        new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
-
-    /// The <see cref="ILionCoreLanguage"/> variant used for this node.
-    protected virtual ILionCoreLanguage _m3 =>
-        new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
-
+        GetClassifier().GetLanguage().LionWebVersion.BuiltIns;
 
     /// <summary>
     /// Initializes <c>this</c> node's <see cref="IReadableNode.GetId">id</see> and optionally <see cref="IReadableNode.GetParent">parent</see>.
