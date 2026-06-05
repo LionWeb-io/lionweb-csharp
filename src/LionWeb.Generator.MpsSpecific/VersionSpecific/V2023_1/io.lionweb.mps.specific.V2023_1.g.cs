@@ -5,15 +5,15 @@
 #pragma warning disable 1591
 #nullable enable
 namespace Io.Lionweb.Mps.Specific.V2023_1;
-using LionWeb.Core;
-using LionWeb.Core.M2;
-using LionWeb.Core.M3;
-using LionWeb.Core.Notification;
-using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2023_1;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using global::LionWeb.Core;
+using global::LionWeb.Core.M2;
+using global::LionWeb.Core.M3;
+using global::LionWeb.Core.Notification;
+using global::LionWeb.Core.Utilities;
+using global::LionWeb.Core.VersionSpecific.V2023_1;
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "0")]
 public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecificLanguage
@@ -556,7 +556,9 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<ReferenceTarget> _seeAlso = [];
+	private List<ReferenceTarget>? _seeAlso;
+	private IReadOnlyList<ReferenceTarget> ReadOnlySeeAlso() => _seeAlso is not null ? _seeAlso.AsReadOnly() : [];
+	private List<ReferenceTarget> WritableSeeAlso() => _seeAlso is not null ? _seeAlso : _seeAlso = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -564,21 +566,21 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso) => TryGetReference<IReadableNode>(_seeAlso, out seeAlso);
-	private bool SetSeeAlsoRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _seeAlso);
-	private bool AddSeeAlsoRaw(ReferenceTarget target) => AddReferencesRaw(target, _seeAlso);
-	private bool InsertSeeAlsoRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _seeAlso);
+	private bool SetSeeAlsoRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableSeeAlso());
+	private bool AddSeeAlsoRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableSeeAlso());
+	private bool InsertSeeAlsoRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableSeeAlso());
 	private bool RemoveSeeAlsoRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _seeAlso);
 	/// <remarks>Optional Multiple Reference</remarks>
         public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes)
 	{
-		AddOptionalMultipleReference<IReadableNode>(nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, AddSeeAlsoRaw);
+		AddOptionalMultipleReference<IReadableNode>(nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, WritableSeeAlso(), AddSeeAlsoRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes)
 	{
-		InsertOptionalMultipleReference<IReadableNode>(index, nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, InsertSeeAlsoRaw);
+		InsertOptionalMultipleReference<IReadableNode>(index, nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, WritableSeeAlso(), InsertSeeAlsoRaw);
 		return this;
 	}
 
@@ -634,7 +636,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 			return true;
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			result = _seeAlso;
+			result = ReadOnlySeeAlso();
 			return true;
 		}
 
@@ -659,7 +661,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleReference<IReadableNode>(value, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, SetSeeAlsoRaw);
+			SetOptionalMultipleReference<IReadableNode>(value, SpecificLanguage.Instance.KeyedDescription_seeAlso, WritableSeeAlso(), SetSeeAlsoRaw);
 			return true;
 		}
 

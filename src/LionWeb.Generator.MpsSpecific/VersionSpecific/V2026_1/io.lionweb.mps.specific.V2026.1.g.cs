@@ -5,15 +5,15 @@
 #pragma warning disable 1591
 #nullable enable
 namespace Io.Lionweb.Mps.Specific.V2026_1;
-using LionWeb.Core;
-using LionWeb.Core.M2;
-using LionWeb.Core.M3;
-using LionWeb.Core.Notification;
-using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2026_1;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using global::LionWeb.Core;
+using global::LionWeb.Core.M2;
+using global::LionWeb.Core.M3;
+using global::LionWeb.Core.Notification;
+using global::LionWeb.Core.Utilities;
+using global::LionWeb.Core.VersionSpecific.V2026_1;
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "2026.1")]
 public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecificLanguage
@@ -166,7 +166,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	public string? ConceptAlias { get => _conceptAlias; set => SetConceptAlias(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetConceptAlias([NotNullWhen(true)] out string? conceptAlias)
+        public bool TryGetConceptAlias([NotNullWhenAttribute(true)] out string? conceptAlias)
 	{
 		conceptAlias = _conceptAlias;
 		return conceptAlias != null;
@@ -194,7 +194,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	public string? ConceptShortDescription { get => _conceptShortDescription; set => SetConceptShortDescription(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetConceptShortDescription([NotNullWhen(true)] out string? conceptShortDescription)
+        public bool TryGetConceptShortDescription([NotNullWhenAttribute(true)] out string? conceptShortDescription)
 	{
 		conceptShortDescription = _conceptShortDescription;
 		return conceptShortDescription != null;
@@ -222,7 +222,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	public string? HelpUrl { get => _helpUrl; set => SetHelpUrl(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetHelpUrl([NotNullWhen(true)] out string? helpUrl)
+        public bool TryGetHelpUrl([NotNullWhenAttribute(true)] out string? helpUrl)
 	{
 		helpUrl = _helpUrl;
 		return helpUrl != null;
@@ -378,7 +378,7 @@ public partial class Deprecated : AnnotationInstanceBase
 	public string? Build { get => _build; set => SetBuild(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetBuild([NotNullWhen(true)] out string? build)
+        public bool TryGetBuild([NotNullWhenAttribute(true)] out string? build)
 	{
 		build = _build;
 		return build != null;
@@ -406,7 +406,7 @@ public partial class Deprecated : AnnotationInstanceBase
 	public string? Comment { get => _comment; set => SetComment(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetComment([NotNullWhen(true)] out string? comment)
+        public bool TryGetComment([NotNullWhenAttribute(true)] out string? comment)
 	{
 		comment = _comment;
 		return comment != null;
@@ -535,7 +535,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	public string? Documentation { get => _documentation; set => SetDocumentation(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetDocumentation([NotNullWhen(true)] out string? documentation)
+        public bool TryGetDocumentation([NotNullWhenAttribute(true)] out string? documentation)
 	{
 		documentation = _documentation;
 		return documentation != null;
@@ -556,29 +556,31 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<ReferenceTarget> _seeAlso = [];
+	private List<ReferenceTarget>? _seeAlso;
+	private IReadOnlyList<ReferenceTarget> ReadOnlySeeAlso() => _seeAlso is not null ? _seeAlso.AsReadOnly() : [];
+	private List<ReferenceTarget> WritableSeeAlso() => _seeAlso is not null ? _seeAlso : _seeAlso = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<IReadableNode> SeeAlso { get => ReferenceTargetNonNullTargets<IReadableNode>(_seeAlso, SpecificLanguage.Instance.KeyedDescription_seeAlso); init => AddSeeAlso(value); }
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetSeeAlso([NotNullWhen(true)] out IReadOnlyList<IReadableNode> seeAlso) => TryGetReference<IReadableNode>(_seeAlso, out seeAlso);
-	private bool SetSeeAlsoRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _seeAlso);
-	private bool AddSeeAlsoRaw(ReferenceTarget target) => AddReferencesRaw(target, _seeAlso);
-	private bool InsertSeeAlsoRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _seeAlso);
+        public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso) => TryGetReference<IReadableNode>(_seeAlso, out seeAlso);
+	private bool SetSeeAlsoRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableSeeAlso());
+	private bool AddSeeAlsoRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableSeeAlso());
+	private bool InsertSeeAlsoRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableSeeAlso());
 	private bool RemoveSeeAlsoRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _seeAlso);
 	/// <remarks>Optional Multiple Reference</remarks>
         public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes)
 	{
-		AddOptionalMultipleReference<IReadableNode>(nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, AddSeeAlsoRaw);
+		AddOptionalMultipleReference<IReadableNode>(nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, WritableSeeAlso(), AddSeeAlsoRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes)
 	{
-		InsertOptionalMultipleReference<IReadableNode>(index, nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, InsertSeeAlsoRaw);
+		InsertOptionalMultipleReference<IReadableNode>(index, nodes, SpecificLanguage.Instance.KeyedDescription_seeAlso, WritableSeeAlso(), InsertSeeAlsoRaw);
 		return this;
 	}
 
@@ -634,7 +636,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 			return true;
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			result = _seeAlso;
+			result = ReadOnlySeeAlso();
 			return true;
 		}
 
@@ -659,7 +661,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleReference<IReadableNode>(value, SpecificLanguage.Instance.KeyedDescription_seeAlso, _seeAlso, SetSeeAlsoRaw);
+			SetOptionalMultipleReference<IReadableNode>(value, SpecificLanguage.Instance.KeyedDescription_seeAlso, WritableSeeAlso(), SetSeeAlsoRaw);
 			return true;
 		}
 
@@ -766,7 +768,7 @@ public partial class ShortDescription : AnnotationInstanceBase
 	public string? Description { get => _description; set => SetDescription(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetDescription([NotNullWhen(true)] out string? description)
+        public bool TryGetDescription([NotNullWhenAttribute(true)] out string? description)
 	{
 		description = _description;
 		return description != null;
@@ -879,7 +881,7 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetName([NotNullWhen(true)] out string? name)
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
 		return name != null;
