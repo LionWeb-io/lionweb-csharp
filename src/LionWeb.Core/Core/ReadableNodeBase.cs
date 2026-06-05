@@ -229,9 +229,9 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     }
 
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget> storage, Reference reference)
+    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget>? storage, Reference reference)
         where R : IReadableNode =>
-        storage.Count != 0
+        storage is { Count: > 0 }
             ? ReferenceTargetNullableTargets<R>(storage, reference)
             : throw new UnsetFeatureException(reference);
 
@@ -292,16 +292,14 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// </summary>
     /// <param name="safeNodes">Value to guard against <c>null</c>.</param>
     /// <param name="link">Link <paramref name="safeNodes"/> originates from.</param>
-    /// <typeparam name="T">Type of members of <paramref name="safeNodes"/>.</typeparam>
+    /// <typeparam name="M">Type of members of <paramref name="safeNodes"/>.</typeparam>
     /// <exception cref="InvalidValueException">If any member of <paramref name="safeNodes"/> is <c>null</c>.</exception>
-    protected void AssureNotNullMembers<T>(IList<T> safeNodes, Link? link)
+    protected void AssureNotNullMembers<M>(IList<M> safeNodes, Link? link)
     {
         foreach (var node in safeNodes)
         {
             if (node == null)
-            {
                 throw new InvalidValueException(link, node);
-            }
         }
     }
 

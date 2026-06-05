@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core;
 
-using M2;
 using M3;
 using Notification;
 using Notification.Partition;
@@ -40,7 +39,7 @@ public abstract partial class NodeBase
     /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode)"/>
     [Obsolete("Use DetachChild(INode, bool)")]
     protected virtual bool DetachChild(INode child) =>
-        DetachChild((INode)child, false) || WritableAnnotations().Remove(child);
+        DetachChild(child, false) || WritableAnnotations().Remove(child);
 
     /// <inheritdoc />
     bool IWritableNode<INode>.DetachChild(INode child, bool notify) =>
@@ -201,10 +200,10 @@ public abstract partial class NodeBase
         where T : IReadableNode
     {
         AssureNotNull(list, link);
+        AssureNotNullMembers(list, link);
+
         if (storage is null)
             return false;
-        
-        AssureNotNullMembers(list, link);
 
         var partitionProducer = GetPartitionNotificationProducer();
 

@@ -207,7 +207,7 @@ public abstract partial class NodeBase
         return true;
     }
 
-    protected bool AddReferencesRaw(ReferenceTarget target, List<ReferenceTarget> storage)
+    protected bool AddReferencesRaw(ReferenceTarget? target, List<ReferenceTarget> storage)
     {
         if (target is null)
             return false;
@@ -216,7 +216,7 @@ public abstract partial class NodeBase
         return true;
     }
 
-    protected bool InsertReferencesRaw(Index index, ReferenceTarget target, List<ReferenceTarget> storage)
+    protected bool InsertReferencesRaw(Index index, ReferenceTarget? target, List<ReferenceTarget> storage)
     {
         if (target is null || !IsInRange(index, storage))
             return false;
@@ -225,7 +225,7 @@ public abstract partial class NodeBase
         return true;
     }
 
-    protected bool RemoveReferencesRaw(ReferenceTarget target, List<ReferenceTarget>? storage)
+    protected bool RemoveReferencesRaw(ReferenceTarget? target, List<ReferenceTarget>? storage)
     {
         if (target is null || storage is null)
             return false;
