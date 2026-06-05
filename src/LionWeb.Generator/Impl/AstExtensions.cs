@@ -302,8 +302,13 @@ public static partial class AstExtensions
     public static PrefixUnaryExpressionSyntax Not(ExpressionSyntax inner) =>
         PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, inner);
 
+    /// <returns><c>is null</c></returns>
     public static IsPatternExpressionSyntax IsNull(string name) =>
         IsPatternExpression(IdentifierName(name), ConstantPattern(Null()));
+
+    /// <returns><c>is not null</c></returns>
+    public static IsPatternExpressionSyntax IsNotNull(string name) =>
+        IsPatternExpression(IdentifierName(name), UnaryPattern(ConstantPattern(Null())));
 
     /// <returns><paramref name="value"/> <c>?? throw</c> <paramref name="exception"/></returns>
     public static ExpressionSyntax NotNullOrThrow(ExpressionSyntax value, ExpressionSyntax exception) =>

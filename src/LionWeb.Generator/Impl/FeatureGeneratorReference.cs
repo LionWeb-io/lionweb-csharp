@@ -204,6 +204,8 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
         return new List<MemberDeclarationSyntax>
         {
             MultipleReferenceField(),
+            MultipleReferenceReadOnly(),
+            MultipleReferenceWritable(),
             MultipleReferenceProperty(CallGeneric(getterMethod, AsType(reference.GetFeatureType()),
                     FeatureField(reference), MetaProperty(reference)))
                 .Xdoc(XdocRequiredMultipleLink()),
@@ -214,13 +216,13 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
             ReferenceRemoverRaw()
         }.Concat(
             LinkAdder([
-                    ExpressionStatement(CallGeneric("AddRequiredMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkAddRaw(reference))),
+                    ExpressionStatement(CallGeneric("AddRequiredMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), InvocationExpression(LinkWritable(reference)), LinkAddRaw(reference))),
                     ReturnStatement(This())
                 ])
                 .Select(XdocRequiredAdder)
         ).Concat(
             LinkInserter([
-                    ExpressionStatement(CallGeneric("InsertRequiredMultipleReference", AsType(reference.Type), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkInsertRaw(reference))),
+                    ExpressionStatement(CallGeneric("InsertRequiredMultipleReference", AsType(reference.Type), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(reference), InvocationExpression(LinkWritable(reference)), LinkInsertRaw(reference))),
                     ReturnStatement(This())
                 ])
                 .Select(XdocRequiredInserter)
@@ -237,7 +239,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
         Method(FeatureSetRaw(reference).ToString(), AsType(typeof(bool)), [
                     Param("targets", AsType(typeof(List<ReferenceTarget>))),
                 ],
-                Call("SetReferencesRaw", IdentifierName("targets"), FeatureField(reference))
+                Call("SetReferencesRaw", IdentifierName("targets"), InvocationExpression(LinkWritable(reference)))
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
@@ -246,7 +248,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                 [
                     Param("target", AsType(typeof(ReferenceTarget)))
                 ],
-                Call("AddReferencesRaw", IdentifierName("target"), FeatureField(reference))
+                Call("AddReferencesRaw", IdentifierName("target"), InvocationExpression(LinkWritable(reference)))
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
@@ -256,7 +258,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
                     Param("index", AsType(typeof(int))),
                     Param("target", AsType(typeof(ReferenceTarget)))
                 ],
-                Call("InsertReferencesRaw", IdentifierName("index"), IdentifierName("target"), FeatureField(reference))
+                Call("InsertReferencesRaw", IdentifierName("index"), IdentifierName("target"), InvocationExpression(LinkWritable(reference)))
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
@@ -309,6 +311,8 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
         return new List<MemberDeclarationSyntax>
             {
                 MultipleReferenceField(),
+                MultipleReferenceReadOnly(),
+                MultipleReferenceWritable(),
                 MultipleReferenceProperty(getter),
                 tryGet,
                 MultiReferenceSetterRaw(),
@@ -318,12 +322,12 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
             }
             .Concat(
                 LinkAdder([
-                    ExpressionStatement(CallGeneric("AddOptionalMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkAddRaw(reference))),
+                    ExpressionStatement(CallGeneric("AddOptionalMultipleReference", AsType(reference.Type), IdentifierName("nodes"), MetaProperty(reference), InvocationExpression(LinkWritable(reference)), LinkAddRaw(reference))),
                     ReturnStatement(This())
                 ])
             ).Concat(
                 LinkInserter([
-                    ExpressionStatement(CallGeneric("InsertOptionalMultipleReference", AsType(reference.Type), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(reference), FeatureField(reference), LinkInsertRaw(reference))),
+                    ExpressionStatement(CallGeneric("InsertOptionalMultipleReference", AsType(reference.Type), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(reference), InvocationExpression(LinkWritable(reference)), LinkInsertRaw(reference))),
                     ReturnStatement(This())
                 ])
             ).Concat(
@@ -352,10 +356,15 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
 
     private FieldDeclarationSyntax MultipleReferenceField() =>
         Field(FeatureField(reference).ToString(),
-                AsType(typeof(List<>),
-                    AsType(typeof(ReferenceTarget))),
-                Collection([]))
-            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
+                NullableType(AsType(typeof(List<>), AsType(typeof(ReferenceTarget))))
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
+
+    private MethodDeclarationSyntax MultipleReferenceReadOnly() =>
+        MultipleLinkReadOnly(AsType(typeof(ReferenceTarget)));
+
+    private MethodDeclarationSyntax MultipleReferenceWritable() =>
+        MultipleLinkWritable(AsType(typeof(ReferenceTarget)));
 
     private PropertyDeclarationSyntax MultipleReferenceProperty(InvocationExpressionSyntax getter)
     {

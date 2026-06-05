@@ -107,6 +107,14 @@ internal abstract class GeneratorBase
     protected ExpressionSyntax LinkRemoveRaw(Link link) =>
         IdentifierName(LinkRemove(link) + "Raw");
 
+    /// <returns><c>ReadOnlyMyLink</c></returns>
+    protected ExpressionSyntax LinkReadOnly(Link link) =>
+        IdentifierName($"ReadOnly{link.Name.ToFirstUpper()}");
+
+    /// <returns><c>ReadOnlyMyLink</c></returns>
+    protected ExpressionSyntax LinkWritable(Link link) =>
+        IdentifierName($"Writable{link.Name.ToFirstUpper()}");
+
 
     /// <inheritdoc cref="INames.FeatureField"/>
     protected ExpressionSyntax FeatureField(Feature feature) =>

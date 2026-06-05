@@ -90,7 +90,7 @@ internal class ContainmentMethodsGenerator(Classifier classifier, GeneratorInput
     private ExpressionStatementSyntax RemoveSelfParentCall(Containment containment) =>
         ExpressionStatement(Call("RemoveSelfParent",
             CastExpression(AsType(containment.GetFeatureType(), writeable: true), IdentifierName("child")),
-            FeatureField(containment),
+            InvocationExpression(LinkWritable(containment)),
             MetaProperty(containment),
             Null(),
             ConditionalExpression(
@@ -131,8 +131,16 @@ internal class ContainmentMethodsGenerator(Classifier classifier, GeneratorInput
                     IdentifierName("child"),
                     DeclarationPattern(AsType(containment.Type), SingleVariableDesignation(Identifier(varName)))
                 ),
-                InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("Contains")),
-                    AsArguments([IdentifierName(varName)]))
+                ParenthesizedExpression(
+                    BinaryExpression(
+                        SyntaxKind.CoalesceExpression,
+                        ConditionalAccessExpression(
+                            FeatureField(containment),
+                            InvocationExpression(MemberBindingExpression(IdentifierName("Contains"))).WithArgumentList(AsArguments([IdentifierName(varName)]))
+                        ),
+                        False()
+                    )
+                )
             ),
             false => Call("ReferenceEquals", FeatureField(containment), IdentifierName("child"))
         };
