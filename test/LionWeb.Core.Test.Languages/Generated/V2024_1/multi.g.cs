@@ -97,7 +97,7 @@ public partial class Container : ConceptInstanceBase
 	private bool RemoveLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library? value) => RemoveChildRaw(value, _libraries);
 	private List<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>? _libraries;
 	private IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> ReadOnlyLibraries() => _libraries is not null ? _libraries.AsReadOnly() : [];
-	private List<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> WritableLibraries() => _libraries is not null ? _libraries : _libraries = [];
+	private List<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> WritableLibraries() => _libraries ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Libraries is empty</exception>
         [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "libraries")]

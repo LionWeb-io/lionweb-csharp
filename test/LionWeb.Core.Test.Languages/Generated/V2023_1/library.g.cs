@@ -589,7 +589,7 @@ public partial class Library : ConceptInstanceBase
 	private bool RemoveBooksRaw(Book? value) => RemoveChildRaw(value, _books);
 	private List<Book>? _books;
 	private IReadOnlyList<Book> ReadOnlyBooks() => _books is not null ? _books.AsReadOnly() : [];
-	private List<Book> WritableBooks() => _books is not null ? _books : _books = [];
+	private List<Book> WritableBooks() => _books ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "books")]

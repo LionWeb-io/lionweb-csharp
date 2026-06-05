@@ -131,7 +131,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 	private List<ReferenceTarget>? _multivaluedRef;
 	private IReadOnlyList<ReferenceTarget> ReadOnlyMultivaluedRef() => _multivaluedRef is not null ? _multivaluedRef.AsReadOnly() : [];
-	private List<ReferenceTarget> WritableMultivaluedRef() => _multivaluedRef is not null ? _multivaluedRef : _multivaluedRef = [];
+	private List<ReferenceTarget> WritableMultivaluedRef() => _multivaluedRef ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultivaluedRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-multivaluedRef")]

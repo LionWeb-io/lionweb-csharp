@@ -125,7 +125,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	private bool RemoveMultipleContainmentRaw(INode? value) => RemoveChildRaw(value, _multipleContainment);
 	private List<INode>? _multipleContainment;
 	private IReadOnlyList<INode> ReadOnlyMultipleContainment() => _multipleContainment is not null ? _multipleContainment.AsReadOnly() : [];
-	private List<INode> WritableMultipleContainment() => _multipleContainment is not null ? _multipleContainment : _multipleContainment = [];
+	private List<INode> WritableMultipleContainment() => _multipleContainment ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultipleContainment is empty</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleContainment")]
@@ -170,7 +170,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	private bool RemoveMultipleOptionalContainmentRaw(INode? value) => RemoveChildRaw(value, _multipleOptionalContainment);
 	private List<INode>? _multipleOptionalContainment;
 	private IReadOnlyList<INode> ReadOnlyMultipleOptionalContainment() => _multipleOptionalContainment is not null ? _multipleOptionalContainment.AsReadOnly() : [];
-	private List<INode> WritableMultipleOptionalContainment() => _multipleOptionalContainment is not null ? _multipleOptionalContainment : _multipleOptionalContainment = [];
+	private List<INode> WritableMultipleOptionalContainment() => _multipleOptionalContainment ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalContainment")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
@@ -206,7 +206,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private List<ReferenceTarget>? _multipleOptionalRef;
 	private IReadOnlyList<ReferenceTarget> ReadOnlyMultipleOptionalRef() => _multipleOptionalRef is not null ? _multipleOptionalRef.AsReadOnly() : [];
-	private List<ReferenceTarget> WritableMultipleOptionalRef() => _multipleOptionalRef is not null ? _multipleOptionalRef : _multipleOptionalRef = [];
+	private List<ReferenceTarget> WritableMultipleOptionalRef() => _multipleOptionalRef ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -241,7 +241,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	private List<ReferenceTarget>? _multipleRef;
 	private IReadOnlyList<ReferenceTarget> ReadOnlyMultipleRef() => _multipleRef is not null ? _multipleRef.AsReadOnly() : [];
-	private List<ReferenceTarget> WritableMultipleRef() => _multipleRef is not null ? _multipleRef : _multipleRef = [];
+	private List<ReferenceTarget> WritableMultipleRef() => _multipleRef ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultipleRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleRef")]

@@ -335,7 +335,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	private bool RemoveAltGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _altGroups);
 	private List<MaterialGroup>? _altGroups;
 	private IReadOnlyList<MaterialGroup> ReadOnlyAltGroups() => _altGroups is not null ? _altGroups.AsReadOnly() : [];
-	private List<MaterialGroup> WritableAltGroups() => _altGroups is not null ? _altGroups : _altGroups = [];
+	private List<MaterialGroup> WritableAltGroups() => _altGroups ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-groups")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
@@ -403,7 +403,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	private bool RemoveGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _groups);
 	private List<MaterialGroup>? _groups;
 	private IReadOnlyList<MaterialGroup> ReadOnlyGroups() => _groups is not null ? _groups.AsReadOnly() : [];
-	private List<MaterialGroup> WritableGroups() => _groups is not null ? _groups : _groups = [];
+	private List<MaterialGroup> WritableGroups() => _groups ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-groups")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
@@ -439,7 +439,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 	private List<ReferenceTarget>? _materials;
 	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials is not null ? _materials.AsReadOnly() : [];
-	private List<ReferenceTarget> WritableMaterials() => _materials is not null ? _materials : _materials = [];
+	private List<ReferenceTarget> WritableMaterials() => _materials ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -1011,7 +1011,7 @@ public partial class CompositeShape : Shape
 	private bool RemoveDisabledPartsRaw(IShape? value) => RemoveChildRaw(value, _disabledParts);
 	private List<IShape>? _disabledParts;
 	private IReadOnlyList<IShape> ReadOnlyDisabledParts() => _disabledParts is not null ? _disabledParts.AsReadOnly() : [];
-	private List<IShape> WritableDisabledParts() => _disabledParts is not null ? _disabledParts : _disabledParts = [];
+	private List<IShape> WritableDisabledParts() => _disabledParts ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If DisabledParts is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-disabled-parts")]
@@ -1087,7 +1087,7 @@ public partial class CompositeShape : Shape
 	private bool RemovePartsRaw(IShape? value) => RemoveChildRaw(value, _parts);
 	private List<IShape>? _parts;
 	private IReadOnlyList<IShape> ReadOnlyParts() => _parts is not null ? _parts.AsReadOnly() : [];
-	private List<IShape> WritableParts() => _parts is not null ? _parts : _parts = [];
+	private List<IShape> WritableParts() => _parts ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Parts is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-parts")]
@@ -1790,7 +1790,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	private bool RemoveShapesRaw(IShape? value) => RemoveChildRaw(value, _shapes);
 	private List<IShape>? _shapes;
 	private IReadOnlyList<IShape> ReadOnlyShapes() => _shapes is not null ? _shapes.AsReadOnly() : [];
-	private List<IShape> WritableShapes() => _shapes is not null ? _shapes : _shapes = [];
+	private List<IShape> WritableShapes() => _shapes ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
@@ -2289,7 +2289,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	private List<ReferenceTarget>? _materials;
 	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials is not null ? _materials.AsReadOnly() : [];
-	private List<ReferenceTarget> WritableMaterials() => _materials is not null ? _materials : _materials = [];
+	private List<ReferenceTarget> WritableMaterials() => _materials ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
@@ -3008,7 +3008,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 {
 	private List<ReferenceTarget>? _shapes;
 	private IReadOnlyList<ReferenceTarget> ReadOnlyShapes() => _shapes is not null ? _shapes.AsReadOnly() : [];
-	private List<ReferenceTarget> WritableShapes() => _shapes is not null ? _shapes : _shapes = [];
+	private List<ReferenceTarget> WritableShapes() => _shapes ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -3215,7 +3215,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	private bool RemoveFixpointsRaw(Coord? value) => RemoveChildRaw(value, _fixpoints);
 	private List<Coord>? _fixpoints;
 	private IReadOnlyList<Coord> ReadOnlyFixpoints() => _fixpoints is not null ? _fixpoints.AsReadOnly() : [];
-	private List<Coord> WritableFixpoints() => _fixpoints is not null ? _fixpoints : _fixpoints = [];
+	private List<Coord> WritableFixpoints() => _fixpoints ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-fixpoints")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]

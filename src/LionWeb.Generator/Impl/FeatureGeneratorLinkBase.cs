@@ -77,11 +77,7 @@ internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link lin
         Method(LinkWritable(link).ToString(),
                 AsType(typeof(List<>), returnType),
                 [],
-                ConditionalExpression(
-                    IsNotNull(FeatureField(link).ToString()),
-                    FeatureField(link),
-                    AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, FeatureField(link), CollectionExpression())
-                )
+                AssignmentExpression(SyntaxKind.CoalesceAssignmentExpression, FeatureField(link), CollectionExpression())
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 

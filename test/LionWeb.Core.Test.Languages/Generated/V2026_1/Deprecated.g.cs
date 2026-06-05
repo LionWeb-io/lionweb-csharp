@@ -182,7 +182,7 @@ public partial class DeprConcept : ConceptInstanceBase
 	private bool RemoveDeprChildRaw(DeprIface? value) => RemoveChildRaw(value, _deprChild);
 	private List<DeprIface>? _deprChild;
 	private IReadOnlyList<DeprIface> ReadOnlyDeprChild() => _deprChild is not null ? _deprChild.AsReadOnly() : [];
-	private List<DeprIface> WritableDeprChild() => _deprChild is not null ? _deprChild : _deprChild = [];
+	private List<DeprIface> WritableDeprChild() => _deprChild ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
