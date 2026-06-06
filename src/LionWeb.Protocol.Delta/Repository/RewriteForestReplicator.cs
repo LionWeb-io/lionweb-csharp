@@ -37,19 +37,17 @@ internal static class RewriteForestReplicator
             sender,
             (filter, s) =>
             {
-                replacingFilter = new IdReplacingNotificationFilter(s);
+                replacingFilter = new IdReplacingNotificationFilter();
                 return new RewriteRemoteReplicator(
                     localForest,
                     filter,
                     replacingFilter,
-                    sharedNodeMap,
-                    s
+                    sharedNodeMap
                 );
             });
 
         var result = new MultipartNotificationHandler(
-            parts.Prepend(replacingFilter).ToList(),
-            sender ?? $"Composite of {nameof(RewriteForestReplicator)} {localForest}");
+            parts.Prepend(replacingFilter).ToList());
 
         return result;
     }
@@ -59,9 +57,8 @@ internal class RewriteRemoteReplicator(
     IForest? localForest,
     IdFilteringNotificationFilter filter,
     IdReplacingNotificationFilter replacingFilter,
-    SharedNodeMap sharedNodeMap,
-    object? sender
-) : RemoteReplicator(localForest, filter, sharedNodeMap, sender)
+    SharedNodeMap sharedNodeMap
+) : RemoteReplicator(localForest, filter, sharedNodeMap)
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(null);
 

@@ -106,9 +106,9 @@ public class Forest : IForest, IDisposable
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
-        _notificationProducer = new ForestNotificationProducer(this);
+        _notificationProducer = new ForestNotificationProducer();
         _notificationIdProvider = new NotificationIdProvider(this);
-        _notificationForwarder = new DeduplicatingNotificationForwarder(_notificationProducer, this);
+        _notificationForwarder = new DeduplicatingNotificationForwarder(_notificationProducer);
     }
 
     /// <inheritdoc />
@@ -236,9 +236,8 @@ public class Forest : IForest, IDisposable
     /// </para> 
     private sealed class DeduplicatingNotificationForwarder(
         IForestNotificationProducer target,
-        object? sender,
         int lookbackSize = 4)
-        : NotificationPipeBase(sender), INotificationReceiver
+        : NotificationPipeBase, INotificationReceiver
     {
         private readonly Queue<INotificationId> _recentlySeenNotificationIds = new(lookbackSize);
 

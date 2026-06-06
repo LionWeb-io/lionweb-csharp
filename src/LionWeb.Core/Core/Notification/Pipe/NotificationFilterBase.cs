@@ -20,8 +20,11 @@ namespace LionWeb.Core.Notification.Pipe;
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> notifications if the notification passes <see cref="Filter"/>.
-public abstract class NotificationFilterBase(object? sender) : NotificationPipeBase(sender), INotificationHandler
+public abstract class NotificationFilterBase() : NotificationPipeBase, INotificationHandler
 {
+    [Obsolete("Use NotificationFilterBase() instead.")]
+    public NotificationFilterBase(object? sender) : this() { }
+    
     /// <inheritdoc />
     public void Receive(INotificationSender correspondingSender, INotification notification)
     {
@@ -39,8 +42,11 @@ public abstract class NotificationFilterBase(object? sender) : NotificationPipeB
 }
 
 /// Suppresses all notifications with <see cref="RegisterNotificationId">registered notification ids</see>.
-public class IdFilteringNotificationFilter(object? sender) : NotificationFilterBase(sender)
+public class IdFilteringNotificationFilter() : NotificationFilterBase
 {
+    [Obsolete("Use IdFilteringNotificationFilter() instead.")]
+    public IdFilteringNotificationFilter(object? sender) : this() { }
+    
     private readonly HashSet<INotificationId> _notificationIds = [];
 
     /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="NotificationPipeBase.Send">sending</see>.

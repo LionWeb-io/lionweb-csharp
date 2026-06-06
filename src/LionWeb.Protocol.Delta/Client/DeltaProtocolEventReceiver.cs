@@ -27,10 +27,15 @@ public class DeltaProtocolEventReceiver : DeltaProtocolReceiverBase<IDeltaEvent>
 
     public DeltaProtocolEventReceiver(PartitionSharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
-        DeserializerBuilder deserializerBuilder, object? sender) : base(sender)
+        DeserializerBuilder deserializerBuilder)
     {
         _mapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
+
+    [Obsolete("Use DeltaProtocolEventReceiver(PartitionSharedNodeMap, SharedKeyedMap, DeserializerBuilder) instead.")]
+    public DeltaProtocolEventReceiver(PartitionSharedNodeMap sharedNodeMap,
+        SharedKeyedMap sharedKeyedMap,
+        DeserializerBuilder deserializerBuilder, object? sender) : this(sharedNodeMap, sharedKeyedMap, deserializerBuilder) { }
 
     /// <inheritdoc />
     public override INotification Map(IDeltaEvent content) => 

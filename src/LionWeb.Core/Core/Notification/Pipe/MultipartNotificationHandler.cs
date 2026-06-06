@@ -29,12 +29,10 @@ public class MultipartNotificationHandler : INotificationHandler
     private readonly INotificationHandler _firstHandler;
     private readonly INotificationHandler _lastHandler;
     private readonly IEnumerable<INotificationHandler> _notificationHandlers;
-    private readonly object? _sender;
 
-    public MultipartNotificationHandler(List<INotificationHandler> notificationHandlers, object? sender)
+    public MultipartNotificationHandler(List<INotificationHandler> notificationHandlers)
     {
         _notificationHandlers = notificationHandlers;
-        _sender = sender;
         if (notificationHandlers.Count < 2)
             throw new ArgumentException(
                 $"{nameof(MultipartNotificationHandler)} must get at least 2 notification handlers");
@@ -53,6 +51,9 @@ public class MultipartNotificationHandler : INotificationHandler
             previous = current;
         }
     }
+
+    [Obsolete("Use MultipartNotificationHandler(List<INotificationHandler>) instead.")]
+    public MultipartNotificationHandler(List<INotificationHandler> notificationHandlers, object? sender) : this(notificationHandlers) { } 
 
     /// <inheritdoc />
     public void Dispose()

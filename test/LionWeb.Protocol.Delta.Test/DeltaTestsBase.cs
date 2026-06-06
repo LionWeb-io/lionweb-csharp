@@ -88,7 +88,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder, "clone");
+            deserializerBuilder);
 
         var replicator = ForestReplicator.Create(cloneForest, sharedNodeMap, "cloneReplicator");
         
@@ -145,7 +145,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder, "clone");
+            deserializerBuilder);
         
         eventReceiver.ConnectTo(replicator);
 

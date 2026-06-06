@@ -40,13 +40,19 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     public RemoteReplicator(
         IForest? localForest,
         IdFilteringNotificationFilter filter,
-        SharedNodeMap sharedNodeMap,
-        object? sender) : base(sender)
+        SharedNodeMap sharedNodeMap)
     {
         _localForest = localForest;
         Filter = filter;
         _sharedNodeMap = sharedNodeMap;
     }
+
+    [Obsolete("Use RemoteReplicator(IForest?, IdFilteringNotificationFilter, SharedNodeMap) instead.")]
+    public RemoteReplicator(
+        IForest? localForest,
+        IdFilteringNotificationFilter filter,
+        SharedNodeMap sharedNodeMap,
+        object? sender) : this(localForest, filter, sharedNodeMap) { }
 
     /// <inheritdoc />
     public void Receive(INotificationSender correspondingSender, INotification notification)

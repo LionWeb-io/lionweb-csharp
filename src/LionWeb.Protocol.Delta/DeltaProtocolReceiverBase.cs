@@ -21,9 +21,12 @@ using Core.Notification;
 using Core.Notification.Pipe;
 using Message;
 
-public abstract class DeltaProtocolReceiverBase<TContent>(object? sender) : NotificationPipeBase(sender), INotificationProducer
+public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationPipeBase, INotificationProducer
     where TContent : IDeltaContent
 {
+    [Obsolete("Use DeltaProtocolReceiverBase() instead.")]
+    public DeltaProtocolReceiverBase(object? sender) : this() { }
+    
     /// <inheritdoc />
     public override void Dispose()
     {

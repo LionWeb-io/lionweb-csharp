@@ -74,11 +74,10 @@ public static class ForestReplicator
             localForest,
             sharedNodeMap,
             sender,
-            (filter, s) => new RemoteReplicator(localForest, filter, sharedNodeMap, s)
+            (filter, _) => new RemoteReplicator(localForest, filter, sharedNodeMap)
         );
 
-        var result = new MultipartNotificationHandler(parts,
-            sender ?? $"Multipart of {nameof(ForestReplicator)} {localForest}");
+        var result = new MultipartNotificationHandler(parts);
 
         return result;
     }
@@ -91,9 +90,9 @@ public static class ForestReplicator
     )
     {
         var internalSender = sender ?? localForest;
-        var filter = new IdFilteringNotificationFilter(internalSender);
+        var filter = new IdFilteringNotificationFilter();
         var remoteReplicator = remoteNotificationReplicator(filter, internalSender);
-        var localReplicator = new LocalReplicator(localForest, sharedNodeMap, internalSender);
+        var localReplicator = new LocalReplicator(localForest, sharedNodeMap);
 
         var result = new List<INotificationHandler> { remoteReplicator, filter };
 

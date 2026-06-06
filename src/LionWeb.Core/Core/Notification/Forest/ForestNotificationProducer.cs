@@ -27,9 +27,12 @@ public interface IForestNotificationProducer : INotificationProducer
 
 /// Forwards all <see cref="INotificationProducer.ProduceNotification">produced</see> notifications
 /// unchanged to <i>following</i> notification pipe.
-public class ForestNotificationProducer(object? sender)
-    : ModelNotificationProducerBase(sender), IForestNotificationProducer
+public class ForestNotificationProducer()
+    : ModelNotificationProducerBase, IForestNotificationProducer
 {
+    [Obsolete("Use ForestNotificationProducer() instead.")]
+    public ForestNotificationProducer(object? sender) : this() { }
+    
     void IForestNotificationProducer.ProduceNotification(INotificationSender correspondingSender,
         INotification notification) =>
         SendWithSender(correspondingSender, notification);

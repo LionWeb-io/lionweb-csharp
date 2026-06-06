@@ -30,16 +30,14 @@ public class DisposeNotificationPipeTests : NotificationTestsBase
     [TestMethod]
     public void SenderOnly()
     {
-        object sender = new object();
-        var member = new TestNotificationSender(sender);
+        var member = new TestNotificationSender();
         member.Dispose();
     }
 
     [TestMethod]
     public void ProducerOnly()
     {
-        object sender = new object();
-        var member = new TestNotificationProducer(sender);
+        var member = new TestNotificationProducer();
         member.Dispose();
     }
 
@@ -54,7 +52,7 @@ public class DisposeNotificationPipeTests : NotificationTestsBase
     public void SenderReceiver_Sender()
     {
         var receiver = new TestNotificationReceiver();
-        var senderRef = Create(() => new TestNotificationSender(null));
+        var senderRef = Create(() => new TestNotificationSender());
 
         ConnectToDispose(senderRef, receiver);
         ForceGc();
@@ -65,7 +63,7 @@ public class DisposeNotificationPipeTests : NotificationTestsBase
     [TestMethod]
     public void SenderReceiver_Receiver()
     {
-        var sender = new TestNotificationSender(null);
+        var sender = new TestNotificationSender();
         var receiverRef = Create(() => new TestNotificationReceiver());
 
         ConnectToDisconnect(sender, receiverRef);
@@ -77,8 +75,8 @@ public class DisposeNotificationPipeTests : NotificationTestsBase
     [TestMethod]
     public void SenderMember_Sender()
     {
-        var receiver = new TestNotificationMember(null);
-        var senderRef = Create(() => new TestNotificationSender(null));
+        var receiver = new TestNotificationMember();
+        var senderRef = Create(() => new TestNotificationSender());
 
         ConnectToDispose(senderRef, receiver);
         ForceGc();
@@ -89,8 +87,8 @@ public class DisposeNotificationPipeTests : NotificationTestsBase
     [TestMethod]
     public void SenderMember_Member()
     {
-        var sender = new TestNotificationSender(null);
-        var receiverRef = Create(() => new TestNotificationMember(null));
+        var sender = new TestNotificationSender();
+        var receiverRef = Create(() => new TestNotificationMember());
 
         ConnectToDisconnect(sender, receiverRef);
         ForceGc();
@@ -287,14 +285,14 @@ public class DisposeNotificationPipeTests : NotificationTestsBase
         return new WeakReference<T>(obj);
     }
 
-    private class TestNotificationSender(object? sender) : NotificationPipeBase(sender);
+    private class TestNotificationSender : NotificationPipeBase;
 
-    private class TestNotificationProducer(object? sender) : NotificationPipeBase(sender), INotificationProducer
+    private class TestNotificationProducer : NotificationPipeBase, INotificationProducer
     {
         public void ProduceNotification(INotification notification) => throw new NotImplementedException();
     }
 
-    private class TestNotificationMember(object? sender) : NotificationPipeBase(sender), INotificationReceiver
+    private class TestNotificationMember : NotificationPipeBase, INotificationReceiver
     {
         public void Receive(INotificationSender correspondingSender, INotification notification) => Send(notification);
     }

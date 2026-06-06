@@ -69,7 +69,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         _eventReceiver = new DeltaProtocolEventReceiver(
             SharedNodeMap,
             sharedKeyedMap,
-            _deserializerBuilder, name);
+            _deserializerBuilder);
 
         _eventReceiver.ConnectTo(_replicator);
     }

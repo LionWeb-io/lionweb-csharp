@@ -27,7 +27,7 @@ public class NotificationCompositor : NotificationPipeBase, INotificationHandler
     private readonly Stack<CompositeNotification> _composites = [];
 
     /// <inheritdoc cref="NotificationCompositor"/>
-    public NotificationCompositor(object? sender) : base(sender)
+    public NotificationCompositor(object? sender)
     {
         _idProvider = new NotificationIdProvider(sender);
     }

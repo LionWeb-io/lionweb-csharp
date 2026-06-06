@@ -23,16 +23,13 @@ using Pipe;
 /// <inheritdoc cref="RemoteReplicator"/>
 public static class PartitionReplicator
 {
-    public static INotificationHandler Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
-        object? sender)
+    public static INotificationHandler Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap)
     {
-        var internalSender = sender ?? localPartition.GetId();
-        var filter = new IdFilteringNotificationFilter(internalSender);
-        var remoteReplicator = new RemoteReplicator(null, filter, sharedNodeMap, internalSender);
-        var localReplicator = new LocalReplicator(null, sharedNodeMap, internalSender);
+        var filter = new IdFilteringNotificationFilter();
+        var remoteReplicator = new RemoteReplicator(null, filter, sharedNodeMap);
+        var localReplicator = new LocalReplicator(null, sharedNodeMap);
 
-        var result = new MultipartNotificationHandler([remoteReplicator, filter],
-            sender ?? $"Composite of {nameof(PartitionReplicator)} {localPartition.GetId()}");
+        var result = new MultipartNotificationHandler([remoteReplicator, filter]);
 
         sharedNodeMap.RegisterNode(localPartition);
 
@@ -45,4 +42,9 @@ public static class PartitionReplicator
 
         return result;
     }
+
+    [Obsolete("Use Create(IPartitionInstance, SharedNodeMap) instead.")]
+    public static INotificationHandler Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
+        object? sender) => Create(localPartition, sharedNodeMap);
+
 }

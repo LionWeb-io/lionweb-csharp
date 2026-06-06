@@ -20,15 +20,15 @@ namespace LionWeb.Core.Notification.Pipe;
 /// Base for all <see cref="INotificationPipe">notification pipes</see> that process <see cref="INotification">notifications</see>.
 public abstract class NotificationPipeBase : INotificationFilter, INotificationSender
 {
-    protected readonly object Sender;
     private readonly Dictionary<INotificationReceiver, EventHandler<INotification>> _handlers = [];
 
     /// <inheritdoc cref="NotificationPipeBase"/>
+    protected NotificationPipeBase() { }
+
+    /// <inheritdoc cref="NotificationPipeBase"/>
     /// <param name="sender">Optional sender of the notifications.</param>
-    protected NotificationPipeBase(object? sender)
-    {
-        Sender = sender ?? this;
-    }
+    [Obsolete("Use NotificationPipeBase() instead.")]
+    protected NotificationPipeBase(object? sender) : this() { }
 
     /// <inheritdoc />
     public void ConnectTo(INotificationReceiver to)

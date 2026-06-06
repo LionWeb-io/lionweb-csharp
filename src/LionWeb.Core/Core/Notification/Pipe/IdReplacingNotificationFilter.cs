@@ -19,9 +19,12 @@ namespace LionWeb.Core.Notification.Pipe;
 
 /// TODO: Do we really need this class?
 /// Replaces all <see cref="RegisterReplacementNotificationId">registered notification ids</see>.
-public class IdReplacingNotificationFilter(object? sender)
-    : NotificationFilterBase(sender)
+public class IdReplacingNotificationFilter()
+    : NotificationFilterBase
 {
+    [Obsolete("Use IdReplacingNotificationFilter() instead.")]
+    public IdReplacingNotificationFilter(object? sender) : this() { }
+    
     private readonly Dictionary<INotificationId, INotificationId> _originalNotificationIds = [];
 
     /// Replaces id <paramref name="notificationId"/> of future notifications with <paramref name="replacement"/>.
