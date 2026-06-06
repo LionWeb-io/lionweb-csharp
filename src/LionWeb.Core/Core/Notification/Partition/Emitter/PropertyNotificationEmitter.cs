@@ -20,7 +20,7 @@ namespace LionWeb.Core.Notification.Partition.Emitter;
 using M3;
 
 /// Encapsulates notification-related logic and data for <i>adding</i> or <i>changing</i> or <i>deleting</i> of <see cref="Property"/>s.
-public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INode>
+public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<IWritableNode>
 {
     private readonly Property _property;
     private readonly object? _newValue;
@@ -71,12 +71,4 @@ public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INod
                 break;
         }
     }
-
-    /// <inheritdoc />
-    protected override bool IsActive() =>
-        Handles(
-            typeof(PropertyAddedNotification),
-            typeof(PropertyDeletedNotification),
-            typeof(PropertyChangedNotification)
-        );
 }

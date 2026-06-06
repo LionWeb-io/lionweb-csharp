@@ -21,7 +21,7 @@ using M3;
 
 /// Encapsulates notification-related logic and data for <i>multiple</i> <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
-public abstract class ContainmentMultipleNotificationEmitterBase<T> : ContainmentNotificationEmitterBase<T> where T : INode
+public abstract class ContainmentMultipleNotificationEmitterBase<T> : ContainmentNotificationEmitterBase<T> where T : IWritableNode
 {
     /// Newly set values and their previous context.
     protected readonly Dictionary<T, OldContainmentInfo?> NewValues;

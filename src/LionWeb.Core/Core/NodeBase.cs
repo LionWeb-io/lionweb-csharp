@@ -126,11 +126,11 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     /// <inheritdoc />
     public virtual void AddAnnotations(IEnumerable<INode> annotations)
     {
-        var safeAnnotations = AssureAnnotations(M2Extensions.AsNodes<IAnnotationInstance>(annotations, null).ToList());
+        var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
         int index = Math.Max(_annotations.Count - 1, 0);
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AnnotationAddMultipleNotificationEmitter emitter = new(this, safeAnnotation, _annotations, index++);
+            AnnotationAddSingleNotificationEmitter emitter = new(this, safeAnnotation, index++);
             emitter.CollectOldData();
             if (AddAnnotationsRaw(safeAnnotation))
                 emitter.Notify();
@@ -160,8 +160,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotation, _annotations,
-                startIndex: index);
+            AnnotationAddSingleNotificationEmitter notification = new(this, safeAnnotation, startIndex: index);
             notification.CollectOldData();
             if (InsertAnnotationsRaw(index++, safeAnnotation))
                 notification.Notify();

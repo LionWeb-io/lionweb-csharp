@@ -22,7 +22,7 @@ using Utilities.ListComparer;
 
 /// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
-public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : INode
+public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : IWritableNode
 {
     private readonly List<IListChange<T>> _changes = [];
 
@@ -99,14 +99,4 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
             }
         }
     }
-
-    /// <inheritdoc />
-    protected override bool IsActive() =>
-        Handles(
-            typeof(ChildAddedNotification),
-            typeof(ChildDeletedNotification),
-            typeof(ChildMovedFromOtherContainmentNotification),
-            typeof(ChildMovedFromOtherContainmentInSameParentNotification),
-            typeof(ChildMovedInSameContainmentNotification)
-        );
 }

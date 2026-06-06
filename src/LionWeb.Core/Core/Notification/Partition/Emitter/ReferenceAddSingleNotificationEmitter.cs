@@ -19,17 +19,37 @@ namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
 
-[Obsolete("Use ReferenceAddSingleNotificationEmitter instead.")]
-public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceAddSingleNotificationEmitter<T> where T : IReadableNode
+public class ReferenceAddSingleNotificationEmitter<T> : ReferenceMultipleNotificationEmitterBase<T> where T : IReadableNode
 {
+    private readonly Index _startIndex;
+
     /// Raises <see cref="ReferenceAddedNotification"/> for <paramref name="reference"/> for each entry in <paramref name="safeNode"/>.
     /// <param name="reference">Reference to raise notifications for.</param>
     /// <param name="destinationParent">Owner of the represented <paramref name="reference"/> </param>
     /// <param name="safeNode">Target to raise notification for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNode"/> to <paramref name="reference"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    public ReferenceAddMultipleNotificationEmitter(Reference reference, INotifiableNode destinationParent, List<ReferenceTarget> safeNodes,
-        Index startIndex, INotificationId? notificationId = null) : base(reference, destinationParent, safeNodes[0], startIndex)
+    public ReferenceAddSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent,
+        ReferenceTarget safeNode,
+        Index startIndex) : base(reference, destinationParent, [safeNode])
     {
+        _startIndex = startIndex;
+    }
+
+    /// <inheritdoc />
+    public override void CollectOldData() { }
+
+    /// <inheritdoc />
+    public override void Notify()
+    {
+        if (!IsActive())
+            return;
+
+        Index index = _startIndex;
+        foreach (var referenceTarget in SafeNodes)
+        {
+            ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, index++, referenceTarget,
+                GetNotificationId()));
+        }
     }
 }

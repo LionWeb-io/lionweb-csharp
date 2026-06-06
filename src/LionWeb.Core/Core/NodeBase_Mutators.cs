@@ -111,7 +111,7 @@ public abstract partial class NodeBase
             return;
         foreach (var value in safeNodes)
         {
-            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, null);
+            ContainmentAddSingleNotificationEmitter<T> emitter = new(containment, this, value, storage, null);
             emitter.CollectOldData();
             if (adder(value))
                 emitter.Notify();
@@ -129,7 +129,7 @@ public abstract partial class NodeBase
         AssureNotNullMembers(safeNodes, containment);
         foreach (var value in safeNodes)
         {
-            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, index);
+            ContainmentAddSingleNotificationEmitter<T> emitter = new(containment, this, value, storage, index);
             emitter.CollectOldData();
             if (inserter(index++, value))
                 emitter.Notify();
@@ -184,7 +184,7 @@ public abstract partial class NodeBase
             return;
         foreach (var value in safeNodes)
         {
-            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, null);
+            ContainmentAddSingleNotificationEmitter<T> emitter = new(containment, this, value, storage, null);
             emitter.CollectOldData();
             if (adder(value))
                 emitter.Notify();
@@ -201,7 +201,7 @@ public abstract partial class NodeBase
         AssureNoSelfMove(index, safeNodes, storage);
         foreach (var value in safeNodes)
         {
-            ContainmentAddMultipleNotificationEmitter<T> emitter = new(containment, this, value, storage, index);
+            ContainmentAddSingleNotificationEmitter<T> emitter = new(containment, this, value, storage, index);
             emitter.CollectOldData();
             if (inserter(index++, value))
                 emitter.Notify();
@@ -263,7 +263,7 @@ public abstract partial class NodeBase
         AssureNotNullMembers(safeNodes, reference);
         foreach (var value in safeNodes)
         {
-            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, storage.Count);
+            ReferenceAddSingleNotificationEmitter<T> emitter = new(reference, this, value, storage.Count);
             emitter.CollectOldData();
             if (adder(value))
                 emitter.Notify();
@@ -280,7 +280,7 @@ public abstract partial class NodeBase
         AssureNotNullMembers(safeNodes, reference);
         foreach (var value in safeNodes)
         {
-            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, index);
+            ReferenceAddSingleNotificationEmitter<T> emitter = new(reference, this, value, index);
             emitter.CollectOldData();
             if (inserter(index++, value))
                 emitter.Notify();
@@ -337,7 +337,7 @@ public abstract partial class NodeBase
         AssureNonEmpty(safeNodes, storage, reference);
         foreach (var value in safeNodes)
         {
-            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, storage.Count);
+            ReferenceAddSingleNotificationEmitter<T> emitter = new(reference, this, value, storage.Count);
             emitter.CollectOldData();
             if (adder(value))
                 emitter.Notify();
@@ -354,7 +354,7 @@ public abstract partial class NodeBase
         AssureNonEmpty(safeNodes, storage, reference);
         foreach (var value in safeNodes)
         {
-            ReferenceAddMultipleNotificationEmitter<T> emitter = new(reference, this, value, index);
+            ReferenceAddSingleNotificationEmitter<T> emitter = new(reference, this, value, index);
             emitter.CollectOldData();
             if (inserter(index++, value))
                 emitter.Notify();
