@@ -20,7 +20,7 @@ namespace LionWeb.Core.Test.Notification.Replicator;
 using LionWeb.Core.Notification;
 using LionWeb.Core.Notification.Pipe;
 
-internal class NotificationMapper(SharedNodeMap sharedNodeMap) : NotificationPipeBase(null), INotificationHandler
+public class NotificationMapper(SharedNodeMap sharedNodeMap) : NotificationPipeBase(null), INotificationHandler
 {
     private readonly NotificationToNotificationMapper _notificationMapper = new(sharedNodeMap);
 
