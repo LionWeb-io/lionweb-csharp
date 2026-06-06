@@ -130,7 +130,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	private List<ReferenceTarget>? _multivaluedRef;
-	private IReadOnlyList<ReferenceTarget> ReadOnlyMultivaluedRef() => _multivaluedRef is not null ? _multivaluedRef.AsReadOnly() : [];
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMultivaluedRef() => _multivaluedRef?.AsReadOnly() ?? _emptyReferences;
 	private List<ReferenceTarget> WritableMultivaluedRef() => _multivaluedRef ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultivaluedRef is empty</exception>

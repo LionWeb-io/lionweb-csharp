@@ -107,6 +107,10 @@ internal abstract class GeneratorBase
     protected ExpressionSyntax LinkRemoveRaw(Link link) =>
         IdentifierName(LinkRemove(link) + "Raw");
 
+    /// <returns><c>_emptyContainment</c></returns>
+    protected ExpressionSyntax ContainmentEmpty(Containment containment) =>
+        IdentifierName($"_empty{containment.Name.ToFirstUpper()}");
+
     /// <returns><c>ReadOnlyMyLink</c></returns>
     protected ExpressionSyntax LinkReadOnly(Link link) =>
         IdentifierName($"ReadOnly{link.Name.ToFirstUpper()}");

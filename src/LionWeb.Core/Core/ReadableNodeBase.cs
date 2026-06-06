@@ -28,6 +28,9 @@ using Utilities;
 [DebuggerDisplay("{GetType().Name}[{GetId()}]")]
 public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
+    private static readonly IReadOnlyList<T> _emptyAnnotations = [];
+    protected static readonly IReadOnlyList<ReferenceTarget> _emptyReferences = [];
+
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
     protected virtual IBuiltInsLanguage _builtIns =>
         GetClassifier().GetLanguage().LionWebVersion.BuiltIns;
@@ -64,7 +67,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// <remarks>This used to be protected. Use <see cref="ReadOnlyAnnotations"/> or <see cref="WritableAnnotations"/> instead.</remarks>
     private List<T>? _annotations;
 
-    protected IReadOnlyList<T> ReadOnlyAnnotations() => _annotations is not null ? _annotations.AsReadOnly() : [];
+    protected IReadOnlyList<T> ReadOnlyAnnotations() => _annotations?.AsReadOnly() ?? _emptyAnnotations;
     
     protected List<T> WritableAnnotations() => _annotations ??= [];
 

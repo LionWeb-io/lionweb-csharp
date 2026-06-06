@@ -792,7 +792,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	private bool InsertContainment_0_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, WritableContainment_0_n());
 	private bool RemoveContainment_0_nRaw(LinkTestConcept? value) => RemoveChildRaw(value, _containment_0_n);
 	private List<LinkTestConcept>? _containment_0_n;
-	private IReadOnlyList<LinkTestConcept> ReadOnlyContainment_0_n() => _containment_0_n is not null ? _containment_0_n.AsReadOnly() : [];
+	private static readonly IReadOnlyList<LinkTestConcept> _emptyContainment_0_n = [];
+	private IReadOnlyList<LinkTestConcept> ReadOnlyContainment_0_n() => _containment_0_n?.AsReadOnly() ?? _emptyContainment_0_n;
 	private List<LinkTestConcept> WritableContainment_0_n() => _containment_0_n ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-containment_0_n")]
@@ -863,7 +864,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	private bool InsertContainment_1_nRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, WritableContainment_1_n());
 	private bool RemoveContainment_1_nRaw(LinkTestConcept? value) => RemoveChildRaw(value, _containment_1_n);
 	private List<LinkTestConcept>? _containment_1_n;
-	private IReadOnlyList<LinkTestConcept> ReadOnlyContainment_1_n() => _containment_1_n is not null ? _containment_1_n.AsReadOnly() : [];
+	private static readonly IReadOnlyList<LinkTestConcept> _emptyContainment_1_n = [];
+	private IReadOnlyList<LinkTestConcept> ReadOnlyContainment_1_n() => _containment_1_n?.AsReadOnly() ?? _emptyContainment_1_n;
 	private List<LinkTestConcept> WritableContainment_1_n() => _containment_1_n ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Containment_1_n is empty</exception>
@@ -937,7 +939,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	private List<ReferenceTarget>? _reference_0_n;
-	private IReadOnlyList<ReferenceTarget> ReadOnlyReference_0_n() => _reference_0_n is not null ? _reference_0_n.AsReadOnly() : [];
+	private IReadOnlyList<ReferenceTarget> ReadOnlyReference_0_n() => _reference_0_n?.AsReadOnly() ?? _emptyReferences;
 	private List<ReferenceTarget> WritableReference_0_n() => _reference_0_n ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_0_n")]
@@ -1008,7 +1010,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	private List<ReferenceTarget>? _reference_1_n;
-	private IReadOnlyList<ReferenceTarget> ReadOnlyReference_1_n() => _reference_1_n is not null ? _reference_1_n.AsReadOnly() : [];
+	private IReadOnlyList<ReferenceTarget> ReadOnlyReference_1_n() => _reference_1_n?.AsReadOnly() ?? _emptyReferences;
 	private List<ReferenceTarget> WritableReference_1_n() => _reference_1_n ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Reference_1_n is empty</exception>
@@ -1837,7 +1839,8 @@ public partial class TestPartition : ConceptInstanceBase, INamedWritable, IParti
 	private bool InsertLinksRaw(int index, LinkTestConcept? value) => InsertChildRaw(index, value, WritableLinks());
 	private bool RemoveLinksRaw(LinkTestConcept? value) => RemoveChildRaw(value, _links);
 	private List<LinkTestConcept>? _links;
-	private IReadOnlyList<LinkTestConcept> ReadOnlyLinks() => _links is not null ? _links.AsReadOnly() : [];
+	private static readonly IReadOnlyList<LinkTestConcept> _emptyLinks = [];
+	private IReadOnlyList<LinkTestConcept> ReadOnlyLinks() => _links?.AsReadOnly() ?? _emptyLinks;
 	private List<LinkTestConcept> WritableLinks() => _links ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "TestPartition-links")]

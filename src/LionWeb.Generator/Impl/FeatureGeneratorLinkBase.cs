@@ -61,14 +61,17 @@ internal abstract class FeatureGeneratorLinkBase(Classifier classifier, Link lin
     private IEnumerable<XmlNodeSyntax> XdocThrowsFeatureNodesEmpty() =>
         XdocThrows($"If both {FeatureProperty(link)} and nodes are empty", AsType(typeof(InvalidValueException)));
 
-    protected MethodDeclarationSyntax MultipleLinkReadOnly(TypeSyntax returnType) =>
+    protected MethodDeclarationSyntax MultipleLinkReadOnly(TypeSyntax returnType, ExpressionSyntax emptyCollection) =>
         Method(LinkReadOnly(link).ToString(),
                 AsType(typeof(IReadOnlyList<>), returnType),
                 [],
-                ConditionalExpression(
-                    IsNotNull(FeatureField(link).ToString()),
-                    InvocationExpression(MemberAccess(FeatureField(link), IdentifierName("AsReadOnly"))),
-                    CollectionExpression()
+                BinaryExpression(
+                    SyntaxKind.CoalesceExpression,
+                    ConditionalAccessExpression(
+                        FeatureField(link),
+                        InvocationExpression(MemberBindingExpression(IdentifierName("AsReadOnly")))
+                    ),
+                    emptyCollection
                 )
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));

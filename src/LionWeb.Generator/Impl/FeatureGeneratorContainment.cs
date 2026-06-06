@@ -80,6 +80,7 @@ internal class FeatureGeneratorContainment(
             ContainmentInserterRaw(),
             ContainmentRemoverRaw(),
             MultipleContainmentField(),
+            MultipleContainmentEmpty(),
             MultipleContainmentReadOnly(),
             MultipleContainmentWritable(),
             MultipleContainmentProperty(AsNonEmptyReadOnlyCall())
@@ -113,6 +114,7 @@ internal class FeatureGeneratorContainment(
             ContainmentInserterRaw(),
             ContainmentRemoverRaw(),
             MultipleContainmentField(),
+            MultipleContainmentEmpty(),
             MultipleContainmentReadOnly(),
             MultipleContainmentWritable(),
             MultipleContainmentProperty(AsReadOnlyCall()),
@@ -177,8 +179,15 @@ internal class FeatureGeneratorContainment(
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
+    private FieldDeclarationSyntax MultipleContainmentEmpty() =>
+        Field(ContainmentEmpty(containment).ToString(),
+                AsType(typeof(IReadOnlyList<>), AsType(containment.Type, writeable: true)),
+                CollectionExpression()
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.StaticKeyword, SyntaxKind.ReadOnlyKeyword));
+
     private MethodDeclarationSyntax MultipleContainmentReadOnly() =>
-        MultipleLinkReadOnly(AsType(containment.Type, writeable: true));
+        MultipleLinkReadOnly(AsType(containment.Type, writeable: true), ContainmentEmpty(containment));
 
     private MethodDeclarationSyntax MultipleContainmentWritable() =>
         MultipleLinkWritable(AsType(containment.Type, writeable: true));

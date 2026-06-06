@@ -557,7 +557,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	private List<ReferenceTarget>? _seeAlso;
-	private IReadOnlyList<ReferenceTarget> ReadOnlySeeAlso() => _seeAlso is not null ? _seeAlso.AsReadOnly() : [];
+    private IReadOnlyList<ReferenceTarget> ReadOnlySeeAlso() => _seeAlso?.AsReadOnly() ?? _emptyReferences;
 	private List<ReferenceTarget> WritableSeeAlso() => _seeAlso ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]

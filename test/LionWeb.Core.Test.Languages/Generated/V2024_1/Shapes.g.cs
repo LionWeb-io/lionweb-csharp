@@ -334,7 +334,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	private bool InsertAltGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, WritableAltGroups());
 	private bool RemoveAltGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _altGroups);
 	private List<MaterialGroup>? _altGroups;
-	private IReadOnlyList<MaterialGroup> ReadOnlyAltGroups() => _altGroups is not null ? _altGroups.AsReadOnly() : [];
+	private static readonly IReadOnlyList<MaterialGroup> _emptyAltGroups = [];
+	private IReadOnlyList<MaterialGroup> ReadOnlyAltGroups() => _altGroups?.AsReadOnly() ?? _emptyAltGroups;
 	private List<MaterialGroup> WritableAltGroups() => _altGroups ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-groups")]
@@ -402,7 +403,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	private bool InsertGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, WritableGroups());
 	private bool RemoveGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _groups);
 	private List<MaterialGroup>? _groups;
-	private IReadOnlyList<MaterialGroup> ReadOnlyGroups() => _groups is not null ? _groups.AsReadOnly() : [];
+	private static readonly IReadOnlyList<MaterialGroup> _emptyGroups = [];
+	private IReadOnlyList<MaterialGroup> ReadOnlyGroups() => _groups?.AsReadOnly() ?? _emptyGroups;
 	private List<MaterialGroup> WritableGroups() => _groups ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-groups")]
@@ -438,7 +440,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	private List<ReferenceTarget>? _materials;
-	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials is not null ? _materials.AsReadOnly() : [];
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials?.AsReadOnly() ?? _emptyReferences;
 	private List<ReferenceTarget> WritableMaterials() => _materials ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
@@ -1010,7 +1012,8 @@ public partial class CompositeShape : Shape
 	private bool InsertDisabledPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, WritableDisabledParts());
 	private bool RemoveDisabledPartsRaw(IShape? value) => RemoveChildRaw(value, _disabledParts);
 	private List<IShape>? _disabledParts;
-	private IReadOnlyList<IShape> ReadOnlyDisabledParts() => _disabledParts is not null ? _disabledParts.AsReadOnly() : [];
+	private static readonly IReadOnlyList<IShape> _emptyDisabledParts = [];
+	private IReadOnlyList<IShape> ReadOnlyDisabledParts() => _disabledParts?.AsReadOnly() ?? _emptyDisabledParts;
 	private List<IShape> WritableDisabledParts() => _disabledParts ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If DisabledParts is empty</exception>
@@ -1086,7 +1089,8 @@ public partial class CompositeShape : Shape
 	private bool InsertPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, WritableParts());
 	private bool RemovePartsRaw(IShape? value) => RemoveChildRaw(value, _parts);
 	private List<IShape>? _parts;
-	private IReadOnlyList<IShape> ReadOnlyParts() => _parts is not null ? _parts.AsReadOnly() : [];
+	private static readonly IReadOnlyList<IShape> _emptyParts = [];
+	private IReadOnlyList<IShape> ReadOnlyParts() => _parts?.AsReadOnly() ?? _emptyParts;
 	private List<IShape> WritableParts() => _parts ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Parts is empty</exception>
@@ -1789,7 +1793,8 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	private bool InsertShapesRaw(int index, IShape? value) => InsertChildRaw(index, value, WritableShapes());
 	private bool RemoveShapesRaw(IShape? value) => RemoveChildRaw(value, _shapes);
 	private List<IShape>? _shapes;
-	private IReadOnlyList<IShape> ReadOnlyShapes() => _shapes is not null ? _shapes.AsReadOnly() : [];
+	private static readonly IReadOnlyList<IShape> _emptyShapes = [];
+	private IReadOnlyList<IShape> ReadOnlyShapes() => _shapes?.AsReadOnly() ?? _emptyShapes;
 	private List<IShape> WritableShapes() => _shapes ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes")]
@@ -2288,7 +2293,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	private List<ReferenceTarget>? _materials;
-	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials is not null ? _materials.AsReadOnly() : [];
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials?.AsReadOnly() ?? _emptyReferences;
 	private List<ReferenceTarget> WritableMaterials() => _materials ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
@@ -3007,7 +3012,7 @@ public partial class OffsetDuplicate : Shape
 public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance<INode>
 {
 	private List<ReferenceTarget>? _shapes;
-	private IReadOnlyList<ReferenceTarget> ReadOnlyShapes() => _shapes is not null ? _shapes.AsReadOnly() : [];
+	private IReadOnlyList<ReferenceTarget> ReadOnlyShapes() => _shapes?.AsReadOnly() ?? _emptyReferences;
 	private List<ReferenceTarget> WritableShapes() => _shapes ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
@@ -3214,7 +3219,8 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	private bool InsertFixpointsRaw(int index, Coord? value) => InsertChildRaw(index, value, WritableFixpoints());
 	private bool RemoveFixpointsRaw(Coord? value) => RemoveChildRaw(value, _fixpoints);
 	private List<Coord>? _fixpoints;
-	private IReadOnlyList<Coord> ReadOnlyFixpoints() => _fixpoints is not null ? _fixpoints.AsReadOnly() : [];
+	private static readonly IReadOnlyList<Coord> _emptyFixpoints = [];
+	private IReadOnlyList<Coord> ReadOnlyFixpoints() => _fixpoints?.AsReadOnly() ?? _emptyFixpoints;
 	private List<Coord> WritableFixpoints() => _fixpoints ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-fixpoints")]

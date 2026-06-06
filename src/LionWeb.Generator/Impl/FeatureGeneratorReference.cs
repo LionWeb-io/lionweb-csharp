@@ -361,7 +361,7 @@ internal class FeatureGeneratorReference(Classifier classifier, Reference refere
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
     private MethodDeclarationSyntax MultipleReferenceReadOnly() =>
-        MultipleLinkReadOnly(AsType(typeof(ReferenceTarget)));
+        MultipleLinkReadOnly(AsType(typeof(ReferenceTarget)), IdentifierName("_emptyReferences"));
 
     private MethodDeclarationSyntax MultipleReferenceWritable() =>
         MultipleLinkWritable(AsType(typeof(ReferenceTarget)));

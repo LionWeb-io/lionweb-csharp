@@ -588,7 +588,8 @@ public partial class Library : ConceptInstanceBase
 	private bool InsertBooksRaw(int index, Book? value) => InsertChildRaw(index, value, WritableBooks());
 	private bool RemoveBooksRaw(Book? value) => RemoveChildRaw(value, _books);
 	private List<Book>? _books;
-	private IReadOnlyList<Book> ReadOnlyBooks() => _books is not null ? _books.AsReadOnly() : [];
+	private static readonly IReadOnlyList<Book> _emptyBooks = [];
+	private IReadOnlyList<Book> ReadOnlyBooks() => _books?.AsReadOnly() ?? _emptyBooks;
 	private List<Book> WritableBooks() => _books ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
