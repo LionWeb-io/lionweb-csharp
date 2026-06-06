@@ -20,7 +20,6 @@ namespace LionWeb.Core.M1;
 /// Builds an <see cref="ISerializer"/>.
 public class SerializerBuilder
 {
-    private CompressedIdConfig _compressedIdConfig = new();
     private bool _serializeEmptyFeatures = true;
     private bool _persistLionCoreReferenceTargetIds = false;
     
@@ -40,11 +39,8 @@ public class SerializerBuilder
 
     /// Whether to compress ids, and whether to store uncompressed node and meta-pointer ids
     /// alongside the compressed ones during processing.
-    public SerializerBuilder WithCompressedIds(CompressedIdConfig? config = null)
-    {
-        _compressedIdConfig = config ?? new();
-        return this;
-    }
+    [Obsolete("Not supported anymore, has no effect.")]
+    public SerializerBuilder WithCompressedIds(CompressedIdConfig? config = null) => this;
 
     /// The version of LionWeb standard to use.
     /// Defaults to <see cref="LionWebVersions.Current"/>.
@@ -73,7 +69,6 @@ public class SerializerBuilder
     {
         Serializer result = new Serializer(LionWebVersion)
         {
-            CompressedIdConfig = _compressedIdConfig,
             Handler = Handler ?? new SerializerExceptionHandler(),
             SerializeEmptyFeatures = _serializeEmptyFeatures,
             PersistLionCoreReferenceTargetIds = _persistLionCoreReferenceTargetIds

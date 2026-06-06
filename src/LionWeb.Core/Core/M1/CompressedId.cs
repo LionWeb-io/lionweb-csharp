@@ -18,24 +18,8 @@
 namespace LionWeb.Core.M1;
 
 using Serialization;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using Utilities;
-
-/// Checks for duplicate node ids in an efficient manner.
-public class DuplicateIdChecker
-{
-    private readonly HashSet<NodeId> _knownIds = new();
-
-    /// Whether <paramref name="compressedId"/> has been seen before by this instance.
-    [Obsolete("Use IsIdDuplicate(NodeId) instead.")]
-    public bool IsIdDuplicate(ICompressedId compressedId) => 
-        !_knownIds.Add(compressedId.AssertedOriginal);
-
-    /// Whether <paramref name="nodeId"/> has been seen before by this instance.
-    public bool IsIdDuplicate(NodeId nodeId) =>
-        !_knownIds.Add(nodeId);
-}
 
 /// <summary>
 /// A potentially compressed id.

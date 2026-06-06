@@ -64,11 +64,6 @@ public class Serializer : ISerializer
     public IEnumerable<SerializedLanguageReference> UsedLanguages =>
         _usedLanguages.Select(SerializeLanguageReference);
 
-    /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
-    /// Uses more memory, but very helpful for debugging.
-    /// Defaults to <c>false</c>. 
-    public CompressedIdConfig CompressedIdConfig { get; init; } = new();
-
     /// Whether references to LionCore nodes (<see cref="ILionCoreLanguage"/>, <see cref="IBuiltInsLanguage"/>)
     /// should include the target node's id, or only the resolveInfo.
     /// Defaults to false.
@@ -110,7 +105,7 @@ public class Serializer : ISerializer
     private SerializedNode? SerializeNode(IReadableNode node)
     {
         var id = node.GetId();
-        if (!_duplicateIdChecker.IsIdDuplicate(Compress(id)))
+        if (!_duplicateIdChecker.IsIdDuplicate(id))
             return SerializeSimpleNode(node);
 
         Handler.DuplicateNodeId(node);
@@ -291,12 +286,12 @@ public class Serializer : ISerializer
             ILionCoreLanguage.LanguageKey => new SerializedReferenceTarget
             {
                 Reference = referenceTarget,
-                ResolveInfo = ConcatResolveInfo(target.Target, ILionCoreLanguage.ResolveInfoPrefix),
+                ResolveInfo = ConcatResolveInfo(target.Target, ILionCoreLanguage.ResolveInfoPrefix)
             },
             IBuiltInsLanguage.LanguageKey => new SerializedReferenceTarget
             {
                 Reference = referenceTarget,
-                ResolveInfo = ConcatResolveInfo(target.Target, IBuiltInsLanguage.ResolveInfoPrefix),
+                ResolveInfo = ConcatResolveInfo(target.Target, IBuiltInsLanguage.ResolveInfoPrefix)
             },
             _ => new SerializedReferenceTarget
             {
@@ -321,9 +316,6 @@ public class Serializer : ISerializer
         new() { Key = language.Key, Version = language.Version };
 
     #region Helpers
-
-    private ICompressedId Compress(NodeId id) =>
-        ICompressedId.Create(id, CompressedIdConfig);
 
     /// Compares features with special handling for LionCore features (only compared by key).
     private class FeatureComparer : IEqualityComparer<Feature>
