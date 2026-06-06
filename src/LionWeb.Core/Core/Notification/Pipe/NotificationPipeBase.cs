@@ -17,15 +17,10 @@
 
 namespace LionWeb.Core.Notification.Pipe;
 
-using Forest;
-using Partition;
-using System.Reflection;
-
 /// Base for all <see cref="INotificationPipe">notification pipes</see> that process <see cref="INotification">notifications</see>.
 public abstract class NotificationPipeBase : INotificationFilter, INotificationSender
 {
     protected readonly object Sender;
-    private readonly Dictionary<Type, int> _subscribedNotifications = [];
     private readonly Dictionary<INotificationReceiver, EventHandler<INotification>> _handlers = [];
 
     /// <inheritdoc cref="NotificationPipeBase"/>
@@ -63,9 +58,7 @@ public abstract class NotificationPipeBase : INotificationFilter, INotificationS
 
     /// <inheritdoc />
     public bool Handles(params Type[] notificationTypes) =>
-        InternalEvent != null &&
-        notificationTypes.Any(notificationType =>
-            _subscribedNotifications.TryGetValue(notificationType, out var count) && count > 0);
+        InternalEvent != null;
 
 
     /// <inheritdoc />
@@ -82,64 +75,16 @@ public abstract class NotificationPipeBase : INotificationFilter, INotificationS
         InternalEvent?.Invoke(sender, message);
 
     /// <inheritdoc />
-    void INotificationSender.Subscribe(INotificationReceiver receiver) =>
-        Subscribe<INotification>(receiver);
-
-    /// <inheritdoc cref="INotificationSender.Subscribe"/>
-    private void Subscribe<TSubscribedNotification>(INotificationReceiver receiver)
-        where TSubscribedNotification : INotification
+    void INotificationSender.Subscribe(INotificationReceiver receiver)
     {
-        RegisterSubscribedNotifications<TSubscribedNotification>();
-
-        var handler = CreateHandler<INotification>(receiver);
+        var handler = CreateHandler(receiver);
 
         if (_handlers.TryAdd(receiver, handler))
             InternalEvent += handler;
     }
 
-    private EventHandler<INotification> CreateHandler<TSubscribedNotification>(
-        INotificationReceiver receiver) where TSubscribedNotification : INotification =>
-        (sender, notification) =>
-        {
-            if (notification is not TSubscribedNotification r)
-                return;
-
-            if (sender is INotificationSender handler)
-            {
-                receiver.Receive(handler, r);
-                return;
-            }
-
-            receiver.Receive(null, r);
-        };
-
-    private void RegisterSubscribedNotifications<TSubscribedNotification>()
-    {
-        var notificationType = typeof(TSubscribedNotification);
-        var allSubtype = _allSubtypes[notificationType];
-        foreach (var subtype in allSubtype)
-        {
-            if (_subscribedNotifications.TryGetValue(subtype, out var count))
-            {
-                _subscribedNotifications[subtype] = count + 1;
-            } else
-            {
-                _subscribedNotifications[subtype] = 1;
-            }
-        }
-    }
-
-    private void UnregisterSubscribedNotifications()
-    {
-        var notificationType = typeof(INotification);
-        var allSubtypes = _allSubtypes[notificationType];
-        foreach (var subtype in allSubtypes)
-        {
-            var newCount = --_subscribedNotifications[subtype];
-            if (newCount == 0)
-                _subscribedNotifications.Remove(subtype);
-        }
-    }
+    private EventHandler<INotification> CreateHandler(INotificationReceiver receiver) =>
+        (sender, notification) => receiver.Receive(sender as INotificationSender, notification);
 
     /// <inheritdoc />
     public void Unsubscribe(INotificationReceiver receiver)
@@ -148,26 +93,5 @@ public abstract class NotificationPipeBase : INotificationFilter, INotificationS
             return;
 
         InternalEvent -= handler;
-
-        UnregisterSubscribedNotifications();
-    }
-
-    private static readonly ILookup<Type, Type> _allSubtypes =
-        InitAllSubtypes();
-
-    private static ILookup<Type, Type> InitAllSubtypes()
-    {
-        Type[] allTypes = Assembly
-            .GetExecutingAssembly()
-            .GetTypes();
-
-        List<Type> baseTypes = [typeof(INotification), typeof(IForestNotification), typeof(IPartitionNotification)];
-
-        return baseTypes
-            .SelectMany(baseType => allTypes
-                .Where(subType => subType.IsAssignableTo(baseType))
-                .SelectMany(subType => new List<(Type, Type)> { (baseType, subType), (subType, subType) })
-            )
-            .ToLookup(k => k.Item1, e => e.Item2);
     }
 }
