@@ -31,42 +31,43 @@ public abstract class NotificationPipeBase : INotificationFilter, INotificationS
     }
 
     /// <inheritdoc />
-    public void ConnectTo(INotificationReceiver to) =>
-        ((INotificationSender)this).Subscribe(to);
+    public void ConnectTo(INotificationReceiver to)
+    {
+        var handler = CreateHandler(to);
+
+        if (_handlers.TryAdd(to, handler))
+            InternalEvent += handler;
+    }
     
     /// <inheritdoc />
-    public void Disconnect(INotificationReceiver to) => 
-        ((INotificationSender)this).Unsubscribe(to);
+    public void Disconnect(INotificationReceiver to) 
+    {
+        if (!_handlers.Remove(to, out var handler))
+            return;
+
+        InternalEvent -= handler;
+    }
 
     /// <inheritdoc />
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        foreach (var (receiver, eventHandler) in _handlers)
+        foreach (var (receiver, _) in _handlers)
         {
-            UnsubscribeHandler(receiver, eventHandler);
+            Disconnect(receiver);
         }
-
-        return;
-
-        void UnsubscribeHandler<T>(INotificationReceiver receiver, EventHandler<T> _) =>
-            Unsubscribe(receiver);
     }
 
     private event EventHandler<INotification>? InternalEvent;
 
-
     /// <inheritdoc />
-    public bool Handles(params Type[] notificationTypes) =>
+    bool INotificationFilter.Handles() =>
         InternalEvent != null;
 
-
-    /// <inheritdoc />
-    void INotificationSender.Send(INotification notification) =>
-        Send(notification);
-
-    /// <inheritdoc cref="INotificationSender.Send"/>
-    protected virtual void Send(INotification notification) =>
+    /// This notification sender wants to send <paramref name="notification"/>.
+    /// Only this notification sender should use this method.
+    /// <remarks>Equivalent to <see cref="EventHandler.Invoke"/>.</remarks>
+    protected void Send(INotification notification) =>
         SendWithSender(this, notification);
 
     /// This notification pipe wants to send <paramref name="message"/> with <paramref name="sender"/>.
@@ -74,24 +75,6 @@ public abstract class NotificationPipeBase : INotificationFilter, INotificationS
     protected void SendWithSender(object? sender, INotification message) =>
         InternalEvent?.Invoke(sender, message);
 
-    /// <inheritdoc />
-    void INotificationSender.Subscribe(INotificationReceiver receiver)
-    {
-        var handler = CreateHandler(receiver);
-
-        if (_handlers.TryAdd(receiver, handler))
-            InternalEvent += handler;
-    }
-
     private EventHandler<INotification> CreateHandler(INotificationReceiver receiver) =>
         (sender, notification) => receiver.Receive(sender as INotificationSender, notification);
-
-    /// <inheritdoc />
-    public void Unsubscribe(INotificationReceiver receiver)
-    {
-        if (!_handlers.Remove(receiver, out var handler))
-            return;
-
-        InternalEvent -= handler;
-    }
 }

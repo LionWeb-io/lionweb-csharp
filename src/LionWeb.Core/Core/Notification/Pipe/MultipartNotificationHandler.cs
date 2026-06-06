@@ -22,7 +22,7 @@ namespace LionWeb.Core.Notification.Pipe;
 /// Every message this notification handler <see cref="Receive">receives</see>
 /// is forwarded to the first <see cref="_notificationHandlers">part</see>.
 /// Each part is connected to the next part.
-/// The last part <see cref="INotificationSender.Send">sends</see> to
+/// The last part <see cref="NotificationPipeBase.Send">sends</see> to
 /// this notification handler's <i>following</i> notification pipes.
 public class MultipartNotificationHandler : INotificationHandler
 {
@@ -69,23 +69,14 @@ public class MultipartNotificationHandler : INotificationHandler
         _firstHandler.Receive(correspondingSender, notification);
 
     /// <inheritdoc />
-    public bool Handles(params Type[] notificationTypes) =>
-        _firstHandler.Handles(notificationTypes);
-
-    void INotificationSender.Send(INotification notification) =>
-        throw new ArgumentException("Should never be called");
-
-    void INotificationSender.Subscribe(INotificationReceiver receiver) =>
-        _lastHandler.Subscribe(receiver);
-
-    void INotificationSender.Unsubscribe(INotificationReceiver receiver) =>
-        _lastHandler.Unsubscribe(receiver);
+    public bool Handles() =>
+        _firstHandler.Handles();
 
     /// <inheritdoc />
     public void ConnectTo(INotificationReceiver to) =>
-        ((INotificationSender)this).Subscribe(to);
+        _lastHandler.ConnectTo(to);
 
     /// <inheritdoc />
     public void Disconnect(INotificationReceiver to) => 
-        ((INotificationSender)this).Unsubscribe(to);
+        _lastHandler.Disconnect(to);
 }
