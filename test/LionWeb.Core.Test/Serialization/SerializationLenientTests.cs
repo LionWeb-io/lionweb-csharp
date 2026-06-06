@@ -61,7 +61,6 @@ public class SerializationLenientTests
             .WithLanguage(BLangLanguage.Instance)
             .WithLanguage(WithEnumLanguage.Instance)
             .WithHandler(new LenientHandler())
-            .WithCompressedIds(new(true, true))
             .Build()
             .Deserialize(serializationChunk);
 

@@ -324,7 +324,6 @@ public class DeserializationTests
 
         var deserializer = new DeserializerBuilder()
             .WithLanguage(v1)
-            .WithCompressedIds(new(KeepOriginal: true))
             .WithHandler(new UnregisteredFactoryDeserializationHandler(v2))
             .Build();
 
@@ -390,7 +389,6 @@ public class DeserializationTests
             .WithLanguage(v1)
             .WithLanguage(v2)
             .WithLanguage(v3)
-            .WithCompressedIds(new(KeepOriginal: true))
             .WithHandler(new ClosestVersionDeserializerHandler())
             .Build();
 

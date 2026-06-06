@@ -34,7 +34,6 @@ public abstract class LionWebVersionsTestBase
         var deserializer = new DeserializerBuilder()
             .WithLanguage(language)
             .WithLionWebVersion(lionWebVersion)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
         List<IReadableNode> nodes = deserializer.Deserialize(chunk);
         return nodes;
@@ -48,7 +47,6 @@ public abstract class LionWebVersionsTestBase
 
         var serializer = new SerializerBuilder()
             .WithLionWebVersion(lionWebVersion)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         chunk = serializer.SerializeToChunk(input);

@@ -65,7 +65,6 @@ public class KeywordLangTests
             .SerializeToChunk(input);
 
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithCompressedIds(new(KeepOriginal: true))
             .WithLanguage(ClassLanguage.Instance)
             .Build();
 

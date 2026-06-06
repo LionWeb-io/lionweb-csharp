@@ -79,7 +79,6 @@ public class LanguageSerializationTests
 
         var redeserialized = new LanguageDeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build()
             .Deserialize(serializationChunk);
         Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
@@ -113,7 +112,6 @@ public class LanguageSerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
         var redeserialized2 = new LanguageDeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build()
             .Deserialize(serializationChunk2);
         Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>()
@@ -165,7 +163,6 @@ public class LanguageSerializationTests
 
         var serializer = new SerializerBuilder()
             .WithLionWebVersion(LionWebVersions.v2024_1_Compatible)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         var chunk = serializer.SerializeToChunk(input);
