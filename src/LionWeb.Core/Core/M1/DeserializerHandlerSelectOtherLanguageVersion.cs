@@ -19,14 +19,20 @@ namespace LionWeb.Core.M1;
 
 using M2;
 using M3;
+using Serialization;
 
-/// Hosts logic to find the closest matching language version in <see cref="IDeserializerHandler.SelectVersion{T}"/>.
+/// Hosts logic to find the closest matching language version in <see cref="IDeserializerHandler.SelectVersion{T}(MetaPointer, List{Language})"/>.
 public static class DeserializerHandlerSelectOtherLanguageVersion
 {
-    /// <inheritdoc cref="SelectVersion{T}(LionWeb.Core.M1.CompressedMetaPointer,System.Collections.Generic.List{LionWeb.Core.M3.Language},Comparer{Language})"/>
-    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+    /// <inheritdoc cref="SelectVersion{T}(MetaPointer,List{LionWeb.Core.M3.Language},Comparer{Language})"/>
+    public static T? SelectVersion<T>(MetaPointer metaPointer, List<Language> languages)
         where T : class, IKeyed =>
         SelectVersion<T>(metaPointer, languages, Comparer<Language>.Create(DefaultLanguageComparer));
+
+    /// <inheritdoc cref="SelectVersion{T}(MetaPointer,List{LionWeb.Core.M3.Language})"/>
+    [Obsolete("Use SelectVersion<T>(MetaPointer, List<Language>) instead.")]
+    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        where T : class, IKeyed => SelectVersion<T>(metaPointer.AssertedOriginal, languages);
 
     /// <summary>
     /// Chooses the <typeparamref name="T"/> with the same key as <paramref name="metaPointer"/>
@@ -38,8 +44,7 @@ public static class DeserializerHandlerSelectOtherLanguageVersion
     /// <param name="languageComparer">Comparer to select the preferred language.
     /// Make sure to invert the result for choosing the latest version.</param>
     /// <typeparam name="T">Kind of language element we're looking for.</typeparam>
-    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages,
-        Comparer<Language> languageComparer)
+    public static T? SelectVersion<T>(MetaPointer metaPointer, List<Language> languages, Comparer<Language> languageComparer)
         where T : class, IKeyed
     {
         IEnumerable<IKeyed> keyed = typeof(T) switch
@@ -55,12 +60,17 @@ public static class DeserializerHandlerSelectOtherLanguageVersion
         };
 
         var candidates = keyed
-            .Where(k => ICompressedId.Create(k.Key, new CompressedIdConfig()).Equals(metaPointer.Key))
+            .Where(k => k.Key.Equals(metaPointer.Key))
             .OrderBy(f => f.GetLanguage(), languageComparer);
 
         return candidates
             .FirstOrDefault() as T;
     }
+
+    /// <inheritdoc cref="SelectVersion{T}(MetaPointer,List{LionWeb.Core.M3.Language}, Comparer{Language})"/>
+    [Obsolete("Use SelectVersion<T>(MetaPointer, List<Language>, Comparer<Language>) instead.")]
+    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages, Comparer<Language> languageComparer)
+        where T : class, IKeyed => SelectVersion<T>(metaPointer.AssertedOriginal, languages, languageComparer);
 
     /// Compares <paramref name="a"/>'s and <paramref name="b"/>'s <see cref="Language.Version"/> by means of <see cref="Version"/>,
     /// i.e. dotted-number (<c>11.22.33.44</c>).

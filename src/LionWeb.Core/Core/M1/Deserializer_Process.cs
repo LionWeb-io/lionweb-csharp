@@ -20,7 +20,6 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedContainment = (CompressedMetaPointer, List<ICompressedId>);
 
 public partial class Deserializer
 {
@@ -37,19 +36,19 @@ public partial class Deserializer
             return node;
         });
 
-        if (processed is not { } compressedId)
+        if (processed is not { } nodeId)
             return;
 
-        RegisterContainments(serializedNode, compressedId);
-        RegisterReferences(serializedNode, compressedId);
-        RegisterAnnotations(serializedNode, compressedId);
+        RegisterContainments(serializedNode, nodeId);
+        RegisterReferences(serializedNode, nodeId);
+        RegisterAnnotations(serializedNode, nodeId);
     }
 
     private void DeserializeProperties(SerializedNode serializedNode, IWritableNode node)
     {
         foreach (var serializedProperty in serializedNode.Properties)
         {
-            var property = _deserializerMetaInfo.FindFeature<Property>(node, Compress(serializedProperty.Property));
+            var property = _deserializerMetaInfo.FindFeature<Property>(node, serializedProperty.Property);
             if (property == null)
                 continue;
 
@@ -67,45 +66,30 @@ public partial class Deserializer
         }
     }
 
-    private void RegisterAnnotations(SerializedNode serializedNode, ICompressedId compressedId)
+    private void RegisterAnnotations(SerializedNode serializedNode, NodeId nodeId)
     {
         if (serializedNode.Annotations.Length == 0)
             return;
 
-        _annotationsByOwnerId[compressedId] = serializedNode
-            .Annotations
-            .Select(Compress)
-            .ToList();
+        _annotationsByOwnerId[nodeId] = serializedNode
+            .Annotations;
     }
 
-    private void RegisterReferences(SerializedNode serializedNode, ICompressedId compressedId)
+    private void RegisterReferences(SerializedNode serializedNode, NodeId nodeId)
     {
         if (serializedNode.References.Length == 0)
             return;
 
-        _referencesByOwnerId[compressedId] = serializedNode
-            .References
-            .Select(Compress)
-            .ToList();
+        _referencesByOwnerId[nodeId] = serializedNode
+            .References;
     }
 
-    private void RegisterContainments(SerializedNode serializedNode, ICompressedId compressedId)
+    private void RegisterContainments(SerializedNode serializedNode, NodeId nodeId)
     {
         if (serializedNode.Containments.Length == 0)
             return;
 
-        _containmentsByOwnerId[compressedId] = serializedNode
-            .Containments
-            .Select(Compress)
-            .ToList();
+        _containmentsByOwnerId[nodeId] = serializedNode
+            .Containments;
     }
-
-    private CompressedContainment Compress(SerializedContainment c) =>
-    (
-        Compress(c.Containment),
-        c
-            .Children
-            .Select(Compress)
-            .ToList()
-    );
 }

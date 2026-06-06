@@ -29,10 +29,10 @@ public class UnresolvableAnnotationTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<ICompressedId, IWritableNode, IWritableNode?> heal)
+    private class DeserializerHealingHandler(Func<NodeId, IWritableNode, IWritableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
+        public override IWritableNode? UnresolvableAnnotation(NodeId annotationId, IReadableNode node) =>
             heal(annotationId, (IWritableNode)node);
     }
 

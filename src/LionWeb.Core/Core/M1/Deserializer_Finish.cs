@@ -25,11 +25,11 @@ public partial class Deserializer
     /// <inheritdoc />
     public override IEnumerable<IWritableNode> Finish()
     {
-        foreach (var compressedId in _deserializedNodesById.Keys)
+        foreach (var nodeId in _deserializedNodesById.Keys)
         {
-            InstallContainments(compressedId);
-            InstallReferences(compressedId);
-            InstallAnnotations(compressedId);
+            InstallContainments(nodeId);
+            InstallReferences(nodeId);
+            InstallAnnotations(nodeId);
         }
 
         return FilterRootNodes();
@@ -42,20 +42,23 @@ public partial class Deserializer
 
     #region Containments
 
-    private void InstallContainments(ICompressedId compressedId)
+    private void InstallContainments(NodeId nodeId)
     {
-        if (!_containmentsByOwnerId.TryGetValue(compressedId, out var containments))
+        if (!_containmentsByOwnerId.TryGetValue(nodeId, out var containments))
             return;
 
-        IWritableNode node = _deserializedNodesById[compressedId];
+        IWritableNode node = _deserializedNodesById[nodeId];
 
-        foreach (var (compressedMetaPointer, compressedChildrenIds) in containments)
+        foreach (var serializedContainment in containments)
         {
-            var containment = _deserializerMetaInfo.FindFeature<Containment>(node, compressedMetaPointer);
+            var metaPointer = serializedContainment.Containment;
+            var childrenIds = serializedContainment.Children;
+            
+            var containment = _deserializerMetaInfo.FindFeature<Containment>(node, metaPointer);
             if (containment == null)
                 continue;
 
-            InstallContainment(compressedChildrenIds, node, containment);
+            InstallContainment(childrenIds, node, containment);
         }
     }
 
@@ -63,24 +66,24 @@ public partial class Deserializer
 
     #region References
 
-    private void InstallReferences(ICompressedId compressedId)
+    private void InstallReferences(NodeId nodeId)
     {
-        if (!_referencesByOwnerId.TryGetValue(compressedId, out var references))
+        if (!_referencesByOwnerId.TryGetValue(nodeId, out var references))
             return;
 
-        InstallReferences(compressedId, references);
+        InstallReferences(nodeId, references);
     }
 
     #endregion
 
     #region Annotations
 
-    private void InstallAnnotations(ICompressedId compressedId)
+    private void InstallAnnotations(NodeId nodeId)
     {
-        if (!_annotationsByOwnerId.TryGetValue(compressedId, out var annotationIds))
+        if (!_annotationsByOwnerId.TryGetValue(nodeId, out var annotationIds))
             return;
 
-        IWritableNode node = _deserializedNodesById[compressedId];
+        IWritableNode node = _deserializedNodesById[nodeId];
 
         List<IWritableNode> annotations = annotationIds
             .Select(annId => FindAnnotation(node, annId))
@@ -90,7 +93,7 @@ public partial class Deserializer
         node.AddAnnotations(annotations);
     }
 
-    private IWritableNode? FindAnnotation(IWritableNode node, ICompressedId annotationId)
+    private IWritableNode? FindAnnotation(IWritableNode node, NodeId annotationId)
     {
         if (!_deserializedNodesById.TryGetValue(annotationId, out var result))
             result = _handler.UnresolvableAnnotation(annotationId, node);

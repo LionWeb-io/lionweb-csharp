@@ -23,13 +23,13 @@ using Core.M3;
 
 internal class NoFeaturesDeserializationHandler : DeserializerExceptionHandler
 {
-    public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
+    public override IWritableNode? UnresolvableChild(NodeId childId, Feature containment, IReadableNode node) =>
         null;
 
     public override IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target,
         Feature reference, IReadableNode parent) =>
         null;
 
-    public override IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
+    public override IWritableNode? UnresolvableAnnotation(NodeId annotationId, IReadableNode node) =>
         null;
 }

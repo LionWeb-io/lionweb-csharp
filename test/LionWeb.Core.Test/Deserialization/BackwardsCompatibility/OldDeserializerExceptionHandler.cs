@@ -15,24 +15,25 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
+namespace LionWeb.Core.Test.Deserialization.BackwardsCompatibility;
 
+using Core.Serialization;
+using M1;
 using M3;
-using Serialization;
 
 /// Throws some variant of <see cref="LionWebExceptionBase"/> for any callback.
-public class DeserializerExceptionHandler : IDeserializerHandler
+public class OldDeserializerExceptionHandler : IDeserializerHandler
 {
     /// <inheritdoc />
-    public virtual Classifier? UnknownClassifier(MetaPointer classifier, NodeId id) =>
+    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) =>
         throw new UnsupportedClassifierException(classifier, $"On node with id={id}: ");
 
     /// <inheritdoc />
-    public virtual NodeId? DuplicateNodeId(NodeId nodeId, IReadableNode existingNode, IReadableNode node) =>
+    public virtual NodeId? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
         throw new DeserializerException($"Duplicate node with id={existingNode.GetId()}");
 
     /// <inheritdoc />
-    public virtual T? SelectVersion<T>(MetaPointer metaPointer, List<Language> languages)
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
         where T : class, IKeyed =>
         // TODO think about correct handling
         // throw new DeserializerException($"Unknown meta-pointer {metaPointer}");
@@ -41,13 +42,13 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     #region features
 
     /// <inheritdoc />
-    public virtual Feature? UnknownFeature<TFeature>(MetaPointer feature,
+    public virtual Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature,
         Classifier classifier,
         IReadableNode node) where TFeature : class, Feature =>
         throw new UnknownFeatureException(classifier, feature, $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public virtual Feature? InvalidFeature<TFeature>(MetaPointer feature,
+    public virtual Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature,
         Classifier classifier,
         IReadableNode node) where TFeature : class, Feature =>
         throw new UnknownFeatureException(classifier, feature, $"On node with id={node.GetId()}:");
@@ -96,7 +97,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={node.GetId()}: unknown property type {property /*.Type*/} with value {value}");
 
     /// <inheritdoc />
-    public virtual object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, NodeId nodeId) =>
+    public virtual object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, ICompressedId nodeId) =>
         throw new DeserializerException(
             $"On node with id={nodeId}: invalid property value '{value}' for property {property}");
 
@@ -105,7 +106,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     #region unresolveable nodes
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableChild(NodeId childId, Feature containment, IReadableNode node) =>
+    public virtual IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
         throw new DeserializerException($"On node with id={node.GetId()}: couldn't find child with id={childId}");
 
     /// <inheritdoc />
@@ -116,7 +117,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={parent.GetId()}: couldn't find reference target with id={target}");
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableAnnotation(NodeId annotationId, IReadableNode node) =>
+    public virtual IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: couldn't find annotation with id={annotationId}");
 
@@ -128,7 +129,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public virtual bool SkipDeserializingDependentNode(NodeId id) =>
+    public virtual bool SkipDeserializingDependentNode(ICompressedId id) =>
         throw new DeserializerException(
             $"Skip deserializing node with id '{id}' because dependentLanguages contains node with same id");
 }
@@ -143,9 +144,3 @@ public class DeserializerKeepUnresolvedReferencesHandler : DeserializerException
         IReadableNode parent) =>
         target;
 }
-
-/// Something went wrong during serialization.
-public class SerializerException(string? message) : LionWebExceptionBase(message);
-
-/// Something went wrong during deserialization.
-public class DeserializerException(string? message) : LionWebExceptionBase(message);

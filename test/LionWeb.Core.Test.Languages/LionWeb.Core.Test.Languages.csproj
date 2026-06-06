@@ -3,7 +3,7 @@
     <PropertyGroup>
         <RootNamespace>LionWeb.Core.Test.Languages</RootNamespace>
         <IsPackable>false</IsPackable>
-        <NoWarn>1591</NoWarn>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

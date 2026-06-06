@@ -15,32 +15,48 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable ArrangeMethodOrOperatorBody
-
 namespace LionWeb.Core.M1;
 
 using Serialization;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using Utilities;
 
 /// Checks for duplicate node ids in an efficient manner.
 public class DuplicateIdChecker
 {
-    private readonly HashSet<ICompressedId> _knownIds = new();
+    private readonly HashSet<NodeId> _knownIds = new();
 
     /// Whether <paramref name="compressedId"/> has been seen before by this instance.
-    public bool IsIdDuplicate(ICompressedId compressedId) =>
-        !_knownIds.Add(compressedId);
+    [Obsolete("Use IsIdDuplicate(NodeId) instead.")]
+    public bool IsIdDuplicate(ICompressedId compressedId) => 
+        !_knownIds.Add(compressedId.AssertedOriginal);
+
+    /// Whether <paramref name="nodeId"/> has been seen before by this instance.
+    public bool IsIdDuplicate(NodeId nodeId) =>
+        !_knownIds.Add(nodeId);
 }
 
 /// <summary>
 /// A potentially compressed id.
 /// Implementation differ in their memory vs. computation tradeoffs.
 /// </summary>
+[Obsolete("Use NodeId (aka string) instead.")]
 public interface ICompressedId
 {
     /// The original node id, if available.
     public NodeId? Original { get; }
+    
+    public NodeId AssertedOriginal
+    {
+        get
+        {
+            var original = Original;
+            if (original is null)
+                throw new NullReferenceException($"{nameof(Original)} is null");
+            return original;
+        }
+    }
 
     /// <summary>
     /// Creates either a new <see cref="CompressedId"/> or <see cref="UncompressedId"/>.
@@ -70,6 +86,7 @@ public interface ICompressedId
 /// <summary>
 /// Configuration which optimizations to apply to (potentially compressed) ids.
 /// </summary>
+[Obsolete("Use raw NodeIds.")]
 public record CompressedIdConfig
 {
     /// <summary>
@@ -113,6 +130,7 @@ public record CompressedIdConfig
 /// </para>
 /// </summary>
 /// <param name="original">Original, uncompressed id.</param>
+[Obsolete("Use NodeId (aka string) instead.")]
 public readonly struct UncompressedId(NodeId original) : ICompressedId, IEquatable<UncompressedId>
 {
     /// <inheritdoc />
@@ -151,6 +169,7 @@ public readonly struct UncompressedId(NodeId original) : ICompressedId, IEquatab
 /// If used without storing the original more memory efficient, but a bit slower.
 /// </para>
 /// </summary>
+[Obsolete("Use NodeId (aka string) instead.")]
 public readonly struct CompressedId : ICompressedId, IEquatable<CompressedId>
 {
     internal CompressedId(byte[] identifier, NodeId? original)
@@ -191,6 +210,7 @@ public readonly struct CompressedId : ICompressedId, IEquatable<CompressedId>
 }
 
 /// Stores a LionWeb MetaPointer in a compact format, optionally preserving the original.
+[Obsolete("Use MetaPointer instead.")]
 public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
 {
     private CompressedMetaPointer(ICompressedId language, ICompressedId version, ICompressedId key,
@@ -213,6 +233,16 @@ public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
 
     /// The original MetaPointer, if available.
     public MetaPointer? Original { get; }
+    public MetaPointer AssertedOriginal
+    {
+        get
+        {
+            var original = Original;
+            if (original is null)
+                throw new NullReferenceException($"{nameof(Original)} is null");
+            return original;
+        }
+    }
 
     /// <summary>
     /// Creates a new <see cref="CompressedMetaPointer"/>.

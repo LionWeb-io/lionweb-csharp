@@ -269,19 +269,19 @@ public class DeserializationTests
 
     private class ClosestVersionDeserializerHandler : DeserializerExceptionHandler
     {
-        public override T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        public override T? SelectVersion<T>(MetaPointer metaPointer, List<Language> languages)
             where T : class =>
             DeserializerHandlerSelectOtherLanguageVersion.SelectVersion<T>(metaPointer, languages);
     }
 
     private class UnregisteredFactoryDeserializationHandler(Language language) : DeserializerExceptionHandler
     {
-        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id)
+        public override Classifier? UnknownClassifier(MetaPointer classifier, NodeId id)
         {
             var firstClassifier = language.Entities.OfType<Classifier>().First();
-            var firstCompressedMetaPointer = CompressedMetaPointer.Create(firstClassifier.ToMetaPointer(), new CompressedIdConfig());
+            var firstMetaPointer = firstClassifier.ToMetaPointer();
             
-            if(classifier.Equals(firstCompressedMetaPointer))
+            if(classifier.Equals(firstMetaPointer))
                 return firstClassifier;
             
             return base.UnknownClassifier(classifier, id);

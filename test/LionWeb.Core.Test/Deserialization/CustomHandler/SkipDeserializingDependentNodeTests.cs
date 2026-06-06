@@ -30,9 +30,9 @@ public class SkipDeserializingDependentNodeTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<ICompressedId, bool> heal) : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<NodeId, bool> heal) : DeserializerExceptionHandler
     {
-        public override bool SkipDeserializingDependentNode(ICompressedId id) => heal(id);
+        public override bool SkipDeserializingDependentNode(NodeId id) => heal(id);
     }
 
 

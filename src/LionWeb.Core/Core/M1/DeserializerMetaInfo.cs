@@ -30,38 +30,35 @@ using System.Diagnostics.CodeAnalysis;
 public class DeserializerMetaInfo(IDeserializerHandler handler)
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
-    private readonly Dictionary<ICompressedId, List<Language>> _languagesByKey = new();
-    private readonly Dictionary<CompressedMetaPointer, Classifier> _classifiers = new();
-    private readonly Dictionary<CompressedMetaPointer, Feature> _features = new();
-    
-    internal CompressedIdConfig CompressedIdConfig { get; set; } = new();
+    private readonly Dictionary<NodeId, List<Language>> _languagesByKey = new();
+    private readonly Dictionary<MetaPointer, Classifier> _classifiers = new();
+    private readonly Dictionary<MetaPointer, Feature> _features = new();
 
     internal void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
     {
         _language2NodeFactory[language] = factory;
-        var compressedKey = Compress(language.Key);
-        if (!_languagesByKey.TryAdd(compressedKey, [language]))
+        var key = language.Key;
+        if (!_languagesByKey.TryAdd(key, [language]))
         {
-            _languagesByKey[compressedKey].Add(language);
+            _languagesByKey[key].Add(language);
         }
 
         foreach (Classifier classifier in language.Entities.OfType<Classifier>())
         {
-            _classifiers[Compress(classifier.ToMetaPointer())] = classifier;
+            _classifiers[classifier.ToMetaPointer()] = classifier;
             foreach (Feature feature in classifier.Features)
             {
-                _features[Compress(feature.ToMetaPointer())] = feature;
+                _features[feature.ToMetaPointer()] = feature;
             }
         }
     }
 
     internal INode? Instantiate(NodeId id, MetaPointer metaPointer)
     {
-        var compressedMetaPointer = Compress(metaPointer);
-        if (!LookupClassifier(compressedMetaPointer, out var classifier))
+        if (!LookupClassifier(metaPointer, out var classifier))
         {
             classifier =
-                handler.UnknownClassifier(compressedMetaPointer, ICompressedId.Create(id, CompressedIdConfig));
+                handler.UnknownClassifier(metaPointer, id);
             if (classifier == null)
                 return null;
         }
@@ -74,41 +71,41 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
         return factory.CreateNode(id, classifier);
     }
 
-    internal Feature? FindFeature<TFeature>(IReadableNode node, CompressedMetaPointer compressedMetaPointer)
+    internal Feature? FindFeature<TFeature>(IReadableNode node, MetaPointer metaPointer)
         where TFeature : class, Feature
     {
         Classifier classifier = node.GetClassifier();
-        if (!LookupFeature(compressedMetaPointer, out var feature))
+        if (!LookupFeature(metaPointer, out var feature))
         {
-            feature = handler.UnknownFeature<TFeature>(compressedMetaPointer, classifier, node);
+            feature = handler.UnknownFeature<TFeature>(metaPointer, classifier, node);
             if (feature == null)
                 return null;
         }
 
-        return feature as TFeature ?? handler.InvalidFeature<TFeature>(compressedMetaPointer, classifier, node);
+        return feature as TFeature ?? handler.InvalidFeature<TFeature>(metaPointer, classifier, node);
     }
 
-    private bool LookupClassifier(CompressedMetaPointer compressedMetaPointer,
+    private bool LookupClassifier(MetaPointer metaPointer,
         [NotNullWhen(true)] out Classifier? classifier) =>
-        _classifiers.TryGetValue(compressedMetaPointer, out classifier) ||
-        SelectVersion(compressedMetaPointer, out classifier);
+        _classifiers.TryGetValue(metaPointer, out classifier) ||
+        SelectVersion(metaPointer, out classifier);
 
-    private bool SelectVersion<T>(CompressedMetaPointer compressedMetaPointer, [NotNullWhen(true)] out T? result)
+    private bool SelectVersion<T>(MetaPointer metaPointer, [NotNullWhen(true)] out T? result)
         where T : class, IKeyed
     {
-        if (!_languagesByKey.TryGetValue(compressedMetaPointer.Language, out var languages))
+        if (!_languagesByKey.TryGetValue(metaPointer.Language, out var languages))
         {
             result = null;
             return false;
         }
 
-        result = handler.SelectVersion<T>(compressedMetaPointer, languages);
+        result = handler.SelectVersion<T>(metaPointer, languages);
         return result != null;
     }
 
-    private bool LookupFeature(CompressedMetaPointer compressedMetaPointer,
+    private bool LookupFeature(MetaPointer metaPointer,
         [NotNullWhen(true)] out Feature? feature) =>
-        _features.TryGetValue(compressedMetaPointer, out feature) || SelectVersion(compressedMetaPointer, out feature);
+        _features.TryGetValue(metaPointer, out feature) || SelectVersion(metaPointer, out feature);
 
     internal bool LookupFactory(Language language, [NotNullWhen(true)] out INodeFactory? factory)
     {
@@ -122,10 +119,4 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
         _language2NodeFactory[language] = factory;
         return true;
     }
-
-    internal ICompressedId Compress(NodeId id) =>
-        ICompressedId.Create(id, CompressedIdConfig);
-
-    private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
-        CompressedMetaPointer.Create(metaPointer, CompressedIdConfig);
 }

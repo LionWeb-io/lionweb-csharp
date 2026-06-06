@@ -15,30 +15,30 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
+namespace LionWeb.Core.Test.Deserialization.BackwardsCompatibility;
 
+using M1;
 using M3;
-using Serialization;
 
 /// Logs and ignores any kind of callback.
-public class DeserializerIgnoringHandler : IDeserializerHandler
+public class OldDeserializerIgnoringHandler : IDeserializerHandler
 {
     /// <inheritdoc />
-    public virtual Classifier? UnknownClassifier(MetaPointer classifier, NodeId id)
+    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id)
     {
         LogMessage($"On node with id={id}: couldn't find specified classifier {classifier} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public NodeId? DuplicateNodeId(NodeId nodeId, IReadableNode existingNode, IReadableNode node)
+    public NodeId? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node)
     {
         LogMessage($"Duplicate node with id={existingNode.GetId()}");
         return null;
     }
 
     /// <inheritdoc />
-    public virtual T? SelectVersion<T>(MetaPointer metaPointer, List<Language> languages)
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
         where T : class, IKeyed
     {
         LogMessage($"Unknown meta-pointer {metaPointer}");
@@ -48,7 +48,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     #region features
 
     /// <inheritdoc />
-    public virtual Feature? UnknownFeature<TFeature>(MetaPointer feature,
+    public virtual Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature,
         Classifier classifier,
         IReadableNode node) where TFeature : class, Feature
     {
@@ -65,7 +65,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public Feature? InvalidFeature<TFeature>(MetaPointer feature,
+    public Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature,
         Classifier classifier,
         IReadableNode node) where TFeature : class, Feature
     {
@@ -126,7 +126,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, NodeId nodeId)
+    public object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, ICompressedId nodeId)
     {
         LogMessage($"On node with id={nodeId}: invalid property value {value} for property {property} - skipping");
         return null;
@@ -137,7 +137,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     #region unresolveable nodes
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableChild(NodeId childId, Feature containment, IReadableNode node)
+    public virtual IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node)
     {
         LogMessage($"On node with id={node.GetId()}: couldn't find child with id={childId} - skipping.");
         return null;
@@ -153,7 +153,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableAnnotation(NodeId annotationId, IReadableNode node)
+    public virtual IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node)
     {
         LogMessage($"On node with id={node.GetId()}: couldn't find annotation with id={annotationId} - skipping.");
         return null;
@@ -167,7 +167,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
 
 
     /// <inheritdoc />
-    public bool SkipDeserializingDependentNode(NodeId id)
+    public bool SkipDeserializingDependentNode(ICompressedId id)
     {
         LogMessage($"Skip deserializing {id} because dependent nodes contains node with same id");
         return true;

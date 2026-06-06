@@ -22,7 +22,6 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedReference = (CompressedMetaPointer, List<(ICompressedId? compressedId, ResolveInfo? resolveInfo)>);
 
 /// <inheritdoc />
 /// <typeparam name="T">Type of node to return</typeparam>
@@ -46,21 +45,19 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     protected readonly DeserializerMetaInfo _deserializerMetaInfo;
 
     /// <inheritdoc cref="IDeserializer.RegisterDependentNodes"/>
-    protected readonly Dictionary<ICompressedId, IReadableNode> _dependentNodesById = new();
+    protected readonly Dictionary<NodeId, IReadableNode> _dependentNodesById = new();
 
     /// Already deserialized nodes.
-    protected readonly Dictionary<ICompressedId, T> _deserializedNodesById = new();
+    protected readonly Dictionary<NodeId, T> _deserializedNodesById = new();
 
     /// <param name="lionWebVersion">Version of LionWeb standard to use.</param>
     /// <param name="handler">Optional handler to customize this deserializer's behaviour in non-regular situations.</param>
-    /// <param name="compressedIdConfig">How to store compressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.</param>
-    protected DeserializerBase(LionWebVersions lionWebVersion, H handler, CompressedIdConfig compressedIdConfig)
+    protected DeserializerBase(LionWebVersions lionWebVersion, H handler)
     {
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
         _handler = handler;
         _deserializerMetaInfo = new DeserializerMetaInfo(_handler);
-        _deserializerMetaInfo.CompressedIdConfig = compressedIdConfig;
         _versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion, this, _deserializerMetaInfo, _handler);
         _versionSpecifics.RegisterBuiltins();
     }
@@ -71,12 +68,6 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <inheritdoc />
     IDeserializerVersionSpecifics IDeserializer.VersionSpecifics => _versionSpecifics;
 
-    /// How to store compressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
-    public CompressedIdConfig CompressedIdConfig
-    {
-        get => _deserializerMetaInfo.CompressedIdConfig;
-    }
-
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     public ReferenceResolveInfoHandling ResolveInfoHandling { get; init; }
 
@@ -85,7 +76,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     {
         foreach (var dependentNode in dependentNodes)
         {
-            _dependentNodesById[Compress(dependentNode.GetId())] = dependentNode;
+            _dependentNodesById[dependentNode.GetId()] = dependentNode;
         }
     }
 
@@ -102,21 +93,21 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <inheritdoc />
     public abstract IEnumerable<T> Finish();
 
-    /// Takes care of <see cref="IDeserializerHandler.SkipDeserializingDependentNode"/>
-    /// and <see cref="IDeserializerHandler.DuplicateNodeId"/>.
-    protected ICompressedId? ProcessInternal(SerializedNode serializedNode, Func<NodeId, T?> instantiator)
+    /// Takes care of <see cref="IDeserializerHandler.SkipDeserializingDependentNode(NodeId)"/>
+    /// and <see cref="IDeserializerHandler.DuplicateNodeId(NodeId, IReadableNode, IReadableNode)"/>.
+    protected NodeId? ProcessInternal(SerializedNode serializedNode, Func<NodeId, T?> instantiator)
     {
         var id = serializedNode.Id;
 
-        ICompressedId compressedId;
+        NodeId nodeId;
 
         T? node;
         bool duplicateFound = false;
 
         do
         {
-            compressedId = Compress(id);
-            if (IsInDependentNodes(compressedId) && _handler.SkipDeserializingDependentNode(compressedId))
+            nodeId = id;
+            if (IsInDependentNodes(nodeId) && _handler.SkipDeserializingDependentNode(nodeId))
                 return null;
 
             node = instantiator(id);
@@ -125,31 +116,31 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
             duplicateFound = false;
 
-            if (_deserializedNodesById.TryGetValue(compressedId, out var existingNode))
+            if (_deserializedNodesById.TryGetValue(nodeId, out var existingNode))
             {
-                id = _handler.DuplicateNodeId(compressedId, existingNode, node);
+                id = _handler.DuplicateNodeId(nodeId, existingNode, node);
                 if (id == null)
                     return null;
                 duplicateFound = true;
             }
         } while (duplicateFound);
 
-        _deserializedNodesById[compressedId] = node;
-        return compressedId;
+        _deserializedNodesById[nodeId] = node;
+        return nodeId;
     }
 
     #region Containment
 
-    /// Sets <paramref name="containment"/> inside <paramref name="node"/> to <paramref name="compressedChildrenIds"/>, if possible.
-    /// Uses only the first entry of <paramref name="compressedChildrenIds"/> if <paramref name="containment"/> is single.
+    /// Sets <paramref name="containment"/> inside <paramref name="node"/> to <paramref name="childrenIds"/>, if possible.
+    /// Uses only the first entry of <paramref name="childrenIds"/> if <paramref name="containment"/> is single.
     ///
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    protected void InstallContainment(List<ICompressedId> compressedChildrenIds, IWritableNode node, Feature containment)
+    protected void InstallContainment(IEnumerable<NodeId> childrenIds, IWritableNode node, Feature containment)
     {
-        List<IWritableNode> children = compressedChildrenIds
-            .Select<ICompressedId, IWritableNode?>(childId => FindChild(node, containment, childId))
+        List<IWritableNode> children = childrenIds
+            .Select<NodeId, IWritableNode?>(childId => FindChild(node, containment, childId))
             .Where(c => c != null)
             .ToList()!;
 
@@ -174,7 +165,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         }
     }
 
-    private IWritableNode? FindChild(IWritableNode node, Feature containment, ICompressedId childId)
+    private IWritableNode? FindChild(IWritableNode node, Feature containment, NodeId childId)
     {
         IWritableNode? result = _deserializedNodesById.TryGetValue(childId, out var existingChild)
             ? existingChild as IWritableNode
@@ -217,7 +208,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// 3. By resolveInfo in <see cref="ILionCoreLanguage"/>
     /// 4. By resolveInfo in <see cref="IBuiltInsLanguage"/>
     /// 5. By resolveInfo vs. name in <see cref="_deserializedNodesById"/> (depending on <see cref="ResolveInfoHandling"/>)
-    protected IReadableNode? FindReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo) =>
+    protected IReadableNode? FindReferenceTarget(NodeId? targetId, ResolveInfo? resolveInfo) =>
         (targetId, resolveInfo) switch
         {
             ({ } tid, _) =>
@@ -284,11 +275,11 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     }
 
     /// <inheritdoc />
-    void IDeserializer.InstallNodeReferences(ICompressedId nodeId, IEnumerable<CompressedReference> references) =>
+    void IDeserializer.InstallNodeReferences(NodeId nodeId, IEnumerable<SerializedReference> references) =>
         InstallReferences(nodeId, references);
-    
+
     /// <inheritdoc cref="IDeserializer.InstallNodeReferences"/>
-    protected void InstallReferences(ICompressedId nodeId, IEnumerable<CompressedReference> references)
+    protected void InstallReferences(NodeId nodeId, IEnumerable<SerializedReference> references)
     {
         T node = _deserializedNodesById[nodeId];
 
@@ -298,9 +289,11 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             return;
         }
 
-        foreach (var (compressedMetaPointer, targetEntries) in references)
+        foreach (var reference in references)
         {
-            var feature = _deserializerMetaInfo.FindFeature<Reference>(node, compressedMetaPointer);
+            var metaPointer = reference.Reference;
+            var targetEntries = reference.Targets;
+            var feature = _deserializerMetaInfo.FindFeature<Reference>(node, metaPointer);
             switch (feature)
             {
                 case null:
@@ -309,7 +302,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
                     // required if FindFeature() "heals" the reference into a containment.
                     InstallContainment(
                         targetEntries
-                            .Select(e => e.compressedId)
+                            .Select(e => e.Reference)
                             .Where(i => i is not null)
                             .ToList()!,
                         writable,
@@ -320,7 +313,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
                     {
                         List<IReferenceTarget> targets = targetEntries
                             .Select(target =>
-                                FindReferenceTarget(node, feature, target.compressedId, target.resolveInfo))
+                                FindReferenceTarget(node, feature, target.Reference, target.ResolveInfo))
                             .Where(d => d is not null)
                             .ToList()!;
 
@@ -354,42 +347,20 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         }
     }
 
-    private IReferenceTarget? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
+    private IReferenceTarget? FindReferenceTarget(IReadableNode node, Feature reference, NodeId? targetId,
         ResolveInfo? resolveInfo)
     {
         var target = FindReferenceTarget(targetId, resolveInfo);
         if (target is not null)
-            return new ReferenceTarget(resolveInfo, target?.GetId() ?? targetId?.Original, target);
+            return new ReferenceTarget(resolveInfo, target.GetId(), target);
 
-        var defaultTarget = new ReferenceTarget(resolveInfo, targetId?.Original, null);
+        var defaultTarget = new ReferenceTarget(resolveInfo, targetId, null);
         return _handler.UnresolvableReferenceTarget(defaultTarget, reference, node);
     }
 
-    /// Compresses <paramref name="r"/>.
-    protected CompressedReference Compress(SerializedReference r) =>
-    (
-        Compress(r.Reference),
-        r
-            .Targets
-            .Select(t => (CompressOpt(t.Reference), t.ResolveInfo))
-            .ToList()
-    );
-
     #endregion
 
-    /// Compresses <paramref name="id"/>.
-    protected internal ICompressedId Compress(NodeId id) =>
-        ICompressedId.Create(id, CompressedIdConfig);
-
-    /// Compresses <paramref name="id"/> if not <c>null</c>.
-    protected internal ICompressedId? CompressOpt(NodeId? id) =>
-        id != null ? ICompressedId.Create(id, CompressedIdConfig) : null;
-
-    /// Compresses <paramref name="metaPointer"/>.
-    protected CompressedMetaPointer Compress(MetaPointer metaPointer) =>
-        CompressedMetaPointer.Create(metaPointer, CompressedIdConfig);
-
-    /// Checks whether <paramref name="compressedId"/> is contained in <see cref="_dependentNodesById"/>.
-    protected bool IsInDependentNodes(ICompressedId compressedId) =>
-        _dependentNodesById.ContainsKey(compressedId);
+    /// Checks whether <paramref name="nodeId"/> is contained in <see cref="_dependentNodesById"/>.
+    protected bool IsInDependentNodes(NodeId nodeId) =>
+        _dependentNodesById.ContainsKey(nodeId);
 }

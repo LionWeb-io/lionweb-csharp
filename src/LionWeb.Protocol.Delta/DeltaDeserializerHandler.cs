@@ -31,7 +31,7 @@ using Core.M3;
 public class DeltaDeserializerHandler(UnresolvedReferencesManager? unresolvedReferencesManager = null) : DeserializerExceptionHandler
 {
     /// <inheritdoc/>
-    public override bool SkipDeserializingDependentNode(ICompressedId id) =>
+    public override bool SkipDeserializingDependentNode(NodeId id) =>
         false;
 
     /// <inheritdoc />

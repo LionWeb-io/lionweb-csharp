@@ -30,10 +30,10 @@ public class UnknownClassifierTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<CompressedMetaPointer, ICompressedId, Classifier?> heal)
+    private class DeserializerHealingHandler(Func<MetaPointer, NodeId, Classifier?> heal)
         : DeserializerExceptionHandler
     {
-        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) =>
+        public override Classifier? UnknownClassifier(MetaPointer classifier, NodeId id) =>
             heal(classifier, id);
     }
 

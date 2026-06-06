@@ -149,7 +149,7 @@ public class LanguageSerializationTests
 
     private class SkipDeserializationHandler : LanguageDeserializerExceptionHandler
     {
-        public override bool SkipDeserializingDependentNode(ICompressedId id) => false;
+        public override bool SkipDeserializingDependentNode(NodeId id) => false;
     }
 
     [TestMethod]
