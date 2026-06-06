@@ -5,13 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.4.8] - tbd
+## [0.5.0] - tbd
 ### Added
 * Small cli project to run profilers.
 ### Fixed
 ### Changed
 * Made `SerializedNode` and related record members non-required.
 * Optimizations to `Serializer`.
+* **Breaking change** Declared `ICompressedId`, `CompressedMetaPointer` and `CompressedIdConfig` obsolete.
+  All public methods using these types have now overloads using `NodeId` and `MessagePointer` instead.
+  Customizations of `IDeserializerHandler` might need to change the type of overloaded methods.
 ### Removed
 ### Deprecated
 ### Security
