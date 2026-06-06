@@ -32,14 +32,12 @@ using Test.Notification.Replicator;
 using Utilities;
 
 [MemoryDiagnoser]
-[TestClass]
 public class ReplicationBenchmark
 {
     private static readonly IVersion2024_1 _lionWebVersion = LionWebVersions.v2024_1;
     private const long _nodeCount = 5_900;
 
     [Benchmark]
-    [TestMethod]
     public void ReplicateDirectOneWay()
     {
         var originalForest = new Forest();
@@ -56,7 +54,6 @@ public class ReplicationBenchmark
     }
 
     [Benchmark]
-    [TestMethod]
     public void ReplicateDirectTwoWay()
     {
         var originalForest = new Forest();
@@ -83,7 +80,6 @@ public class ReplicationBenchmark
         for (var i = 0; i < list.Count; i++)
         {
             var partition = i % 2 == 0 ? originalPartition : clonedPartition; 
-            Console.WriteLine($"Processing node {i}");
             LinkTestConcept node = list[i];
 
             if (node.GetParent() is null)
@@ -104,7 +100,6 @@ public class ReplicationBenchmark
     }
 
     [Benchmark]
-    [TestMethod]
     public void ReplicateJsonOneWay()
     {
         var originalForest = new Forest();
@@ -126,7 +121,7 @@ public class ReplicationBenchmark
         var commandReceiver = new DeltaProtocolCommandReceiver(
             sharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder, "clone");
+            deserializerBuilder);
         
         commandReceiver.ConnectTo(replicator);
 
@@ -159,7 +154,6 @@ public class ReplicationBenchmark
         List<LinkTestConcept> list = SerializerBenchmark.CreateNodes(_nodeCount).ToList();
         for (var i = 0; i < list.Count; i++)
         {
-            Console.WriteLine($"Processing node {i}");
             LinkTestConcept node = list[i];
 
             if (node.GetParent() is null)
