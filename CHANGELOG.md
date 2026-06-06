@@ -8,6 +8,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.5.0] - tbd
 ### Added
 * Small cli project to run profilers.
+* Introduced `M2Extensions.AsAnnotations()`
+* * Added `INotificationFilter.Handles()`, as we don't care about which notification type we're handling.
 ### Fixed
 ### Changed
 * Made `SerializedNode` and related record members non-required.
@@ -15,8 +17,14 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * **Breaking change** Declared `ICompressedId`, `CompressedMetaPointer` and `CompressedIdConfig` obsolete.
   All public methods using these types have now overloads using `NodeId` and `MessagePointer` instead.
   Customizations of `IDeserializerHandler` might need to change the type of overloaded methods.
+* Simplified `INotificationPipe` and `NotificationPipeBase`.
+* Simplified NotificationEmitter classes.
 ### Removed
+* Removed `sender` parameter from most notification pipe classes, as it's not used.
+* Removed `INotificationSender.Send()`.
 ### Deprecated
+* `INotificationSender.Subscribe()` and `.Unsubscribe()`
+* `INotificationFilter.Handles(Type[])`
 ### Security
 
 ## [0.4.7] - 2026-05-21
