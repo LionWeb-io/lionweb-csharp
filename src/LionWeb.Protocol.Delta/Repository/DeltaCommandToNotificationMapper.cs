@@ -469,14 +469,11 @@ public class DeltaCommandToNotificationMapper
 
     private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
     {
-        if (_sharedKeyedMap.TryGetValue(Compress(deltaReference), out var e) && e is T c)
+        if (_sharedKeyedMap.TryGetValue(deltaReference, out var e) && e is T c)
             return c;
 
         throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
     }
-
-    private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
-        CompressedMetaPointer.Create(metaPointer, true);
 
     private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {

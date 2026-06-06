@@ -101,8 +101,5 @@ public class SharedKeyedMapBuilder
     }
 
     private bool TryAdd(MetaPointer metaPointer, IKeyed keyed) =>
-        _sharedKeyedMap.TryAdd(
-            CompressedMetaPointer.Create(metaPointer, new CompressedIdConfig(KeepOriginal: true)),
-            keyed
-        );
+        _sharedKeyedMap.TryAdd(metaPointer, keyed);
 }
