@@ -110,8 +110,8 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
 
         if (value is not IEnumerable)
             throw new InvalidValueException(feature, value);
-        var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
-        AssureAnnotations(M2Extensions.AsNodes<IAnnotationInstance>(safeNodes, feature).ToList());
+        var safeNodes = M2Extensions.AsAnnotations<INode>(value).ToList();
+        AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(safeNodes).ToList());
         AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations);
         notification.CollectOldData();
         RemoveSelfParent(_annotations.ToList(), _annotations, null);
@@ -157,7 +157,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
         AssureInRange(index, _annotations);
-        var safeAnnotations = AssureAnnotations(M2Extensions.AsNodes<IAnnotationInstance>(annotations, null).ToList());
+        var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
         foreach (var safeAnnotation in safeAnnotations)
         {
             AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotation, _annotations,

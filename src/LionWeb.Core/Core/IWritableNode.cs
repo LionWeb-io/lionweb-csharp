@@ -401,21 +401,21 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
 
     /// <inheritdoc/>
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) =>
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations, null));
+        AddAnnotations(M2Extensions.AsAnnotations<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
     public void AddAnnotations(IEnumerable<T> annotations);
 
     /// <inheritdoc/>
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations, null));
+        InsertAnnotations(index, M2Extensions.AsAnnotations<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
     public void InsertAnnotations(Index index, IEnumerable<T> annotations);
 
     /// <inheritdoc/>
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) =>
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations, null));
+        RemoveAnnotations(M2Extensions.AsAnnotations<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
     public bool RemoveAnnotations(IEnumerable<T> annotations);

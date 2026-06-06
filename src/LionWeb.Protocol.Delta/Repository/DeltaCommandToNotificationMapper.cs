@@ -351,7 +351,7 @@ public class DeltaCommandToNotificationMapper
         var parent = ToNode(command.Parent);
         return new AnnotationReplacedNotification(
             Deserialize(command.NewAnnotation),
-            M2Extensions.AsNodes<IWritableNode>(parent.GetAnnotations()).ToList()[command.Index],
+            M2Extensions.AsAnnotations<IWritableNode>(parent.GetAnnotations()).ToList()[command.Index],
             parent,
             command.Index,
             ToNotificationId(command)
