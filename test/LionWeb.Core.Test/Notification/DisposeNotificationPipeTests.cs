@@ -105,7 +105,7 @@ public class DisposeNotificationPipeTests : NotificationTestsBase
         Do(forestRef, f => f.AddPartitions([partition]));
         ForceGc();
 
-        AssertAlive(forestRef);
+        AssertCollected(forestRef);
     }
 
     [TestMethod]
