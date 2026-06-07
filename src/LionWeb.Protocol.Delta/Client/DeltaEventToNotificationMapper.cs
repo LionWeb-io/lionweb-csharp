@@ -544,7 +544,7 @@ public class DeltaEventToNotificationMapper
 internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder)
     : DeltaEventToNotificationMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
-    private readonly SharedNodeMap _interdependentNodeMap = new();
+    private readonly Dictionary<NodeId, IReadableNode> _interdependentNodeMap = new();
 
     private protected override IWritableNode ToNode(TargetNode nodeId)
     {
@@ -563,7 +563,11 @@ internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap shared
     private protected override IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         var result = base.Deserialize(deltaChunk);
-        _interdependentNodeMap.RegisterNode(result);
+        foreach (IWritableNode node in M1Extensions.Descendants(result, true, true))
+        {
+            _interdependentNodeMap[node.GetId()] = node;
+            
+        }
         return result;
     }
 }

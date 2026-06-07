@@ -21,6 +21,7 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
+using M1;
 
 /// <summary>
 /// This class provides a convenience notification to notification mapping layer between a local forest/partition and a forest/partition replicator.
@@ -54,7 +55,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             AnnotationReplacedNotification a => OnAnnotationReplaced(a),
             AnnotationMovedAndReplacedInSameParentNotification a => OnAnnotationMovedAndReplacedInSameParentNotification(a),
             AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
-            AnnotationMovedAndReplacedFromOtherParentNotification a => OnAnnotationMovedAndReplacedFromOtherParent(a), 
+            AnnotationMovedAndReplacedFromOtherParentNotification a => OnAnnotationMovedAndReplacedFromOtherParent(a),
             AnnotationMovedInSameParentNotification a => OnAnnotationMovedInSameParent(a),
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
@@ -264,7 +265,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         var parent = LookUpNode(notification.Parent);
         var movedChild = LookUpNode(notification.MovedChild);
         var replacedChild = LookUpNode(notification.ReplacedChild);
-        
+
         return new ChildMovedAndReplacedInSameContainmentNotification(
             notification.NewIndex,
             movedChild,
@@ -336,14 +337,14 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.NotificationId
         );
     }
-    
+
     private AnnotationMovedAndReplacedFromOtherParentNotification OnAnnotationMovedAndReplacedFromOtherParent(AnnotationMovedAndReplacedFromOtherParentNotification notification)
     {
         var newParent = LookUpNode(notification.NewParent);
         var oldParent = LookUpNode(notification.OldParent);
         var movedAnnotation = LookUpNode(notification.MovedAnnotation);
         var replacedAnnotation = LookUpNode(notification.ReplacedAnnotation);
-        
+
         return new AnnotationMovedAndReplacedFromOtherParentNotification(
             newParent,
             notification.NewIndex,
@@ -368,13 +369,13 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.NotificationId
         );
     }
-    
+
     private INotification OnAnnotationMovedAndReplacedInSameParentNotification(AnnotationMovedAndReplacedInSameParentNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
         var movedAnnotation = LookUpNode(notification.MovedAnnotation);
         var replacedAnnotation = LookUpNode(notification.ReplacedAnnotation);
-        
+
         return new AnnotationMovedAndReplacedInSameParentNotification(
             notification.NewIndex,
             movedAnnotation,
@@ -432,7 +433,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.NotificationId
         );
     }
-    
+
     #endregion
 
     private CompositeNotification OnComposite(CompositeNotification notification)
@@ -468,7 +469,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         throw new InvalidOperationException($"Unknown target node with id: {nodeId}");
     }
 
-    private protected virtual T CloneNode<T>(T node) where T : IReadableNode =>
+    private protected virtual T CloneNode<T>(T node) where T : class, IReadableNode =>
         (T)SameIdCloner.Clone((INode)node);
 }
 
@@ -479,8 +480,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 /// </summary>
 internal class InterdependentNotificationToNotificationMapper(SharedNodeMap sharedNodeMap) : NotificationToNotificationMapper(sharedNodeMap)
 {
-    private readonly SharedNodeMap _interdependentNodeMap = new();
- 
+    private readonly Dictionary<NodeId, IReadableNode> _interdependentNodeMap = new();
+
     private protected override T LookUpNode<T>(T node)
     {
         var nodeId = node.GetId();
@@ -491,7 +492,7 @@ internal class InterdependentNotificationToNotificationMapper(SharedNodeMap shar
 
             throw new UnsupportedNodeTypeException(result, nameof(result));
         }
-        
+
         if (_interdependentNodeMap.TryGetValue(nodeId, out var local))
         {
             if (local is T w)
@@ -519,7 +520,11 @@ internal class InterdependentNotificationToNotificationMapper(SharedNodeMap shar
     private protected override T CloneNode<T>(T node)
     {
         var result = (T)SameIdCloner.Clone((INode)node);
-        _interdependentNodeMap.RegisterNode(result);
+        foreach (IWritableNode n in M1Extensions.Descendants(result, true, true))
+        {
+            _interdependentNodeMap[n.GetId()] = n;
+        }
+
         return result;
     }
 }
