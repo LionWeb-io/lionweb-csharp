@@ -156,7 +156,7 @@ internal abstract class NodeCreatorBase
 
         var result =
             _versionSpecifics._handler.InvalidPropertyValue<bool>(null, property,
-                _versionSpecifics._deserializer.Compress(_id));
+                _id);
         return result as bool? ?? throw new InvalidValueException(property, result);
     }
 
@@ -167,7 +167,7 @@ internal abstract class NodeCreatorBase
 
         var result =
             _versionSpecifics._handler.InvalidPropertyValue<string>(null, property,
-                _versionSpecifics._deserializer.Compress(_id));
+                _id);
         return result as string ?? throw new InvalidValueException(property, result);
     }
 }
@@ -217,7 +217,7 @@ internal abstract class ContainmentsInstallerBase(
 
         return serializedContainment.Children
             .Select(c =>
-                _versionSpecifics._handler.UnresolvableChild(_versionSpecifics._deserializer.Compress(c), containment,
+                _versionSpecifics._handler.UnresolvableChild(c, containment,
                     _node) as T)
             .Where(t => t != null)!;
     }

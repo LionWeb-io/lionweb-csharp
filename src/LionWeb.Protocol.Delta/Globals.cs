@@ -34,4 +34,4 @@ global using AdditionalInfoDataKey = string;
 global using EventSequenceNumber = long;
 global using SemanticPropertyValue = object;
 global using ErrorCode = string;
-global using SharedKeyedMap = System.Collections.Generic.Dictionary<LionWeb.Core.M1.CompressedMetaPointer, LionWeb.Core.M3.IKeyed>;
+global using SharedKeyedMap = System.Collections.Generic.Dictionary<LionWeb.Core.Serialization.MetaPointer, LionWeb.Core.M3.IKeyed>;

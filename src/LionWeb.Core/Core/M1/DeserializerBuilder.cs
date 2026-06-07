@@ -25,7 +25,6 @@ public class DeserializerBuilder
 {
     private readonly Dictionary<Language, INodeFactory> _languages = new();
     private readonly HashSet<IReadableNode> _dependentNodes = new();
-    private CompressedIdConfig _compressedIdConfig = new();
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
     private bool _languageReferences = false;
 
@@ -88,18 +87,14 @@ public class DeserializerBuilder
 
     /// Whether to compress ids, and whether to store uncompressed node and meta-pointer ids
     /// alongside the compressed ones during processing.
-    public DeserializerBuilder WithCompressedIds(CompressedIdConfig? config = null)
-    {
-        _compressedIdConfig = config ?? new ();
-        return this;
-    }
+    [Obsolete("Not supported anymore, has no effect.")]
+    public DeserializerBuilder WithCompressedIds(CompressedIdConfig? config = null) => this;
 
     /// <inheritdoc cref="WithCompressedIds(LionWeb.Core.M1.CompressedIdConfig?)"/>
     /// <param name="compress">Whether we compress ids at all.</param>
     /// <param name="keepOriginal">Whether we keep the original around for compressed ids. Uses more memory, but eases debugging.</param>
-    [Obsolete("Use WithCompressedIds(CompressedIdConfig) instead.")]
-    public DeserializerBuilder WithCompressedIds(bool keepOriginal = true, bool compress = true) =>
-        WithCompressedIds(new CompressedIdConfig(compress, keepOriginal));
+    [Obsolete("Not supported anymore, has no effect.")]
+    public DeserializerBuilder WithCompressedIds(bool keepOriginal = true, bool compress = true) => this;
     
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     /// Defaults to <see cref="ReferenceResolveInfoHandling.None"/>.
@@ -125,7 +120,7 @@ public class DeserializerBuilder
     /// </exception>
     public IDeserializer Build()
     {
-        IDeserializer result = new Deserializer(LionWebVersion, Handler, _compressedIdConfig)
+        IDeserializer result = new Deserializer(LionWebVersion, Handler)
         {
             ResolveInfoHandling = _referenceResolveInfoHandling
         };

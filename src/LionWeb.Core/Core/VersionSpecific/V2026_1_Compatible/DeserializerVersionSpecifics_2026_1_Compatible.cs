@@ -39,7 +39,7 @@ internal class DeserializerVersionSpecifics_2026_1_Compatible<T, H>(
     protected override object? ConvertPrimitiveType(IReadableNode node, Feature property, PrimitiveType datatype,
         PropertyValue value)
     {
-        ICompressedId compressedId = _metaInfo.Compress(node.GetId());
+        var nodeId = node.GetId();
         return datatype switch
         {
             var b when
@@ -49,14 +49,14 @@ internal class DeserializerVersionSpecifics_2026_1_Compatible<T, H>(
                 =>
                 bool.TryParse(value, out var result)
                     ? result
-                    : _handler.InvalidPropertyValue<bool>(value, property, compressedId),
+                    : _handler.InvalidPropertyValue<bool>(value, property, nodeId),
             var i when
                 BuiltInsLanguage_2023_1.Instance.Integer.EqualsIdentity(i) ||
                 BuiltInsLanguage_2024_1.Instance.Integer.EqualsIdentity(i) ||
                 BuiltInsLanguage_2026_1.Instance.Integer.EqualsIdentity(i) =>
                 int.TryParse(value, out var result)
                     ? result
-                    : _handler.InvalidPropertyValue<int>(value, property, compressedId),
+                    : _handler.InvalidPropertyValue<int>(value, property, nodeId),
             // leave a String value as a string:
             var s when
                 BuiltInsLanguage_2023_1.Instance.String.EqualsIdentity(s) ||

@@ -38,7 +38,7 @@ public partial class LanguageDeserializer
 
     private void InstallLanguageContainments(SerializedNode serializedNode)
     {
-        if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
+        if (!_deserializedNodesById.TryGetValue(serializedNode.Id, out var node))
             return;
 
         ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup = serializedNode
@@ -51,10 +51,10 @@ public partial class LanguageDeserializer
                 pair => pair.Containment.Key,
                 pair =>
                 {
-                    var compressedId = Compress(pair.child);
-                    return (IKeyed)(_deserializedNodesById.TryGetValue(compressedId, out var deserialized)
+                    var childId = pair.child;
+                    return (IKeyed)(_deserializedNodesById.TryGetValue(childId, out var deserialized)
                         ? deserialized
-                        : _dependentNodesById[compressedId]);
+                        : _dependentNodesById[childId]);
                 }
             );
 
@@ -66,14 +66,14 @@ public partial class LanguageDeserializer
 
     private void InstallLanguageReferences(SerializedNode serializedNode)
     {
-        if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
+        if (!_deserializedNodesById.TryGetValue(serializedNode.Id, out var node))
             return;
 
         ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup = serializedNode
             .References
             .SelectMany(reference => reference.Targets.Select(target => (reference, target)))
             .ToLookup(pair => pair.reference.Reference.Key,
-                pair => FindReferenceTarget(CompressOpt(pair.target.Reference), pair.target.ResolveInfo) as IKeyed);
+                pair => FindReferenceTarget(pair.target.Reference, pair.target.ResolveInfo) as IKeyed);
 
         if (serializedReferencesLookup.Count == 0)
             return;

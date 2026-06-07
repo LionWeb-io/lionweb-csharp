@@ -15,32 +15,32 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
+namespace LionWeb.Core.Test.Deserialization.BackwardsCompatibility;
 
+using M1;
 using M3;
-using Serialization;
 
 /// Delegates all calls to <paramref name="delegateHandler"/>.
-public class DeserializerDelegatingHandler(IDeserializerHandler delegateHandler) : IDeserializerHandler
+public class OldDeserializerDelegatingHandler(IDeserializerHandler delegateHandler) : IDeserializerHandler
 {
     /// <inheritdoc />
-    public virtual Classifier? UnknownClassifier(MetaPointer classifier, NodeId id) =>
+    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) =>
         delegateHandler.UnknownClassifier(classifier, id);
 
     /// <inheritdoc />
-    public virtual NodeId? DuplicateNodeId(NodeId nodeId, IReadableNode existingNode, IReadableNode node) =>
+    public virtual NodeId? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
         delegateHandler.DuplicateNodeId(nodeId, existingNode, node);
 
     /// <inheritdoc />
-    public virtual T? SelectVersion<T>(MetaPointer metaPointer, List<Language> languages) where T : class, IKeyed =>
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed =>
         delegateHandler.SelectVersion<T>(metaPointer, languages);
 
     /// <inheritdoc />
-    public virtual Feature? UnknownFeature<TFeature>(MetaPointer feature, Classifier classifier, IReadableNode node)
+    public virtual Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IReadableNode node)
         where TFeature : class, Feature => delegateHandler.UnknownFeature<TFeature>(feature, classifier, node);
 
     /// <inheritdoc />
-    public virtual Feature? InvalidFeature<TFeature>(MetaPointer feature, Classifier classifier, IReadableNode node)
+    public virtual Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IReadableNode node)
         where TFeature : class, Feature => delegateHandler.InvalidFeature<TFeature>(feature, classifier, node);
 
     /// <inheritdoc />
@@ -73,11 +73,11 @@ public class DeserializerDelegatingHandler(IDeserializerHandler delegateHandler)
         delegateHandler.UnknownDatatype(value, datatype, property, node);
 
     /// <inheritdoc />
-    public virtual object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, NodeId nodeId) =>
+    public virtual object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, ICompressedId nodeId) =>
         delegateHandler.InvalidPropertyValue<TValue>(value, property, nodeId);
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableChild(NodeId childId, Feature containment, IReadableNode node) =>
+    public virtual IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
         delegateHandler.UnresolvableChild(childId, containment, node);
 
     /// <inheritdoc />
@@ -86,11 +86,11 @@ public class DeserializerDelegatingHandler(IDeserializerHandler delegateHandler)
         => delegateHandler.UnresolvableReferenceTarget(target, reference, parent);
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableAnnotation(NodeId annotationId, IReadableNode node) =>
+    public virtual IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
         delegateHandler.UnresolvableAnnotation(annotationId, node);
 
     /// <inheritdoc />
-    public virtual bool SkipDeserializingDependentNode(NodeId id) =>
+    public virtual bool SkipDeserializingDependentNode(ICompressedId id) =>
         delegateHandler.SkipDeserializingDependentNode(id);
 
     /// <inheritdoc />

@@ -25,7 +25,7 @@ public partial class LanguageDeserializer
     /// <inheritdoc />
     public override void Process(SerializedNode serializedNode)
     {
-        _serializedNodesById[Compress(serializedNode.Id)] = serializedNode;
+        _serializedNodesById[serializedNode.Id] = serializedNode;
         if (!IsLanguageNode(serializedNode))
             return;
 

@@ -26,7 +26,6 @@ public class LanguageDeserializerBuilder
     private readonly Dictionary<Language, INodeFactory> _languages = new();
     private readonly HashSet<IReadableNode> _dependentNodes = new();
     private readonly HashSet<Language> _dependentLanguages = new();
-    private CompressedIdConfig _compressedIdConfig = new();
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
 
     /// <inheritdoc cref="WithLionWebVersion"/>
@@ -92,11 +91,8 @@ public class LanguageDeserializerBuilder
 
     /// Whether to compress ids, and whether to store uncompressed node and meta-pointer ids
     /// alongside the compressed ones during processing.
-    public LanguageDeserializerBuilder WithCompressedIds(CompressedIdConfig? config = null)
-    {
-        _compressedIdConfig = config ?? new();
-        return this;
-    }
+    [Obsolete("Not supported anymore, has no effect.")]
+    public LanguageDeserializerBuilder WithCompressedIds(CompressedIdConfig? config = null) => this;
 
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     /// Defaults to <see cref="ReferenceResolveInfoHandling.None"/>.
@@ -122,7 +118,7 @@ public class LanguageDeserializerBuilder
     /// </exception>
     public ILanguageDeserializer Build()
     {
-        var result = new LanguageDeserializer(LionWebVersion, Handler, _compressedIdConfig)
+        var result = new LanguageDeserializer(LionWebVersion, Handler)
         {
             ResolveInfoHandling = _referenceResolveInfoHandling
         };

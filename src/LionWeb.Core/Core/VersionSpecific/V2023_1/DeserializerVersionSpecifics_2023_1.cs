@@ -50,17 +50,17 @@ internal class DeserializerVersionSpecifics_2023_1<T, H>(
 
     private object? ConvertPrimitiveType(IReadableNode node, Feature property, PrimitiveType datatype, PropertyValue value)
     {
-        ICompressedId compressedId = _metaInfo.Compress(node.GetId());
+        var nodeId = node.GetId();
         return datatype switch
         {
             var b when b == BuiltInsLanguage_2023_1.Instance.Boolean =>
                 bool.TryParse(value, out var result)
                     ? result
-                    : _handler.InvalidPropertyValue<bool>(value, property, compressedId),
+                    : _handler.InvalidPropertyValue<bool>(value, property, nodeId),
             var i when i == BuiltInsLanguage_2023_1.Instance.Integer =>
                 int.TryParse(value, out var result)
                     ? result
-                    : _handler.InvalidPropertyValue<int>(value, property, compressedId),
+                    : _handler.InvalidPropertyValue<int>(value, property, nodeId),
             // leave both a String and JSON value as a string:
             var s when s == BuiltInsLanguage_2023_1.Instance.String ||
                        s == BuiltInsLanguage_2023_1.Instance.Json => value,

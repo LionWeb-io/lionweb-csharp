@@ -27,10 +27,10 @@ using M1;
 [TestClass]
 public class DuplicateNodeIdTests
 {
-    private class DeserializerHealingHandler(Func<ICompressedId, IWritableNode, INode, string?> heal)
+    private class DeserializerHealingHandler(Func<NodeId, IWritableNode, INode, string?> heal)
         : DeserializerExceptionHandler
     {
-        public override string? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
+        public override string? DuplicateNodeId(NodeId nodeId, IReadableNode existingNode, IReadableNode node) =>
             heal(nodeId, (IWritableNode)existingNode, (INode)node);
     }
 
@@ -316,7 +316,7 @@ public class DuplicateNodeIdTests
         Assert.AreEqual(0, nodes.OfType<Coord>().Count());
     }
 
-    private readonly Dictionary<ICompressedId, int> _healingHandlerCallCount = new();
+    private readonly Dictionary<NodeId, int> _healingHandlerCallCount = new();
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     [TestMethod]

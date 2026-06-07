@@ -31,8 +31,8 @@ public class DeserializerIgnoringHandlerTests
     public void unknown_classifier()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnknownClassifier(
-            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
-            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true))));
+            new MetaPointer("key-Shapes", "1", "key-Geometry"),
+            "a"));
     }
 
 
@@ -40,7 +40,7 @@ public class DeserializerIgnoringHandlerTests
     public void duplicate_node_id()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().DuplicateNodeId(
-            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
+            "a",
             new Line("line"),
             new Line("line")));
     }
@@ -49,7 +49,7 @@ public class DeserializerIgnoringHandlerTests
     public void unknown_feature()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnknownFeature<Containment>(
-            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
+            new MetaPointer("key-Shapes", "1", "key-Geometry"),
             new DynamicConcept("concept", _lionWebVersion, new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
             new Line("line")));
     }
@@ -58,7 +58,7 @@ public class DeserializerIgnoringHandlerTests
     public void invalid_feature()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().InvalidFeature<Containment>(
-            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
+            new MetaPointer("key-Shapes", "1", "key-Geometry"),
             new DynamicConcept("concept", _lionWebVersion, new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
             new Line("line")));
     }
@@ -86,7 +86,7 @@ public class DeserializerIgnoringHandlerTests
     public void unresolvable_child()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableChild(
-            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
+            "a",
             new DynamicContainment("dyn-containment", _lionWebVersion,
                 new DynamicConcept("dyn-concept", _lionWebVersion, new DynamicLanguage("dyn-lang", _lionWebVersion))),
             new Line("line")));
@@ -106,7 +106,7 @@ public class DeserializerIgnoringHandlerTests
     public void unresolvable_annotation()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableAnnotation(
-            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
+            "a",
             new Line("line")));
     }
 
@@ -161,12 +161,12 @@ public class DeserializerIgnoringHandlerTests
             "a",
             new DynamicProperty("dyn-property", _lionWebVersion,
                 new DynamicConcept("dyn-concept", _lionWebVersion, new DynamicLanguage("dyn-lang", _lionWebVersion))),
-            ICompressedId.Create("b", new CompressedIdConfig(KeepOriginal:true))));
+            "b"));
     }
 
     [TestMethod]
     public void skip_deserializing_dependent_node()
     {
-        Assert.IsTrue(new DeserializerIgnoringHandler().SkipDeserializingDependentNode(ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true))));
+        Assert.IsTrue(new DeserializerIgnoringHandler().SkipDeserializingDependentNode("a"));
     }
 }

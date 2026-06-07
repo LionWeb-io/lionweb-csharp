@@ -25,7 +25,7 @@ using Serialization;
 public partial class LanguageDeserializer : DeserializerBase<IReadableNode, ILanguageDeserializerHandler>,
     ILanguageDeserializer
 {
-    private readonly Dictionary<ICompressedId, SerializedNode> _serializedNodesById = new();
+    private readonly Dictionary<NodeId, SerializedNode> _serializedNodesById = new();
 
     private readonly DeserializerBuilder _deserializerBuilder = new();
 
@@ -36,11 +36,18 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode, ILan
     /// Deserializes languages based on LionWeb version <paramref name="lionWebVersion"/>.
     /// </summary>
     /// <inheritdoc />
-    public LanguageDeserializer(LionWebVersions lionWebVersion, ILanguageDeserializerHandler? handler = null, CompressedIdConfig? compressedIdConfig = null) :
-        base(lionWebVersion, handler ?? new LanguageDeserializerExceptionHandler(), compressedIdConfig ?? new())
+    public LanguageDeserializer(LionWebVersions lionWebVersion, ILanguageDeserializerHandler? handler = null) :
+        base(lionWebVersion, handler ?? new LanguageDeserializerExceptionHandler())
     {
         _languageVersionSpecifics = ILanguageDeserializerVersionSpecifics.Create(lionWebVersion, this, _handler);
         RegisterDependentLanguage(_m3);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("Use LanguageDeserializer(LionWebVersions, ILanguageDeserializerHandler?) instead.")]
+    public LanguageDeserializer(LionWebVersions lionWebVersion, ILanguageDeserializerHandler? handler = null, CompressedIdConfig? compressedIdConfig = null) :
+        this(lionWebVersion, handler)
+    {
     }
 
     /// <inheritdoc />

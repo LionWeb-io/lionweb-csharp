@@ -31,10 +31,10 @@ public class UnknownFeatureTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<CompressedMetaPointer, Classifier, IWritableNode, Feature?> heal)
+    private class DeserializerHealingHandler(Func<MetaPointer, Classifier, IWritableNode, Feature?> heal)
         : DeserializerExceptionHandler
     {
-        public override Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
+        public override Feature? UnknownFeature<TFeature>(MetaPointer feature, Classifier classifier,
             IReadableNode node) => heal(feature, classifier, (IWritableNode)node);
     }
 

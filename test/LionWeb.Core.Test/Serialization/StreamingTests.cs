@@ -98,7 +98,6 @@ public class StreamingTests
 
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(LionWebVersions.v2024_1)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
@@ -117,7 +116,6 @@ public class StreamingTests
 
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(LionWebVersions.v2024_1)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);

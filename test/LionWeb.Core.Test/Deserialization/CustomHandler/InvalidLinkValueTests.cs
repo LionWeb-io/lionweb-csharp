@@ -690,7 +690,6 @@ public class InvalidLinkValueTests
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(TinyRefLangLanguage.Instance)
             .WithLanguage(ShapesLanguage.Instance)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);

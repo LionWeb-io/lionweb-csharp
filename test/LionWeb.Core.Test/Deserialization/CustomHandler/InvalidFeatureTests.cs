@@ -30,10 +30,10 @@ public class InvalidFeatureTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<CompressedMetaPointer, Classifier, IWritableNode, Feature?> heal)
+    private class DeserializerHealingHandler(Func<MetaPointer, Classifier, IWritableNode, Feature?> heal)
         : DeserializerExceptionHandler
     {
-        public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
+        public override Feature? InvalidFeature<TFeature>(MetaPointer feature, Classifier classifier,
             IReadableNode node) => heal(feature, classifier, (IWritableNode)node);
     }
 
@@ -182,7 +182,6 @@ public class InvalidFeatureTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
@@ -239,7 +238,6 @@ public class InvalidFeatureTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
-            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);

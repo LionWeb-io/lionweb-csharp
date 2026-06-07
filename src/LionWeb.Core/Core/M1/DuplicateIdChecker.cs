@@ -1,4 +1,4 @@
-﻿// Copyright 2025 TRUMPF Laser SE and other contributors
+// Copyright 2026 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -15,21 +15,19 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Client;
+namespace LionWeb.Core.M1;
 
-using Core;
-using Core.M1;
-using Core.M3;
-
-internal class NoFeaturesDeserializationHandler : DeserializerExceptionHandler
+/// Checks for duplicate node ids in an efficient manner.
+public class DuplicateIdChecker
 {
-    public override IWritableNode? UnresolvableChild(NodeId childId, Feature containment, IReadableNode node) =>
-        null;
+    private readonly HashSet<NodeId> _knownIds = new();
 
-    public override IReferenceTarget? UnresolvableReferenceTarget(IReferenceTarget target,
-        Feature reference, IReadableNode parent) =>
-        null;
+    /// Whether <paramref name="compressedId"/> has been seen before by this instance.
+    [Obsolete("Use IsIdDuplicate(NodeId) instead.")]
+    public bool IsIdDuplicate(ICompressedId compressedId) => 
+        !_knownIds.Add(compressedId.AssertedOriginal);
 
-    public override IWritableNode? UnresolvableAnnotation(NodeId annotationId, IReadableNode node) =>
-        null;
+    /// Whether <paramref name="nodeId"/> has been seen before by this instance.
+    public bool IsIdDuplicate(NodeId nodeId) =>
+        !_knownIds.Add(nodeId);
 }

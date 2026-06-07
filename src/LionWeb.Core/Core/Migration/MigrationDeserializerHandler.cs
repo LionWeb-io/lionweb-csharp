@@ -27,16 +27,14 @@ using Serialization;
 public class MigrationDeserializerHandler : DeserializerDelegatingHandler
 {
     private readonly LionWebVersions _lionWebVersion;
-    private readonly CompressedIdConfig _compressedIdConfig;
     private readonly List<DynamicLanguage> _languages;
-    private readonly Dictionary<ICompressedId, List<DynamicLanguage>> _languageKeys = [];
+    private readonly Dictionary<string, List<DynamicLanguage>> _languageKeys = [];
 
     /// <inheritdoc />
     public MigrationDeserializerHandler(LionWebVersions lionWebVersion, IEnumerable<DynamicLanguage> languages,
         IDeserializerHandler delegateHandler) : base(delegateHandler)
     {
         _lionWebVersion = lionWebVersion;
-        _compressedIdConfig = new CompressedIdConfig(false);
         _languages = languages.ToList();
         foreach (var language in _languages)
         {
@@ -46,52 +44,46 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
 
     private void AddLanguage(DynamicLanguage language)
     {
-        if (_languageKeys.TryGetValue(Compress(language.Key), out var langs))
+        if (_languageKeys.TryGetValue(language.Key, out var langs))
         {
             langs.Add(language);
         } else
         {
-            _languageKeys[Compress(language.Key)] = [language];
+            _languageKeys[language.Key] = [language];
         }
     }
 
     /// <inheritdoc />
-    public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) =>
+    public override Classifier? UnknownClassifier(MetaPointer classifier, NodeId id) =>
         CreateClassifier(classifier);
 
-    private DynamicConcept CreateClassifier(CompressedMetaPointer classifier)
+    private DynamicConcept CreateClassifier(MetaPointer classifier)
     {
         DynamicLanguage lang = GetOrCreateLanguage(classifier);
 
-        var result = new DynamicConcept(classifier.Key.Original!, _lionWebVersion, null)
-        {
-            Name = "Concept-" + classifier.Key.Original!, Key = classifier.Key.Original!
-        };
+        var result = new DynamicConcept(classifier.Key, _lionWebVersion, null) { Name = "Concept-" + classifier.Key, Key = classifier.Key };
         lang.AddEntities([result]);
         return result;
     }
 
-    private DynamicLanguage GetOrCreateLanguage(CompressedMetaPointer metaPointer)
+    private DynamicLanguage GetOrCreateLanguage(MetaPointer metaPointer)
     {
         DynamicLanguage? lang = null;
         if (_languageKeys.TryGetValue(metaPointer.Language, out var languages))
         {
-            lang = languages.FirstOrDefault(l => Equals(Compress(l.Version), metaPointer.Version));
+            lang = languages.FirstOrDefault(l => Equals(l.Version, metaPointer.Version));
         }
 
         lang ??= CreateLanguage(metaPointer);
         return lang;
     }
 
-    private DynamicLanguage CreateLanguage(CompressedMetaPointer classifier)
+    private DynamicLanguage CreateLanguage(MetaPointer classifier)
     {
-        var language = classifier.Language.Original!;
-        var version = classifier.Version.Original!;
+        var language = classifier.Language;
+        var version = classifier.Version;
 
-        var lang = new DynamicLanguage(language, _lionWebVersion)
-        {
-            Name = "Language-" + language, Key = language, Version = version
-        };
+        var lang = new DynamicLanguage(language, _lionWebVersion) { Name = "Language-" + language, Key = language, Version = version };
         lang.SetFactory(new MigrationFactory(lang));
         _languages.Add(lang);
         AddLanguage(lang);
@@ -99,35 +91,28 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
     }
 
     /// <inheritdoc />
-    public override Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-        IReadableNode node)
+    public override Feature? UnknownFeature<TFeature>(MetaPointer feature, Classifier classifier, IReadableNode node)
     {
         DynamicFeature? result = null;
         if (typeof(TFeature).IsAssignableFrom(typeof(Property)))
         {
-            result = new DynamicProperty(feature.Key.Original!, _lionWebVersion, null)
-            {
-                Name = feature.Key.Original!,
-                Key = feature.Key.Original!,
-                Optional = true,
-                Type = _lionWebVersion.BuiltIns.String
-            };
+            result = new DynamicProperty(feature.Key, _lionWebVersion, null) { Name = feature.Key, Key = feature.Key, Optional = true, Type = _lionWebVersion.BuiltIns.String };
         } else if (typeof(TFeature).IsAssignableFrom(typeof(Containment)))
         {
-            result = new DynamicContainment(feature.Key.Original!, _lionWebVersion, null)
+            result = new DynamicContainment(feature.Key, _lionWebVersion, null)
             {
-                Name = feature.Key.Original!,
-                Key = feature.Key.Original!,
+                Name = feature.Key,
+                Key = feature.Key,
                 Multiple = true,
                 Optional = true,
                 Type = _lionWebVersion.BuiltIns.Node
             };
         } else if (typeof(TFeature).IsAssignableFrom(typeof(Reference)))
         {
-            result = new DynamicReference(feature.Key.Original!, _lionWebVersion, null)
+            result = new DynamicReference(feature.Key, _lionWebVersion, null)
             {
-                Name = feature.Key.Original!,
-                Key = feature.Key.Original!,
+                Name = feature.Key,
+                Key = feature.Key,
                 Multiple = true,
                 Optional = true,
                 Type = _lionWebVersion.BuiltIns.Node
@@ -138,12 +123,10 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
         }
 
         var language = GetOrCreateLanguage(feature);
-        var defaultClassifierKey = $"{feature.Language.Original}_defaultClassifier";
+        var defaultClassifierKey = $"{feature.Language}_defaultClassifier";
         var defaultClassifier =
             language.Entities.OfType<DynamicConcept>().FirstOrDefault(e => e.Key == defaultClassifierKey) ??
-            CreateClassifier(CompressedMetaPointer.Create(
-                new MetaPointer(feature.Language.Original!, feature.Version.Original!, defaultClassifierKey),
-                _compressedIdConfig));
+            CreateClassifier(feature with { Key = defaultClassifierKey });
 
         defaultClassifier.AddFeatures([result]);
         return result;
@@ -168,7 +151,4 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
         lenientAnnotationInstance.SetClassifier(newClassifier);
         return lenientAnnotationInstance;
     }
-
-    private ICompressedId Compress(string key) =>
-        ICompressedId.Create(key, _compressedIdConfig);
 }

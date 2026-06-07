@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M1;
 
 using M3;
+using Serialization;
 
 /// <summary>
 /// Callbacks to customize a <see cref="IDeserializer"/>'s behaviour in non-regular situations.
@@ -35,7 +36,11 @@ public interface IDeserializerHandler
     /// <param name="classifier">Unknown classifier.</param>
     /// <param name="id">Node id the unknown classifier appeared.</param>
     /// <returns>Replacement classifier to use, or <c>null</c> to skip node <paramref name="id"/>.</returns>
-    Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id);
+    Classifier? UnknownClassifier(MetaPointer classifier, NodeId id) => UnknownClassifier(CompressedMetaPointer.Create(classifier, true), ICompressedId.Create(id, true));
+
+    /// <inheritdoc cref="UnknownClassifier(MetaPointer, NodeId)"/>
+    [Obsolete("Use UnknownClassifier(MetaPointer, NodeId) instead.")]
+    Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) => UnknownClassifier(classifier.AssertedOriginal, id.AssertedOriginal);
 
     /// <summary>
     /// <paramref name="nodeId"/> is same for <paramref name="existingNode"/> and <paramref name="node"/>. 
@@ -46,7 +51,11 @@ public interface IDeserializerHandler
     /// <returns>Replacement node id to use for <paramref name="node"/>, or <c>null</c> to skip <paramref name="node"/>.</returns>
     /// <remarks>For both <paramref name="existingNode"/> and <paramref name="node"/>, only node id and properties are populated -- no other features.</remarks>
     /// <remarks>If returned replacement node id is not unique, deserializer keeps calling this method, might lead to an infinite loop.</remarks>
-    NodeId? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node);
+    NodeId? DuplicateNodeId(NodeId nodeId, IReadableNode existingNode, IReadableNode node) => DuplicateNodeId(ICompressedId.Create(nodeId, true), existingNode, node);
+
+    /// <inheritdoc cref="DuplicateNodeId(NodeId, IReadableNode, IReadableNode)"/>
+    [Obsolete("Use DuplicateNodeId(NodeId, IReadableNode, IReadableNode) instead.")]
+    NodeId? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) => DuplicateNodeId(nodeId.AssertedOriginal, existingNode, node);
 
     /// <summary>
     /// Cannot resolve <paramref name="metaPointer"/>, but know about at least one language
@@ -56,7 +65,11 @@ public interface IDeserializerHandler
     /// <param name="languages">Languages with same key as <paramref name="metaPointer"/>.</param>
     /// <typeparam name="T">Kind of language element we're looking for.</typeparam>
     /// <returns>Resolved <paramref name="metaPointer"/>, typically from one of <paramref name="languages"/>.</returns>
-    T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed;
+    T? SelectVersion<T>(MetaPointer metaPointer, List<Language> languages) where T : class, IKeyed => SelectVersion<T>(CompressedMetaPointer.Create(metaPointer, true), languages);
+
+    /// <inheritdoc cref="SelectVersion(MetaPointer, List{Language})"/>
+    [Obsolete("Use SelectVersion(MetaPointer, List<Language>) instead.")]
+    T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed => SelectVersion<T>(metaPointer.AssertedOriginal, languages);
 
     #region features
 
@@ -70,8 +83,13 @@ public interface IDeserializerHandler
     /// <returns>Replacement feature to use, or <c>null</c> to skip feature <paramref name="feature"/>.</returns>
     /// <remarks>Return type <see cref="Feature"/> instead of <typeparamref name="TFeature"/>
     /// to support feature kind vs. value mismatch (e.g. string in containment).</remarks>
+    Feature? UnknownFeature<TFeature>(MetaPointer feature, Classifier classifier, IReadableNode node)
+        where TFeature : class, Feature => UnknownFeature<TFeature>(CompressedMetaPointer.Create(feature, true), classifier, node);
+
+    /// <inheritdoc cref="UnknownFeature(MetaPointer, Classifier, IReadableNode)"/>
+    [Obsolete("Use UnknownFeature(MetaPointer, Classifier, IReadableNode) instead.")]
     Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IReadableNode node)
-        where TFeature : class, Feature;
+        where TFeature : class, Feature => UnknownFeature<TFeature>(feature.AssertedOriginal, classifier, node);
 
     /// <summary>
     /// Feature found for <paramref name="feature"/> is not a <typeparamref name="TFeature"/>.
@@ -83,8 +101,13 @@ public interface IDeserializerHandler
     /// <returns>Replacement feature to use, or <c>null</c> to skip feature <paramref name="feature"/>.</returns>
     /// <remarks>Return type <see cref="Feature"/> instead of <typeparamref name="TFeature"/>
     /// to support feature kind vs. value mismatch (e.g. string in containment).</remarks>
+    Feature? InvalidFeature<TFeature>(MetaPointer feature, Classifier classifier, IReadableNode node)
+        where TFeature : class, Feature => InvalidFeature<TFeature>(CompressedMetaPointer.Create(feature, true), classifier, node);
+
+    /// <inheritdoc cref="InvalidFeature(MetaPointer, Classifier, IReadableNode)"/>
+    [Obsolete("Use InvalidFeature(MetaPointer, Classifier, IReadableNode) instead.")]
     Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IReadableNode node)
-        where TFeature : class, Feature;
+        where TFeature : class, Feature => InvalidFeature<TFeature>(feature.AssertedOriginal, classifier, node);
 
     /// <summary>
     /// Cannot put <paramref name="value"/> into <paramref name="link"/>.
@@ -169,7 +192,11 @@ public interface IDeserializerHandler
     /// <param name="nodeId">Node that has property <paramref name="property"/>.</param>
     /// <typeparam name="TValue">Type of value to be used for property <paramref name="property"/> in node <paramref name="nodeId"/>.</typeparam>
     /// <returns>Replacement value to use, or <c>null</c> to skip property <paramref name="property"/>.</returns>
-    object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, ICompressedId nodeId);
+    object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, NodeId nodeId) => InvalidPropertyValue<TValue>(value, property, ICompressedId.Create(nodeId, true));
+
+    /// <inheritdoc cref="InvalidPropertyValue(PropertyValue?, Feature, NodeId)"/>
+    [Obsolete("Use InvalidPropertyValue(PropertyValue?, Feature, NodeId) instead.")]
+    object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, ICompressedId nodeId) => InvalidPropertyValue<TValue>(value, property, nodeId.AssertedOriginal);
 
     #endregion
 
@@ -182,7 +209,11 @@ public interface IDeserializerHandler
     /// <param name="containment">Containment that should contain <paramref name="childId"/>.</param>
     /// <param name="node">Node that mentions <paramref name="childId"/> as child.</param>
     /// <returns>Replacement child node to use, or <c>null</c> to skip child <paramref name="childId"/>.</returns>
-    IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node);
+    IWritableNode? UnresolvableChild(NodeId childId, Feature containment, IReadableNode node) => UnresolvableChild(ICompressedId.Create(childId, true), containment, node);
+
+    /// <inheritdoc cref="UnresolvableChild(NodeId, Feature, IReadableNode)"/>
+    [Obsolete("Use UnresolvableChild(NodeId, Feature, IReadableNode) instead.")]
+    IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) => UnresolvableChild(childId.AssertedOriginal, containment, node);
 
     /// <summary>
     /// Cannot find node targeted by <paramref name="target"/> mentioned as reference target in <paramref name="parent"/> in reference <paramref name="reference"/>.
@@ -199,7 +230,11 @@ public interface IDeserializerHandler
     /// <param name="annotationId">Unresolvable annotation node id.</param>
     /// <param name="node">Node that mentions <paramref name="annotationId"/> as annotation.</param>
     /// <returns>Replacement annotation node to use, or <c>null</c> to skip annotation node <paramref name="annotationId"/>.</returns>
-    IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node);
+    IWritableNode? UnresolvableAnnotation(NodeId annotationId, IReadableNode node) => UnresolvableAnnotation(ICompressedId.Create(annotationId, true), node);
+
+    /// <inheritdoc cref="UnresolvableAnnotation(NodeId, IReadableNode)"/>
+    [Obsolete("Use UnresolvableAnnotation(NodeId, IReadableNode) instead.")]
+    IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) => UnresolvableAnnotation(annotationId.AssertedOriginal, node);
 
     #endregion
 
@@ -209,7 +244,11 @@ public interface IDeserializerHandler
     /// <param name="id">Node id appearing in both deserialized nodes and dependent nodes.</param>
     /// <returns><c>true</c> if we should skip the deserialized node if the same node id appears in dependent nodes;
     /// <c>false</c> if we should still deserialize the node.</returns>
-    bool SkipDeserializingDependentNode(ICompressedId id);
+    bool SkipDeserializingDependentNode(NodeId id) => SkipDeserializingDependentNode(ICompressedId.Create(id, true));
+
+    /// <inheritdoc cref="SkipDeserializingDependentNode(NodeId)"/>
+    [Obsolete("Use SkipDeserializingDependentNode(NodeId) instead.")]
+    bool SkipDeserializingDependentNode(ICompressedId id) => SkipDeserializingDependentNode(id.AssertedOriginal);
 
     /// <summary>
     /// Cannot install references into <paramref name="node"/>. 

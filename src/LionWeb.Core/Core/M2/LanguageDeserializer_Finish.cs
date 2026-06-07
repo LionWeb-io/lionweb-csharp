@@ -30,7 +30,6 @@ public partial class LanguageDeserializer
 
         _deserializerBuilder
             .WithHandler(_handler)
-            .WithCompressedIds(CompressedIdConfig)
             .WithLanguages(_deserializedNodesById.Values.OfType<Language>())
             .WithDependentNodes(_deserializedNodesById.Values)
             .WithLionWebVersion(LionWebVersion);
@@ -59,7 +58,7 @@ public partial class LanguageDeserializer
                                       _handler.InvalidAnnotation(deserializedAnnotation, null);
 
                 if (node != null)
-                    _deserializedNodesById[Compress(node.GetId())] = node;
+                    _deserializedNodesById[node.GetId()] = node;
 
                 return node;
             })
@@ -75,13 +74,11 @@ public partial class LanguageDeserializer
             IReadableNode? readableParent = null;
             IWritableNode? writableParent = null;
 
-            var serializedAnnotation = _serializedNodesById[Compress(deserializedAnnotation.GetId())];
+            var serializedAnnotation = _serializedNodesById[deserializedAnnotation.GetId()];
             var parentId = serializedAnnotation.Parent;
             if (parentId != null)
             {
-                ICompressedId compressedParentId = Compress(parentId);
-
-                if (_deserializedNodesById.TryGetValue(compressedParentId, out readableParent) &&
+                if (_deserializedNodesById.TryGetValue(parentId, out readableParent) &&
                     readableParent is IWritableNode w)
                 {
                     writableParent = w;
@@ -119,5 +116,5 @@ public partial class LanguageDeserializer
     }
 
     private void InstallAnnotationReferences(IDeserializer deserializer, SerializedNode serializedNode) =>
-        deserializer.InstallNodeReferences(Compress(serializedNode.Id), serializedNode.References.Select(Compress));
+        deserializer.InstallNodeReferences(serializedNode.Id, serializedNode.References.Select(r => r));
 }

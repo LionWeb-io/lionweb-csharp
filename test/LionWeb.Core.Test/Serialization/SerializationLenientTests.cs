@@ -61,7 +61,6 @@ public class SerializationLenientTests
             .WithLanguage(BLangLanguage.Instance)
             .WithLanguage(WithEnumLanguage.Instance)
             .WithHandler(new LenientHandler())
-            .WithCompressedIds(new(true, true))
             .Build()
             .Deserialize(serializationChunk);
 
@@ -124,7 +123,7 @@ public class SerializationLenientTests
 
     class LenientHandler : DeserializerExceptionHandler
     {
-        public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
+        public override Feature? InvalidFeature<TFeature>(MetaPointer feature, Classifier classifier,
             IReadableNode node) where TFeature : class
         {
             var replacementFeature = new List<Language>
@@ -138,9 +137,7 @@ public class SerializationLenientTests
                 .SelectMany(l => l.Entities)
                 .OfType<Classifier>()
                 .SelectMany(c => c.Features)
-                .FirstOrDefault(f =>
-                    CompressedMetaPointer.Create(f.ToMetaPointer(), new CompressedIdConfig(true, false))
-                        .Equals(feature));
+                .FirstOrDefault(f => f.ToMetaPointer().Equals(feature));
 
             return replacementFeature;
         }
