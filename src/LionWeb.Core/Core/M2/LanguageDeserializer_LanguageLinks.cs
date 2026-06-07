@@ -41,26 +41,23 @@ public partial class LanguageDeserializer
         if (!_deserializedNodesById.TryGetValue(serializedNode.Id, out var node))
             return;
 
-        ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup = serializedNode
-            .Containments
-            .SelectMany(containment => containment
-                .Children
-                .Select(child => (containment.Containment, child))
-            )
-            .ToLookup(
-                pair => pair.Containment.Key,
-                pair =>
-                {
-                    var childId = pair.child;
-                    return (IKeyed)(_deserializedNodesById.TryGetValue(childId, out var deserialized)
+        List<(MetaPointerKey, IKeyed)> containments = [];
+        foreach (var serializedContainment in serializedNode.Containments)
+        {
+            foreach (var childId in serializedContainment.Children)
+            {
+                var keyed = (IKeyed)
+                    (_deserializedNodesById.TryGetValue(childId, out var deserialized)
                         ? deserialized
                         : _dependentNodesById[childId]);
-                }
-            );
+                containments.Add((serializedContainment.Containment.Key, keyed));
+            }
+        }
 
-        if (serializedContainmentsLookup.Count == 0)
+        if (containments.Count == 0)
             return;
 
+        ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup = containments.ToLookup(p => p.Item1, p => p.Item2);
         _languageVersionSpecifics.InstallLanguageContainments(serializedNode, node, serializedContainmentsLookup);
     }
 
@@ -69,15 +66,20 @@ public partial class LanguageDeserializer
         if (!_deserializedNodesById.TryGetValue(serializedNode.Id, out var node))
             return;
 
-        ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup = serializedNode
-            .References
-            .SelectMany(reference => reference.Targets.Select(target => (reference, target)))
-            .ToLookup(pair => pair.reference.Reference.Key,
-                pair => FindReferenceTarget(pair.target.Reference, pair.target.ResolveInfo) as IKeyed);
+        List<(MetaPointerKey, IKeyed?)> references = [];
 
-        if (serializedReferencesLookup.Count == 0)
+        foreach (var serializedReference in serializedNode.References)
+        {
+            foreach (var target in serializedReference.Targets)
+            {
+                references.Add((serializedReference.Reference.Key, FindReferenceTarget(target.Reference, target.ResolveInfo) as IKeyed));
+            }
+        }
+
+        if (references.Count == 0)
             return;
 
+        ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup = references.ToLookup(p => p.Item1, p => p.Item2);
         _languageVersionSpecifics.InstallLanguageReferences(serializedNode, node, serializedReferencesLookup);
     }
 }

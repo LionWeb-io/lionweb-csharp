@@ -45,25 +45,33 @@ public partial class LanguageDeserializer
 
     private List<IWritableNode> DeserializeAnnotations(IDeserializer deserializer)
     {
-        var annotationNodes = _serializedNodesById
-            .Where(p => !_deserializedNodesById.ContainsKey(p.Key))
-            .Where(p => !IsInDependentNodes(p.Key))
-            .Select(p => p.Value);
+        List<SerializedNode> annotationNodes = [];
+
+        foreach (var pair in _serializedNodesById)
+        {
+            if (_deserializedNodesById.ContainsKey(pair.Key) || IsInDependentNodes(pair.Key))
+                continue;
+
+            annotationNodes.Add(pair.Value);
+        }
+
         List<IReadableNode> deserializedAnnotations = deserializer.Deserialize(annotationNodes);
 
-        return deserializedAnnotations
-            .Select(deserializedAnnotation =>
-            {
-                IWritableNode? node = deserializedAnnotation as IWritableNode ??
-                                      _handler.InvalidAnnotation(deserializedAnnotation, null);
+        var result = new List<IWritableNode>(deserializedAnnotations.Count);
 
-                if (node != null)
-                    _deserializedNodesById[node.GetId()] = node;
+        foreach (var deserializedAnnotation in deserializedAnnotations)
+        {
+            IWritableNode? node = deserializedAnnotation as IWritableNode ??
+                                  _handler.InvalidAnnotation(deserializedAnnotation, null);
 
-                return node;
-            })
-            .Where(n => n != null)
-            .ToList()!;
+            if (node is null)
+                continue;
+
+            _deserializedNodesById[node.GetId()] = node;
+            result.Add(node);
+        }
+
+        return result;
     }
 
 
@@ -109,9 +117,10 @@ public partial class LanguageDeserializer
 
     private void InstallAnnotationReferences(IDeserializer deserializer)
     {
-        foreach (var serializedNode in _serializedNodesById.Values.Where(n => !IsLanguageNode(n)))
+        foreach (var serializedNode in _serializedNodesById.Values)
         {
-            InstallAnnotationReferences(deserializer, serializedNode);
+            if (!IsLanguageNode(serializedNode))
+                InstallAnnotationReferences(deserializer, serializedNode);
         }
     }
 
@@ -119,7 +128,7 @@ public partial class LanguageDeserializer
     {
         if (serializedNode.References.Length == 0)
             return;
-        
-        deserializer.InstallNodeReferences(serializedNode.Id, serializedNode.References.Select(r => r));
+
+        deserializer.InstallNodeReferences(serializedNode.Id, serializedNode.References);
     }
 }

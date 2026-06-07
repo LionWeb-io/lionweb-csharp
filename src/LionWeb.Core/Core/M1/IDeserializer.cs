@@ -78,7 +78,7 @@ public interface IDeserializer
     /// Installs all of <paramref name="references"/> into <paramref name="nodeId"/>, if the target can be found.
     /// Takes care of <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>.
     /// and <see cref="IDeserializerHandler.InvalidReference"/>.
-    protected internal void InstallNodeReferences(NodeId nodeId, IEnumerable<SerializedReference> references);
+    protected internal void InstallNodeReferences(NodeId nodeId, SerializedReference[] references);
 }
 
 /// <inheritdoc />

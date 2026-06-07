@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.5.0] - tbd
+
+This release focuses on performance.
+In our tests, we gained in all measured use cases:
+
+| Use case    | Execution | Memory |
+|-------------|-----------|--------|
+| Serialize   | +48 %     | -47 %  |
+| Deserialize | +30 %     | -30 %  |
+| Replicate   | +48 %     | -51 %  |
+
 ### Added
 * Small cli project to run profilers.
 * Introduced `M2Extensions.AsAnnotations()`
@@ -25,6 +35,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Removed `ReadableNodeBase._m3`.
 * Changed `ReadableNodeBase._annotations` to _private_; use `ReadOnlyAnnotations()` / WritableAnnotations() instead.
 * Marked `IDeltaEvent.OriginCommands` non-nullable.
+* Replaced most LINQ by loops in `Serializer`, `Deserializer`, and `Children()`.
 ### Removed
 * Removed `sender` parameter from most notification pipe classes, as it's not used.
 * Removed `INotificationSender.Send()`.

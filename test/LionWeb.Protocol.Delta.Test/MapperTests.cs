@@ -715,6 +715,27 @@ public class MapperTests : DeltaTestsBase
     }
 
     [TestMethod]
+    public void Composite_ReuseId()
+    {
+        var partition = new TestPartition("partition");
+        var child = new LinkTestConcept("child");
+        var child2 = new LinkTestConcept("child");
+        List<IReadableNode> nodes = [];
+
+        Assert.IsEmpty(Test<CompositeCommand, CompositeEvent>(nodes,
+            new CompositeNotification([
+                new PartitionAddedNotification(partition, _notificationIdProvider.Create()),
+                new ChildAddedNotification(partition, child, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
+                new ChildDeletedNotification(child, partition, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
+                new ChildAddedNotification(partition, child, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
+                new ChildDeletedNotification(child, partition, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
+                new ChildAddedNotification(partition, child2, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
+                new ChildDeletedNotification(child2, partition, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
+            ], _notificationIdProvider.Create())
+        ));
+    }
+
+    [TestMethod]
     [Ignore("changing classifier not supported yet")]
     public void ClassifierChanged()
     {
