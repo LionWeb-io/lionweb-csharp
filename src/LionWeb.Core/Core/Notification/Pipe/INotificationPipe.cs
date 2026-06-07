@@ -29,48 +29,45 @@ namespace LionWeb.Core.Notification.Pipe;
 ///
 /// <para>
 /// Upon <see cref="INotificationReceiver.Receive">receiving</see> a notification,
-/// a notification pipe member can choose to <see cref="INotificationSender.Send"/> the unmodified, modified, or a new notification
+/// a notification pipe member can choose to <see cref="NotificationPipeBase.Send"/> the unmodified, modified, or a new notification
 /// to its <i>following</i> notification pipe members.
 /// A notification pipe member can also suppress an incoming notifications, i.e. not send the notifications to its <i>following</i> notification pipe members. 
 /// </para>
 public interface INotificationPipe : IDisposable;
 
-/// A <see cref="INotificationPipe">notification pipe member</see> that can <see cref="Send"/> notifications
+/// A <see cref="INotificationPipe">notification pipe member</see> that can <see cref="NotificationPipeBase.Send"/> notifications
 /// to <i>following</i> pipe members.
 public interface INotificationSender : INotificationPipe
 {
-    /// All notifications <see cref="INotificationSender.Send">sent</see> by <c>this</c>
+    /// All notifications <see cref="NotificationPipeBase.Send">sent</see> by <c>this</c>
     /// will be <see cref="INotificationReceiver.Receive">received</see> by <paramref name="to"/>.
     /// <remarks>Equivalent to C# <c>event += to</c>.</remarks>
     void ConnectTo(INotificationReceiver to);
 
-    /// Notifications <see cref="INotificationSender.Send">sent</see> by <c>this</c>
+    /// Notifications <see cref="NotificationPipeBase.Send">sent</see> by <c>this</c>
     /// will <b>NOT</b> be <see cref="INotificationReceiver.Receive">received</see> by <paramref name="to"/> anymore.
     /// <remarks>Equivalent to C# <c>event -= to</c>.</remarks>
     void Disconnect(INotificationReceiver to);
-
-    /// This notification sender wants to send <paramref name="notification"/>.
-    /// Only this notification sender should use this method.
-    /// <remarks>Equivalent to <see cref="EventHandler.Invoke"/>.</remarks>
-    protected void Send(INotification notification);
 
     /// Subscribes <paramref name="receiver"/> to this.
     /// <para>
     /// <b>For internal use only, use <see cref="ConnectTo"/></b>.
     /// </para>
     /// <paramref name="receiver"/> <see cref="INotificationReceiver.Receive">receives</see> all messages
-    /// <see cref="INotificationSender.Send">sent</see> by this notification pipe.
-    protected internal void Subscribe(INotificationReceiver receiver);
+    /// <see cref="NotificationPipeBase.Send">sent</see> by this notification pipe.
+    [Obsolete("Use ConnectTo() instead.")]
+    protected internal void Subscribe(INotificationReceiver receiver) => ConnectTo(receiver);
 
     /// Unsubscribes <paramref name="receiver"/> from this.
     /// <para>
     /// <b>For internal use only</b> -- each notification pipe member should unsubscribe itself from all <i>preceding</i> notification pipe members on disposal.
     /// </para>
-    protected internal void Unsubscribe(INotificationReceiver receiver);
+    [Obsolete("Use Disconnect() instead.")]
+    protected internal void Unsubscribe(INotificationReceiver receiver) => Disconnect(receiver);
 }
 
 /// A <see cref="INotificationPipe">notification pipe member</see> that can determine whether it
-/// <see cref="Handles">can handle</see> specific notification types.
+/// <see cref="Handles()">can handle</see> a notification.
 public interface INotificationFilter : INotificationPipe
 {
     /// Whether anybody would receive any of the <paramref name="notificationTypes"/> notifications.
@@ -78,13 +75,21 @@ public interface INotificationFilter : INotificationPipe
     /// <returns>
     ///     <c>true</c> if someone would receive any of the <paramref name="notificationTypes"/> notifications; <c>false</c> otherwise.
     /// </returns>
-    bool Handles(params Type[] notificationTypes);
+    [Obsolete("Filtering by notification time is deprecated, use Handles() instead")]
+    bool Handles(params Type[] notificationTypes) => Handles();
+
+    /// Whether anybody would receive a notification.
+    /// Useful for returning eagerly from complex logic to calculate the notification contents.
+    /// <returns>
+    ///     <c>true</c> if someone would receive a notification; <c>false</c> otherwise.
+    /// </returns>
+    bool Handles() => true;
 }
 
 /// A <i>producing</i> <see cref="INotificationPipe">notification pipe member</see> has no <i>preceding</i> member,
 /// i.e. a "starting member" in a pipe.
 /// It <see cref="ProduceNotification">produces</see> notifications from outside the notification pipe system,
-/// and <see cref="INotificationSender.Send">sends</see> them to <i>following</i> pipes. 
+/// and <see cref="NotificationPipeBase.Send">sends</see> them to <i>following</i> pipes. 
 public interface INotificationProducer : INotificationFilter, INotificationSender, INotificationPipe
 {
     /// Receiving a notification from outside the notification pipe system.
@@ -97,14 +102,12 @@ public interface INotificationReceiver : INotificationPipe, INotificationFilter
 {
     void IDisposable.Dispose() { }
 
-    bool INotificationFilter.Handles(params Type[] notificationTypes) => true;
-
     /// This notification pipe member receives <paramref name="notification"/>.
     void Receive(INotificationSender correspondingSender, INotification notification);
 }
 
 /// A <see cref="INotificationPipe">notification pipe member</see> that can both
 /// <see cref="INotificationReceiver.Receive"/> notifications from <i>preceding</i> pipe members and
-/// <see cref="INotificationSender.Send"/> notifications to <i>following</i> pipe members,
+/// <see cref="NotificationPipeBase.Send"/> notifications to <i>following</i> pipe members,
 /// i.e. a "middle member" in a pipe.
 public interface INotificationHandler : INotificationReceiver, INotificationSender;

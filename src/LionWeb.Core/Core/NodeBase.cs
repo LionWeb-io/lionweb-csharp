@@ -110,8 +110,8 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
 
         if (value is not IEnumerable)
             throw new InvalidValueException(feature, value);
-        var safeNodes = M2Extensions.AsNodes<INode>(value, feature).ToList();
-        AssureAnnotations(M2Extensions.AsNodes<IAnnotationInstance>(safeNodes, feature).ToList());
+        var safeNodes = M2Extensions.AsAnnotations<INode>(value).ToList();
+        AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(safeNodes).ToList());
         AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations);
         notification.CollectOldData();
         RemoveSelfParent(_annotations.ToList(), _annotations, null);
@@ -126,11 +126,11 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     /// <inheritdoc />
     public virtual void AddAnnotations(IEnumerable<INode> annotations)
     {
-        var safeAnnotations = AssureAnnotations(M2Extensions.AsNodes<IAnnotationInstance>(annotations, null).ToList());
+        var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
         int index = Math.Max(_annotations.Count - 1, 0);
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AnnotationAddMultipleNotificationEmitter emitter = new(this, safeAnnotation, _annotations, index++);
+            AnnotationAddSingleNotificationEmitter emitter = new(this, safeAnnotation, index++);
             emitter.CollectOldData();
             if (AddAnnotationsRaw(safeAnnotation))
                 emitter.Notify();
@@ -157,11 +157,10 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
         AssureInRange(index, _annotations);
-        var safeAnnotations = AssureAnnotations(M2Extensions.AsNodes<IAnnotationInstance>(annotations, null).ToList());
+        var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotation, _annotations,
-                startIndex: index);
+            AnnotationAddSingleNotificationEmitter notification = new(this, safeAnnotation, startIndex: index);
             notification.CollectOldData();
             if (InsertAnnotationsRaw(index++, safeAnnotation))
                 notification.Notify();

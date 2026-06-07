@@ -23,6 +23,7 @@
       <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj">
           <PrivateAssets>None</PrivateAssets>
       </ProjectReference>
+      <ProjectReference Include="..\..\src\LionWeb.Protocol.Delta\LionWeb.Protocol.Delta.csproj" />
       <ProjectReference Include="..\LionWeb.Core.Test.Languages\LionWeb.Core.Test.Languages.csproj">
           <PrivateAssets>None</PrivateAssets>
       </ProjectReference>

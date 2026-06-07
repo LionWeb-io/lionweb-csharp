@@ -18,20 +18,19 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 using Utilities.ListComparer;
 
 /// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
 public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBase
 {
-    private readonly List<IListChange<INode>> _changes = [];
+    private readonly List<IListChange<IWritableNode>> _changes = [];
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     public AnnotationSetNotificationEmitter(INotifiableNode destinationParent,
-        List<INode>? setValues,
-        List<INode> existingValues) : base(destinationParent, setValues)
+        List<IWritableNode>? setValues,
+        List<IWritableNode> existingValues) : base(destinationParent, setValues)
     {
         if (!IsActive() || setValues == null)
             return;
@@ -40,11 +39,11 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
         _changes = listComparer.Compare();
     }
 
-    [Obsolete]
+    /// <inheritdoc cref="AnnotationSetNotificationEmitter(INotifiableNode, List{IWritableNode}?, List{IWritableNode})"/>
     public AnnotationSetNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? setValues,
         List<INode> existingValues,
-        INotificationId? notificationId = null) : this(destinationParent, setValues, existingValues)
+        INotificationId? notificationId = null) : this(destinationParent, setValues?.Cast<IWritableNode>().ToList(), existingValues.Cast<IWritableNode>().ToList())
     {}
 
     /// <inheritdoc />
@@ -57,7 +56,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
         {
             switch (change)
             {
-                case ListAdded<INode> added:
+                case ListAdded<IWritableNode> added:
                     switch (NewValues[added.Element])
                     {
                         case null:
@@ -80,25 +79,16 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
 
                     break;
 
-                case ListMoved<INode> moved:
+                case ListMoved<IWritableNode> moved:
                     ProduceNotification(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, moved.LeftIndex, GetNotificationId()));
                     break;
 
-                case ListDeleted<INode> deleted:
+                case ListDeleted<IWritableNode> deleted:
                     ProduceNotification(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
                         GetNotificationId()));
                     break;
             }
         }
     }
-
-    /// <inheritdoc />
-    protected override bool IsActive() =>
-        Handles(
-            typeof(AnnotationAddedNotification),
-            typeof(AnnotationDeletedNotification),
-            typeof(AnnotationMovedFromOtherParentNotification),
-            typeof(AnnotationMovedInSameParentNotification)
-        );
 }

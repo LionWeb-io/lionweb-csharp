@@ -20,8 +20,11 @@ namespace LionWeb.Core.Notification.Pipe;
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> notifications if the notification passes <see cref="Filter"/>.
-public abstract class NotificationFilterBase(object? sender) : NotificationPipeBase(sender), INotificationHandler
+public abstract class NotificationFilterBase() : NotificationPipeBase, INotificationHandler
 {
+    [Obsolete("Use NotificationFilterBase() instead.")]
+    public NotificationFilterBase(object? sender) : this() { }
+    
     /// <inheritdoc />
     public void Receive(INotificationSender correspondingSender, INotification notification)
     {
@@ -31,7 +34,7 @@ public abstract class NotificationFilterBase(object? sender) : NotificationPipeB
             Send(filtered);
     }
 
-    /// Determines whether <paramref name="notification"/> will be <see cref="INotificationSender.Send">sent</see>
+    /// Determines whether <paramref name="notification"/> will be <see cref="NotificationPipeBase.Send">sent</see>
     /// to <i>following</i> notification pipes.
     /// <param name="notification">Notification to check.</param>
     /// <returns>the notification to send, or <c>null</c>.</returns>
@@ -39,15 +42,18 @@ public abstract class NotificationFilterBase(object? sender) : NotificationPipeB
 }
 
 /// Suppresses all notifications with <see cref="RegisterNotificationId">registered notification ids</see>.
-public class IdFilteringNotificationFilter(object? sender) : NotificationFilterBase(sender)
+public class IdFilteringNotificationFilter() : NotificationFilterBase
 {
+    [Obsolete("Use IdFilteringNotificationFilter() instead.")]
+    public IdFilteringNotificationFilter(object? sender) : this() { }
+    
     private readonly HashSet<INotificationId> _notificationIds = [];
 
-    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="INotificationSender.Send">sending</see>.
+    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="NotificationPipeBase.Send">sending</see>.
     public void RegisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Add(notificationId);
 
-    /// <see cref="INotificationSender.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
+    /// <see cref="NotificationPipeBase.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
     public void UnregisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Remove(notificationId);
 

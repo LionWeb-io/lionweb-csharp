@@ -299,7 +299,7 @@ public static class M1Extensions
                     $"{self.GetId()} contains itself as child"));
 
         if (includeAnnotations)
-            result = result.Concat(M2Extensions.AsNodes<T>(self.GetAnnotations(), null));
+            result = result.Concat(M2Extensions.AsAnnotations<T>(self.GetAnnotations()));
 
         if (includeSelf)
             result = result.Prepend(self);

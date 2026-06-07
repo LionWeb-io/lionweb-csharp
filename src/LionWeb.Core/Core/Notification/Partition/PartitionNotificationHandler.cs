@@ -19,7 +19,7 @@ namespace LionWeb.Core.Notification.Partition;
 
 using Pipe;
 
-/// Produces notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// Produces notifications about <see cref="INode">nodes</see> and their <see cref="M3.Feature">features</see>.
 public interface IPartitionNotificationProducer : INotificationProducer
 {
     INotificationId CreateNotificationId();
@@ -28,7 +28,7 @@ public interface IPartitionNotificationProducer : INotificationProducer
 /// Forwards all <see cref="INotificationProducer.ProduceNotification">initiated</see> notifications
 /// unchanged to <i>following</i> notification pipes.
 public class PartitionNotificationProducer(object? sender)
-    : ModelNotificationProducerBase(sender), IPartitionNotificationProducer
+    : ModelNotificationProducerBase, IPartitionNotificationProducer
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(sender);
 

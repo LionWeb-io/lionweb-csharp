@@ -53,17 +53,15 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// Whether this emitter should execute at all.
     /// </summary>
     [MemberNotNullWhen(true, nameof(_partitionProducer))]
-    protected abstract bool IsActive();
+    protected bool IsActive() =>
+        _partitionProducer?.Handles() ?? false;
 
     /// <summary>
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _partitionProducer.CreateNotificationId();
+    protected INotificationId GetNotificationId() => _partitionProducer?.CreateNotificationId()!;
     
     protected void ProduceNotification(INotification notification) =>
         _partitionProducer?.ProduceNotification(notification);
-    
-    protected bool Handles(params Type[] notificationTypes) =>
-        _partitionProducer?.Handles(notificationTypes) ?? false;
 }

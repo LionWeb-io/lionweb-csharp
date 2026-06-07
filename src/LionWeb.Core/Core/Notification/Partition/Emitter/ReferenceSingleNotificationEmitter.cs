@@ -67,12 +67,4 @@ public class ReferenceSingleNotificationEmitter<T> : ReferenceNotificationEmitte
                 break;
         }
     }
-
-    /// <inheritdoc />
-    protected override bool IsActive() =>
-        Handles(
-            typeof(ReferenceAddedNotification),
-            typeof(ReferenceDeletedNotification),
-            typeof(ReferenceChangedNotification)
-        );
 }

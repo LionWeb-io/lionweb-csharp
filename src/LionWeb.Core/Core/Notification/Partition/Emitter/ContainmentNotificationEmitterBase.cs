@@ -23,7 +23,7 @@ using M3;
 
 /// Encapsulates notification-related logic and data for <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
-public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificationEmitterBase<T> where T : INode
+public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificationEmitterBase<T> where T : IWritableNode
 {
     /// Represented <see cref="Containment"/>.
     protected readonly Containment Containment;
@@ -38,7 +38,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
     /// Collects <see cref="OldContainmentInfo"/> from <paramref name="value"/>, to be used in <see cref="PartitionNotificationEmitterBase{T}.CollectOldData"/>
     protected OldContainmentInfo? Collect(T value)
     {
-        var oldParent = value.GetParent();
+        var oldParent = (IWritableNode?)value.GetParent();
         if (oldParent == null)
             return null;
 
@@ -51,7 +51,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
             return null;
 
         var oldIndex = oldContainment.Multiple
-            ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment), oldContainment).ToList().IndexOf(value)
+            ? M2Extensions.AsNodes<IWritableNode>(oldParent.Get(oldContainment), oldContainment).ToList().IndexOf(value)
             : 0;
 
         return new OldContainmentInfo(oldParent, oldContainment, oldIndex, oldPartition);
@@ -62,7 +62,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
     /// <param name="Containment"></param>
     /// <param name="Index"></param>
     protected record OldContainmentInfo(
-        INode Parent,
+        IWritableNode Parent,
         Containment Containment,
         Index Index,
         IPartitionInstance? Partition);

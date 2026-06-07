@@ -279,7 +279,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         Assert.AreEqual(1, compositeNotificationCounter.Count);
     }
 
-    private class CompositeNotificationCounter() : NotificationPipeBase(null), INotificationHandler
+    private class CompositeNotificationCounter : NotificationPipeBase, INotificationHandler
     {
         public int Count { get; private set; }
 
@@ -294,7 +294,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         }
     }
 
-    private class RawNotificationCounter() : NotificationPipeBase(null), INotificationHandler
+    private class RawNotificationCounter : NotificationPipeBase, INotificationHandler
     {
         public int Count { get; private set; }
 
@@ -325,7 +325,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     #region partition replicator use case example
 
     //tag::creator[]
-    private class Creator() : NotificationPipeBase(null), INotificationProducer
+    private class Creator : NotificationPipeBase, INotificationProducer
     {
         public void ProduceNotification(INotification notification) => Send(notification);
     }

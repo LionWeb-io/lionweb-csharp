@@ -118,7 +118,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         File.WriteAllText(_stringFile, output);
     }
 
-    public static IEnumerable<INode> CreateNodes(long count)
+    public static IEnumerable<LinkTestConcept> CreateNodes(long count)
     {
         LinkTestConcept? lastLine = null;
         LinkTestConcept? lastCircle = null;
@@ -133,7 +133,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             //         $"Creating Line #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
             // }
 
-            INode result;
+            LinkTestConcept result;
             if (lastCoord == null || l % 2 == 0)
             {
                 lastCoord = new LinkTestConcept(id);

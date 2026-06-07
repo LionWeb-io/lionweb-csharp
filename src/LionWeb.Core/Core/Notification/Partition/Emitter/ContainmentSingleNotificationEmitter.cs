@@ -18,11 +18,10 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 /// Encapsulates notification-related logic and data for changing <i>single</i> <see cref="Containment"/>s.
 /// <typeparam name="T">Type of node of the represented <see cref="Containment"/>.</typeparam>
-public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEmitterBase<T> where T : INode
+public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEmitterBase<T> where T : IWritableNode
 {
     private readonly T? _newValue;
     private readonly T? _oldValue;
@@ -42,11 +41,8 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
 
     [Obsolete]
     public ContainmentSingleNotificationEmitter(Containment containment, INotifiableNode destinationParent, T? newValue,
-        T? oldValue,
-        INotificationId? notificationId = null)
-        : this(containment, destinationParent, newValue, oldValue)
-    {
-    }
+        T? oldValue, INotificationId? notificationId = null) : this(containment, destinationParent, newValue, oldValue)
+    { }
 
     /// <inheritdoc />
     public override void CollectOldData()
@@ -125,18 +121,4 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 throw new ArgumentException("Unknown state");
         }
     }
-
-    /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(_oldContainmentInfo))]
-    protected override bool IsActive() =>
-        Handles(
-            typeof(ChildAddedNotification),
-            typeof(ChildDeletedNotification),
-            typeof(ChildReplacedNotification),
-            typeof(ChildMovedFromOtherContainmentNotification),
-            typeof(ChildMovedFromOtherContainmentInSameParentNotification),
-            typeof(ChildMovedInSameContainmentNotification),
-            typeof(ChildMovedAndReplacedFromOtherContainmentNotification),
-            typeof(ChildMovedAndReplacedFromOtherContainmentInSameParentNotification)
-        );
 }

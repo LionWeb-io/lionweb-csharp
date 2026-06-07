@@ -18,9 +18,12 @@
 namespace LionWeb.Core.Notification.Pipe;
 
 /// Forwards all <see cref="ProduceNotification">produced</see> notifications unchanged to <i>following</i> notification pipes.
-public abstract class ModelNotificationProducerBase(object? sender)
-    : NotificationPipeBase(sender), INotificationProducer
+public abstract class ModelNotificationProducerBase()
+    : NotificationPipeBase, INotificationProducer
 {
+    [Obsolete("Use ModelNotificationProducerBase() instead.")]
+    public ModelNotificationProducerBase(object? sender) : this() { }
+    
     /// <inheritdoc />
     public void ProduceNotification(INotification notification) =>
         Send(notification);

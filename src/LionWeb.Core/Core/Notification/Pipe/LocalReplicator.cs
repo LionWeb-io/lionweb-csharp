@@ -31,9 +31,8 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
 
     public LocalReplicator(
         IForest? localForest,
-        SharedNodeMap sharedNodeMap,
-        object? sender
-    ) : base(sender)
+        SharedNodeMap sharedNodeMap
+    )
     {
         _sharedNodeMap = sharedNodeMap;
 
@@ -45,6 +44,9 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
             RegisterPartition(partition);
         }
     }
+
+    [Obsolete("Use LocalReplicator(IForest?, SharedNodeMap) instead.")]
+    public LocalReplicator(IForest? localForest, SharedNodeMap sharedNodeMap, object? sender) : this(localForest, sharedNodeMap){}
 
     /// <inheritdoc />
     public void Receive(INotificationSender correspondingSender, INotification notification)

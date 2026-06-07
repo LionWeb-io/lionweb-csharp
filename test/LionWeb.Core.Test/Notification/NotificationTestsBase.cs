@@ -56,7 +56,7 @@ public abstract class NotificationTestsBase
     }
 }
 
-public class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
+public class NotificationObserver : NotificationPipeBase, INotificationReceiver
 {
     public int Count => Notifications.Count;
 
@@ -69,7 +69,7 @@ public class NotificationObserver() : NotificationPipeBase(null), INotificationR
 /// <summary>
 /// Forwards the notification to the following pipe 
 /// </summary>
-internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
+internal class NotificationForwarder : NotificationPipeBase, INotificationProducer
 {
     public void ProduceNotification(INotification notification) => Send(notification);
 }

@@ -21,92 +21,18 @@ using M3;
 
 /// Encapsulates notification-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
-public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : INode
+[Obsolete("Use ContainmentAddSingleNotificationEmitter instead.")]
+public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentAddSingleNotificationEmitter<T> where T : IWritableNode
 {
-    private readonly List<T> _existingValues;
-    private Index _newIndex;
-
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
-    /// <param name="addedValue">Newly added value.</param>
+    /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
-    /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <paramref name="containment"/>.</param>
-    public ContainmentAddMultipleNotificationEmitter(Containment containment,
-        INotifiableNode destinationParent,
-        T addedValue,
-        List<T> existingValues,
-        Index? startIndex = null) : this(containment, destinationParent, [addedValue], existingValues, startIndex)
-    {
-    }
-
-    [Obsolete]
+    /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
     public ContainmentAddMultipleNotificationEmitter(Containment containment,
         INotifiableNode destinationParent,
         List<T>? addedValues,
         List<T> existingValues,
         Index? startIndex = null,
-        INotificationId? notificationId = null) : base(containment, destinationParent, addedValues)
-    {
-        _existingValues = existingValues;
-        _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
-    }
-    
-    /// <inheritdoc />
-    public override void Notify()
-    {
-        if (!IsActive())
-            return;
-
-        foreach ((T? added, OldContainmentInfo? old) in NewValues)
-        {
-            switch (old)
-            {
-                case null:
-                    ProduceNotification(new ChildAddedNotification(DestinationParent, added, Containment, _newIndex,
-                        GetNotificationId()));
-                    break;
-
-                case not null when old.Parent != DestinationParent:
-                    var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, _newIndex, added,
-                        old.Parent, old.Containment, old.Index, GetNotificationId());
-                    ProduceOriginMoveNotification(old, notification);
-                    ProduceNotification(notification);
-                    break;
-
-                case not null when old.Parent == DestinationParent && old.Containment == Containment && old.Index == _newIndex:
-                    // no-op
-                    break;
-
-                case not null when old.Parent == DestinationParent && old.Containment == Containment:
-                    if (_newIndex ==  _existingValues.Count)
-                        _newIndex--;
-                    if (old.Index == _newIndex)
-                        break;
-                    
-                    ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added,
-                        DestinationParent, old.Containment, old.Index, GetNotificationId()));
-
-                    break;
-
-                case not null when old.Parent == DestinationParent && old.Containment != Containment:
-                    ProduceNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, _newIndex,
-                        added, DestinationParent, old.Containment, old.Index, GetNotificationId()));
-                    break;
-
-                default:
-                    throw new ArgumentException("Unknown state");
-            }
-
-            _newIndex++;
-        }
-    }
-
-    /// <inheritdoc />
-    protected override bool IsActive() =>
-        Handles(
-            typeof(ChildAddedNotification),
-            typeof(ChildMovedFromOtherContainmentNotification),
-            typeof(ChildMovedFromOtherContainmentInSameParentNotification),
-            typeof(ChildMovedInSameContainmentNotification)
-        );
+        INotificationId? notificationId = null) : base(containment, destinationParent, addedValues.First(), existingValues, startIndex) { }
 }

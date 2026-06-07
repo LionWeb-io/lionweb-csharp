@@ -19,80 +19,17 @@ namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
 
-#region Annotation
-
 /// Encapsulates notification-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Annotation"/>s.
-public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEmitterBase
+[Obsolete("Use AnnotationAddSingleNotificationEmitter instead.")]
+public class AnnotationAddMultipleNotificationEmitter : AnnotationAddSingleNotificationEmitter
 {
-    private Index _newIndex;
-
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>.</param>
-    /// <param name="addedValue">Newly added value.</param>
+    /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
-    /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <see cref="Annotation"/>s.</param>
-    public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
-        IWritableNode addedValue,
-        List<INode> existingValues, Index? startIndex = null) : base(destinationParent, [addedValue])
-    {
-        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
-    }
-
-    [Obsolete]
+    /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
     public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? addedValues,
-        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues)
+        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues.First(), startIndex)
     {
-        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
     }
-
-    /// <inheritdoc />
-    public override void Notify()
-    {
-        if (!IsActive())
-            return;
-
-        foreach ((INode? added, OldAnnotationInfo? old) in NewValues)
-        {
-            switch (old)
-            {
-                case null:
-                    ProduceNotification(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
-                        GetNotificationId()));
-                    break;
-
-                case not null when old.Parent != DestinationParent:
-                    var notificationId = GetNotificationId();
-                    var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
-                        old.Index, notificationId);
-                    ProduceOriginMoveNotification(old, notification);
-                    ProduceNotification(notification);
-                    break;
-
-
-                case not null when old.Parent == DestinationParent && old.Index == _newIndex:
-                    // no-op
-                    break;
-
-                case not null when old.Parent == DestinationParent:
-                    ProduceNotification(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
-                        old.Index, GetNotificationId()));
-                    break;
-
-                default:
-                    throw new ArgumentException("Unknown state");
-            }
-
-            _newIndex++;
-        }
-    }
-
-    /// <inheritdoc />
-    protected override bool IsActive() =>
-        Handles(
-            typeof(AnnotationAddedNotification),
-            typeof(AnnotationMovedFromOtherParentNotification),
-            typeof(AnnotationMovedInSameParentNotification)
-        );
 }
-
-#endregion

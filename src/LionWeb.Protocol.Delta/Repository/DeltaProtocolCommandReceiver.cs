@@ -27,10 +27,15 @@ public class DeltaProtocolCommandReceiver : DeltaProtocolReceiverBase<IDeltaComm
 
     public DeltaProtocolCommandReceiver(PartitionSharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
-        DeserializerBuilder deserializerBuilder, object? sender) : base(sender)
+        DeserializerBuilder deserializerBuilder)
     {
         _mapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
+
+    [Obsolete("Use DeltaProtocolCommandReceiver(PartitionSharedNodeMap, SharedKeyedMap, DeserializerBuilder) instead.")]
+    public DeltaProtocolCommandReceiver(PartitionSharedNodeMap sharedNodeMap,
+        SharedKeyedMap sharedKeyedMap,
+        DeserializerBuilder deserializerBuilder, object? sender) : this(sharedNodeMap, sharedKeyedMap, deserializerBuilder) { }
 
     /// <inheritdoc />
     public override INotification Map(IDeltaCommand content) => 

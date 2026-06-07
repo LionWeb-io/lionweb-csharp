@@ -429,6 +429,21 @@ public static class M2Extensions
         };
 
     /// <summary>
+    /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;
+    /// </summary>
+    /// <param name="value">Untyped value, convertible to <typeparamref name="T"/>.</param>
+    /// <typeparam name="T">Type of nodes in <paramref name="value"/>.</typeparam>
+    /// <returns><paramref name="value"/> re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;.</returns>
+    /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be re-typed as IEnumerable&lt;<typeparamref name="T"/>&gt;</exception>
+    public static IEnumerable<T> AsAnnotations<T>(object? value) where T : IReadableNode
+        => value switch
+        {
+            IEnumerable e => CastIterator<T>(null, e),
+            T n => [n],
+            _ => throw new InvalidValueException(null, value)
+        };
+
+    /// <summary>
     /// Re-types <paramref name="value"/> as IEnumerable&lt;<typeparamref name="T"/>&gt;.
     /// </summary>
     /// <param name="link"><paramref name="value"/>'s origin Link.</param>

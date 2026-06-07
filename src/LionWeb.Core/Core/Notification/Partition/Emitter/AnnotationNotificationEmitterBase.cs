@@ -21,23 +21,16 @@ using M1;
 using M3;
 
 /// Encapsulates notification-related logic and data for <i>multiple</i> <see cref="Annotation"/>s.
-public abstract class AnnotationNotificationEmitterBase : PartitionNotificationEmitterBase<INode>
+public abstract class AnnotationNotificationEmitterBase : PartitionNotificationEmitterBase<IWritableNode>
 {
     /// Newly set values and their previous context.
-    protected readonly Dictionary<INode, OldAnnotationInfo?> NewValues;
+    protected readonly Dictionary<IWritableNode, OldAnnotationInfo?> NewValues;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="newValues">Newly set values.</param>
-    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
     protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<IWritableNode>? newValues) : base(destinationParent)
     {
-        NewValues = newValues?.ToDictionary<IWritableNode, INode, OldAnnotationInfo?>(k => (INode)k, _ => null) ?? [];
-    }
-
-    [Obsolete]
-    protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<INode>? newValues) : base(destinationParent)
-    {
-        NewValues = newValues?.ToDictionary<INode, INode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
+        NewValues = newValues?.ToDictionary<IWritableNode, IWritableNode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
     }
 
     /// <inheritdoc />
@@ -56,14 +49,14 @@ public abstract class AnnotationNotificationEmitterBase : PartitionNotificationE
 
             var oldPartition = newValue.GetPartition();
 
-            NewValues[newValue] = new(oldParent, oldIndex, oldPartition);
+            NewValues[newValue] = new((IWritableNode)oldParent, oldIndex, oldPartition);
         }
     }
 
     /// Context of an annotation instance before it has been removed from its previous <paramref name="Parent"/>.
     /// <param name="Parent"></param>
     /// <param name="Index"></param>
-    protected record OldAnnotationInfo(INode Parent, Index Index, IPartitionInstance? Partition);
+    protected record OldAnnotationInfo(IWritableNode Parent, Index Index, IPartitionInstance? Partition);
 
     protected void ProduceOriginMoveNotification(OldAnnotationInfo old, AnnotationMovedFromOtherParentNotification notification)
     {

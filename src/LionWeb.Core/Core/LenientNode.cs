@@ -274,7 +274,7 @@ public class LenientNode : NodeBase, INode
     {
         if (feature == null)
         {
-            var annotations = M2Extensions.AsNodes<INode>(value, null).ToList();
+            var annotations = M2Extensions.AsAnnotations<INode>(value).ToList();
             RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
             AddAnnotations(annotations);
             return true;
@@ -380,7 +380,7 @@ public class LenientNode : NodeBase, INode
     {
         if (link == null)
         {
-            var annotations = M2Extensions.AsNodes<INode>(nodes, link).ToList();
+            var annotations = M2Extensions.AsAnnotations<INode>(nodes).ToList();
             AddAnnotations(annotations);
             return true;
         }
@@ -422,7 +422,7 @@ public class LenientNode : NodeBase, INode
     {
         if (link == null)
         {
-            var annotations = M2Extensions.AsNodes<INode>(nodes, link).ToList();
+            var annotations = M2Extensions.AsAnnotations<INode>(nodes).ToList();
             InsertAnnotations(index, annotations);
             return true;
         }
@@ -437,7 +437,7 @@ public class LenientNode : NodeBase, INode
     {
         if (link is null)
         {
-            var annotations= M2Extensions.AsNodes<INode>(nodes, link).ToList();
+            var annotations= M2Extensions.AsAnnotations<INode>(nodes).ToList();
             RemoveAnnotations(annotations);
             return true;
         }
