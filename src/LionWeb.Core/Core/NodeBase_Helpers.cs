@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core;
 
-using M2;
 using M3;
 using Notification;
 using Notification.Partition;
@@ -40,7 +39,7 @@ public abstract partial class NodeBase
     /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode)"/>
     [Obsolete("Use DetachChild(INode, bool)")]
     protected virtual bool DetachChild(INode child) =>
-        DetachChild((INode)child, false) || _annotations.Remove(child);
+        DetachChild(child, false) || WritableAnnotations().Remove(child);
 
     /// <inheritdoc />
     bool IWritableNode<INode>.DetachChild(INode child, bool notify) =>
@@ -49,11 +48,12 @@ public abstract partial class NodeBase
     /// <inheritdoc cref="IWritableNode.DetachChild(IWritableNode, bool)"/>
     protected virtual bool DetachChild(INode child, bool notify)
     {
-        var index = _annotations.IndexOf(child);
+        var writableAnnotations = WritableAnnotations();
+        var index = writableAnnotations.IndexOf(child);
         if (index < 0)
             return false;
         
-        _annotations.RemoveAt(index);
+        writableAnnotations.RemoveAt(index);
 
         if (!notify)
             return true;
@@ -194,13 +194,16 @@ public abstract partial class NodeBase
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link,
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T>? storage, Link? link,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover = null,
         INotificationId? notificationId = null)
         where T : IReadableNode
     {
         AssureNotNull(list, link);
         AssureNotNullMembers(list, link);
+
+        if (storage is null)
+            return false;
 
         var partitionProducer = GetPartitionNotificationProducer();
 
@@ -232,8 +235,8 @@ public abstract partial class NodeBase
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns>Non-empty, read-only view of <paramref name="storage"/>.</returns>
     /// <exception cref="UnsetFeatureException">If <paramref name="storage"/> is empty.</exception>
-    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T> storage, Link link) where T : IReadableNode =>
-        storage.Count != 0
+    protected IReadOnlyList<T> AsNonEmptyReadOnly<T>(List<T>? storage, Link link) where T : IReadableNode =>
+        storage != null && storage.Count != 0
             ? storage.AsReadOnly()
             : throw new UnsetFeatureException(link);
 
@@ -296,9 +299,9 @@ public abstract partial class NodeBase
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c>, contains any <c>null</c> members,
     /// or both <paramref name="list"/> and <paramref name="storage"/> are empty.</exception>
-    protected void AssureNonEmpty<T>([NotNull] List<T>? list, IList storage, Link link)
+    protected void AssureNonEmpty<T>([NotNull] List<T>? list, IList? storage, Link link)
     {
-        if (list == null || (list.Count == 0 && storage.Count == 0))
+        if (list == null || (list.Count == 0 && storage is null or { Count: 0 }))
             throw new InvalidValueException(link, list);
         AssureNotNullMembers(list, link);
     }
@@ -350,8 +353,11 @@ public abstract partial class NodeBase
     /// <param name="link">Link of <paramref name="storage"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> were empty after removing all of <paramref name="safeNodes"/>.</exception>
-    protected void AssureNotClearing<T>(List<T?> safeNodes, IEnumerable<T> storage, Link link) where T : IReadableNode?
+    protected void AssureNotClearing<T>(List<T?> safeNodes, IEnumerable<T>? storage, Link link) where T : IReadableNode?
     {
+        if (storage == null)
+            throw new InvalidValueException(link, safeNodes);
+        
         var copy = new List<T>(storage);
         RemoveAll(safeNodes, copy, null);
         if (copy.Count == 0)
@@ -411,11 +417,14 @@ public abstract partial class NodeBase
     }
 
     /// <inheritdoc cref="RemoveAll{T}(List{T}, List{T}, Action{IPartitionNotificationProducer, Index, T, INotificationId?}?, INotificationId?)"/>
-    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceTarget> storage,
+    protected void RemoveAll<T>(List<T> safeNodes, List<ReferenceTarget>? storage,
         Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
         INotificationId? notificationId = null)
         where T : IReadableNode
     {
+        if (storage is null)
+            return;
+        
         var partitionProducer = GetPartitionNotificationProducer();
 
         foreach (var node in safeNodes)

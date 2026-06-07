@@ -119,11 +119,14 @@ public class GeneralNodeLangFactory : AbstractBaseNodeFactory, IGeneralNodeLangF
 [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-GeneralNodeConcept")]
 public partial class GeneralNodeConcept : ConceptInstanceBase
 {
-	private bool SetMultipleContainmentRaw(List<INode> nodes) => ExchangeChildrenRaw(nodes, _multipleContainment);
-	private bool AddMultipleContainmentRaw(INode? value) => AddChildRaw(value, _multipleContainment);
-	private bool InsertMultipleContainmentRaw(int index, INode? value) => InsertChildRaw(index, value, _multipleContainment);
+	private bool SetMultipleContainmentRaw(List<INode> nodes) => ExchangeChildrenRaw(nodes, WritableMultipleContainment());
+	private bool AddMultipleContainmentRaw(INode? value) => AddChildRaw(value, WritableMultipleContainment());
+	private bool InsertMultipleContainmentRaw(int index, INode? value) => InsertChildRaw(index, value, WritableMultipleContainment());
 	private bool RemoveMultipleContainmentRaw(INode? value) => RemoveChildRaw(value, _multipleContainment);
-	private readonly List<INode> _multipleContainment = [];
+	private List<INode>? _multipleContainment;
+	private static readonly IReadOnlyList<INode> _emptyMultipleContainment = [];
+	private IReadOnlyList<INode> ReadOnlyMultipleContainment() => _multipleContainment?.AsReadOnly() ?? _emptyMultipleContainment;
+	private List<INode> WritableMultipleContainment() => _multipleContainment ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultipleContainment is empty</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleContainment")]
@@ -133,7 +136,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetMultipleContainment([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleContainment)
 	{
-		multipleContainment = _multipleContainment.AsReadOnly();
+		multipleContainment = ReadOnlyMultipleContainment();
 		return multipleContainment.Count != 0;
 	}
 
@@ -141,7 +144,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If both MultipleContainment and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleContainment(IEnumerable<INode> nodes)
 	{
-		AddRequiredMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, _multipleContainment, AddMultipleContainmentRaw);
+		AddRequiredMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, WritableMultipleContainment(), AddMultipleContainmentRaw);
 		return this;
 	}
 
@@ -150,7 +153,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultipleContainment.Count</exception>
         public GeneralNodeConcept InsertMultipleContainment(int index, IEnumerable<INode> nodes)
 	{
-		InsertRequiredMultipleContainment<INode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, _multipleContainment, InsertMultipleContainmentRaw);
+		InsertRequiredMultipleContainment<INode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, WritableMultipleContainment(), InsertMultipleContainmentRaw);
 		return this;
 	}
 
@@ -162,34 +165,37 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private bool SetMultipleOptionalContainmentRaw(List<INode> nodes) => ExchangeChildrenRaw(nodes, _multipleOptionalContainment);
-	private bool AddMultipleOptionalContainmentRaw(INode? value) => AddChildRaw(value, _multipleOptionalContainment);
-	private bool InsertMultipleOptionalContainmentRaw(int index, INode? value) => InsertChildRaw(index, value, _multipleOptionalContainment);
+	private bool SetMultipleOptionalContainmentRaw(List<INode> nodes) => ExchangeChildrenRaw(nodes, WritableMultipleOptionalContainment());
+	private bool AddMultipleOptionalContainmentRaw(INode? value) => AddChildRaw(value, WritableMultipleOptionalContainment());
+	private bool InsertMultipleOptionalContainmentRaw(int index, INode? value) => InsertChildRaw(index, value, WritableMultipleOptionalContainment());
 	private bool RemoveMultipleOptionalContainmentRaw(INode? value) => RemoveChildRaw(value, _multipleOptionalContainment);
-	private readonly List<INode> _multipleOptionalContainment = [];
+	private List<INode>? _multipleOptionalContainment;
+	private static readonly IReadOnlyList<INode> _emptyMultipleOptionalContainment = [];
+	private IReadOnlyList<INode> ReadOnlyMultipleOptionalContainment() => _multipleOptionalContainment?.AsReadOnly() ?? _emptyMultipleOptionalContainment;
+	private List<INode> WritableMultipleOptionalContainment() => _multipleOptionalContainment ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalContainment")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<INode> MultipleOptionalContainment { get => _multipleOptionalContainment.AsReadOnly(); init => AddMultipleOptionalContainment(value); }
+	public IReadOnlyList<INode> MultipleOptionalContainment { get => ReadOnlyMultipleOptionalContainment(); init => AddMultipleOptionalContainment(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public bool TryGetMultipleOptionalContainment([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalContainment)
 	{
-		multipleOptionalContainment = _multipleOptionalContainment.AsReadOnly();
+		multipleOptionalContainment = ReadOnlyMultipleOptionalContainment();
 		return multipleOptionalContainment.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public GeneralNodeConcept AddMultipleOptionalContainment(IEnumerable<INode> nodes)
 	{
-		AddOptionalMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, _multipleOptionalContainment, AddMultipleOptionalContainmentRaw);
+		AddOptionalMultipleContainment<INode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, WritableMultipleOptionalContainment(), AddMultipleOptionalContainmentRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public GeneralNodeConcept InsertMultipleOptionalContainment(int index, IEnumerable<INode> nodes)
 	{
-		InsertOptionalMultipleContainment<INode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, _multipleOptionalContainment, InsertMultipleOptionalContainmentRaw);
+		InsertOptionalMultipleContainment<INode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, WritableMultipleOptionalContainment(), InsertMultipleOptionalContainmentRaw);
 		return this;
 	}
 
@@ -200,7 +206,9 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<ReferenceTarget> _multipleOptionalRef = [];
+	private List<ReferenceTarget>? _multipleOptionalRef;
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMultipleOptionalRef() => _multipleOptionalRef?.AsReadOnly() ?? _emptyReferences;
+	private List<ReferenceTarget> WritableMultipleOptionalRef() => _multipleOptionalRef ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleOptionalRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -208,21 +216,21 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMultipleOptionalRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleOptionalRef) => TryGetReference<IReadableNode>(_multipleOptionalRef, out multipleOptionalRef);
-	private bool SetMultipleOptionalRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _multipleOptionalRef);
-	private bool AddMultipleOptionalRefRaw(ReferenceTarget target) => AddReferencesRaw(target, _multipleOptionalRef);
-	private bool InsertMultipleOptionalRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _multipleOptionalRef);
+	private bool SetMultipleOptionalRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableMultipleOptionalRef());
+	private bool AddMultipleOptionalRefRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableMultipleOptionalRef());
+	private bool InsertMultipleOptionalRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableMultipleOptionalRef());
 	private bool RemoveMultipleOptionalRefRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _multipleOptionalRef);
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept AddMultipleOptionalRef(IEnumerable<IReadableNode> nodes)
 	{
-		AddOptionalMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, _multipleOptionalRef, AddMultipleOptionalRefRaw);
+		AddOptionalMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, WritableMultipleOptionalRef(), AddMultipleOptionalRefRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public GeneralNodeConcept InsertMultipleOptionalRef(int index, IEnumerable<IReadableNode> nodes)
 	{
-		InsertOptionalMultipleReference<IReadableNode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, _multipleOptionalRef, InsertMultipleOptionalRefRaw);
+		InsertOptionalMultipleReference<IReadableNode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, WritableMultipleOptionalRef(), InsertMultipleOptionalRefRaw);
 		return this;
 	}
 
@@ -233,7 +241,9 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<ReferenceTarget> _multipleRef = [];
+	private List<ReferenceTarget>? _multipleRef;
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMultipleRef() => _multipleRef?.AsReadOnly() ?? _emptyReferences;
+	private List<ReferenceTarget> WritableMultipleRef() => _multipleRef ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If MultipleRef is empty</exception>
         [LionCoreMetaPointer(Language = typeof(GeneralNodeLangLanguage), Key = "key-multipleRef")]
@@ -242,15 +252,15 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMultipleRef([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> multipleRef) => TryGetReference<IReadableNode>(_multipleRef, out multipleRef);
-	private bool SetMultipleRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _multipleRef);
-	private bool AddMultipleRefRaw(ReferenceTarget target) => AddReferencesRaw(target, _multipleRef);
-	private bool InsertMultipleRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _multipleRef);
+	private bool SetMultipleRefRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableMultipleRef());
+	private bool AddMultipleRefRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableMultipleRef());
+	private bool InsertMultipleRefRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableMultipleRef());
 	private bool RemoveMultipleRefRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _multipleRef);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultipleRef and nodes are empty</exception>
         public GeneralNodeConcept AddMultipleRef(IEnumerable<IReadableNode> nodes)
 	{
-		AddRequiredMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, _multipleRef, AddMultipleRefRaw);
+		AddRequiredMultipleReference<IReadableNode>(nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, WritableMultipleRef(), AddMultipleRefRaw);
 		return this;
 	}
 
@@ -259,7 +269,7 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultipleRef.Count</exception>
         public GeneralNodeConcept InsertMultipleRef(int index, IEnumerable<IReadableNode> nodes)
 	{
-		InsertRequiredMultipleReference<IReadableNode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, _multipleRef, InsertMultipleRefRaw);
+		InsertRequiredMultipleReference<IReadableNode>(index, nodes, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, WritableMultipleRef(), InsertMultipleRefRaw);
 		return this;
 	}
 
@@ -486,13 +496,13 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 			return true;
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature))
 		{
-			result = _multipleContainment;
+			result = ReadOnlyMultipleContainment();
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature))
 		{
-			result = _multipleOptionalContainment;
+			result = ReadOnlyMultipleOptionalContainment();
 			return true;
 		}
 
@@ -524,13 +534,13 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 			return true;
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.EqualsIdentity(feature))
 		{
-			result = _multipleOptionalRef;
+			result = ReadOnlyMultipleOptionalRef();
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.EqualsIdentity(feature))
 		{
-			result = _multipleRef;
+			result = ReadOnlyMultipleRef();
 			return true;
 		}
 
@@ -544,25 +554,25 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 			return true;
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleContainment<INode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, _multipleContainment, SetMultipleContainmentRaw);
+			SetRequiredMultipleContainment<INode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, WritableMultipleContainment(), SetMultipleContainmentRaw);
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleContainment<INode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, _multipleOptionalContainment, SetMultipleOptionalContainmentRaw);
+			SetOptionalMultipleContainment<INode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, WritableMultipleOptionalContainment(), SetMultipleOptionalContainmentRaw);
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleReference<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, _multipleOptionalRef, SetMultipleOptionalRefRaw);
+			SetOptionalMultipleReference<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalRef, WritableMultipleOptionalRef(), SetMultipleOptionalRefRaw);
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleReference<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, _multipleRef, SetMultipleRefRaw);
+			SetRequiredMultipleReference<IReadableNode>(value, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleRef, WritableMultipleRef(), SetMultipleRefRaw);
 			return true;
 		}
 
@@ -840,13 +850,13 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		Containment? c = GetContainmentOf(child);
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment.EqualsIdentity(c))
 		{
-			RemoveSelfParent((INode)child, _multipleContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, null, notify ? ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment) : null);
+			RemoveSelfParent((INode)child, WritableMultipleContainment(), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment, null, notify ? ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment) : null);
 			return true;
 		}
 
 		if (GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment.EqualsIdentity(c))
 		{
-			RemoveSelfParent((INode)child, _multipleOptionalContainment, GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, null, notify ? ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment) : null);
+			RemoveSelfParent((INode)child, WritableMultipleOptionalContainment(), GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment, null, notify ? ContainmentRemover<INode>(GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment) : null);
 			return true;
 		}
 
@@ -875,9 +885,9 @@ public partial class GeneralNodeConcept : ConceptInstanceBase
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is IReadableNode child0 && _multipleContainment.Contains(child0))
+		if (child is IReadableNode child0 && (_multipleContainment?.Contains(child0) ?? false))
 			return GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleContainment;
-		if (child is IReadableNode child1 && _multipleOptionalContainment.Contains(child1))
+		if (child is IReadableNode child1 && (_multipleOptionalContainment?.Contains(child1) ?? false))
 			return GeneralNodeLangLanguage.Instance.GeneralNodeConcept_multipleOptionalContainment;
 		if (ReferenceEquals(_singleContainment, child))
 			return GeneralNodeLangLanguage.Instance.GeneralNodeConcept_singleContainment;

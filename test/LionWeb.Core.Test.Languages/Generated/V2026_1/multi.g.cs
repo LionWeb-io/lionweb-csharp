@@ -91,11 +91,14 @@ public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
 [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "Container")]
 public partial class Container : ConceptInstanceBase
 {
-	private bool SetLibrariesRaw(List<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> nodes) => ExchangeChildrenRaw(nodes, _libraries);
-	private bool AddLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library? value) => AddChildRaw(value, _libraries);
-	private bool InsertLibrariesRaw(int index, LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library? value) => InsertChildRaw(index, value, _libraries);
+	private bool SetLibrariesRaw(List<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> nodes) => ExchangeChildrenRaw(nodes, WritableLibraries());
+	private bool AddLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library? value) => AddChildRaw(value, WritableLibraries());
+	private bool InsertLibrariesRaw(int index, LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library? value) => InsertChildRaw(index, value, WritableLibraries());
 	private bool RemoveLibrariesRaw(LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library? value) => RemoveChildRaw(value, _libraries);
-	private readonly List<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> _libraries = [];
+	private List<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>? _libraries;
+	private static readonly IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> _emptyLibraries = [];
+	private IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> ReadOnlyLibraries() => _libraries?.AsReadOnly() ?? _emptyLibraries;
+	private List<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> WritableLibraries() => _libraries ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Libraries is empty</exception>
         [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "libraries")]
@@ -105,7 +108,7 @@ public partial class Container : ConceptInstanceBase
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetLibraries([NotNullWhenAttribute(true)] out IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> libraries)
 	{
-		libraries = _libraries.AsReadOnly();
+		libraries = ReadOnlyLibraries();
 		return libraries.Count != 0;
 	}
 
@@ -113,7 +116,7 @@ public partial class Container : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
         public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> nodes)
 	{
-		AddRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(nodes, MultiLanguage.Instance.Container_libraries, _libraries, AddLibrariesRaw);
+		AddRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(nodes, MultiLanguage.Instance.Container_libraries, WritableLibraries(), AddLibrariesRaw);
 		return this;
 	}
 
@@ -122,7 +125,7 @@ public partial class Container : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Libraries.Count</exception>
         public Container InsertLibraries(int index, IEnumerable<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library> nodes)
 	{
-		InsertRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(index, nodes, MultiLanguage.Instance.Container_libraries, _libraries, InsertLibrariesRaw);
+		InsertRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(index, nodes, MultiLanguage.Instance.Container_libraries, WritableLibraries(), InsertLibrariesRaw);
 		return this;
 	}
 
@@ -160,7 +163,7 @@ public partial class Container : ConceptInstanceBase
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature))
 		{
-			result = _libraries;
+			result = ReadOnlyLibraries();
 			return true;
 		}
 
@@ -174,7 +177,7 @@ public partial class Container : ConceptInstanceBase
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(value, MultiLanguage.Instance.Container_libraries, _libraries, SetLibrariesRaw);
+			SetRequiredMultipleContainment<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(value, MultiLanguage.Instance.Container_libraries, WritableLibraries(), SetLibrariesRaw);
 			return true;
 		}
 
@@ -267,7 +270,7 @@ public partial class Container : ConceptInstanceBase
 		Containment? c = GetContainmentOf(child);
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(c))
 		{
-			RemoveSelfParent((LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library)child, _libraries, MultiLanguage.Instance.Container_libraries, null, notify ? ContainmentRemover<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(MultiLanguage.Instance.Container_libraries) : null);
+			RemoveSelfParent((LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library)child, WritableLibraries(), MultiLanguage.Instance.Container_libraries, null, notify ? ContainmentRemover<LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library>(MultiLanguage.Instance.Container_libraries) : null);
 			return true;
 		}
 
@@ -280,7 +283,7 @@ public partial class Container : ConceptInstanceBase
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library child0 && _libraries.Contains(child0))
+		if (child is LionWeb.Core.Test.Languages.Generated.V2026_1.Library.M2.Library child0 && (_libraries?.Contains(child0) ?? false))
 			return MultiLanguage.Instance.Container_libraries;
 		return null;
 	}

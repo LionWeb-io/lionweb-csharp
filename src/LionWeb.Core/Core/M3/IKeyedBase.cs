@@ -28,11 +28,11 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
 
     /// <inheritdoc />
     protected override IBuiltInsLanguage _builtIns =>
-        new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.BuiltIns).Value;
+        _language.LionWebVersion.BuiltIns;
 
-    /// <inheritdoc />
-    protected override ILionCoreLanguage _m3 =>
-        new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.LionCore).Value;
+    /// The <see cref="ILionCoreLanguage"/> variant used for this node.
+    protected virtual ILionCoreLanguage _m3 =>
+        _language.LionWebVersion.LionCore;
 
     /// <inheritdoc />
     protected IKeyedBase(NodeId id, TLanguage language) : this(id, language, language) { }

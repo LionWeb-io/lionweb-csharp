@@ -179,9 +179,9 @@ public abstract partial class NodeBase
         return true;
     }
 
-    protected bool RemoveChildRaw<T>(T? valueToRemove, List<T> current) where T : class, IWritableNode
+    protected bool RemoveChildRaw<T>(T? valueToRemove, List<T>? current) where T : class, IWritableNode
     {
-        if (valueToRemove is null)
+        if (valueToRemove is null || current is null)
             return false;
 
         if (current.Remove(valueToRemove))
@@ -207,7 +207,7 @@ public abstract partial class NodeBase
         return true;
     }
 
-    protected bool AddReferencesRaw(ReferenceTarget target, List<ReferenceTarget> storage)
+    protected bool AddReferencesRaw(ReferenceTarget? target, List<ReferenceTarget> storage)
     {
         if (target is null)
             return false;
@@ -216,7 +216,7 @@ public abstract partial class NodeBase
         return true;
     }
 
-    protected bool InsertReferencesRaw(Index index, ReferenceTarget target, List<ReferenceTarget> storage)
+    protected bool InsertReferencesRaw(Index index, ReferenceTarget? target, List<ReferenceTarget> storage)
     {
         if (target is null || !IsInRange(index, storage))
             return false;
@@ -225,9 +225,9 @@ public abstract partial class NodeBase
         return true;
     }
 
-    protected bool RemoveReferencesRaw(ReferenceTarget target, List<ReferenceTarget> storage)
+    protected bool RemoveReferencesRaw(ReferenceTarget? target, List<ReferenceTarget>? storage)
     {
-        if (target is null)
+        if (target is null || storage is null)
             return false;
 
         var index = storage.FindIndex(r =>

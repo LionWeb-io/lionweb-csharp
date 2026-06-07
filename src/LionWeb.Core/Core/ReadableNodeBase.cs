@@ -28,14 +28,12 @@ using Utilities;
 [DebuggerDisplay("{GetType().Name}[{GetId()}]")]
 public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
+    private static readonly IReadOnlyList<T> _emptyAnnotations = [];
+    protected static readonly IReadOnlyList<ReferenceTarget> _emptyReferences = [];
+
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
     protected virtual IBuiltInsLanguage _builtIns =>
-        new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
-
-    /// The <see cref="ILionCoreLanguage"/> variant used for this node.
-    protected virtual ILionCoreLanguage _m3 =>
-        new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
-
+        GetClassifier().GetLanguage().LionWebVersion.BuiltIns;
 
     /// <summary>
     /// Initializes <c>this</c> node's <see cref="IReadableNode.GetId">id</see> and optionally <see cref="IReadableNode.GetParent">parent</see>.
@@ -66,11 +64,17 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     public T? GetParent() => _parent;
 
     /// <inheritdoc cref="IReadableNode.GetAnnotations()"/>
-    // ReSharper disable once InconsistentNaming
-    protected readonly List<T> _annotations = [];
+    /// <remarks>This used to be protected. Use <see cref="ReadOnlyAnnotations"/> or <see cref="WritableAnnotations"/> instead.</remarks>
+    private List<T>? _annotations;
+
+    protected IReadOnlyList<T> ReadOnlyAnnotations() => _annotations?.AsReadOnly() ?? _emptyAnnotations;
+    
+    protected List<T> WritableAnnotations() => _annotations ??= [];
+
 
     /// <inheritdoc />
-    public virtual IReadOnlyList<T> GetAnnotations() => _annotations.AsReadOnly();
+    public virtual IReadOnlyList<T> GetAnnotations() => ReadOnlyAnnotations();
+
 
     /// <inheritdoc />
     public abstract Classifier GetClassifier();
@@ -88,7 +92,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
 
     /// <inheritdoc/>
     public virtual IReadOnlyList<IReadableNode> GetAnnotationsRaw() =>
-        _annotations.Cast<IReadableNode>().ToImmutableList();
+        _annotations is not null ? _annotations.Cast<IReadableNode>().ToImmutableList() : [];
 
     /// <inheritdoc/>
     bool IReadableNode.TryGetPropertyRaw(Property property, out object? value) =>
@@ -155,11 +159,13 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// Extracts all target nodes from <paramref name="storage"/> targets.
     /// Represents unresolvable targets as <c>null</c>. 
     /// </summary>
-    protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget> storage, Reference reference)
+    protected IImmutableList<R?> ReferenceTargetNullableTargets<R>(List<ReferenceTarget>? storage, Reference reference)
         where R : IReadableNode =>
-        storage
-            .Select(r => ReferenceTargetNullableTarget<R>(r, reference))
-            .ToImmutableList();
+        storage is not null
+            ? storage
+                .Select(r => ReferenceTargetNullableTarget<R>(r, reference))
+                .ToImmutableList()
+            : [];
 
     /// <summary>
     /// Extracts target node from <paramref name="storage"/> target.
@@ -179,8 +185,9 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// <summary>
     /// Extracts all target nodes from <paramref name="storage"/> targets.
     /// </summary>
-    protected IImmutableList<R> ReferenceTargetNonNullTargets<R>(List<ReferenceTarget> storage, Reference reference)
+    protected IImmutableList<R> ReferenceTargetNonNullTargets<R>(List<ReferenceTarget>? storage, Reference reference)
         where R : IReadableNode =>
+        storage is not null ?
         storage
             .Select(r =>
             {
@@ -189,7 +196,8 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
                     throw new InvalidValueException(reference, r);
                 return result;
             })
-            .ToImmutableList();
+            .ToImmutableList()
+        : [];
 
     /// <summary>
     /// Extracts target node from <paramref name="storage"/> target.
@@ -219,16 +227,16 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     }
 
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget> storage, Reference reference)
+    protected IReadOnlyList<R?> GetRequiredNullableReferences<R>(List<ReferenceTarget>? storage, Reference reference)
         where R : IReadableNode =>
-        storage.Count != 0
+        storage is { Count: > 0 }
             ? ReferenceTargetNullableTargets<R>(storage, reference)
             : throw new UnsetFeatureException(reference);
 
     /// <inheritdoc cref="AsNonEmptyReadOnly{T}(List{T},Link)"/>
-    protected IReadOnlyList<R> GetRequiredNonNullReferences<R>(List<ReferenceTarget> storage, Reference reference)
+    protected IReadOnlyList<R> GetRequiredNonNullReferences<R>(List<ReferenceTarget>? storage, Reference reference)
         where R : IReadableNode =>
-        storage.Count != 0
+        storage is { Count: > 0 }
             ? ReferenceTargetNonNullTargets<R>(storage, reference)
             : throw new UnsetFeatureException(reference);
 
@@ -236,8 +244,14 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// Tries to retrieve all <see cref="ReferenceTarget.Target"/>s from <paramref name="storage"/>.
     /// </summary>
     /// <returns><c>true</c> if all <paramref name="storage"/>.<see cref="ReferenceTarget.Target"/>s are non-null and of type <typeparamref name="R"/>; <c>false</c> otherwise.</returns>
-    protected bool TryGetReference<R>(List<ReferenceTarget> storage, out IReadOnlyList<R> targets)
+    protected bool TryGetReference<R>(List<ReferenceTarget>? storage, out IReadOnlyList<R> targets)
     {
+        if (storage is null)
+        {
+            targets = [];
+            return false;
+        }
+        
         var result = storage.Count != 0;
         var nodes = new List<R>(storage.Count);
         foreach (var r in storage)
@@ -276,16 +290,14 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
     /// </summary>
     /// <param name="safeNodes">Value to guard against <c>null</c>.</param>
     /// <param name="link">Link <paramref name="safeNodes"/> originates from.</param>
-    /// <typeparam name="T">Type of members of <paramref name="safeNodes"/>.</typeparam>
+    /// <typeparam name="M">Type of members of <paramref name="safeNodes"/>.</typeparam>
     /// <exception cref="InvalidValueException">If any member of <paramref name="safeNodes"/> is <c>null</c>.</exception>
-    protected void AssureNotNullMembers<T>(IList<T> safeNodes, Link? link)
+    protected void AssureNotNullMembers<M>(IList<M> safeNodes, Link? link)
     {
         foreach (var node in safeNodes)
         {
             if (node == null)
-            {
                 throw new InvalidValueException(link, node);
-            }
         }
     }
 

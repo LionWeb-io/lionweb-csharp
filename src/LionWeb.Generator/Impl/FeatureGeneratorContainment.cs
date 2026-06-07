@@ -80,18 +80,21 @@ internal class FeatureGeneratorContainment(
             ContainmentInserterRaw(),
             ContainmentRemoverRaw(),
             MultipleContainmentField(),
+            MultipleContainmentEmpty(),
+            MultipleContainmentReadOnly(),
+            MultipleContainmentWritable(),
             MultipleContainmentProperty(AsNonEmptyReadOnlyCall())
                 .Xdoc(XdocRequiredMultipleLink()),
-            TryGetMultiple(InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly")))),
+            TryGetMultiple(InvocationExpression(LinkReadOnly(containment))),
         }.Concat(
             LinkAdder([
-                    ExpressionStatement(CallGeneric("AddRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkAddRaw(containment))),
+                    ExpressionStatement(CallGeneric("AddRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), InvocationExpression(LinkWritable(containment)), LinkAddRaw(containment))),
                     ReturnStatement(This())
                 ], writeable: true)
                 .Select(XdocRequiredAdder)
         ).Concat(
             LinkInserter([
-                    ExpressionStatement(CallGeneric("InsertRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkInsertRaw(containment))),
+                    ExpressionStatement(CallGeneric("InsertRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(containment), InvocationExpression(LinkWritable(containment)), LinkInsertRaw(containment))),
                     ReturnStatement(This())
                 ], writeable: true)
                 .Select(XdocRequiredInserter)
@@ -111,17 +114,19 @@ internal class FeatureGeneratorContainment(
             ContainmentInserterRaw(),
             ContainmentRemoverRaw(),
             MultipleContainmentField(),
+            MultipleContainmentEmpty(),
+            MultipleContainmentReadOnly(),
+            MultipleContainmentWritable(),
             MultipleContainmentProperty(AsReadOnlyCall()),
-            TryGetMultiple(
-                InvocationExpression(MemberAccess(FeatureField(containment), IdentifierName("AsReadOnly")))),
+            TryGetMultiple(AsReadOnlyCall()),
         }.Concat(
             LinkAdder([
-                ExpressionStatement(CallGeneric("AddOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkAddRaw(containment))),
+                ExpressionStatement(CallGeneric("AddOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("nodes"), MetaProperty(containment), InvocationExpression(LinkWritable(containment)), LinkAddRaw(containment))),
                 ReturnStatement(This())
             ], writeable: true)
         ).Concat(
             LinkInserter([
-                ExpressionStatement(CallGeneric("InsertOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(containment), FeatureField(containment), LinkInsertRaw(containment))),
+                ExpressionStatement(CallGeneric("InsertOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("index"), IdentifierName("nodes"), MetaProperty(containment), InvocationExpression(LinkWritable(containment)), LinkInsertRaw(containment))),
                 ReturnStatement(This())
             ], writeable: true)
         ).Concat(
@@ -136,7 +141,7 @@ internal class FeatureGeneratorContainment(
                 [
                     Param("nodes", AsType(typeof(List<>), AsType(containment.GetFeatureType(), writeable: true)))
                 ],
-                Call("ExchangeChildrenRaw", IdentifierName("nodes"), FeatureField(containment))
+                Call("ExchangeChildrenRaw", IdentifierName("nodes"), InvocationExpression(LinkWritable(containment)))
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
@@ -145,7 +150,7 @@ internal class FeatureGeneratorContainment(
                 [
                     Param("value", NullableType(AsType(containment.Type, writeable: true)))
                 ],
-                Call("AddChildRaw", IdentifierName("value"), FeatureField(containment))
+                Call("AddChildRaw", IdentifierName("value"), InvocationExpression(LinkWritable(containment)))
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
@@ -155,7 +160,7 @@ internal class FeatureGeneratorContainment(
                     Param("index", AsType(typeof(int))),
                     Param("value", NullableType(AsType(containment.Type, writeable: true)))
                 ],
-                Call("InsertChildRaw", IdentifierName("index"), IdentifierName("value"), FeatureField(containment))
+                Call("InsertChildRaw", IdentifierName("index"), IdentifierName("value"), InvocationExpression(LinkWritable(containment)))
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
@@ -170,10 +175,23 @@ internal class FeatureGeneratorContainment(
 
     private FieldDeclarationSyntax MultipleContainmentField() =>
         Field(FeatureField(containment).ToString(),
-                AsType(typeof(List<>), AsType(containment.Type, writeable: true)),
-                Collection([]))
-            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
+                NullableType(AsType(typeof(List<>), AsType(containment.Type, writeable: true)))
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
+    private FieldDeclarationSyntax MultipleContainmentEmpty() =>
+        Field(ContainmentEmpty(containment).ToString(),
+                AsType(typeof(IReadOnlyList<>), AsType(containment.Type, writeable: true)),
+                CollectionExpression()
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.StaticKeyword, SyntaxKind.ReadOnlyKeyword));
+
+    private MethodDeclarationSyntax MultipleContainmentReadOnly() =>
+        MultipleLinkReadOnly(AsType(containment.Type, writeable: true), ContainmentEmpty(containment));
+
+    private MethodDeclarationSyntax MultipleContainmentWritable() =>
+        MultipleLinkWritable(AsType(containment.Type, writeable: true));
+    
     private PropertyDeclarationSyntax MultipleContainmentProperty(InvocationExpressionSyntax getter) =>
         PropertyDeclaration(
                 AsType(typeof(IReadOnlyList<>), AsType(containment.Type, writeable: true)),

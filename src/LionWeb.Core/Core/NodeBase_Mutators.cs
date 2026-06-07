@@ -101,7 +101,7 @@ public abstract partial class NodeBase
             emitter.Notify();
     }
 
-    protected void AddOptionalMultipleContainment<T>(IEnumerable<T> nodes, Containment containment, List<T> storage,
+    protected void AddOptionalMultipleContainment<T>(IEnumerable<T>? nodes, Containment containment, List<T> storage,
         Func<T, bool> adder) where T : INode
     {
         var safeNodes = nodes?.ToList();
@@ -118,9 +118,8 @@ public abstract partial class NodeBase
         }
     }
 
-    protected void InsertOptionalMultipleContainment<T>(int index, IEnumerable<T> nodes, Containment containment,
-        List<T> storage,
-        Func<int, T?, bool> inserter) where T : INode
+    protected void InsertOptionalMultipleContainment<T>(int index, IEnumerable<T>? nodes, Containment containment,
+        List<T> storage, Func<int, T?, bool> inserter) where T : INode
     {
         AssureInRange(index, storage);
         var safeNodes = nodes?.ToList();
@@ -137,10 +136,8 @@ public abstract partial class NodeBase
     }
 
     protected void RemoveOptionalMultipleContainment<T>(IEnumerable<T>? nodes, Containment containment,
-        List<T> storage, Func<T?, bool> remover) where T : INode
-    {
+        List<T>? storage, Func<T?, bool> remover) where T : INode =>
         RemoveSelfParent(nodes?.ToList(), storage, containment, ContainmentRemover<T>(containment));
-    }
 
     #endregion
 
@@ -209,7 +206,7 @@ public abstract partial class NodeBase
     }
 
     protected void RemoveRequiredMultipleContainment<T>(IEnumerable<T>? nodes, Containment containment,
-        List<T> storage, Func<T?, bool> remover) where T : INode
+        List<T>? storage, Func<T?, bool> remover) where T : INode
     {
         var safeNodes = nodes?.ToList();
         AssureNotNull(safeNodes, containment);
@@ -288,7 +285,7 @@ public abstract partial class NodeBase
     }
 
     protected void RemoveOptionalMultipleReference<T>(IEnumerable<T>? nodes, Reference reference,
-        List<ReferenceTarget> storage, Func<ReferenceTarget, bool> remover) where T : IReadableNode
+        List<ReferenceTarget>? storage, Func<ReferenceTarget, bool> remover) where T : IReadableNode
     {
         var safeNodes = nodes?.ToList();
         AssureNotNull(safeNodes, reference);
@@ -329,7 +326,7 @@ public abstract partial class NodeBase
             emitter.Notify();
     }
 
-    protected void AddRequiredMultipleReference<T>(IEnumerable<T> nodes, Reference reference,
+    protected void AddRequiredMultipleReference<T>(IEnumerable<T>? nodes, Reference reference,
         List<ReferenceTarget> storage, Func<ReferenceTarget, bool> adder) where T : IReadableNode
     {
         var safeNodes = nodes?.Select(node => ReferenceTarget.FromNode(node)).ToList();
@@ -344,9 +341,8 @@ public abstract partial class NodeBase
         }
     }
 
-    protected void InsertRequiredMultipleReference<T>(int index, IEnumerable<T> nodes, Reference reference,
-        List<ReferenceTarget> storage,
-        Func<int, ReferenceTarget, bool> inserter) where T : IReadableNode
+    protected void InsertRequiredMultipleReference<T>(int index, IEnumerable<T>? nodes, Reference reference,
+        List<ReferenceTarget> storage, Func<int, ReferenceTarget, bool> inserter) where T : IReadableNode
     {
         AssureInRange(index, storage);
         var safeNodes = nodes?.Select(node => ReferenceTarget.FromNode(node)).ToList();
@@ -362,7 +358,7 @@ public abstract partial class NodeBase
     }
 
     protected void RemoveRequiredMultipleReference<T>(IEnumerable<T>? nodes, Reference reference,
-        List<ReferenceTarget> storage, Func<ReferenceTarget, bool> remover) where T : IReadableNode
+        List<ReferenceTarget>? storage, Func<ReferenceTarget, bool> remover) where T : IReadableNode
     {
         var safeNodes = nodes?.ToList();
         AssureNotNull(safeNodes, reference);

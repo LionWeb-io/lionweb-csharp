@@ -103,6 +103,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     protected virtual bool SetInternal(Feature? feature, object? value) =>
             SetInternalAnnotation(feature, value);
 
+    #region Annotations
     private bool SetInternalAnnotation(Feature? feature, object? value)
     {
         if (feature != null)
@@ -112,22 +113,25 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
             throw new InvalidValueException(feature, value);
         var safeNodes = M2Extensions.AsAnnotations<INode>(value).ToList();
         AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(safeNodes).ToList());
-        AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations);
+        var annotations = WritableAnnotations();
+        AnnotationSetNotificationEmitter notification = new(this, safeNodes, annotations);
         notification.CollectOldData();
-        RemoveSelfParent(_annotations.ToList(), _annotations, null);
-        _annotations.AddRange(SetSelfParent(safeNodes, null));
+        RemoveSelfParent(annotations.ToList(), annotations, null);
+        annotations.AddRange(SetSelfParent(safeNodes, null));
         notification.Notify();
         
         return true;
     }
 
-    #region Annotations
-
     /// <inheritdoc />
     public virtual void AddAnnotations(IEnumerable<INode> annotations)
     {
         var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
-        int index = Math.Max(_annotations.Count - 1, 0);
+        if (safeAnnotations.Count == 0)
+            return;
+        
+        List<INode> writableAnnotations = WritableAnnotations();
+        int index = Math.Max(writableAnnotations.Count - 1, 0);
         foreach (var safeAnnotation in safeAnnotations)
         {
             AnnotationAddSingleNotificationEmitter emitter = new(this, safeAnnotation, index++);
@@ -149,14 +153,15 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         var node = (INode)annotation;
         AttachChild(node);
 
-        _annotations.Add(node);
+        WritableAnnotations().Add(node);
         return true;
     }
 
     /// <inheritdoc />
     public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
-        AssureInRange(index, _annotations);
+        var writableAnnotations = WritableAnnotations();
+        AssureInRange(index, writableAnnotations);
         var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
         foreach (var safeAnnotation in safeAnnotations)
         {
@@ -173,19 +178,20 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
     /// <inheritdoc cref="IWritableNode.InsertAnnotationsRaw"/>
     protected internal bool InsertAnnotationsRaw(Index index, IWritableNode annotation)
     {
-        if (!IsInRange(index, _annotations) || annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
+        var writableAnnotations = WritableAnnotations();
+        if (!IsInRange(index, writableAnnotations) || annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
 
         var node = (INode)annotation;
         AttachChild(node);
 
-        _annotations.Insert(index, node);
+        writableAnnotations.Insert(index, node);
         return true;
     }
 
     /// <inheritdoc />
     public virtual bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover);
+        RemoveSelfParent(annotations?.ToList(), WritableAnnotations(), null, AnnotationRemover);
 
     bool IWritableNode.RemoveAnnotationsRaw(IWritableNode annotation) =>
         RemoveAnnotationsRaw(annotation);
@@ -196,7 +202,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         if (annotation is not IAnnotationInstance ann || !ann.GetAnnotation().CanAnnotate(GetClassifier()))
             return false;
 
-        return RemoveSelfParent((INode)annotation, _annotations, null);
+        return RemoveSelfParent((INode)annotation, WritableAnnotations(), null);
     }
 
     #endregion

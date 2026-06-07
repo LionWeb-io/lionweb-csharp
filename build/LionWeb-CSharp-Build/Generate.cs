@@ -16,7 +16,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using Io.Lionweb.Mps.Specific;
-using Io.Lionweb.Mps.Specific.V2024_1;
 using LionWeb.Build.Languages;
 using LionWeb.Core;
 using LionWeb.Core.M1;
@@ -26,11 +25,8 @@ using LionWeb.Core.Migration;
 using LionWeb.Core.Serialization;
 using LionWeb.Generator;
 using LionWeb.Generator.GeneratorExtensions;
-using LionWeb.Generator.Impl;
 using LionWeb.Generator.Names;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 {

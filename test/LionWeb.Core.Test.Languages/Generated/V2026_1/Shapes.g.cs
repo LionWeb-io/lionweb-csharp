@@ -329,34 +329,37 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-BillOfMaterials")]
 public partial class BillOfMaterials : AnnotationInstanceBase
 {
-	private bool SetAltGroupsRaw(List<MaterialGroup> nodes) => ExchangeChildrenRaw(nodes, _altGroups);
-	private bool AddAltGroupsRaw(MaterialGroup? value) => AddChildRaw(value, _altGroups);
-	private bool InsertAltGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, _altGroups);
+	private bool SetAltGroupsRaw(List<MaterialGroup> nodes) => ExchangeChildrenRaw(nodes, WritableAltGroups());
+	private bool AddAltGroupsRaw(MaterialGroup? value) => AddChildRaw(value, WritableAltGroups());
+	private bool InsertAltGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, WritableAltGroups());
 	private bool RemoveAltGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _altGroups);
-	private readonly List<MaterialGroup> _altGroups = [];
+	private List<MaterialGroup>? _altGroups;
+	private static readonly IReadOnlyList<MaterialGroup> _emptyAltGroups = [];
+	private IReadOnlyList<MaterialGroup> ReadOnlyAltGroups() => _altGroups?.AsReadOnly() ?? _emptyAltGroups;
+	private List<MaterialGroup> WritableAltGroups() => _altGroups ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-groups")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<MaterialGroup> AltGroups { get => _altGroups.AsReadOnly(); init => AddAltGroups(value); }
+	public IReadOnlyList<MaterialGroup> AltGroups { get => ReadOnlyAltGroups(); init => AddAltGroups(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public bool TryGetAltGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> altGroups)
 	{
-		altGroups = _altGroups.AsReadOnly();
+		altGroups = ReadOnlyAltGroups();
 		return altGroups.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		AddOptionalMultipleContainment<MaterialGroup>(nodes, ShapesLanguage.Instance.BillOfMaterials_altGroups, _altGroups, AddAltGroupsRaw);
+		AddOptionalMultipleContainment<MaterialGroup>(nodes, ShapesLanguage.Instance.BillOfMaterials_altGroups, WritableAltGroups(), AddAltGroupsRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials InsertAltGroups(int index, IEnumerable<MaterialGroup> nodes)
 	{
-		InsertOptionalMultipleContainment<MaterialGroup>(index, nodes, ShapesLanguage.Instance.BillOfMaterials_altGroups, _altGroups, InsertAltGroupsRaw);
+		InsertOptionalMultipleContainment<MaterialGroup>(index, nodes, ShapesLanguage.Instance.BillOfMaterials_altGroups, WritableAltGroups(), InsertAltGroupsRaw);
 		return this;
 	}
 
@@ -395,34 +398,37 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return this;
 	}
 
-	private bool SetGroupsRaw(List<MaterialGroup> nodes) => ExchangeChildrenRaw(nodes, _groups);
-	private bool AddGroupsRaw(MaterialGroup? value) => AddChildRaw(value, _groups);
-	private bool InsertGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, _groups);
+	private bool SetGroupsRaw(List<MaterialGroup> nodes) => ExchangeChildrenRaw(nodes, WritableGroups());
+	private bool AddGroupsRaw(MaterialGroup? value) => AddChildRaw(value, WritableGroups());
+	private bool InsertGroupsRaw(int index, MaterialGroup? value) => InsertChildRaw(index, value, WritableGroups());
 	private bool RemoveGroupsRaw(MaterialGroup? value) => RemoveChildRaw(value, _groups);
-	private readonly List<MaterialGroup> _groups = [];
+	private List<MaterialGroup>? _groups;
+	private static readonly IReadOnlyList<MaterialGroup> _emptyGroups = [];
+	private IReadOnlyList<MaterialGroup> ReadOnlyGroups() => _groups?.AsReadOnly() ?? _emptyGroups;
+	private List<MaterialGroup> WritableGroups() => _groups ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-groups")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<MaterialGroup> Groups { get => _groups.AsReadOnly(); init => AddGroups(value); }
+	public IReadOnlyList<MaterialGroup> Groups { get => ReadOnlyGroups(); init => AddGroups(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public bool TryGetGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> groups)
 	{
-		groups = _groups.AsReadOnly();
+		groups = ReadOnlyGroups();
 		return groups.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		AddOptionalMultipleContainment<MaterialGroup>(nodes, ShapesLanguage.Instance.BillOfMaterials_groups, _groups, AddGroupsRaw);
+		AddOptionalMultipleContainment<MaterialGroup>(nodes, ShapesLanguage.Instance.BillOfMaterials_groups, WritableGroups(), AddGroupsRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials InsertGroups(int index, IEnumerable<MaterialGroup> nodes)
 	{
-		InsertOptionalMultipleContainment<MaterialGroup>(index, nodes, ShapesLanguage.Instance.BillOfMaterials_groups, _groups, InsertGroupsRaw);
+		InsertOptionalMultipleContainment<MaterialGroup>(index, nodes, ShapesLanguage.Instance.BillOfMaterials_groups, WritableGroups(), InsertGroupsRaw);
 		return this;
 	}
 
@@ -433,7 +439,9 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<ReferenceTarget> _materials = [];
+	private List<ReferenceTarget>? _materials;
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials?.AsReadOnly() ?? _emptyReferences;
+	private List<ReferenceTarget> WritableMaterials() => _materials ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -441,21 +449,21 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
-	private bool SetMaterialsRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _materials);
-	private bool AddMaterialsRaw(ReferenceTarget target) => AddReferencesRaw(target, _materials);
-	private bool InsertMaterialsRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _materials);
+	private bool SetMaterialsRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableMaterials());
+	private bool AddMaterialsRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableMaterials());
+	private bool InsertMaterialsRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableMaterials());
 	private bool RemoveMaterialsRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _materials);
 	/// <remarks>Optional Multiple Reference</remarks>
         public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes)
 	{
-		AddOptionalMultipleReference<IShape>(nodes, ShapesLanguage.Instance.BillOfMaterials_materials, _materials, AddMaterialsRaw);
+		AddOptionalMultipleReference<IShape>(nodes, ShapesLanguage.Instance.BillOfMaterials_materials, WritableMaterials(), AddMaterialsRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes)
 	{
-		InsertOptionalMultipleReference<IShape>(index, nodes, ShapesLanguage.Instance.BillOfMaterials_materials, _materials, InsertMaterialsRaw);
+		InsertOptionalMultipleReference<IShape>(index, nodes, ShapesLanguage.Instance.BillOfMaterials_materials, WritableMaterials(), InsertMaterialsRaw);
 		return this;
 	}
 
@@ -523,13 +531,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
-			result = _altGroups;
+			result = ReadOnlyAltGroups();
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
 		{
-			result = _groups;
+			result = ReadOnlyGroups();
 			return true;
 		}
 
@@ -542,7 +550,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
 		{
-			result = _materials;
+			result = ReadOnlyMaterials();
 			return true;
 		}
 
@@ -556,7 +564,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleContainment<MaterialGroup>(value, ShapesLanguage.Instance.BillOfMaterials_altGroups, _altGroups, SetAltGroupsRaw);
+			SetOptionalMultipleContainment<MaterialGroup>(value, ShapesLanguage.Instance.BillOfMaterials_altGroups, WritableAltGroups(), SetAltGroupsRaw);
 			return true;
 		}
 
@@ -573,13 +581,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleContainment<MaterialGroup>(value, ShapesLanguage.Instance.BillOfMaterials_groups, _groups, SetGroupsRaw);
+			SetOptionalMultipleContainment<MaterialGroup>(value, ShapesLanguage.Instance.BillOfMaterials_groups, WritableGroups(), SetGroupsRaw);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleReference<IShape>(value, ShapesLanguage.Instance.BillOfMaterials_materials, _materials, SetMaterialsRaw);
+			SetOptionalMultipleReference<IShape>(value, ShapesLanguage.Instance.BillOfMaterials_materials, WritableMaterials(), SetMaterialsRaw);
 			return true;
 		}
 
@@ -756,7 +764,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(c))
 		{
-			RemoveSelfParent((MaterialGroup)child, _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups, null, notify ? ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_altGroups) : null);
+			RemoveSelfParent((MaterialGroup)child, WritableAltGroups(), ShapesLanguage.Instance.BillOfMaterials_altGroups, null, notify ? ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_altGroups) : null);
 			return true;
 		}
 
@@ -770,7 +778,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(c))
 		{
-			RemoveSelfParent((MaterialGroup)child, _groups, ShapesLanguage.Instance.BillOfMaterials_groups, null, notify ? ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_groups) : null);
+			RemoveSelfParent((MaterialGroup)child, WritableGroups(), ShapesLanguage.Instance.BillOfMaterials_groups, null, notify ? ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_groups) : null);
 			return true;
 		}
 
@@ -783,11 +791,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is MaterialGroup child0 && _altGroups.Contains(child0))
+		if (child is MaterialGroup child0 && (_altGroups?.Contains(child0) ?? false))
 			return ShapesLanguage.Instance.BillOfMaterials_altGroups;
 		if (ReferenceEquals(_defaultGroup, child))
 			return ShapesLanguage.Instance.BillOfMaterials_defaultGroup;
-		if (child is MaterialGroup child2 && _groups.Contains(child2))
+		if (child is MaterialGroup child2 && (_groups?.Contains(child2) ?? false))
 			return ShapesLanguage.Instance.BillOfMaterials_groups;
 		return null;
 	}
@@ -999,11 +1007,14 @@ public partial class Circle : Shape
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-CompositeShape")]
 public partial class CompositeShape : Shape
 {
-	private bool SetDisabledPartsRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, _disabledParts);
-	private bool AddDisabledPartsRaw(IShape? value) => AddChildRaw(value, _disabledParts);
-	private bool InsertDisabledPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, _disabledParts);
+	private bool SetDisabledPartsRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, WritableDisabledParts());
+	private bool AddDisabledPartsRaw(IShape? value) => AddChildRaw(value, WritableDisabledParts());
+	private bool InsertDisabledPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, WritableDisabledParts());
 	private bool RemoveDisabledPartsRaw(IShape? value) => RemoveChildRaw(value, _disabledParts);
-	private readonly List<IShape> _disabledParts = [];
+	private List<IShape>? _disabledParts;
+	private static readonly IReadOnlyList<IShape> _emptyDisabledParts = [];
+	private IReadOnlyList<IShape> ReadOnlyDisabledParts() => _disabledParts?.AsReadOnly() ?? _emptyDisabledParts;
+	private List<IShape> WritableDisabledParts() => _disabledParts ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If DisabledParts is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-disabled-parts")]
@@ -1013,7 +1024,7 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetDisabledParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> disabledParts)
 	{
-		disabledParts = _disabledParts.AsReadOnly();
+		disabledParts = ReadOnlyDisabledParts();
 		return disabledParts.Count != 0;
 	}
 
@@ -1021,7 +1032,7 @@ public partial class CompositeShape : Shape
     	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
         public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes)
 	{
-		AddRequiredMultipleContainment<IShape>(nodes, ShapesLanguage.Instance.CompositeShape_disabledParts, _disabledParts, AddDisabledPartsRaw);
+		AddRequiredMultipleContainment<IShape>(nodes, ShapesLanguage.Instance.CompositeShape_disabledParts, WritableDisabledParts(), AddDisabledPartsRaw);
 		return this;
 	}
 
@@ -1030,7 +1041,7 @@ public partial class CompositeShape : Shape
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than DisabledParts.Count</exception>
         public CompositeShape InsertDisabledParts(int index, IEnumerable<IShape> nodes)
 	{
-		InsertRequiredMultipleContainment<IShape>(index, nodes, ShapesLanguage.Instance.CompositeShape_disabledParts, _disabledParts, InsertDisabledPartsRaw);
+		InsertRequiredMultipleContainment<IShape>(index, nodes, ShapesLanguage.Instance.CompositeShape_disabledParts, WritableDisabledParts(), InsertDisabledPartsRaw);
 		return this;
 	}
 
@@ -1073,11 +1084,14 @@ public partial class CompositeShape : Shape
 		return this;
 	}
 
-	private bool SetPartsRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, _parts);
-	private bool AddPartsRaw(IShape? value) => AddChildRaw(value, _parts);
-	private bool InsertPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, _parts);
+	private bool SetPartsRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, WritableParts());
+	private bool AddPartsRaw(IShape? value) => AddChildRaw(value, WritableParts());
+	private bool InsertPartsRaw(int index, IShape? value) => InsertChildRaw(index, value, WritableParts());
 	private bool RemovePartsRaw(IShape? value) => RemoveChildRaw(value, _parts);
-	private readonly List<IShape> _parts = [];
+	private List<IShape>? _parts;
+	private static readonly IReadOnlyList<IShape> _emptyParts = [];
+	private IReadOnlyList<IShape> ReadOnlyParts() => _parts?.AsReadOnly() ?? _emptyParts;
+	private List<IShape> WritableParts() => _parts ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Parts is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-parts")]
@@ -1087,7 +1101,7 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> parts)
 	{
-		parts = _parts.AsReadOnly();
+		parts = ReadOnlyParts();
 		return parts.Count != 0;
 	}
 
@@ -1095,7 +1109,7 @@ public partial class CompositeShape : Shape
     	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
         public CompositeShape AddParts(IEnumerable<IShape> nodes)
 	{
-		AddRequiredMultipleContainment<IShape>(nodes, ShapesLanguage.Instance.CompositeShape_parts, _parts, AddPartsRaw);
+		AddRequiredMultipleContainment<IShape>(nodes, ShapesLanguage.Instance.CompositeShape_parts, WritableParts(), AddPartsRaw);
 		return this;
 	}
 
@@ -1104,7 +1118,7 @@ public partial class CompositeShape : Shape
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Parts.Count</exception>
         public CompositeShape InsertParts(int index, IEnumerable<IShape> nodes)
 	{
-		InsertRequiredMultipleContainment<IShape>(index, nodes, ShapesLanguage.Instance.CompositeShape_parts, _parts, InsertPartsRaw);
+		InsertRequiredMultipleContainment<IShape>(index, nodes, ShapesLanguage.Instance.CompositeShape_parts, WritableParts(), InsertPartsRaw);
 		return this;
 	}
 
@@ -1167,13 +1181,13 @@ public partial class CompositeShape : Shape
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature))
 		{
-			result = _disabledParts;
+			result = ReadOnlyDisabledParts();
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature))
 		{
-			result = _parts;
+			result = ReadOnlyParts();
 			return true;
 		}
 
@@ -1187,7 +1201,7 @@ public partial class CompositeShape : Shape
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleContainment<IShape>(value, ShapesLanguage.Instance.CompositeShape_disabledParts, _disabledParts, SetDisabledPartsRaw);
+			SetRequiredMultipleContainment<IShape>(value, ShapesLanguage.Instance.CompositeShape_disabledParts, WritableDisabledParts(), SetDisabledPartsRaw);
 			return true;
 		}
 
@@ -1204,7 +1218,7 @@ public partial class CompositeShape : Shape
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleContainment<IShape>(value, ShapesLanguage.Instance.CompositeShape_parts, _parts, SetPartsRaw);
+			SetRequiredMultipleContainment<IShape>(value, ShapesLanguage.Instance.CompositeShape_parts, WritableParts(), SetPartsRaw);
 			return true;
 		}
 
@@ -1334,7 +1348,7 @@ public partial class CompositeShape : Shape
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(c))
 		{
-			RemoveSelfParent((IShape)child, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_disabledParts) : null);
+			RemoveSelfParent((IShape)child, WritableDisabledParts(), ShapesLanguage.Instance.CompositeShape_disabledParts, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_disabledParts) : null);
 			return true;
 		}
 
@@ -1348,7 +1362,7 @@ public partial class CompositeShape : Shape
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(c))
 		{
-			RemoveSelfParent((IShape)child, _parts, ShapesLanguage.Instance.CompositeShape_parts, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_parts) : null);
+			RemoveSelfParent((IShape)child, WritableParts(), ShapesLanguage.Instance.CompositeShape_parts, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_parts) : null);
 			return true;
 		}
 
@@ -1361,11 +1375,11 @@ public partial class CompositeShape : Shape
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is IShape child0 && _disabledParts.Contains(child0))
+		if (child is IShape child0 && (_disabledParts?.Contains(child0) ?? false))
 			return ShapesLanguage.Instance.CompositeShape_disabledParts;
 		if (ReferenceEquals(_evilPart, child))
 			return ShapesLanguage.Instance.CompositeShape_evilPart;
-		if (child is IShape child2 && _parts.Contains(child2))
+		if (child is IShape child2 && (_parts?.Contains(child2) ?? false))
 			return ShapesLanguage.Instance.CompositeShape_parts;
 		return null;
 	}
@@ -1774,34 +1788,37 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return this;
 	}
 
-	private bool SetShapesRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, _shapes);
-	private bool AddShapesRaw(IShape? value) => AddChildRaw(value, _shapes);
-	private bool InsertShapesRaw(int index, IShape? value) => InsertChildRaw(index, value, _shapes);
+	private bool SetShapesRaw(List<IShape> nodes) => ExchangeChildrenRaw(nodes, WritableShapes());
+	private bool AddShapesRaw(IShape? value) => AddChildRaw(value, WritableShapes());
+	private bool InsertShapesRaw(int index, IShape? value) => InsertChildRaw(index, value, WritableShapes());
 	private bool RemoveShapesRaw(IShape? value) => RemoveChildRaw(value, _shapes);
-	private readonly List<IShape> _shapes = [];
+	private List<IShape>? _shapes;
+	private static readonly IReadOnlyList<IShape> _emptyShapes = [];
+	private IReadOnlyList<IShape> ReadOnlyShapes() => _shapes?.AsReadOnly() ?? _emptyShapes;
+	private List<IShape> WritableShapes() => _shapes ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
+	public IReadOnlyList<IShape> Shapes { get => ReadOnlyShapes(); init => AddShapes(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
 	{
-		shapes = _shapes.AsReadOnly();
+		shapes = ReadOnlyShapes();
 		return shapes.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry AddShapes(IEnumerable<IShape> nodes)
 	{
-		AddOptionalMultipleContainment<IShape>(nodes, ShapesLanguage.Instance.Geometry_shapes, _shapes, AddShapesRaw);
+		AddOptionalMultipleContainment<IShape>(nodes, ShapesLanguage.Instance.Geometry_shapes, WritableShapes(), AddShapesRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry InsertShapes(int index, IEnumerable<IShape> nodes)
 	{
-		InsertOptionalMultipleContainment<IShape>(index, nodes, ShapesLanguage.Instance.Geometry_shapes, _shapes, InsertShapesRaw);
+		InsertOptionalMultipleContainment<IShape>(index, nodes, ShapesLanguage.Instance.Geometry_shapes, WritableShapes(), InsertShapesRaw);
 		return this;
 	}
 
@@ -1862,7 +1879,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 			return true;
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
 		{
-			result = _shapes;
+			result = ReadOnlyShapes();
 			return true;
 		}
 
@@ -1887,7 +1904,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleContainment<IShape>(value, ShapesLanguage.Instance.Geometry_shapes, _shapes, SetShapesRaw);
+			SetOptionalMultipleContainment<IShape>(value, ShapesLanguage.Instance.Geometry_shapes, WritableShapes(), SetShapesRaw);
 			return true;
 		}
 
@@ -1999,7 +2016,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(c))
 		{
-			RemoveSelfParent((IShape)child, _shapes, ShapesLanguage.Instance.Geometry_shapes, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.Geometry_shapes) : null);
+			RemoveSelfParent((IShape)child, WritableShapes(), ShapesLanguage.Instance.Geometry_shapes, null, notify ? ContainmentRemover<IShape>(ShapesLanguage.Instance.Geometry_shapes) : null);
 			return true;
 		}
 
@@ -2014,7 +2031,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 			return result;
 		if (ReferenceEquals(_documentation, child))
 			return ShapesLanguage.Instance.Geometry_documentation;
-		if (child is IShape child1 && _shapes.Contains(child1))
+		if (child is IShape child1 && (_shapes?.Contains(child1) ?? false))
 			return ShapesLanguage.Instance.Geometry_shapes;
 		return null;
 	}
@@ -2275,7 +2292,9 @@ public partial class MaterialGroup : ConceptInstanceBase
 		return this;
 	}
 
-	private readonly List<ReferenceTarget> _materials = [];
+	private List<ReferenceTarget>? _materials;
+	private IReadOnlyList<ReferenceTarget> ReadOnlyMaterials() => _materials?.AsReadOnly() ?? _emptyReferences;
+	private List<ReferenceTarget> WritableMaterials() => _materials ??= [];
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
@@ -2284,15 +2303,15 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
         public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials) => TryGetReference<IShape>(_materials, out materials);
-	private bool SetMaterialsRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _materials);
-	private bool AddMaterialsRaw(ReferenceTarget target) => AddReferencesRaw(target, _materials);
-	private bool InsertMaterialsRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _materials);
+	private bool SetMaterialsRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableMaterials());
+	private bool AddMaterialsRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableMaterials());
+	private bool InsertMaterialsRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableMaterials());
 	private bool RemoveMaterialsRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _materials);
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
         public MaterialGroup AddMaterials(IEnumerable<IShape> nodes)
 	{
-		AddRequiredMultipleReference<IShape>(nodes, ShapesLanguage.Instance.MaterialGroup_materials, _materials, AddMaterialsRaw);
+		AddRequiredMultipleReference<IShape>(nodes, ShapesLanguage.Instance.MaterialGroup_materials, WritableMaterials(), AddMaterialsRaw);
 		return this;
 	}
 
@@ -2301,7 +2320,7 @@ public partial class MaterialGroup : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Materials.Count</exception>
         public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes)
 	{
-		InsertRequiredMultipleReference<IShape>(index, nodes, ShapesLanguage.Instance.MaterialGroup_materials, _materials, InsertMaterialsRaw);
+		InsertRequiredMultipleReference<IShape>(index, nodes, ShapesLanguage.Instance.MaterialGroup_materials, WritableMaterials(), InsertMaterialsRaw);
 		return this;
 	}
 
@@ -2405,7 +2424,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 			return true;
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
 		{
-			result = _materials;
+			result = ReadOnlyMaterials();
 			return true;
 		}
 
@@ -2430,7 +2449,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleReference<IShape>(value, ShapesLanguage.Instance.MaterialGroup_materials, _materials, SetMaterialsRaw);
+			SetRequiredMultipleReference<IShape>(value, ShapesLanguage.Instance.MaterialGroup_materials, WritableMaterials(), SetMaterialsRaw);
 			return true;
 		}
 
@@ -2992,7 +3011,9 @@ public partial class OffsetDuplicate : Shape
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-ReferenceGeometry")]
 public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance<INode>
 {
-	private readonly List<ReferenceTarget> _shapes = [];
+	private List<ReferenceTarget>? _shapes;
+	private IReadOnlyList<ReferenceTarget> ReadOnlyShapes() => _shapes?.AsReadOnly() ?? _emptyReferences;
+	private List<ReferenceTarget> WritableShapes() => _shapes ??= [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
@@ -3000,21 +3021,21 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes) => TryGetReference<IShape>(_shapes, out shapes);
-	private bool SetShapesRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, _shapes);
-	private bool AddShapesRaw(ReferenceTarget target) => AddReferencesRaw(target, _shapes);
-	private bool InsertShapesRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, _shapes);
+	private bool SetShapesRaw(List<ReferenceTarget> targets) => SetReferencesRaw(targets, WritableShapes());
+	private bool AddShapesRaw(ReferenceTarget target) => AddReferencesRaw(target, WritableShapes());
+	private bool InsertShapesRaw(int index, ReferenceTarget target) => InsertReferencesRaw(index, target, WritableShapes());
 	private bool RemoveShapesRaw(ReferenceTarget target) => RemoveReferencesRaw(target, _shapes);
 	/// <remarks>Optional Multiple Reference</remarks>
         public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes)
 	{
-		AddOptionalMultipleReference<IShape>(nodes, ShapesLanguage.Instance.ReferenceGeometry_shapes, _shapes, AddShapesRaw);
+		AddOptionalMultipleReference<IShape>(nodes, ShapesLanguage.Instance.ReferenceGeometry_shapes, WritableShapes(), AddShapesRaw);
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes)
 	{
-		InsertOptionalMultipleReference<IShape>(index, nodes, ShapesLanguage.Instance.ReferenceGeometry_shapes, _shapes, InsertShapesRaw);
+		InsertOptionalMultipleReference<IShape>(index, nodes, ShapesLanguage.Instance.ReferenceGeometry_shapes, WritableShapes(), InsertShapesRaw);
 		return this;
 	}
 
@@ -3056,7 +3077,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
-			result = _shapes;
+			result = ReadOnlyShapes();
 			return true;
 		}
 
@@ -3070,7 +3091,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleReference<IShape>(value, ShapesLanguage.Instance.ReferenceGeometry_shapes, _shapes, SetShapesRaw);
+			SetOptionalMultipleReference<IShape>(value, ShapesLanguage.Instance.ReferenceGeometry_shapes, WritableShapes(), SetShapesRaw);
 			return true;
 		}
 
@@ -3193,20 +3214,23 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		return this;
 	}
 
-	private bool SetFixpointsRaw(List<Coord> nodes) => ExchangeChildrenRaw(nodes, _fixpoints);
-	private bool AddFixpointsRaw(Coord? value) => AddChildRaw(value, _fixpoints);
-	private bool InsertFixpointsRaw(int index, Coord? value) => InsertChildRaw(index, value, _fixpoints);
+	private bool SetFixpointsRaw(List<Coord> nodes) => ExchangeChildrenRaw(nodes, WritableFixpoints());
+	private bool AddFixpointsRaw(Coord? value) => AddChildRaw(value, WritableFixpoints());
+	private bool InsertFixpointsRaw(int index, Coord? value) => InsertChildRaw(index, value, WritableFixpoints());
 	private bool RemoveFixpointsRaw(Coord? value) => RemoveChildRaw(value, _fixpoints);
-	private readonly List<Coord> _fixpoints = [];
+	private List<Coord>? _fixpoints;
+	private static readonly IReadOnlyList<Coord> _emptyFixpoints = [];
+	private IReadOnlyList<Coord> ReadOnlyFixpoints() => _fixpoints?.AsReadOnly() ?? _emptyFixpoints;
+	private List<Coord> WritableFixpoints() => _fixpoints ??= [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-fixpoints")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<Coord> Fixpoints { get => _fixpoints.AsReadOnly(); init => AddFixpoints(value); }
+	public IReadOnlyList<Coord> Fixpoints { get => ReadOnlyFixpoints(); init => AddFixpoints(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public bool TryGetFixpoints([NotNullWhenAttribute(true)] out IReadOnlyList<Coord> fixpoints)
 	{
-		fixpoints = _fixpoints.AsReadOnly();
+		fixpoints = ReadOnlyFixpoints();
 		return fixpoints.Count != 0;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
@@ -3214,7 +3238,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Multiple Containment</remarks>
         public Shape AddFixpoints(IEnumerable<Coord> nodes)
 	{
-		AddOptionalMultipleContainment<Coord>(nodes, ShapesLanguage.Instance.IShape_fixpoints, _fixpoints, AddFixpointsRaw);
+		AddOptionalMultipleContainment<Coord>(nodes, ShapesLanguage.Instance.IShape_fixpoints, WritableFixpoints(), AddFixpointsRaw);
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
@@ -3222,7 +3246,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Multiple Containment</remarks>
         public Shape InsertFixpoints(int index, IEnumerable<Coord> nodes)
 	{
-		InsertOptionalMultipleContainment<Coord>(index, nodes, ShapesLanguage.Instance.IShape_fixpoints, _fixpoints, InsertFixpointsRaw);
+		InsertOptionalMultipleContainment<Coord>(index, nodes, ShapesLanguage.Instance.IShape_fixpoints, WritableFixpoints(), InsertFixpointsRaw);
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
@@ -3372,7 +3396,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 			return true;
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
-			result = _fixpoints;
+			result = ReadOnlyFixpoints();
 			return true;
 		}
 
@@ -3397,7 +3421,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
-			SetOptionalMultipleContainment<Coord>(value, ShapesLanguage.Instance.IShape_fixpoints, _fixpoints, SetFixpointsRaw);
+			SetOptionalMultipleContainment<Coord>(value, ShapesLanguage.Instance.IShape_fixpoints, WritableFixpoints(), SetFixpointsRaw);
 			return true;
 		}
 
@@ -3538,7 +3562,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(c))
 		{
-			RemoveSelfParent((Coord)child, _fixpoints, ShapesLanguage.Instance.IShape_fixpoints, null, notify ? ContainmentRemover<Coord>(ShapesLanguage.Instance.IShape_fixpoints) : null);
+			RemoveSelfParent((Coord)child, WritableFixpoints(), ShapesLanguage.Instance.IShape_fixpoints, null, notify ? ContainmentRemover<Coord>(ShapesLanguage.Instance.IShape_fixpoints) : null);
 			return true;
 		}
 
@@ -3559,7 +3583,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is Coord child0 && _fixpoints.Contains(child0))
+		if (child is Coord child0 && (_fixpoints?.Contains(child0) ?? false))
 			return ShapesLanguage.Instance.IShape_fixpoints;
 		if (ReferenceEquals(_shapeDocs, child))
 			return ShapesLanguage.Instance.Shape_shapeDocs;

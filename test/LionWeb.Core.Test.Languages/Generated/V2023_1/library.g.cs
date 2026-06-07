@@ -583,11 +583,14 @@ public partial class GuideBookWriter : Writer
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Library")]
 public partial class Library : ConceptInstanceBase
 {
-	private bool SetBooksRaw(List<Book> nodes) => ExchangeChildrenRaw(nodes, _books);
-	private bool AddBooksRaw(Book? value) => AddChildRaw(value, _books);
-	private bool InsertBooksRaw(int index, Book? value) => InsertChildRaw(index, value, _books);
+	private bool SetBooksRaw(List<Book> nodes) => ExchangeChildrenRaw(nodes, WritableBooks());
+	private bool AddBooksRaw(Book? value) => AddChildRaw(value, WritableBooks());
+	private bool InsertBooksRaw(int index, Book? value) => InsertChildRaw(index, value, WritableBooks());
 	private bool RemoveBooksRaw(Book? value) => RemoveChildRaw(value, _books);
-	private readonly List<Book> _books = [];
+	private List<Book>? _books;
+	private static readonly IReadOnlyList<Book> _emptyBooks = [];
+	private IReadOnlyList<Book> ReadOnlyBooks() => _books?.AsReadOnly() ?? _emptyBooks;
+	private List<Book> WritableBooks() => _books ??= [];
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "books")]
@@ -597,7 +600,7 @@ public partial class Library : ConceptInstanceBase
 	/// <remarks>Required Multiple Containment</remarks>
         public bool TryGetBooks([NotNullWhenAttribute(true)] out IReadOnlyList<Book> books)
 	{
-		books = _books.AsReadOnly();
+		books = ReadOnlyBooks();
 		return books.Count != 0;
 	}
 
@@ -605,7 +608,7 @@ public partial class Library : ConceptInstanceBase
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
         public Library AddBooks(IEnumerable<Book> nodes)
 	{
-		AddRequiredMultipleContainment<Book>(nodes, LibraryLanguage.Instance.Library_books, _books, AddBooksRaw);
+		AddRequiredMultipleContainment<Book>(nodes, LibraryLanguage.Instance.Library_books, WritableBooks(), AddBooksRaw);
 		return this;
 	}
 
@@ -614,7 +617,7 @@ public partial class Library : ConceptInstanceBase
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
         public Library InsertBooks(int index, IEnumerable<Book> nodes)
 	{
-		InsertRequiredMultipleContainment<Book>(index, nodes, LibraryLanguage.Instance.Library_books, _books, InsertBooksRaw);
+		InsertRequiredMultipleContainment<Book>(index, nodes, LibraryLanguage.Instance.Library_books, WritableBooks(), InsertBooksRaw);
 		return this;
 	}
 
@@ -703,7 +706,7 @@ public partial class Library : ConceptInstanceBase
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
 		{
-			result = _books;
+			result = ReadOnlyBooks();
 			return true;
 		}
 
@@ -717,7 +720,7 @@ public partial class Library : ConceptInstanceBase
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
 		{
-			SetRequiredMultipleContainment<Book>(value, LibraryLanguage.Instance.Library_books, _books, SetBooksRaw);
+			SetRequiredMultipleContainment<Book>(value, LibraryLanguage.Instance.Library_books, WritableBooks(), SetBooksRaw);
 			return true;
 		}
 
@@ -832,7 +835,7 @@ public partial class Library : ConceptInstanceBase
 		Containment? c = GetContainmentOf(child);
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(c))
 		{
-			RemoveSelfParent((Book)child, _books, LibraryLanguage.Instance.Library_books, null, notify ? ContainmentRemover<Book>(LibraryLanguage.Instance.Library_books) : null);
+			RemoveSelfParent((Book)child, WritableBooks(), LibraryLanguage.Instance.Library_books, null, notify ? ContainmentRemover<Book>(LibraryLanguage.Instance.Library_books) : null);
 			return true;
 		}
 
@@ -845,7 +848,7 @@ public partial class Library : ConceptInstanceBase
 		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
-		if (child is Book child0 && _books.Contains(child0))
+		if (child is Book child0 && (_books?.Contains(child0) ?? false))
 			return LibraryLanguage.Instance.Library_books;
 		return null;
 	}

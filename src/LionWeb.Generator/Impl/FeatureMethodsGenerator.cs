@@ -115,48 +115,62 @@ internal class FeatureMethodsGenerator(
 
     #region TryGetRaw
 
-    private MethodDeclarationSyntax? GenTryGetPropertyRaw() =>
-        AbstractGetRaw("TryGetPropertyRaw", typeof(Property), NullableType(AsType(typeof(object))),
-            PropertiesToImplement());
+    private MethodDeclarationSyntax? GenTryGetPropertyRaw()
+    {
+        IReadOnlyList<Feature> properties = PropertiesToImplement();
+        return properties.Count == 0
+            ? null
+            : AbstractGetRaw("TryGetPropertyRaw", typeof(Property), NullableType(AsType(typeof(object))), properties.Select<Feature, StatementSyntax>(feature =>
+                IfStatement(GenEqualsIdentityFeature(feature),
+                    AsStatements([
+                        Assignment("result", FeatureField(feature)),
+                        ReturnTrue()
+                    ])
+                ))
+            );
+    }
 
     private MethodDeclarationSyntax? GenTryGetContainmentRaw() =>
-        AbstractGetRaw("TryGetContainmentRaw", typeof(Containment), NullableType(AsType(typeof(IReadableNode))),
+        LinkGetRaw("TryGetContainmentRaw", typeof(Containment), NullableType(AsType(typeof(IReadableNode))),
             ContainmentsToImplement(false));
 
     private MethodDeclarationSyntax? GenTryGetContainmentsRaw() =>
-        AbstractGetRaw("TryGetContainmentsRaw", typeof(Containment), AsType(typeof(IReadOnlyList<IReadableNode>)),
+        LinkGetRaw("TryGetContainmentsRaw", typeof(Containment), AsType(typeof(IReadOnlyList<IReadableNode>)),
             ContainmentsToImplement(true));
 
     private MethodDeclarationSyntax? GenTryGetReferenceRaw() =>
-        AbstractGetRaw("TryGetReferenceRaw", typeof(Reference), NullableType(AsType(typeof(IReferenceTarget))),
+        LinkGetRaw("TryGetReferenceRaw", typeof(Reference), NullableType(AsType(typeof(IReferenceTarget))),
             ReferencesToImplement(false));
 
     private MethodDeclarationSyntax? GenTryGetReferencesRaw() =>
-        AbstractGetRaw("TryGetReferencesRaw", typeof(Reference), AsType(typeof(IReadOnlyList<IReferenceTarget>)),
+        LinkGetRaw("TryGetReferencesRaw", typeof(Reference), AsType(typeof(IReadOnlyList<IReferenceTarget>)),
             ReferencesToImplement(true));
 
-    private MethodDeclarationSyntax? AbstractGetRaw(string methodName, Type featureType, TypeSyntax resultType,
-        IReadOnlyList<Feature> features) =>
-        features.Count == 0
+    private MethodDeclarationSyntax? LinkGetRaw(string methodName, Type featureType, TypeSyntax resultType,
+        IReadOnlyList<Link> links) =>
+        links.Count == 0
             ? null
-            : Method(methodName, AsType(typeof(bool)), [
-                    Param("feature", AsType(featureType)),
-                    Param("result", resultType)
-                        .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
-                ])
-                .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
-                .WithBody(AsStatements(new List<StatementSyntax>
-                    {
-                        IfStatement(ParseExpression($"base.{methodName}(feature, out result)"), ReturnTrue())
-                    }
-                    .Concat(features.Select(GenGetInternalRaw))
-                    .Append(ReturnStatement(false.AsLiteral()))
-                ));
+            : AbstractGetRaw(methodName, featureType, resultType, links.Select(GenGetInternalRaw));
 
-    private StatementSyntax GenGetInternalRaw(Feature feature) =>
-        IfStatement(GenEqualsIdentityFeature(feature),
+    private MethodDeclarationSyntax AbstractGetRaw(string methodName, Type featureType, TypeSyntax resultType, IEnumerable<StatementSyntax> statementSyntaxes) =>
+        Method(methodName, AsType(typeof(bool)), [
+                Param("feature", AsType(featureType)),
+                Param("result", resultType)
+                    .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+            .WithBody(AsStatements(new List<StatementSyntax>
+                {
+                    IfStatement(ParseExpression($"base.{methodName}(feature, out result)"), ReturnTrue())
+                }
+                .Concat(statementSyntaxes)
+                .Append(ReturnStatement(false.AsLiteral()))
+            ));
+
+    private StatementSyntax GenGetInternalRaw(Link link) =>
+        IfStatement(GenEqualsIdentityFeature(link),
             AsStatements([
-                Assignment("result", FeatureField(feature)),
+                Assignment("result", link.Multiple ? InvocationExpression(LinkReadOnly(link)) : FeatureField(link)),
                 ReturnTrue()
             ])
         );
@@ -303,25 +317,25 @@ internal class FeatureMethodsGenerator(
 
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
-        ExpressionStatement(CallGeneric("SetOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
+        ExpressionStatement(CallGeneric("SetOptionalMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), InvocationExpression(LinkWritable(containment)), FeatureSetRaw(containment))),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment) =>
     [
-        ExpressionStatement(CallGeneric("SetRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), FeatureField(containment), FeatureSetRaw(containment))),
+        ExpressionStatement(CallGeneric("SetRequiredMultipleContainment", AsType(containment.Type, writeable:true), IdentifierName("value"), MetaProperty(containment), InvocationExpression(LinkWritable(containment)), FeatureSetRaw(containment))),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiOptionalReference(Reference reference) =>
     [
-        ExpressionStatement(CallGeneric("SetOptionalMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
+        ExpressionStatement(CallGeneric("SetOptionalMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), InvocationExpression(LinkWritable(reference)), FeatureSetRaw(reference))),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiRequiredReference(Reference reference) =>
     [
-        ExpressionStatement(CallGeneric("SetRequiredMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), FeatureField(reference), FeatureSetRaw(reference))),
+        ExpressionStatement(CallGeneric("SetRequiredMultipleReference", AsType(reference.Type), IdentifierName("value"), MetaProperty(reference), InvocationExpression(LinkWritable(reference)), FeatureSetRaw(reference))),
         ReturnTrue()
     ];
 
