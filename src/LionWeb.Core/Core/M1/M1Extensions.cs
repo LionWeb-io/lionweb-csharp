@@ -287,24 +287,56 @@ public static class M1Extensions
     public static IEnumerable<T> Children<T>(T self, bool includeSelf = false, bool includeAnnotations = false)
         where T : class, IReadableNode
     {
-        var result = self
-            .CollectAllSetFeatures()
-            .OfType<Containment>()
-            .Select(containment => (containment: containment, value: self.Get(containment)))
-            .Where(tuple => tuple.value is T || tuple.value is IEnumerable e && M2Extensions.AreAll<T>(e))
-            .SelectMany(tuple => M2Extensions.AsNodes<T>(tuple.value, tuple.containment))
-            .Select(c => !ReferenceEquals(c, self)
-                ? c
-                : throw new TreeShapeException(self,
-                    $"{self.GetId()} contains itself as child"));
-
-        if (includeAnnotations)
-            result = result.Concat(M2Extensions.AsAnnotations<T>(self.GetAnnotations()));
+        List<T> result = [];
 
         if (includeSelf)
-            result = result.Prepend(self);
+            result.Add(self);
+
+        foreach (Feature feature in self.CollectAllSetFeatures())
+        {
+            if (feature is not Containment containment)
+                continue;
+
+            switch (containment)
+            {
+                case Containment { Multiple: true } when self.TryGetContainmentsRaw(containment, out var children):
+                    result.EnsureCapacity(result.Count + children.Count);
+                    foreach (T ch in M2Extensions.AsNodes<T>(children, containment))
+                    {
+                        CheckTreeShape(ch);
+                        result.Add(ch);
+                    }
+
+                    break;
+                case Containment { Multiple: false } when self.TryGetContainmentRaw(containment, out var child):
+                    T typedChild = child as T ?? throw new InvalidValueException(feature, child);
+                    CheckTreeShape(typedChild);
+                    result.Add(typedChild);
+                    break;
+                default:
+                    if (self.TryGetRaw(containment, out var value))
+                    {
+                        if (value is T typedValue)
+                        {
+                            CheckTreeShape(typedValue);
+                            result.Add(typedValue);
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        if (includeAnnotations)
+            result.AddRange(M2Extensions.AsAnnotations<T>(self.GetAnnotations()));
 
         return result;
+
+        void CheckTreeShape(T typedChild)
+        {
+            if (typedChild == self)
+                throw new TreeShapeException(self, $"{self.GetId()} contains itself as child");
+        }
     }
 
     #endregion
