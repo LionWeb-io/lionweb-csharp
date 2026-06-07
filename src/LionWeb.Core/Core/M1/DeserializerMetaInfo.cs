@@ -29,10 +29,10 @@ using System.Diagnostics.CodeAnalysis;
 /// <see cref="DeserializerBase{T,H}._deserializerMetaInfo"/>.</remarks>
 public class DeserializerMetaInfo(IDeserializerHandler handler)
 {
-    private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
-    private readonly Dictionary<NodeId, List<Language>> _languagesByKey = new();
-    private readonly Dictionary<MetaPointer, Classifier> _classifiers = new();
-    private readonly Dictionary<MetaPointer, Feature> _features = new();
+    private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = [];
+    private readonly Dictionary<NodeId, List<Language>> _languagesByKey = [];
+    private readonly Dictionary<MetaPointer, Classifier> _classifiers = [];
+    private readonly Dictionary<MetaPointer, Feature> _features = [];
 
     internal void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
     {
@@ -43,8 +43,11 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
             _languagesByKey[key].Add(language);
         }
 
-        foreach (Classifier classifier in language.Entities.OfType<Classifier>())
+        foreach (var entity in language.Entities)
         {
+            if (entity is not Classifier classifier)
+                continue;
+
             _classifiers[classifier.ToMetaPointer()] = classifier;
             foreach (Feature feature in classifier.Features)
             {

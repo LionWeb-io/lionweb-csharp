@@ -35,9 +35,6 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// LionCore M3 according to <see cref="_versionSpecifics"/>.
     protected readonly ILionCoreLanguage _m3;
 
-    /// LionCore builtins according to <see cref="_versionSpecifics"/>.
-    protected readonly IBuiltInsLanguage _builtIns;
-
     ///Handler to customize this deserializer's behaviour in non-regular situations.
     protected readonly H _handler;
 
@@ -49,6 +46,9 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     /// Already deserialized nodes.
     protected readonly Dictionary<NodeId, T> _deserializedNodesById = new();
+
+    /// LionCore builtins according to <see cref="_versionSpecifics"/>.
+    private readonly IBuiltInsLanguage _builtIns;
 
     /// <param name="lionWebVersion">Version of LionWeb standard to use.</param>
     /// <param name="handler">Optional handler to customize this deserializer's behaviour in non-regular situations.</param>
@@ -137,14 +137,21 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <para>
     /// Takes care of <see cref="IDeserializerHandler.InvalidLinkValue{T}"/>.
     /// </para>
-    protected void InstallContainment(IEnumerable<NodeId> childrenIds, IWritableNode node, Feature containment)
+    protected void InstallContainment(NodeId[] childrenIds, IWritableNode node, Feature containment)
     {
-        List<IWritableNode> children = childrenIds
-            .Select<NodeId, IWritableNode?>(childId => FindChild(node, containment, childId))
-            .Where(c => c != null)
-            .ToList()!;
-
-        SetContainment(children, node, containment);
+        if (childrenIds.Length == 0)
+            return;
+    
+        var children = new List<IWritableNode>(childrenIds.Length);
+        foreach (var childId in childrenIds)
+        {
+            var child = FindChild(node, containment, childId);
+            if (child is not null)
+                children.Add(child);
+        }
+    
+        if (children.Count > 0)
+            SetContainment(children, node, containment);
     }
 
     private void SetContainment<TChild>(List<TChild> children, IWritableNode node, Feature containment)
@@ -195,7 +202,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         return result;
     }
 
-    private bool ContainsAncestor(IWritableNode node, IReadableNode? parent) =>
+    private static bool ContainsAncestor(IWritableNode node, IReadableNode? parent) =>
         ReferenceEquals(node, parent) || parent != null && ContainsAncestor(node, parent.GetParent());
 
     #endregion
@@ -275,11 +282,11 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     }
 
     /// <inheritdoc />
-    void IDeserializer.InstallNodeReferences(NodeId nodeId, IEnumerable<SerializedReference> references) =>
+    void IDeserializer.InstallNodeReferences(NodeId nodeId, SerializedReference[] references) =>
         InstallReferences(nodeId, references);
 
     /// <inheritdoc cref="IDeserializer.InstallNodeReferences"/>
-    protected void InstallReferences(NodeId nodeId, IEnumerable<SerializedReference> references)
+    protected void InstallReferences(NodeId nodeId, SerializedReference[] references)
     {
         T node = _deserializedNodesById[nodeId];
 
@@ -297,29 +304,30 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             switch (feature)
             {
                 case null:
-                    continue;
+                    break;
                 case Containment c:
                     // required if FindFeature() "heals" the reference into a containment.
-                    InstallContainment(
-                        targetEntries
-                            .Select(e => e.Reference)
-                            .Where(i => i is not null)
-                            .ToList()!,
-                        writable,
-                        c
-                    );
-                    continue;
-                default:
+                    var childrenIds = new NodeId[targetEntries.Length];
+                    int i = 0;
+                    foreach (var targetEntry in targetEntries)
                     {
-                        List<IReferenceTarget> targets = targetEntries
-                            .Select(target =>
-                                FindReferenceTarget(node, feature, target.Reference, target.ResolveInfo))
-                            .Where(d => d is not null)
-                            .ToList()!;
-
-                        SetReference(targets, writable, feature);
-                        break;
+                        if (targetEntry.Reference is { } t)
+                            childrenIds[i++] = t;
                     }
+
+                    InstallContainment(childrenIds, writable, c);
+                    break;
+                default:
+                    List<IReferenceTarget> targets = [];
+
+                    foreach (var targetEntry in targetEntries)
+                    {
+                        if (FindReferenceTarget(node, feature, targetEntry.Reference, targetEntry.ResolveInfo) is { } t)
+                            targets.Add(t);
+                    }
+
+                    SetReference(targets, writable, feature);
+                    break;
             }
         }
     }

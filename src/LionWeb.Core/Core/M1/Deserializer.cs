@@ -44,6 +44,7 @@ public partial class Deserializer : DeserializerBase<IWritableNode, IDeserialize
         base(lionWebVersion, handler ?? new DeserializerExceptionHandler())
     {
     }
+
     /// <inheritdoc />
     [Obsolete("Use Deserializer(LionWebVersions, IDeserializerHandler?) instead.")]
     public Deserializer(LionWebVersions lionWebVersion, IDeserializerHandler? handler = null, CompressedIdConfig? compressedIdConfig = null) :

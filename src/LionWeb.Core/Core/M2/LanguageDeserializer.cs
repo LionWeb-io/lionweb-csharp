@@ -25,10 +25,8 @@ using Serialization;
 public partial class LanguageDeserializer : DeserializerBase<IReadableNode, ILanguageDeserializerHandler>,
     ILanguageDeserializer
 {
-    private readonly Dictionary<NodeId, SerializedNode> _serializedNodesById = new();
-
+    private readonly Dictionary<NodeId, SerializedNode> _serializedNodesById = [];
     private readonly DeserializerBuilder _deserializerBuilder = new();
-
     private readonly ILanguageDeserializerVersionSpecifics _languageVersionSpecifics;
 
 

@@ -53,7 +53,7 @@ public partial class Deserializer
         {
             var metaPointer = serializedContainment.Containment;
             var childrenIds = serializedContainment.Children;
-            
+
             var containment = _deserializerMetaInfo.FindFeature<Containment>(node, metaPointer);
             if (containment == null)
                 continue;
@@ -85,10 +85,15 @@ public partial class Deserializer
 
         IWritableNode node = _deserializedNodesById[nodeId];
 
-        List<IWritableNode> annotations = annotationIds
-            .Select(annId => FindAnnotation(node, annId))
-            .Where(c => c != null)
-            .ToList()!;
+        var annotations = new List<IWritableNode>(annotationIds.Length);
+        foreach (var annotationId in annotationIds)
+        {
+            if (FindAnnotation(node, annotationId) is { } a)
+                annotations.Add(a);
+        }
+
+        if (annotations.Count == 0)
+            return;
 
         node.AddAnnotations(annotations);
     }
