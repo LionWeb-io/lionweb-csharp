@@ -248,3 +248,20 @@ public class VersionMismatchException(LionWebVersions versionA, LionWebVersions 
 /// <param name="message">Additional message</param>
 public class InvalidNotificationException(INotification notification, string message) :
     LionWebExceptionBase($"Invalid notification: {message}. Notification: {notification}");
+
+/// <summary>
+/// Mapping between <see cref="INotification"/>,
+/// <see cref="LionWeb.Protocol.Delta.Message.Event.IDeltaEvent"/>,
+/// <see cref="LionWeb.Protocol.Delta.Message.Command.IDeltaCommand"/> failed.
+/// </summary>
+public class LionWebMappingException : LionWebExceptionBase
+{
+    public LionWebMappingException(string field, string value) : base($"Mapping failed: invalid {field} value: {value}")
+    {
+    }
+
+    public LionWebMappingException(string field, IReadableNode node) : base($"Mapping failed: parent of {field}[{node.GetId()}] unset")
+    {
+        
+    }
+}

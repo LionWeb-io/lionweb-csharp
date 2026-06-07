@@ -132,6 +132,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case ReferenceChangedNotification e:
                 OnRemoteReferenceChanged(e);
                 break;
+            case CompositeNotification e:
+                OnRemoteComposite(correspondingSender, e);
+                break;
             default:
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
@@ -384,11 +387,20 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(n, () =>
         {
             IWritableNode localNewParent = n.Parent;
-            var success = n.Reference.Multiple switch
+            bool success;
+            const string messagePrefix = "Added reference";
+            if (n.Reference.Multiple)
             {
-                true => localNewParent.InsertReferencesRaw(n.Reference, n.Index, (ReferenceTarget)n.NewTarget),
-                false => localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.NewTarget)
-            };
+                IReadOnlyList<IReferenceTarget> references = CheckMultipleReferencesExist(n, messagePrefix);
+                if (n.Index != 0)
+                    CheckMultipleReferenceBounds(n, references, messagePrefix);
+                success = localNewParent.InsertReferencesRaw(n.Reference, n.Index, (ReferenceTarget)n.NewTarget);
+            } else
+            {
+                CheckSingleReferenceBounds(n, messagePrefix);
+                success = localNewParent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.NewTarget);
+            }
+
             ProduceNotification(n, success);
         });
 
@@ -398,11 +410,17 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var localParent = n.Parent;
 
-            bool success = n.Reference.Multiple switch
+            bool success;
+            const string messagePrefix = "Deleted reference";
+            if (n.Reference.Multiple)
             {
-                true => localParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.DeletedTarget),
-                false => localParent.SetReferenceRaw(n.Reference, null)
-            };
+                CheckMultipleReference(n, messagePrefix);
+                success = localParent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.DeletedTarget);
+            } else
+            {
+                CheckSingleReference(n, messagePrefix);
+                success = localParent.SetReferenceRaw(n.Reference, null);
+            }
 
             ProduceNotification(n, success);
         });
@@ -410,27 +428,74 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteReferenceChanged(ReferenceChangedNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            var success = ReplaceReference(n.Parent, n.OldTarget, n.Reference, n.Index, n.NewTarget);
+            bool success;
+            const string messagePrefix = "Changed reference";
+            if (n.Reference.Multiple)
+            {
+                CheckMultipleReference(n, messagePrefix);
+                success = n.Parent.RemoveReferencesRaw(n.Reference, (ReferenceTarget)n.OldTarget) && n.Parent.InsertReferencesRaw(n.Reference, n.Index, (ReferenceTarget)n.NewTarget);
+            } else
+            {
+                CheckSingleReference(n, messagePrefix);
+                success = n.Parent.SetReferenceRaw(n.Reference, (ReferenceTarget?)n.NewTarget);
+            }
+
             ProduceNotification(n, success);
         });
 
-    private static bool ReplaceReference(IWritableNode localParent, IReferenceTarget replacedTarget,
-        Reference reference,
-        Index index, IReferenceTarget newTarget)
-    {
-        bool success = reference.Multiple switch
-        {
-            true => localParent.RemoveReferencesRaw(reference, (ReferenceTarget)replacedTarget)
-                    && localParent.InsertReferencesRaw(reference, index, (ReferenceTarget)newTarget),
+    private static readonly ReferenceTargetIdComparer _targetComparer = new ReferenceTargetIdComparer();
 
-            false => localParent.SetReferenceRaw(reference, (ReferenceTarget?)newTarget)
-        };
-        return success;
+    private static void CheckMultipleReference(IReferenceNotification notification, string messagePrefix)
+    {
+        IReadOnlyList<IReferenceTarget> references = CheckMultipleReferencesExist(notification, messagePrefix);
+        var index = CheckMultipleReferenceBounds(notification, references, messagePrefix);
+        if (!_targetComparer.Equals(notification.Target, references[index]))
+            throw new InvalidNotificationException(notification,
+                $"{messagePrefix} target {notification.Target} does not match with actual target {references[index]} at index {index} in reference {notification.Reference}");
+    }
+
+    private static Index CheckMultipleReferenceBounds(IReferenceNotification notification, IReadOnlyList<IReferenceTarget> references, string messagePrefix)
+    {
+        var index = notification.Index;
+        if (index != 0 && index == references.Count)
+            index--;
+        if (index < 0 || index >= references.Count)
+            throw new InvalidNotificationException(notification, $"{messagePrefix} index {index} out of range (size: {references.Count}) on reference {notification.Reference}");
+        return index;
+    }
+
+    private static IReadOnlyList<IReferenceTarget> CheckMultipleReferencesExist(IReferenceNotification notification, string messagePrefix)
+    {
+        if (!notification.Parent.TryGetReferencesRaw(notification.Reference, out var references))
+            throw new InvalidNotificationException(notification, $"{messagePrefix} target {notification.Target} does not exist within reference {notification.Reference}");
+        return references;
+    }
+
+    private static void CheckSingleReference(IReferenceNotification notification, string messagePrefix)
+    {
+        CheckSingleReferenceBounds(notification, messagePrefix);
+        if (!notification.Parent.TryGetReferenceRaw(notification.Reference, out var actualTarget) || !_targetComparer.Equals(notification.Target, actualTarget))
+            throw new InvalidNotificationException(notification,
+                $"{messagePrefix} target {notification.Target} does not match with actual target {actualTarget} at index {notification.Index} in reference {notification.Reference}");
+    }
+
+    private static void CheckSingleReferenceBounds(IReferenceNotification notification, string messagePrefix)
+    {
+        if (notification.Index != 0)
+            throw new InvalidNotificationException(notification, $"{messagePrefix} uses non-zero index {notification.Index} on reference {notification.Reference}");
     }
 
     #endregion
 
-    /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    private void OnRemoteComposite(INotificationSender correspondingSender, CompositeNotification e)
+    {
+        foreach (var item in e.Parts)
+        {
+            Receive(correspondingSender, item);
+        }
+    }
+
+    /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>.
     protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
     {
         var notificationId = notification.NotificationId;
@@ -478,7 +543,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
         if (index != 0)
             throw new InvalidNotificationException(notification,
-                $"{messagePrefix} with id {candidateNodeId} uses non-zero index {index}{messagePrefix}");
+                $"{messagePrefix} with id {candidateNodeId} uses non-zero index {index}{messageSuffix}");
 
         var actualNodeId = existingChild.GetId();
 
@@ -492,6 +557,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private static void CheckMatchingNodeId(string messagePrefix, INotification notification, IWritableNode candidate,
         IReadOnlyList<IReadableNode> list, Index index, string? messageSuffix = null)
     {
+        if (index < 0 || index >= list.Count)
+            throw new InvalidNotificationException(notification, $"{messagePrefix} index {index} out of range (size: {list.Count}){messageSuffix}");
+        
         var candidateNodeId = candidate.GetId();
         var actualNodeId = list[index].GetId();
 
@@ -505,7 +573,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private static void CheckMatchingNodeId(string messagePrefix, INotification notification, IReadableNode localParent,
         IWritableNode candidate, Containment containment, Index index)
     {
-        var messageSuffix = $"in containment {containment}";
+        var messageSuffix = $" in containment {containment}";
         switch (containment.Multiple)
         {
             case true when localParent.TryGetContainmentsRaw(containment, out var nodes):

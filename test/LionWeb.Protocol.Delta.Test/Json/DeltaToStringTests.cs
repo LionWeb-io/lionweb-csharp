@@ -78,7 +78,7 @@ public class DeltaToStringTests : JsonTestsBase
             {
                 SequenceNumber = Sequence()
             },
-        ], AdditionalInfos()) { SequenceNumber = Sequence() };
+        ], Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
         Assert.AreEqual(
             "CompositeEvent { AdditionalInfos = [AdditionalInfo { Kind = MyKind, Message = MyMessage, Data = [AdditionalInfoData { Key = key0, Value = value0 }, AdditionalInfoData { Key = key1, Value = value1 }] }], SequenceNumber = 2, Parts = [PropertyDeleted { AdditionalInfos = [AdditionalInfo { Kind = MyKind, Message = MyMessage, Data = [AdditionalInfoData { Key = key0, Value = value0 }, AdditionalInfoData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 2 }, CommandSource { ParticipationId = myParticipation, CommandId = 3 }], Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, OldValue = 1 }, ChildDeleted { AdditionalInfos = [AdditionalInfo { Kind = MyKind, Message = MyMessage, Data = [AdditionalInfoData { Key = key0, Value = value0 }, AdditionalInfoData { Key = key1, Value = value1 }] }], SequenceNumber = 1, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 6 }, CommandSource { ParticipationId = myParticipation, CommandId = 7 }], DeletedChild = 4, DeletedDescendants = [], Parent = 5, Containment = MetaPointer { Language = myLang, Version = v0, Key = 2 }, Index = 1 }] }",
             input.ToString());

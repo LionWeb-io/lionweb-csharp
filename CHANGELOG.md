@@ -10,7 +10,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Small cli project to run profilers.
 * Introduced `M2Extensions.AsAnnotations()`
 * * Added `INotificationFilter.Handles()`, as we don't care about which notification type we're handling.
+* `IReferenceNotification` grouping interface.
 ### Fixed
+* Mappers + replicator support all kinds of messages (except `ChangeClassifier`).
 ### Changed
 * Made `SerializedNode` and related record members non-required.
 * Optimizations to `Serializer`.
@@ -22,6 +24,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Multiple link fields in generated classes are not initialized by default anymore, but only on first access. No change to external behavior, but saves some memory.
 * Removed `ReadableNodeBase._m3`.
 * Changed `ReadableNodeBase._annotations` to _private_; use `ReadOnlyAnnotations()` / WritableAnnotations() instead.
+* Marked `IDeltaEvent.OriginCommands` non-nullable.
 ### Removed
 * Removed `sender` parameter from most notification pipe classes, as it's not used.
 * Removed `INotificationSender.Send()`.

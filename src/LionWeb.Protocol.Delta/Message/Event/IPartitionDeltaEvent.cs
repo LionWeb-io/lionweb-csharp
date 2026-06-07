@@ -31,7 +31,7 @@ public record ClassifierChanged(
     TargetNode Node,
     MetaPointer NewClassifier,
     MetaPointer OldClassifier,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), INodeEvent
 {
     /// <inheritdoc />
@@ -71,7 +71,7 @@ public record PropertyAdded(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue NewValue,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
 {
     /// <inheritdoc />
@@ -83,7 +83,7 @@ public record PropertyDeleted(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue OldValue,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
 {
     /// <inheritdoc />
@@ -96,7 +96,7 @@ public record PropertyChanged(
     MetaPointer Property,
     PropertyValue NewValue,
     PropertyValue OldValue,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
 {
     /// <inheritdoc />
@@ -122,7 +122,7 @@ public record ChildAdded(
     DeltaSerializationChunk NewChild,
     MetaPointer Containment,
     Index Index,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -136,7 +136,7 @@ public record ChildDeleted(
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -218,7 +218,7 @@ public record ChildReplaced(
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -308,7 +308,7 @@ public record ChildMovedFromOtherContainment(
     TargetNode OldParent,
     MetaPointer OldContainment,
     Index OldIndex,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -331,7 +331,7 @@ public record ChildMovedFromOtherContainmentInSameParent(
     TargetNode Parent,
     MetaPointer OldContainment,
     Index OldIndex,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -349,7 +349,7 @@ public record ChildMovedInSameContainment(
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos),
     IContainmentEvent
 {
@@ -368,7 +368,7 @@ public record ChildMovedAndReplacedFromOtherContainment(
     Index OldIndex,
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -484,7 +484,7 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     Index OldIndex,
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -593,7 +593,7 @@ public record ChildMovedAndReplacedInSameContainment(
     Index OldIndex,
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
@@ -698,7 +698,7 @@ public record AnnotationAdded(
     TargetNode Parent,
     DeltaSerializationChunk NewAnnotation,
     Index Index,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -711,7 +711,7 @@ public record AnnotationDeleted(
     TargetNode[] DeletedDescendants,
     TargetNode Parent,
     Index Index,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -785,7 +785,7 @@ public record AnnotationReplaced(
     TargetNode[] ReplacedDescendants,
     TargetNode Parent,
     Index Index,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -861,7 +861,7 @@ public record AnnotationMovedFromOtherParent(
     TargetNode MovedAnnotation,
     TargetNode OldParent,
     Index OldIndex,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -878,7 +878,7 @@ public record AnnotationMovedInSameParent(
     TargetNode MovedAnnotation,
     TargetNode Parent,
     Index OldIndex,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -894,7 +894,7 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     Index OldIndex,
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -995,7 +995,7 @@ public record AnnotationMovedAndReplacedInSameParent(
     Index OldIndex,
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -1097,7 +1097,7 @@ public record ReferenceAdded(
     Index Index,
     TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
 {
     /// <inheritdoc />
@@ -1111,7 +1111,7 @@ public record ReferenceDeleted(
     Index Index,
     TargetNode? DeletedReference,
     ResolveInfo? DeletedResolveInfo,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
 {
     /// <inheritdoc />
@@ -1127,7 +1127,7 @@ public record ReferenceChanged(
     ResolveInfo? NewResolveInfo,
     TargetNode? OldReference,
     ResolveInfo? OldResolveInfo,
-    CommandSource[]? OriginCommands,
+    CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
 {
     /// <inheritdoc />

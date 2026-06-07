@@ -432,7 +432,7 @@ public abstract class JsonTestsBase
             CreateChildDeleted(),
             CreateAnnotationDeleted(),
             CreateReferenceDeleted()
-        ], AdditionalInfos()) { SequenceNumber = Sequence() };
+        ], Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static NoOpEvent CreateNoOpEvent() =>
         new(Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };

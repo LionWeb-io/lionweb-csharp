@@ -124,9 +124,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         Log(
             $"received event: {deltaEvent.GetType()}({string.Join(",", deltaEvent.OriginCommands.Select(oc => $"{oc.ParticipationId}:{oc.CommandId}"))},{deltaEvent.SequenceNumber})");
 
-        CommandSource? commandSource = deltaEvent.OriginCommands.FirstOrDefault();
+        var commandSource = deltaEvent.OriginCommands.First();
 
-        deltaEvent.InternalParticipationId = commandSource?.ParticipationId;
+        deltaEvent.InternalParticipationId = commandSource.ParticipationId;
 
         if (EventSequenceNumber == deltaEvent.SequenceNumber)
         {
@@ -149,7 +149,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         if (deltaEvent is ErrorEvent e)
             throw new DeltaException(e);
 
-        var originCommands = deltaEvent.OriginCommands ?? [];
+        var originCommands = deltaEvent.OriginCommands;
         var commandSource = originCommands.FirstOrDefault();
         if (originCommands.All(cmd =>
                 ParticipationId == cmd.ParticipationId &&

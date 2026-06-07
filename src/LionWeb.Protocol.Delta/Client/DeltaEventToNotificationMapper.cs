@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
-using Core.M2;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
@@ -61,16 +60,19 @@ public class DeltaEventToNotificationMapper
             ChildMovedFromOtherContainmentInSameParent a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainment a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainment a => OnChildMovedAndReplacedFromOtherContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentInSameParent a =>
-                OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedInSameContainment a => OnChildMovedAndReplacedInSameContainment(a),
             AnnotationAdded a => OnAnnotationAdded(a),
             AnnotationDeleted a => OnAnnotationDeleted(a),
             AnnotationReplaced a => OnAnnotationReplaced(a),
             AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParent a => OnAnnotationMovedInSameParent(a),
+            AnnotationMovedAndReplacedFromOtherParent a => OnAnnotationMovedAndReplacedFromOtherParent(a),
+            AnnotationMovedAndReplacedInSameParent a => OnAnnotationMovedAndReplacedInSameParent(a),
             ReferenceAdded a => OnReferenceAdded(a),
             ReferenceDeleted a => OnReferenceDeleted(a),
             ReferenceChanged a => OnReferenceChanged(a),
+            CompositeEvent a => OnComposite(a),
             _ => throw new ArgumentException($"{nameof(DeltaEventToNotificationMapper)} does not support {deltaEvent.GetType().Name}!")
         };
 
@@ -161,7 +163,7 @@ public class DeltaEventToNotificationMapper
         var parent = ToNode(childDeletedEvent.Parent);
         var containment = ToContainment(childDeletedEvent.Containment, parent);
         return new ChildDeletedNotification(
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[childDeletedEvent.Index],
+            ToNode(childDeletedEvent.DeletedChild),
             parent,
             containment,
             childDeletedEvent.Index,
@@ -175,7 +177,7 @@ public class DeltaEventToNotificationMapper
         var containment = ToContainment(childReplacedEvent.Containment, parent);
         return new ChildReplacedNotification(
             Deserialize(childReplacedEvent.NewChild),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment), containment).ToList()[childReplacedEvent.Index],
+            ToNode(childReplacedEvent.ReplacedChild),
             parent,
             containment,
             childReplacedEvent.Index,
@@ -207,8 +209,7 @@ public class DeltaEventToNotificationMapper
         ChildMovedAndReplacedFromOtherContainment childMovedAndReplacedEvent)
     {
         var movedChild = ToNode(childMovedAndReplacedEvent.MovedChild);
-        var oldParent = (IWritableNode)movedChild.GetParent();
-        var oldContainment = oldParent.GetContainmentOf(movedChild);
+        var oldContainment = GetContainmentAndParent(movedChild, nameof(childMovedAndReplacedEvent.MovedChild), out var oldParent);
 
         var newParent = ToNode(childMovedAndReplacedEvent.NewParent);
         var newContainment = ToContainment(childMovedAndReplacedEvent.NewContainment, newParent);
@@ -268,6 +269,23 @@ public class DeltaEventToNotificationMapper
         );
     }
 
+    private ChildMovedAndReplacedInSameContainmentNotification OnChildMovedAndReplacedInSameContainment(
+        ChildMovedAndReplacedInSameContainment childMovedEvent)
+    {
+        var parent = ToNode(childMovedEvent.Parent);
+        var movedChild = ToNode(childMovedEvent.MovedChild);
+        var containment = ToContainment(childMovedEvent.Containment, parent);
+        return new ChildMovedAndReplacedInSameContainmentNotification(
+            childMovedEvent.NewIndex,
+            movedChild,
+            parent,
+            containment,
+            ToNode(childMovedEvent.ReplacedChild),
+            childMovedEvent.OldIndex,
+            ToNotificationId(childMovedEvent)
+        );
+    }
+
     private ChildMovedInSameContainmentNotification OnChildMovedInSameContainment(
         ChildMovedInSameContainment childMovedEvent)
     {
@@ -287,7 +305,22 @@ public class DeltaEventToNotificationMapper
     private Containment ToContainment(MetaPointer deltaContainment, IReadableNode node) =>
         ToFeature<Containment>(deltaContainment, node);
 
+    private static Containment GetContainmentAndParent(IWritableNode child, string field, out IWritableNode parent)
+    {
+        parent = GetParent(child, field);
+        var containment =  parent.GetContainmentOf(child)!;
+        return containment;
+    }
+
     #endregion
+
+    private static IWritableNode GetParent(IWritableNode child, string field)
+    {
+        var nullableParent = (IWritableNode?)child.GetParent();
+        if (nullableParent is null)
+            throw new LionWebMappingException(field, child);
+        return nullableParent;
+    }
 
     #region Annotations
 
@@ -305,9 +338,9 @@ public class DeltaEventToNotificationMapper
     private AnnotationDeletedNotification OnAnnotationDeleted(AnnotationDeleted annotationDeletedEvent)
     {
         var parent = ToNode(annotationDeletedEvent.Parent);
-        var deletedAnnotation = parent.GetAnnotations()[annotationDeletedEvent.Index];
+        var deletedAnnotation = ToNode(annotationDeletedEvent.DeletedAnnotation);
         return new AnnotationDeletedNotification(
-            deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
+            deletedAnnotation,
             parent,
             annotationDeletedEvent.Index,
             ToNotificationId(annotationDeletedEvent)
@@ -317,10 +350,10 @@ public class DeltaEventToNotificationMapper
     private AnnotationReplacedNotification OnAnnotationReplaced(AnnotationReplaced annotationReplacedEvent)
     {
         var parent = ToNode(annotationReplacedEvent.Parent);
-        var replacedAnnotation = parent.GetAnnotations()[annotationReplacedEvent.Index];
+        var replacedAnnotation = ToNode(annotationReplacedEvent.ReplacedAnnotation);
         return new AnnotationReplacedNotification(
             Deserialize(annotationReplacedEvent.NewAnnotation),
-            replacedAnnotation as IWritableNode ?? throw new InvalidValueException(null, replacedAnnotation),
+            replacedAnnotation,
             parent,
             annotationReplacedEvent.Index,
             ToNotificationId(annotationReplacedEvent)
@@ -353,6 +386,38 @@ public class DeltaEventToNotificationMapper
             movedAnnotation,
             parent,
             annotationMovedEvent.OldIndex,
+            ToNotificationId(annotationMovedEvent)
+        );
+    }
+
+    private AnnotationMovedAndReplacedFromOtherParentNotification OnAnnotationMovedAndReplacedFromOtherParent(
+        AnnotationMovedAndReplacedFromOtherParent annotationMovedEvent)
+    {
+        var oldParent = ToNode(annotationMovedEvent.OldParent);
+        var newParent = ToNode(annotationMovedEvent.NewParent);
+        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        return new AnnotationMovedAndReplacedFromOtherParentNotification(
+            newParent,
+            annotationMovedEvent.NewIndex,
+            movedAnnotation,
+            oldParent,
+            annotationMovedEvent.OldIndex,
+            ToNode(annotationMovedEvent.ReplacedAnnotation),
+            ToNotificationId(annotationMovedEvent)
+        );
+    }
+
+    private AnnotationMovedAndReplacedInSameParentNotification OnAnnotationMovedAndReplacedInSameParent(
+        AnnotationMovedAndReplacedInSameParent annotationMovedEvent)
+    {
+        var parent = ToNode(annotationMovedEvent.Parent);
+        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        return new AnnotationMovedAndReplacedInSameParentNotification(
+            annotationMovedEvent.NewIndex,
+            movedAnnotation,
+            parent,
+            annotationMovedEvent.OldIndex,
+            ToNode(annotationMovedEvent.ReplacedAnnotation),
             ToNotificationId(annotationMovedEvent)
         );
     }
@@ -416,19 +481,20 @@ public class DeltaEventToNotificationMapper
 
     #endregion
 
-    private static INotificationId ToNotificationId(IDeltaEvent deltaEvent) =>
-        new ParticipationNotificationId(deltaEvent.InternalParticipationId,
-            string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
-
-    private IWritableNode ToNode(TargetNode nodeId)
+    private CompositeNotification OnComposite(CompositeEvent compositeEvent)
     {
-        if (TryToNode(nodeId, out var w))
-            return w;
+        var mapper = new InterdependentDeltaEventToNotificationMapper(_sharedNodeMap, _sharedKeyedMap, _deserializerBuilder);
 
-        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+        return new(
+            compositeEvent.Parts.Select(mapper.Map),
+            ToNotificationId(compositeEvent)
+        );
     }
 
-    private bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
+    private static INotificationId ToNotificationId(IDeltaEvent deltaEvent) =>
+        new ParticipationNotificationId(deltaEvent.InternalParticipationId, deltaEvent.Id);
+
+    private protected bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
     {
         if (_sharedNodeMap.TryGetValue(nodeId, out var n) && n is IWritableNode w)
         {
@@ -448,10 +514,18 @@ public class DeltaEventToNotificationMapper
         throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
     }
 
-    private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    private protected virtual IWritableNode ToNode(TargetNode nodeId)
+    {
+        if (TryToNode(nodeId, out var w))
+            return w;
+
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+    }
+
+    private protected virtual IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-        
+
         var node = nodes.FirstOrDefault();
         if (node is not IWritableNode w)
         {
@@ -459,6 +533,37 @@ public class DeltaEventToNotificationMapper
         }
 
         return w;
+    }
+}
 
+/// <inheritdoc/>
+/// <summary>
+/// Variant of <see cref="DeltaEventToNotificationMapper"/>
+/// that resolves references to nodes that were created during mapping, but not yet added to <paramref name="sharedNodeMap"/>. 
+/// </summary>
+internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder)
+    : DeltaEventToNotificationMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+{
+    private readonly SharedNodeMap _interdependentNodeMap = new();
+
+    private protected override IWritableNode ToNode(TargetNode nodeId)
+    {
+        if (TryToNode(nodeId, out var w))
+            return w;
+
+        if (_interdependentNodeMap.TryGetValue(nodeId, out var node))
+        {
+            if (node is IWritableNode wr)
+                return wr;
+        }
+
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+    }
+
+    private protected override IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    {
+        var result = base.Deserialize(deltaChunk);
+        _interdependentNodeMap.RegisterNode(result);
+        return result;
     }
 }

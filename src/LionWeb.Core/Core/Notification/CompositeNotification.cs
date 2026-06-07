@@ -53,13 +53,13 @@ public record CompositeNotification : IForestNotification, IPartitionNotificatio
     public HashSet<IReadableNode> AffectedNodes => Parts.SelectMany(p => p.AffectedNodes).ToHashSet();
 
     /// <inheritdoc />
-    public IPartitionInstance Partition => throw new NotImplementedException();
+    public IPartitionInstance Partition => null;
 
     /// <inheritdoc />
-    public NodeId ContextNodeId => throw new NotImplementedException();
+    public NodeId ContextNodeId => null;
 
     /// <inheritdoc />
-    public IWritableNode ContextNode => throw new NotImplementedException();
+    public IWritableNode ContextNode => null;
 
     /// <inheritdoc />
     public virtual bool Equals(CompositeNotification? other)
@@ -118,11 +118,5 @@ public record CompositeNotification : IForestNotification, IPartitionNotificatio
         builder.Append(']');
 
         return true;
-    }
-
-    public void Deconstruct(out IReadOnlyList<INotification> Parts, out INotificationId NotificationId)
-    {
-        Parts = this.Parts;
-        NotificationId = this.NotificationId;
     }
 }
