@@ -128,13 +128,13 @@ public class Serializer : ISerializer
 
         Dictionary<Feature, object?> featureValues = CollectFeatureValues(node, classifier);
 
-        featureValues.RemoveAll(CollectProperties(node, featureValues, out var serializedProperties));
+        featureValues.RemoveAllKeys(CollectProperties(node, featureValues, out var serializedProperties));
 
-        featureValues.RemoveAll(CollectContainmentsMultiple(featureValues, out var serializedSingleContainments));
-        featureValues.RemoveAll(CollectContainmentsSingle(featureValues, out var serializedMultipleContainments));
+        featureValues.RemoveAllKeys(CollectContainmentsMultiple(featureValues, out var serializedSingleContainments));
+        featureValues.RemoveAllKeys(CollectContainmentsSingle(featureValues, out var serializedMultipleContainments));
 
-        featureValues.RemoveAll(CollectReferencesMultiple(featureValues, out var serializedSingleReferences));
-        featureValues.RemoveAll(CollectReferencesSingle(featureValues, out var serializedMultipleReferences));
+        featureValues.RemoveAllKeys(CollectReferencesMultiple(featureValues, out var serializedSingleReferences));
+        featureValues.RemoveAllKeys(CollectReferencesSingle(featureValues, out var serializedMultipleReferences));
 
         Debug.Assert(featureValues.Count == 0, $"remaining features: {featureValues}");
 
@@ -170,8 +170,8 @@ public class Serializer : ISerializer
     private Dictionary<Feature, object?> CollectFeatureValues(IReadableNode node, Classifier classifier)
     {
         var features = new HashSet<Feature>(_featureComparer);
-        features.AddAll(node.CollectAllSetFeatures());
-        features.AddAll(AllFeatures(classifier));
+        features.UnionWith(node.CollectAllSetFeatures());
+        features.UnionWith(AllFeatures(classifier));
 
         Dictionary<Feature, object?> featureValues = [];
         foreach (Feature feature in features)
@@ -416,15 +416,7 @@ public class Serializer : ISerializer
 
 internal static class CollectionExtensions
 {
-    public static void AddAll(this HashSet<Feature> set, IEnumerable<Feature> newEntries)
-    {
-        foreach (var newEntry in newEntries)
-        {
-            set.Add(newEntry);
-        }
-    }
-
-    public static void RemoveAll(this Dictionary<Feature, object?> dictionary, IEnumerable<Feature> keysToRemove)
+    public static void RemoveAllKeys(this Dictionary<Feature, object?> dictionary, IEnumerable<Feature> keysToRemove)
     {
         foreach (var feature in keysToRemove)
         {
