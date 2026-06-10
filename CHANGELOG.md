@@ -10,11 +10,11 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 This release focuses on performance.
 In our tests, we gained in all measured use cases:
 
-| Use case    | Execution | Memory |
-|-------------|-----------|--------|
-| Serialize   | +48 %     | -47 %  |
-| Deserialize | +30 %     | -30 %  |
-| Replicate   | +48 %     | -51 %  |
+| Use case    | Speed | Memory |
+|-------------|-------|--------|
+| Serialize   | +48 % | -47 %  |
+| Deserialize | +30 % | -30 %  |
+| Replicate   | +48 % | -51 %  |
 
 ### Added
 * Small cli project to run profilers.
