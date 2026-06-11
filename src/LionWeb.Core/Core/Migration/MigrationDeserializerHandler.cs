@@ -54,15 +54,19 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
     }
 
     /// <inheritdoc />
-    public override Classifier? UnknownClassifier(MetaPointer classifier, NodeId id) =>
-        CreateClassifier(classifier);
-
-    private DynamicConcept CreateClassifier(MetaPointer classifier)
+    public override Classifier UnknownClassifier(MetaPointer classifier, NodeId id)
     {
-        DynamicLanguage lang = GetOrCreateLanguage(classifier);
+        var language = GetOrCreateLanguage(classifier);
+        return FindClassifier(language, classifier.Key) ?? CreateClassifier(language, classifier.Key);
+    }
 
-        var result = new DynamicConcept(classifier.Key, _lionWebVersion, null) { Name = "Concept-" + classifier.Key, Key = classifier.Key };
-        lang.AddEntities([result]);
+    private static DynamicClassifier? FindClassifier(Language language, MetaPointerKey classifierKey) =>
+        language.Entities.OfType<DynamicClassifier>().FirstOrDefault(e => e.Key == classifierKey);
+
+    private DynamicConcept CreateClassifier(DynamicLanguage language, MetaPointerKey classifierKey)
+    {
+        var result = new DynamicConcept(classifierKey, _lionWebVersion, null) { Name = "Concept-" + classifierKey, Key = classifierKey };
+        language.AddEntities([result]);
         return result;
     }
 
@@ -91,9 +95,15 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
     }
 
     /// <inheritdoc />
-    public override Feature? UnknownFeature<TFeature>(MetaPointer feature, Classifier classifier, IReadableNode node)
+    public override Feature UnknownFeature<TFeature>(MetaPointer feature, Classifier classifier, IReadableNode node)
     {
-        DynamicFeature? result = null;
+        var language = GetOrCreateLanguage(feature);
+        var dynamicClassifier = FindClassifier(language, classifier.Key);
+        var existingFeature = dynamicClassifier?.Features.FirstOrDefault(f => f.Key == feature.Key);
+        if (existingFeature is not null)
+            return existingFeature;
+
+        DynamicFeature? result;
         if (typeof(TFeature).IsAssignableFrom(typeof(Property)))
         {
             result = new DynamicProperty(feature.Key, _lionWebVersion, null) { Name = feature.Key, Key = feature.Key, Optional = true, Type = _lionWebVersion.BuiltIns.String };
@@ -122,18 +132,18 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
             throw new ArgumentOutOfRangeException(feature.ToString());
         }
 
-        var language = GetOrCreateLanguage(feature);
-        var defaultClassifierKey = $"{feature.Language}_defaultClassifier";
-        var defaultClassifier =
-            language.Entities.OfType<DynamicConcept>().FirstOrDefault(e => e.Key == defaultClassifierKey) ??
-            CreateClassifier(feature with { Key = defaultClassifierKey });
+        if (dynamicClassifier is null)
+        {
+            var defaultClassifierKey = $"{feature.Language}_defaultClassifier";
+            dynamicClassifier = FindClassifier(language, defaultClassifierKey) ?? CreateClassifier(language, defaultClassifierKey);
+        }
 
-        defaultClassifier.AddFeatures([result]);
+        dynamicClassifier.AddFeatures([result]);
         return result;
     }
 
     /// <inheritdoc />
-    public override IWritableNode? InvalidAnnotation(IReadableNode annotation, IReadableNode? node)
+    public override IWritableNode InvalidAnnotation(IReadableNode annotation, IReadableNode? node)
     {
         var oldClassifier = (DynamicClassifier)annotation.GetClassifier();
         var language = (DynamicLanguage)oldClassifier.GetLanguage();
