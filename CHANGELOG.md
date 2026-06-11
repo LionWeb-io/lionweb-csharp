@@ -10,11 +10,12 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 This release focuses on performance.
 In our tests, we gained in all measured use cases:
 
-| Use case    | Speed | Memory |
-|-------------|-------|--------|
-| Serialize   | +48 % | -47 %  |
-| Deserialize | +30 % | -30 %  |
-| Replicate   | +48 % | -51 %  |
+| Use case    | Speed  | Memory |
+|-------------|--------|--------|
+| Serialize   | + 48 % | -47 %  |
+| Deserialize | + 30 % | -30 %  |
+| Replicate   | + 48 % | -51 %  |
+| Migrate     | +258 % | + 3 %  |
 
 ### Added
 * Small cli project to run profilers.
@@ -23,6 +24,7 @@ In our tests, we gained in all measured use cases:
 * `IReferenceNotification` grouping interface.
 ### Fixed
 * Mappers + replicator support all kinds of messages (except `ChangeClassifier`).
+* `MigrationDeserializerHandler` created way too many M2 instances for unknown keys.
 ### Changed
 * Made `SerializedNode` and related record members non-required.
 * Optimizations to `Serializer`.
