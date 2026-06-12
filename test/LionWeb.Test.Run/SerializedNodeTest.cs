@@ -61,7 +61,7 @@ public class SerializedNodeTest
         };
 
     public void SerializeNodes(Stream stream) => 
-        JsonUtils.WriteNodesToStream(stream, new SerializerBuilder().WithLionWebVersion(LionWebVersions.Current).Build(), SerializerBenchmark.CreateNodes(32_000));
+        JsonUtils.WriteNodesToStream(stream, new SerializerBuilder().WithLionWebVersion(LionWebVersions.Current).Build(), BenchmarkBase.CreateNodes(32_000));
 
     public List<IReadableNode> DeserializeNodes(Stream stream) => 
         JsonUtils.ReadNodesFromStream(stream, new DeserializerBuilder().WithLionWebVersion(LionWebVersions.Current).WithLanguage(TestLanguageLanguage.Instance).Build());

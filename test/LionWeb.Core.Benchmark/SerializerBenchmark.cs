@@ -21,8 +21,6 @@ using BenchmarkDotNet.Attributes;
 using M1;
 using Serialization;
 using System.Text.Json;
-using Test.Languages.Generated.V2024_1.TestLanguage;
-using Test.Serialization;
 
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
@@ -116,63 +114,5 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             .SerializeToChunk(_nodes), _aotOptions);
 
         File.WriteAllText(_stringFile, output);
-    }
-
-    public static IEnumerable<LinkTestConcept> CreateNodes(long count) =>
-        CreateNodes<LinkTestConcept>(count, (id, containment_0_1, containment_1, containment_0_n) =>
-        {
-            var result = new LinkTestConcept(id);
-
-            if (containment_0_1 is not null)
-                result.Containment_0_1 = containment_0_1;
-
-            if (containment_1 is not null)
-                result.Containment_1 = containment_1;
-
-            if (containment_0_n is not null)
-                result.AddContainment_0_n(containment_0_n);
-
-            return result;
-        });
-    
-    public static IEnumerable<T> CreateNodes<T>(long count, Func<string, T?, T?, List<T>?, T> factory)
-    {
-        T? lastLine = default;
-        T? lastCircle = default;
-        T? lastCoord = default;
-        for (long l = 0; l < count; l++)
-        {
-            var id = $"id{l}_{StringRandomizer.RandomLength()}";
-
-            // if (l % 10_000 == 0)
-            // {
-            //     TestContext.WriteLine(
-            //         $"Creating Line #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
-            // }
-
-            T result;
-            if (lastCoord == null || l % 2 == 0)
-            {
-                lastCoord = factory(id, default, default, null);
-                result = lastCoord;
-            } else if (l % 3 == 0)
-            {
-                lastLine = factory(id, lastCoord, default, null);
-                result = lastLine;
-            } else if (l % 17 == 0)
-            {
-                lastCircle = factory(id,default, lastCoord, null);
-                result = lastCircle;
-            } else if (l % 37 == 0)
-            {
-                result = factory(id, default, default, [lastLine!, lastCircle!]);
-            } else
-            {
-                lastCoord = factory(id, default, default, null);
-                result = lastCoord;
-            }
-
-            yield return result;
-        }
     }
 }
