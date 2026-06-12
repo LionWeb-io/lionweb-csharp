@@ -22,7 +22,7 @@ using Serialization;
 using System.Text.Json;
 using Test.Languages.Generated.V2024_1.TestLanguage;
 
-public class SerializerBenchmarkBase
+public abstract class SerializerBenchmarkBase : BenchmarkBase
 {
     protected readonly Language _language;
     protected readonly LionWebVersions _lionWebVersion;
@@ -48,12 +48,6 @@ public class SerializerBenchmarkBase
     static SerializerBenchmarkBase()
     {
         _aotOptions = LionWebJsonSerializerContext.Default.Options;
-        _simpleOptions = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
+        _simpleOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     }
-
-    static string AsFraction(long value) =>
-        $"{value / 1_000_000D:0.000}" + "M";
 }

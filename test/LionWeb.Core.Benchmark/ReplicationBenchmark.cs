@@ -32,7 +32,7 @@ using Test.Notification.Replicator;
 using Utilities;
 
 [MemoryDiagnoser]
-public class ReplicationBenchmark
+public class ReplicationBenchmark : BenchmarkBase
 {
     private static readonly IVersion2024_1 _lionWebVersion = LionWebVersions.v2024_1;
     private const long _nodeCount = 5_900;

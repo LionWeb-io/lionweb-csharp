@@ -26,7 +26,7 @@ using Test.Languages.Generated.V2023_1.TestLanguage;
 
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
-public class MigrationBenchmark : SerializerBenchmarkBase
+public class MigrationBenchmark : BenchmarkBase
 {
     private List<LinkTestConcept> _v2023Nodes;
     private MemoryStream _input;
