@@ -33,7 +33,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
 
         IDeserializer deserializer = Deserializer();
 
-        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, _simpleOptions);
+        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, null, _simpleOptions);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
         if (_maxSize != actual)
@@ -47,7 +47,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
 
         IDeserializer deserializer = Deserializer();
 
-        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, _aotOptions);
+        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, null, _aotOptions);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
         if (_maxSize != actual)
@@ -61,7 +61,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
 
         IDeserializer deserializer = Deserializer();
 
-        var nodes = JsonUtils.ReadNodesFromStream(stream, deserializer, null, _simpleOptions);
+        var nodes = JsonUtils.ReadNodesFromStream(stream, deserializer, null, null, _simpleOptions);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
         if (_maxSize != actual)
@@ -75,7 +75,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
 
         IDeserializer deserializer = Deserializer();
 
-        var nodes = JsonUtils.ReadNodesFromStream(stream, deserializer, null,  _aotOptions);
+        var nodes = JsonUtils.ReadNodesFromStream(stream, deserializer, null,  null, _aotOptions);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
         if (_maxSize != actual)

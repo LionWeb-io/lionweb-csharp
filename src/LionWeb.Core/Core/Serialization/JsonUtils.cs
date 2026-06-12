@@ -90,23 +90,33 @@ public static class JsonUtils
     /// <param name="lionWebVersionChecker">Optional action to access or check the <see cref="SerializationChunk.SerializationFormatVersion"/>;
     /// should throw <see cref="VersionMismatchException"/> if the check fails.
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
+    /// <param name="languageReferencesChecker">Optional function to evaluate <see cref="SerializationChunk.Languages"/>.
+    /// Must return <c>true</c> if deserialization should continue and <c>false</c> otherwise.
+    /// If parsing is stopped (return value <c>false</c>), <see cref="ReadNodesFromStreamAsync"/> returns an empty list.
+    /// <para/>
+    /// NOTE: <see cref="SerializationChunk.Languages"/> may appear before or after <see cref="SerializationChunk.Nodes"/> in JSON.
+    /// </param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
     /// <seealso cref="ReadNodesFromStream"/>
     public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(
         Stream utf8JsonStream,
         IDeserializer deserializer,
-        Action<string>? lionWebVersionChecker = null
-    ) => await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, _readContext.Options);
+        Action<string>? lionWebVersionChecker = null,
+        Func<List<SerializedLanguageReference>, bool>? languageReferencesChecker = null
+    ) => await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, languageReferencesChecker, _readContext.Options);
 
     internal static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(
         Stream utf8JsonStream,
         IDeserializer deserializer,
         Action<string>? lionWebVersionChecker,
+        Func<List<SerializedLanguageReference>, bool>? languageReferencesChecker,
         JsonSerializerOptions jsonSerializerOptions
     ) =>
         await new StreamReaderAsync(utf8JsonStream, deserializer)
         {
-            JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker
+            JsonSerializerOptions = jsonSerializerOptions,
+            LionWebVersionChecker = lionWebVersionChecker,
+            LanguageReferencesChecker = languageReferencesChecker
         }.ReadNodes();
 
     /// <summary>
@@ -117,23 +127,33 @@ public static class JsonUtils
     /// <param name="lionWebVersionChecker">Optional action to access or check the <see cref="SerializationChunk.SerializationFormatVersion"/>;
     /// should throw <see cref="VersionMismatchException"/> if the check fails.
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
+    /// <param name="languageReferencesChecker">Optional function to evaluate <see cref="SerializationChunk.Languages"/>.
+    /// Must return <c>true</c> if deserialization should continue and <c>false</c> otherwise.
+    /// If parsing is stopped (return value <c>false</c>), <see cref="ReadNodesFromStream"/> returns an empty list. 
+    /// <para/>
+    /// NOTE: <see cref="SerializationChunk.Languages"/> may appear before or after <see cref="SerializationChunk.Nodes"/> in JSON.
+    /// </param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
     /// <seealso cref="ReadNodesFromStreamAsync"/>
     public static List<IReadableNode> ReadNodesFromStream(
         Stream utf8JsonStream,
         IDeserializer deserializer,
-        Action<string>? lionWebVersionChecker = null
-    ) => ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, _readContext.Options);
+        Action<string>? lionWebVersionChecker = null,
+        Func<List<SerializedLanguageReference>, bool>? languageReferencesChecker = null
+    ) => ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, languageReferencesChecker, _readContext.Options);
 
     internal static List<IReadableNode> ReadNodesFromStream(
         Stream utf8JsonStream,
         IDeserializer deserializer,
         Action<string>? lionWebVersionChecker,
+        Func<List<SerializedLanguageReference>, bool>? languageReferencesChecker,
         JsonSerializerOptions jsonSerializerOptions
     ) =>
         new StreamReaderSync(utf8JsonStream, deserializer)
         {
-            JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker
+            JsonSerializerOptions = jsonSerializerOptions,
+            LionWebVersionChecker = lionWebVersionChecker,
+            LanguageReferencesChecker = languageReferencesChecker
         }.ReadNodes();
 }
 
