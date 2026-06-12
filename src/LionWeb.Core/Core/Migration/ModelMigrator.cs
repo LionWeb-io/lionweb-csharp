@@ -90,13 +90,26 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     /// <inheritdoc />
     public async Task<bool> MigrateAsync(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream)
     {
-        (List<IReadableNode> loaded, string? lionWebVersion) = await Deserialize(inputUtf8JsonStream);
-        UpdateSerializedLionWebVersion(lionWebVersion);
+        (List<IReadableNode> loaded, bool anyMatchingMigration) = await Deserialize(inputUtf8JsonStream);
 
         int migrationRound = 0;
         bool anyChange = false;
         bool changeInThisRound;
         var rootNodes = loaded.Cast<LenientNode>().ToList();
+
+        if (!anyMatchingMigration)
+        {
+            if (inputUtf8JsonStream.CanSeek)
+            {
+                inputUtf8JsonStream.Seek(0, SeekOrigin.Begin);
+                await inputUtf8JsonStream.CopyToAsync(migratedUtf8JsonStream);
+            } else
+            {
+                await Serialize(migratedUtf8JsonStream, rootNodes);
+            }
+
+            return false;
+        }
 
         do
         {
@@ -124,22 +137,29 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
         return anyChange;
     }
 
-    private async Task<(List<IReadableNode> loaded, string? lionWebVersion)> Deserialize(Stream inputUtf8JsonStream)
+    private async Task<(List<IReadableNode> loaded, bool anyMatchingMigration)> Deserialize(Stream inputUtf8JsonStream)
     {
-        string? lionWebVersion = null;
+        var anyMatchingMigration = true;
         var builder = DeserializerBuilder ?? new DeserializerBuilder().WithLionWebVersion(LionWebVersion);
         var deserializer = builder
             .WithHandler(new MigrationDeserializerHandler(LionWebVersion, KnownLanguages,
                 builder.Handler ?? new DeserializerExceptionHandler()))
             .WithLanguages(KnownLanguages).Build();
 
-        var loaded = await JsonUtils.ReadNodesFromStreamAsync(inputUtf8JsonStream, deserializer, serializedVersion =>
+        var loaded = await JsonUtils.ReadNodesFromStreamAsync(inputUtf8JsonStream, deserializer,
+            serializedVersion =>
         {
-            lionWebVersion = serializedVersion;
+            UpdateSerializedLionWebVersion(serializedVersion);
             deserializer.LionWebVersion.AssureCompatible(serializedVersion);
+        },
+            langRefs =>
+        {
+            var usedLanguages = langRefs.Select(r => new LanguageIdentity(r.Key, r.Version)).ToHashSet();
+            anyMatchingMigration = _migrations.Any(m => m.IsApplicable(usedLanguages));
+            return !inputUtf8JsonStream.CanSeek || anyMatchingMigration;
         });
 
-        return (loaded, lionWebVersion);
+        return (loaded, anyMatchingMigration);
     }
 
     private void UpdateSerializedLionWebVersion(string? lionWebVersion)

@@ -244,11 +244,11 @@ public class SerializationTests : SerializationTestsBase
     public async Task SerializedLionWebVersion_Async()
     {
         const string text = "\ud83d\ude0a Hällö 😊";
-        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") { Name = text } };
+        var rootNode = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") { Name = text } };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(stream, serializer, materialGroup.Descendants(true));
+        await JsonUtils.WriteNodesToStreamAsync(stream, serializer, rootNode.Descendants(true));
 
         stream.Seek(0, SeekOrigin.Begin);
 
@@ -269,11 +269,11 @@ public class SerializationTests : SerializationTestsBase
     public void SerializedLionWebVersion_Sync()
     {
         const string text = "\ud83d\ude0a Hällö 😊";
-        var materialGroup = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") { Name = text } };
+        var rootNode = new LinkTestConcept("a") { Containment_1 = new LinkTestConcept("b") { Name = text } };
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
-        JsonUtils.WriteNodesToStream(stream, serializer, materialGroup.Descendants(true));
+        JsonUtils.WriteNodesToStream(stream, serializer, rootNode.Descendants(true));
 
         stream.Seek(0, SeekOrigin.Begin);
 

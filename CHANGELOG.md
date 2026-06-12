@@ -15,7 +15,7 @@ In our tests, we gained in all measured use cases:
 | Serialize   | + 48 % | -47 %  |
 | Deserialize | + 30 % | -30 %  |
 | Replicate   | + 48 % | -51 %  |
-| Migrate     | +258 % | + 3 %  |
+| Migrate     | +260 % | - 6 %  |
 
 ### Added
 * Small cli project to run profilers.
@@ -38,6 +38,8 @@ In our tests, we gained in all measured use cases:
 * Changed `ReadableNodeBase._annotations` to _private_; use `ReadOnlyAnnotations()` / WritableAnnotations() instead.
 * Marked `IDeltaEvent.OriginCommands` non-nullable.
 * Replaced most LINQ by loops in `Serializer`, `Deserializer`, and `Children()`.
+* `JsonUtils.ReadNodesFromStream[Async]()` got an additional parameter `languageReferencesChecker` to inspect the `languages` section of a serialization chunk.
+* `ModelMigrator` uses aforementioned `languageReferencesChecker`.
 ### Removed
 * Removed `sender` parameter from most notification pipe classes, as it's not used.
 * Removed `INotificationSender.Send()`.

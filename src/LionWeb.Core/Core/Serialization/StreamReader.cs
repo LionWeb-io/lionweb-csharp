@@ -29,18 +29,22 @@ internal abstract class StreamReaderBase(IDeserializer deserializer)
 
     public Action<string>? LionWebVersionChecker { get; init; }
 
+    public Func<List<SerializedLanguageReference>, bool>? LanguageReferencesChecker { get; init; }
+
     public required JsonSerializerOptions JsonSerializerOptions { get; init; }
 
     protected bool IsInsideNodes(string? stringFromReader) => stringFromReader == "nodes";
-
-    protected bool IsSerializationFormatVersion(string? stringFromReader) =>
-        stringFromReader == "serializationFormatVersion";
 
     protected void Process(SerializedNode? serializedNode)
     {
         if (serializedNode != null)
             Deserializer.Process(serializedNode);
     }
+
+    protected bool IsInsideLanguages(string? stringFromReader) => stringFromReader == "languages";
+
+    protected bool IsSerializationFormatVersion(string? stringFromReader) =>
+        stringFromReader == "serializationFormatVersion";
 
     protected void CheckSerializationFormatVersion(string? stringFromReader)
     {
@@ -62,26 +66,50 @@ internal sealed class StreamReaderAsync(Stream utf8JsonStream, IDeserializer des
     public async Task<List<IReadableNode>> ReadNodes()
     {
         var insideNodes = false;
+        var insideLanguages = false;
+        List<SerializedLanguageReference> languageReferences = [];
+
         while (await Advance())
         {
-            switch (_streamReader.TokenType)
+            switch (_streamReader.TokenType, insideNodes, insideLanguages)
             {
-                case JsonTokenType.PropertyName when IsSerializationFormatVersion(_streamReader.GetString()):
+                case (JsonTokenType.PropertyName, _, _) when IsSerializationFormatVersion(_streamReader.GetString()):
                     await Advance();
                     CheckSerializationFormatVersion(_streamReader.GetString());
                     break;
 
-                case JsonTokenType.PropertyName when IsInsideNodes(_streamReader.GetString()):
+                case (JsonTokenType.PropertyName, false, _) when IsInsideNodes(_streamReader.GetString()):
                     insideNodes = true;
+                    insideLanguages = false;
                     break;
 
-                case JsonTokenType.PropertyName when !IsInsideNodes(_streamReader.GetString()):
+                case (JsonTokenType.PropertyName, _, false) when IsInsideLanguages(_streamReader.GetString()):
+                    insideLanguages = true;
                     insideNodes = false;
                     break;
 
-                case JsonTokenType.StartObject when insideNodes:
+                case (JsonTokenType.PropertyName, true, _):
+                    insideNodes = false;
+                    break;
+
+                case (JsonTokenType.PropertyName, _, true):
+                    insideLanguages = false;
+                    break;
+
+                case (JsonTokenType.StartObject, true, false):
                     var serializedNode = await _streamReader.DeserializeAsync<SerializedNode>(JsonSerializerOptions);
                     Process(serializedNode);
+                    break;
+
+                case (JsonTokenType.StartObject, false, true) when LanguageReferencesChecker is not null:
+                    var languageReference = await _streamReader.DeserializeAsync<SerializedLanguageReference>(JsonSerializerOptions);
+                    if (languageReference is not null)
+                        languageReferences.Add(languageReference);
+                    break;
+
+                case (JsonTokenType.EndArray, false, true) when LanguageReferencesChecker is not null:
+                    if (!LanguageReferencesChecker(languageReferences))
+                        return [];
                     break;
             }
         }
@@ -102,27 +130,50 @@ internal sealed class StreamReaderSync(Stream utf8JsonStream, IDeserializer dese
         using var jsonStreamReader = new Utf8JsonStreamReader(utf8JsonStream, _bufferSize);
 
         var insideNodes = false;
+        var insideLanguages = false;
+        List<SerializedLanguageReference> languageReferences = [];
+
         while (jsonStreamReader.Read())
         {
-            switch (jsonStreamReader.TokenType)
+            switch (jsonStreamReader.TokenType, insideNodes, insideLanguages)
             {
-                case JsonTokenType.PropertyName when IsSerializationFormatVersion(jsonStreamReader.GetString()):
+                case (JsonTokenType.PropertyName, _, _) when IsSerializationFormatVersion(jsonStreamReader.GetString()):
                     jsonStreamReader.Read();
                     CheckSerializationFormatVersion(jsonStreamReader.GetString());
                     break;
 
-                case JsonTokenType.PropertyName when IsInsideNodes(jsonStreamReader.GetString()):
+                case (JsonTokenType.PropertyName, false, _) when IsInsideNodes(jsonStreamReader.GetString()):
                     insideNodes = true;
+                    insideLanguages = false;
                     break;
 
-                case JsonTokenType.PropertyName when !IsInsideNodes(jsonStreamReader.GetString()):
+                case (JsonTokenType.PropertyName, _, false) when IsInsideLanguages(jsonStreamReader.GetString()):
+                    insideLanguages = true;
                     insideNodes = false;
                     break;
 
-                case JsonTokenType.StartObject when insideNodes:
+                case (JsonTokenType.PropertyName, true, _):
+                    insideNodes = false;
+                    break;
+
+                case (JsonTokenType.PropertyName, _, true):
+                    insideLanguages = false;
+                    break;
+
+                case (JsonTokenType.StartObject, true, false):
                     var serializedNode = jsonStreamReader.Deserialize<SerializedNode>(JsonSerializerOptions);
-                    if (serializedNode != null)
-                        Deserializer.Process(serializedNode);
+                    Process(serializedNode);
+                    break;
+
+                case (JsonTokenType.StartObject, false, true) when LanguageReferencesChecker is not null:
+                    var languageReference = jsonStreamReader.Deserialize<SerializedLanguageReference>(JsonSerializerOptions);
+                    if (languageReference is not null)
+                        languageReferences.Add(languageReference);
+                    break;
+
+                case (JsonTokenType.EndArray, false, true) when LanguageReferencesChecker is not null:
+                    if (!LanguageReferencesChecker(languageReferences))
+                        return [];
                     break;
             }
         }
