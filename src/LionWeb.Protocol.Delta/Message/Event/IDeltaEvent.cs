@@ -204,14 +204,6 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
     public IDeltaEvent[] Parts { get; init; }
 
     /// <inheritdoc />
-    [JsonIgnore]
-    public override EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override CommandSource[] OriginCommands => base.OriginCommands;
-
-    /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)
     {
         if (other is null)

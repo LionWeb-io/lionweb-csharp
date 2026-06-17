@@ -20,8 +20,9 @@ In our tests, we gained in all measured use cases:
 ### Added
 * Small cli project to run profilers.
 * Introduced `M2Extensions.AsAnnotations()`
-* * Added `INotificationFilter.Handles()`, as we don't care about which notification type we're handling.
+* Added `INotificationFilter.Handles()`, as we don't care about which notification type we're handling.
 * `IReferenceNotification` grouping interface.
+* Added `CompositeEvent` members `SequenceNumber` and `OriginCommands` to JSON.
 ### Fixed
 * Mappers + replicator support all kinds of messages (except `ChangeClassifier`).
 * `MigrationDeserializerHandler` created way too many M2 instances for unknown keys.
