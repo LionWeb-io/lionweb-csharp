@@ -62,6 +62,9 @@ public record CompositeNotification : IForestNotification, IPartitionNotificatio
     public IWritableNode ContextNode => null;
 
     /// <inheritdoc />
+    public void Freeze() { }
+
+    /// <inheritdoc />
     public virtual bool Equals(CompositeNotification? other)
     {
         if (other is null)

@@ -17,15 +17,15 @@
 
 namespace LionWeb.Core.Notification.Partition;
 
-using M1;
 using M3;
+using Pipe;
 using SemanticPropertyValue = object;
 
 /// All LionWeb notifications relating to a partition.
 public interface IPartitionNotification : INotification
 {
     NodeId ContextNodeId { get; }
-    
+
     IWritableNode ContextNode { get; }
 }
 
@@ -42,6 +42,9 @@ public abstract record APartitionNotification(INotificationId NotificationId) : 
 
     /// <inheritdoc />
     public abstract IWritableNode ContextNode { get; }
+
+    /// <inheritdoc />
+    public virtual void Freeze() { }
 }
 
 #region Nodes
@@ -115,7 +118,7 @@ public record PropertyChangedNotification(
     SemanticPropertyValue NewValue,
     SemanticPropertyValue OldValue,
     INotificationId NotificationId)
-    : APartitionNotification(NotificationId),IPropertyNotification
+    : APartitionNotification(NotificationId), IPropertyNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Node];
@@ -147,6 +150,12 @@ public record ChildAddedNotification(
 
     /// <inheritdoc />
     public IReadableNode NewNode => NewChild;
+
+    public IWritableNode? FrozenNewChild { get; private set; }
+
+    /// <inheritdoc />
+    public override void Freeze() =>
+        FrozenNewChild ??= SameIdCloner.Clone((INode)NewChild);
 }
 
 /// <param name="DeletedChild"></param>
@@ -167,8 +176,13 @@ public record ChildDeletedNotification(
     public override IWritableNode ContextNode => Parent;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(DeletedChild, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(DeletedChild);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 /// <param name="NewChild"></param>
@@ -191,11 +205,22 @@ public record ChildReplacedNotification(
     public override IWritableNode ContextNode => Parent;
 
     /// <inheritdoc />
-    public IReadableNode NewNode =>  NewChild;
+    public IReadableNode NewNode => NewChild;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(ReplacedChild, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedChild);
+
+    public IWritableNode? FrozenNewChild { get; private set; }
+
+    /// <inheritdoc />
+    public override void Freeze()
+    {
+        _deletedNodes ??= CollectDeleted();
+        FrozenNewChild ??= SameIdCloner.Clone((INode)NewChild);
+    }
 }
 
 /// <param name="NewParent"></param>
@@ -289,8 +314,13 @@ public record ChildMovedAndReplacedFromOtherContainmentNotification(
     public override IWritableNode ContextNode => NewParent;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(ReplacedChild, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedChild);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 /// <param name="NewContainment"></param>
@@ -316,8 +346,13 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
     public override IWritableNode ContextNode => Parent;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(ReplacedChild, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedChild);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 /// <param name="NewIndex"></param>
@@ -341,8 +376,13 @@ public record ChildMovedAndReplacedInSameContainmentNotification(
     public override IWritableNode ContextNode => Parent;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(ReplacedChild, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedChild);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 #endregion
@@ -367,6 +407,12 @@ public record AnnotationAddedNotification(
 
     /// <inheritdoc />
     public IReadableNode NewNode => NewAnnotation;
+
+    public IWritableNode? FrozenNewAnnotation { get; private set; }
+
+    /// <inheritdoc />
+    public override void Freeze() =>
+        FrozenNewAnnotation ??= SameIdCloner.Clone((INode)NewAnnotation);
 }
 
 /// <param name="DeletedAnnotation"></param>
@@ -386,8 +432,13 @@ public record AnnotationDeletedNotification(
     public override IWritableNode ContextNode => Parent;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(DeletedAnnotation, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(DeletedAnnotation);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 /// <param name="NewAnnotation"></param>
@@ -411,8 +462,19 @@ public record AnnotationReplacedNotification(
     public IReadableNode NewNode => NewAnnotation;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(ReplacedAnnotation, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedAnnotation);
+
+    public IWritableNode? FrozenNewAnnotation { get; private set; }
+
+    /// <inheritdoc />
+    public override void Freeze()
+    {
+        _deletedNodes ??= CollectDeleted();
+        FrozenNewAnnotation ??= SameIdCloner.Clone((INode)NewAnnotation);
+    }
 }
 
 /// <param name="NewParent"></param>
@@ -474,8 +536,13 @@ public record AnnotationMovedAndReplacedFromOtherParentNotification(
     public override IWritableNode ContextNode => NewParent;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(ReplacedAnnotation, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedAnnotation);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 /// <param name="NewIndex"></param>
@@ -497,8 +564,13 @@ public record AnnotationMovedAndReplacedInSameParentNotification(
     public override IWritableNode ContextNode => Parent;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(ReplacedAnnotation, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedAnnotation);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 #endregion
@@ -508,10 +580,9 @@ public record AnnotationMovedAndReplacedInSameParentNotification(
 public interface IReferenceNotification : IPartitionNotification
 {
     IWritableNode Parent { get; }
-        Reference Reference { get; }
+    Reference Reference { get; }
     Index Index { get; }
     IReferenceTarget Target { get; }
-    
 }
 
 /// <param name="Parent"></param>

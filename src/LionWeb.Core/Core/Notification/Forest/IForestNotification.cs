@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Notification.Forest;
 
-using M1;
+using Pipe;
 
 /// All LionWeb notifications relating to a forest.
 public interface IForestNotification : INotification
@@ -38,6 +38,9 @@ public abstract record AForestNotification(INotificationId NotificationId) : IFo
 
     /// <inheritdoc />
     public abstract IPartitionInstance Partition { get; }
+
+    /// <inheritdoc />
+    public virtual void Freeze() { }
 }
 
 /// A partition has been deleted from this forest.
@@ -51,8 +54,13 @@ public record PartitionDeletedNotification(
     public override IPartitionInstance Partition => DeletedPartition;
 
     /// <inheritdoc />
-    public IEnumerable<IReadableNode> DeletedNodes =>
-        M1Extensions.Descendants<IReadableNode>(DeletedPartition, true, true);
+    public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
+
+    private IReadOnlyList<IReadableNode>? _deletedNodes;
+    private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(DeletedPartition);
+
+    /// <inheritdoc />
+    public override void Freeze() => _deletedNodes ??= CollectDeleted();
 }
 
 /// A new partition has been added to this forest.
@@ -67,4 +75,10 @@ public record PartitionAddedNotification(
 
     /// <inheritdoc />
     public IReadableNode NewNode => NewPartition;
+
+    public IPartitionInstance? FrozenNewPartition { get; private set; }
+
+    /// <inheritdoc />
+    public override void Freeze() =>
+        FrozenNewPartition ??= (IPartitionInstance)SameIdCloner.Clone((INode)NewPartition);
 }

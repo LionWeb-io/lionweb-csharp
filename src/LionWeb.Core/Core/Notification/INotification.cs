@@ -24,6 +24,11 @@ public interface INotification
     INotificationId NotificationId { get; set; }
     
     HashSet<IReadableNode> AffectedNodes { get; }
+
+    /// <summary>
+    /// Freezes members that might lead to different delta protocol serialization if evaluated later.
+    /// </summary>
+    void Freeze();
 }
 
 /// ID of a notification in the LionWeb notification system.

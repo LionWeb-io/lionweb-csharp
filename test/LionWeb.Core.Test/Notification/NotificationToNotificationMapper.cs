@@ -68,7 +68,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private PartitionAddedNotification OnPartitionAdded(PartitionAddedNotification notification) =>
         new(
-            CloneNode(notification.NewPartition),
+            CloneNode(notification.FrozenNewPartition ?? notification.NewPartition),
             notification.NotificationId
         );
 
@@ -126,7 +126,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ChildAddedNotification OnChildAdded(ChildAddedNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
-        var newChild = CloneNode(notification.NewChild);
+        var newChild = CloneNode(notification.FrozenNewChild ?? notification.NewChild);
 
         return new(
             parent,
@@ -153,7 +153,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ChildReplacedNotification OnChildReplaced(ChildReplacedNotification notification)
     {
-        var newChild = CloneNode(notification.NewChild);
+        var newChild = CloneNode(notification.FrozenNewChild ?? notification.NewChild);
         var replacedChild = LookUpNode(notification.ReplacedChild);
         var parent = LookUpNode(notification.Parent);
 
@@ -284,7 +284,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private AnnotationAddedNotification OnAnnotationAdded(AnnotationAddedNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
-        var newAnnotation = CloneNode(notification.NewAnnotation);
+        var newAnnotation = CloneNode(notification.FrozenNewAnnotation ?? notification.NewAnnotation);
 
         return new(
             parent,
@@ -309,7 +309,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private AnnotationReplacedNotification OnAnnotationReplaced(AnnotationReplacedNotification notification)
     {
-        var newAnnotation = CloneNode(notification.NewAnnotation);
+        var newAnnotation = CloneNode(notification.FrozenNewAnnotation ?? notification.NewAnnotation);
         var replacedAnnotation = LookUpNode(notification.ReplacedAnnotation);
         var parent = LookUpNode(notification.Parent);
 
@@ -520,7 +520,7 @@ internal class InterdependentNotificationToNotificationMapper(SharedNodeMap shar
     private protected override T CloneNode<T>(T node)
     {
         var result = (T)SameIdCloner.Clone((INode)node);
-        foreach (IWritableNode n in M1Extensions.Descendants(result, true, true))
+        foreach (IWritableNode n in M1Extensions.Descendants((IWritableNode)result, true, true))
         {
             _interdependentNodeMap[n.GetId()] = n;
         }
