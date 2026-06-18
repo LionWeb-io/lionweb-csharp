@@ -45,7 +45,8 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 		_secondTestEnumeration_literal1 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal1", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal1", Name = "literal1" });
 		_secondTestEnumeration_literal2 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal2", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal2", Name = "literal2" });
 		_secondTestEnumeration_literal3 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal3", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal3", Name = "literal3" });
-		_testAnnotation = new(() => new AnnotationBase<NullableReferencesTestLanguageLanguage>("TestAnnotation", this) { Key = "TestAnnotation", Name = "TestAnnotation", AnnotatesLazy = new(() => _builtIns.Node), ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [TestAnnotation_ref]) });
+		_testAnnotation = new(() => new AnnotationBase<NullableReferencesTestLanguageLanguage>("TestAnnotation", this) { Key = "TestAnnotation", Name = "TestAnnotation", AnnotatesLazy = new(() => _builtIns.Node), ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [TestAnnotation_containment, TestAnnotation_ref]) });
+		_testAnnotation_containment = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("TestAnnotation-containment", TestAnnotation, this) { Key = "TestAnnotation-containment", Name = "containment", Optional = true, Multiple = false, Type = _builtIns.Node });
 		_testAnnotation_ref = new(() => new ReferenceBase<NullableReferencesTestLanguageLanguage>("TestAnnotation-ref", TestAnnotation, this) { Key = "TestAnnotation-ref", Name = "ref", Optional = false, Multiple = false, Type = _builtIns.Node });
 		_testEnumeration = new(() => new EnumerationBase<NullableReferencesTestLanguageLanguage>("TestEnumeration", this) { Key = "TestEnumeration", Name = "TestEnumeration", LiteralsLazy = new(() => [TestEnumeration_literal1, TestEnumeration_literal2, TestEnumeration_literal3]) });
 		_testEnumeration_literal1 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("TestEnumeration-literal1", TestEnumeration, this) { Key = "TestEnumeration-literal1", Name = "literal1" });
@@ -142,6 +143,9 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 
 	private readonly Lazy<Annotation> _testAnnotation;
 	public Annotation TestAnnotation => _testAnnotation.Value;
+
+	private readonly Lazy<Containment> _testAnnotation_containment;
+	public Containment TestAnnotation_containment => _testAnnotation_containment.Value;
 
 	private readonly Lazy<Reference> _testAnnotation_ref;
 	public Reference TestAnnotation_ref => _testAnnotation_ref.Value;
@@ -1625,6 +1629,34 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		return this;
 	}
 
+	private INode? _containment = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "TestAnnotation-containment")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
+	public INode? Containment { get => _containment; set => SetContainment(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetContainment([NotNullWhenAttribute(true)] out INode? containment)
+	{
+		containment = _containment;
+		return containment != null;
+	}
+
+	private bool SetContainmentRaw(INode? value)
+	{
+		if (!ExchangeChildRaw(value, _containment))
+			return false;
+		_containment = value;
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public TestAnnotation SetContainment(INode? value)
+	{
+		SetOptionalSingleContainment<INode>(value, NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment, _containment, SetContainmentRaw);
+		return this;
+	}
+
 	private ReferenceTarget? _ref = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
@@ -1678,6 +1710,12 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 			return true;
 		}
 
+		if (NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment.EqualsIdentity(feature))
+		{
+			result = Containment;
+			return true;
+		}
+
 		if (NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_ref.EqualsIdentity(feature))
 		{
 			result = Ref;
@@ -1694,6 +1732,19 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
 			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected override bool TryGetContainmentRaw(Containment feature, out IReadableNode? result)
+	{
+		if (base.TryGetContainmentRaw(feature, out result))
+			return true;
+		if (NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment.EqualsIdentity(feature))
+		{
+			result = _containment;
 			return true;
 		}
 
@@ -1729,6 +1780,17 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 			throw new InvalidValueException(feature, value);
 		}
 
+		if (NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment.EqualsIdentity(feature))
+		{
+			if (value is null or INode)
+			{
+				SetContainment((INode?)value);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		if (NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_ref.EqualsIdentity(feature))
 		{
 			if (value is IReadableNode v)
@@ -1758,6 +1820,15 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		return false;
 	}
 
+	protected override bool SetContainmentRaw(Containment feature, IWritableNode? value)
+	{
+		if (base.SetContainmentRaw(feature, value))
+			return true;
+		if (NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment.EqualsIdentity(feature) && value is null or INode)
+			return SetContainmentRaw((INode?)value);
+		return false;
+	}
+
 	protected override bool SetReferenceRaw(Reference feature, ReferenceTarget? value)
 	{
 		if (base.SetReferenceRaw(feature, value))
@@ -1773,9 +1844,39 @@ public partial class TestAnnotation : AnnotationInstanceBase, INamedWritable
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (TryGetName(out _))
 			result.Add(_builtIns.INamed_name);
+		if (TryGetContainment(out _))
+			result.Add(NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment);
 		if (TryGetRef(out _))
 			result.Add(NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_ref);
 		return result;
+	}
+
+	/// <inheritdoc/>
+        protected override bool DetachChild(INode child, bool notify)
+	{
+		if (base.DetachChild(child, notify))
+			return true;
+		Containment? c = GetContainmentOf(child);
+		if (NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment.EqualsIdentity(c))
+		{
+			_containment = null;
+			if (notify)
+				NotifyRemoveFromParent<INode>(child, NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment);
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        public override Containment? GetContainmentOf(INode child)
+	{
+		Containment? result = base.GetContainmentOf(child);
+		if (result != null)
+			return result;
+		if (ReferenceEquals(_containment, child))
+			return NullableReferencesTestLanguageLanguage.Instance.TestAnnotation_containment;
+		return null;
 	}
 }
 
