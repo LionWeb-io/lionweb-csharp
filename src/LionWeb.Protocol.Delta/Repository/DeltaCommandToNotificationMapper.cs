@@ -209,11 +209,11 @@ public class DeltaCommandToNotificationMapper
         MoveAndReplaceChildFromOtherContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
-        var oldContainment = GetContainmentAndParent(movedChild, nameof(command.MovedChild), out var oldParent);
         var newParent = ToNode(command.NewParent);
         var newContainment = ToContainment(command.NewContainment, newParent);
+        var oldParent = ToNode(command.OldParent);
+        var oldContainment = ToContainment(command.OldContainment, oldParent);
         var replacedChild = ToNode(command.ReplacedChild);
-        var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentNotification(
             newParent,
@@ -222,7 +222,7 @@ public class DeltaCommandToNotificationMapper
             movedChild,
             oldParent,
             oldContainment,
-            oldIndex,
+            command.OldIndex,
             replacedChild,
             ToNotificationId(command)
         );

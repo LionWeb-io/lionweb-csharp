@@ -206,7 +206,8 @@ public class DeltaEventToNotificationMapper
         ChildMovedAndReplacedFromOtherContainment childMovedAndReplacedEvent)
     {
         var movedChild = ToNode(childMovedAndReplacedEvent.MovedChild);
-        var oldContainment = GetContainmentAndParent(movedChild, nameof(childMovedAndReplacedEvent.MovedChild), out var oldParent);
+        var oldParent = ToNode(childMovedAndReplacedEvent.OldParent);
+        var oldContainment = ToContainment(childMovedAndReplacedEvent.OldContainment, oldParent);
 
         var newParent = ToNode(childMovedAndReplacedEvent.NewParent);
         var newContainment = ToContainment(childMovedAndReplacedEvent.NewContainment, newParent);
