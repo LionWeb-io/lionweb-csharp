@@ -80,7 +80,6 @@ public class TwowayTests : TwowayReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("Not possible with TestLanguage")]
     public void AnnotationAdded_Deep()
     {
         var node = new TestPartition("a");
@@ -90,14 +89,14 @@ public class TwowayTests : TwowayReplicatorTestsBase
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
 
-        // var added = new TestAnnotation("added")
-        // {
-        //     AltGroups = [new MaterialGroup("mg") { MatterState = MatterState.gas }]
-        // };
-        // node.AddAnnotations([added]);
+        var added = new TestAnnotation("added")
+        {
+            Containment = new LinkTestConcept("mg") { Name = "gas" }
+        };
+        node.AddAnnotations([added]);
 
         AssertEquals([node], [clone]);
-        // Assert.AreNotSame(added, clone.GetAnnotations()[0]);
+        Assert.AreNotSame(added, clone.GetAnnotations()[0]);
     }
 
     #endregion
