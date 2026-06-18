@@ -338,11 +338,9 @@ public class MapperTests : DeltaTestsBase
         var newParent = new LinkTestConcept("newParent") { Containment_1_n = [replaced] };
         List<IReadableNode> nodes = [oldParent, newParent, moved];
 
-        List<Exception> exceptions = Test<MoveAndReplaceChildFromOtherContainment, ChildMovedAndReplacedFromOtherContainment>(nodes,
+        Assert.IsEmpty(Test<MoveAndReplaceChildFromOtherContainment, ChildMovedAndReplacedFromOtherContainment>(nodes,
             new ChildMovedAndReplacedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, replaced, _notificationIdProvider.Create())
-        );
-        Assert.HasCount(2, exceptions);
-        Assert.IsTrue(exceptions.All(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset"));
+        ));
     }
 
     [TestMethod]

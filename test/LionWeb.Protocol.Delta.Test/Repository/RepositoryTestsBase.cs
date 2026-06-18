@@ -98,15 +98,18 @@ public abstract class RepositoryTestsBase
 
     private static void Log(string message) =>
         Console.WriteLine(message);
-}
 
-public abstract class RepositoryTestNoExceptionsBase : RepositoryTestsBase
-{
-    [TestCleanup]
-    public void AssertNoExceptions()
+    protected void AssertNoExceptions()
     {
         AssertNoExceptions(_repository.Exceptions);
         AssertNoExceptions(_aClient.Exceptions);
         AssertNoExceptions(_bClient.Exceptions);
     }
+}
+
+public abstract class RepositoryTestNoExceptionsBase : RepositoryTestsBase
+{
+    [TestCleanup]
+    public new void AssertNoExceptions() => 
+        base.AssertNoExceptions();
 }

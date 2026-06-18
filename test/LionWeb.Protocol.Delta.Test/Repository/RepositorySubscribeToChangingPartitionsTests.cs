@@ -20,7 +20,7 @@ namespace LionWeb.Protocol.Delta.Test.Repository;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
-public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExceptionsBase
+public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestsBase
 {
     [TestMethod]
     [Timeout(6000)]
@@ -51,6 +51,7 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
         _aClient.WaitForReceived(1);
         
         Assert.HasCount(1, _bForest.Partitions);
+        AssertNoExceptions();
     }
     
     [TestMethod]
@@ -75,6 +76,12 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
         _aClient.WaitForReceived(1);
         
         Assert.HasCount(0, _bForest.Partitions);
+        AssertNoExceptions(_repository.Exceptions);
+        AssertNoExceptions(_aClient.Exceptions);
+        Assert.HasCount(1, _bClient.Exceptions);
+        Assert.IsInstanceOfType<DeltaException>(_bClient.Exceptions[0]);
+        var bClientException = (DeltaException)_bClient.Exceptions[0];
+        Assert.AreEqual("Unknown node id part", bClientException.Message);
     }
     
     [TestMethod]
@@ -105,6 +112,7 @@ public class RepositorySubscribeToChangingPartitionsTests : RepositoryTestNoExce
         WaitForReceived(1);
         
         Assert.HasCount(0, _bForest.Partitions);
+        AssertNoExceptions();
     }
     
 }
