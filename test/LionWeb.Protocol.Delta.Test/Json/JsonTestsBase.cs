@@ -176,7 +176,7 @@ public abstract class JsonTestsBase
         new(Index(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildFromOtherContainment CreateMoveAndReplaceChildFromOtherContainment() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(),
             TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildFromOtherContainmentInSameParent

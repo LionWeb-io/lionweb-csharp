@@ -71,6 +71,7 @@ public class NotificationCompositor : NotificationPipeBase, INotificationHandler
         if (!_composites.TryPeek(out var composite))
             return false;
 
+        notification.Freeze();
         composite.AddPart(notification);
         return true;
     }

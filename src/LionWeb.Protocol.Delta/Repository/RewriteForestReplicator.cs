@@ -27,15 +27,13 @@ internal static class RewriteForestReplicator
 {
     public static INotificationHandler Create(
         IForest localForest,
-        SharedNodeMap sharedNodeMap,
-        object? sender
+        SharedNodeMap sharedNodeMap
     )
     {
         IdReplacingNotificationFilter replacingFilter = null!;
         var parts = ForestReplicator.CreateInternal(localForest,
             sharedNodeMap,
-            sender,
-            (filter, s) =>
+            filter =>
             {
                 replacingFilter = new IdReplacingNotificationFilter();
                 return new RewriteRemoteReplicator(

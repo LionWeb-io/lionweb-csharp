@@ -84,14 +84,11 @@ public class DeltaEventToNotificationMapper
             ToNotificationId(partitionAdded)
         );
 
-    private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted)
-    {
-        TryToNode(partitionDeleted.DeletedPartition, out var deletedNode);
-        if (deletedNode is null or IPartitionInstance)
-            return new PartitionDeletedNotification((IPartitionInstance)deletedNode!, ToNotificationId(partitionDeleted));
-
-        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.AdditionalInfos, deletedNode));
-    }
+    private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted) =>
+        new(
+            (IPartitionInstance)ToNode(partitionDeleted.DeletedPartition),
+            ToNotificationId(partitionDeleted)
+        );
 
     #endregion
 
@@ -209,7 +206,8 @@ public class DeltaEventToNotificationMapper
         ChildMovedAndReplacedFromOtherContainment childMovedAndReplacedEvent)
     {
         var movedChild = ToNode(childMovedAndReplacedEvent.MovedChild);
-        var oldContainment = GetContainmentAndParent(movedChild, nameof(childMovedAndReplacedEvent.MovedChild), out var oldParent);
+        var oldParent = ToNode(childMovedAndReplacedEvent.OldParent);
+        var oldContainment = ToContainment(childMovedAndReplacedEvent.OldContainment, oldParent);
 
         var newParent = ToNode(childMovedAndReplacedEvent.NewParent);
         var newContainment = ToContainment(childMovedAndReplacedEvent.NewContainment, newParent);

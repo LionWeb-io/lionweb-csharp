@@ -66,15 +66,13 @@ public static class ForestReplicator
     /// </list>
     public static INotificationHandler Create(
         IForest localForest,
-        SharedNodeMap sharedNodeMap,
-        object? sender
+        SharedNodeMap sharedNodeMap
     )
     {
         var parts = CreateInternal(
             localForest,
             sharedNodeMap,
-            sender,
-            (filter, _) => new RemoteReplicator(localForest, filter, sharedNodeMap)
+            filter => new RemoteReplicator(localForest, filter, sharedNodeMap)
         );
 
         var result = new MultipartNotificationHandler(parts);
@@ -82,16 +80,21 @@ public static class ForestReplicator
         return result;
     }
 
+    [Obsolete("Use Create(IForest, SharedNodeMap) instead")]
+    public static INotificationHandler Create(
+        IForest localForest,
+        SharedNodeMap sharedNodeMap,
+        object? sender
+    ) => Create(localForest, sharedNodeMap);
+
     public static List<INotificationHandler> CreateInternal(
         IForest localForest,
         SharedNodeMap sharedNodeMap,
-        object? sender,
-        Func<IdFilteringNotificationFilter, object, RemoteReplicator> remoteNotificationReplicator
+        Func<IdFilteringNotificationFilter, RemoteReplicator> remoteNotificationReplicator
     )
     {
-        var internalSender = sender ?? localForest;
         var filter = new IdFilteringNotificationFilter();
-        var remoteReplicator = remoteNotificationReplicator(filter, internalSender);
+        var remoteReplicator = remoteNotificationReplicator(filter);
         var localReplicator = new LocalReplicator(localForest, sharedNodeMap);
 
         var result = new List<INotificationHandler> { remoteReplicator, filter };

@@ -17,6 +17,9 @@
 
 namespace LionWeb.Core.Notification;
 
+using M1;
+using System.Collections.Immutable;
+
 /// <summary>
 /// Implementers delete nodes.
 /// </summary>
@@ -25,5 +28,8 @@ public interface IDeletedNodeNotification : INotification
     /// <summary>
     /// All deleted nodes.
     /// </summary>
-    IEnumerable<IReadableNode> DeletedNodes { get; }
+    IReadOnlyList<IReadableNode> DeletedNodes { get; }
+
+    protected static IReadOnlyList<IReadableNode> CollectDeleted(IReadableNode deleted) =>
+        M1Extensions.Descendants(deleted, true, true).ToImmutableList();
 }

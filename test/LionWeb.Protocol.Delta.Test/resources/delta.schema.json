@@ -1522,6 +1522,15 @@
         "newIndex": {
           "$ref": "#/$defs/index"
         },
+        "oldParent": {
+          "$ref": "#/$defs/targetNode"
+        },
+        "oldContainment": {
+          "$ref": "#/$defs/metaPointer"
+        },
+        "oldIndex": {
+          "$ref": "#/$defs/index"
+        },
         "replacedChild": {
           "$ref": "#/$defs/targetNode"
         },
@@ -1540,14 +1549,17 @@
         "newParent",
         "newContainment",
         "newIndex",
+        "oldParent",
+        "oldContainment",
+        "oldIndex",
         "replacedChild",
         "movedChild",
         "commandId",
         "additionalInfos"
       ],
       "additionalProperties": false,
-      "minProperties": 8,
-      "maxProperties": 8
+      "minProperties": 11,
+      "maxProperties": 11
     },
     "MoveAndReplaceChildFromOtherContainmentInSameParent": {
       "properties": {
@@ -3273,6 +3285,12 @@
             "$ref": "#/$defs/Events"
           }
         },
+        "originCommands": {
+          "$ref": "#/$defs/commandSources"
+        },
+        "sequenceNumber": {
+          "$ref": "#/$defs/eventSequenceNumber"
+        },
         "additionalInfos": {
           "$ref": "#/$defs/additionalInfos"
         }
@@ -3280,11 +3298,13 @@
       "required": [
         "messageKind",
         "parts",
+        "originCommands",
+        "sequenceNumber",
         "additionalInfos"
       ],
       "additionalProperties": false,
-      "minProperties": 3,
-      "maxProperties": 3
+      "minProperties": 5,
+      "maxProperties": 5
     },
     "NoOpEvent": {
       "properties": {

@@ -81,7 +81,6 @@ public class AddedTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    [Ignore("Not possible with TestLanguage")]
     public void Deep()
     {
         var originalPartition = new TestPartition("a");
@@ -89,10 +88,10 @@ public class AddedTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
-        // var added = new TestAnnotation("added") { AltGroups = [new MaterialGroup("mg") { MatterState = MatterState.gas }] };
-        // originalPartition.AddAnnotations([added]);
+        var added = new TestAnnotation("added") { Containment = new LinkTestConcept("mg") { Name = "gas" } };
+        originalPartition.AddAnnotations([added]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-        // Assert.AreNotSame(added, clonedPartition.Contents[0].GetAnnotations()[0]);
+        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
     }
 }

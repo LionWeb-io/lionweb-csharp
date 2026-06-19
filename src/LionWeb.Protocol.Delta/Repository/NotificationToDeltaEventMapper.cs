@@ -76,7 +76,7 @@ public class NotificationToDeltaEventMapper
 
     private PartitionAdded OnPartitionAdded(PartitionAddedNotification partitionAddedNotification) =>
         new(
-            ToDeltaChunk(partitionAddedNotification.NewPartition),
+            ToDeltaChunk(partitionAddedNotification.FrozenNewPartition ?? partitionAddedNotification.NewPartition),
             partitionAddedNotification.NewPartition.GetId(),
             ToCommandSources(partitionAddedNotification),
             []
@@ -136,7 +136,7 @@ public class NotificationToDeltaEventMapper
     private ChildAdded OnChildAdded(ChildAddedNotification childAddedNotification) =>
         new(
             childAddedNotification.Parent.GetId(),
-            ToDeltaChunk(childAddedNotification.NewChild),
+            ToDeltaChunk(childAddedNotification.FrozenNewChild ?? childAddedNotification.NewChild),
             childAddedNotification.Containment.ToMetaPointer(),
             childAddedNotification.Index,
             ToCommandSources(childAddedNotification),
@@ -156,7 +156,7 @@ public class NotificationToDeltaEventMapper
 
     private ChildReplaced OnChildReplaced(ChildReplacedNotification childReplacedNotification) =>
         new(
-            ToDeltaChunk(childReplacedNotification.NewChild),
+            ToDeltaChunk(childReplacedNotification.FrozenNewChild ?? childReplacedNotification.NewChild),
             childReplacedNotification.ReplacedChild.GetId(),
             ToDescendants(childReplacedNotification.ReplacedChild),
             childReplacedNotification.Parent.GetId(),
@@ -259,7 +259,7 @@ public class NotificationToDeltaEventMapper
     private AnnotationAdded OnAnnotationAdded(AnnotationAddedNotification annotationAddedNotification) =>
         new(
             annotationAddedNotification.Parent.GetId(),
-            ToDeltaChunk(annotationAddedNotification.NewAnnotation),
+            ToDeltaChunk(annotationAddedNotification.FrozenNewAnnotation ?? annotationAddedNotification.NewAnnotation),
             annotationAddedNotification.Index,
             ToCommandSources(annotationAddedNotification),
             []
@@ -277,7 +277,7 @@ public class NotificationToDeltaEventMapper
 
     private AnnotationReplaced OnAnnotationReplaced(AnnotationReplacedNotification annotationReplacedNotification) =>
         new(
-            ToDeltaChunk(annotationReplacedNotification.NewAnnotation),
+            ToDeltaChunk(annotationReplacedNotification.FrozenNewAnnotation ?? annotationReplacedNotification.NewAnnotation),
             annotationReplacedNotification.ReplacedAnnotation.GetId(),
             ToDescendants(annotationReplacedNotification.ReplacedAnnotation),
             annotationReplacedNotification.Parent.GetId(),
