@@ -33,7 +33,7 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
 {
     protected INode _parent = null!;
     protected Containment _containment = null!;
-    protected int _index;
+    protected int _replacedIndex;
 
     public virtual T Replace()
     {
@@ -87,12 +87,12 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
         if (self is not IAnnotationInstance ann || replacement is not IAnnotationInstance replAnn)
             throw new InvalidValueException(null, replacement);
 
-        _index = _parent.GetAnnotationsRaw().IndexOf(ann);
-        if (_index < 0)
+        _replacedIndex = _parent.GetAnnotationsRaw().IndexOf(ann);
+        if (_replacedIndex < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
 
-        return _index;
+        return _replacedIndex;
     }
 
     private void ReplaceAnnotation(Index index)
@@ -122,12 +122,12 @@ internal class NodeReplacer<T>(INode self, T replacement) where T : INode
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
 
-        _index = nodes.IndexOf(self);
-        if (_index < 0)
+        _replacedIndex = nodes.IndexOf(self);
+        if (_replacedIndex < 0)
             // should not happen
             throw new TreeShapeException(self, "Node not contained in its parent");
 
-        if (!_parent.InsertContainmentsRaw(_containment, _index, replacement)
+        if (!_parent.InsertContainmentsRaw(_containment, _replacedIndex, replacement)
             || !_parent.RemoveContainmentsRaw(_containment, self))
         {
             throw new InvalidValueException(_containment, replacement);

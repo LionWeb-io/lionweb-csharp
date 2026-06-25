@@ -285,7 +285,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         ChildMovedAndReplacedInSameContainmentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.NewIndex);
+            CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.OldIndex + n.IndexOffset);
             var success = ReplaceChildOrAnnotation(n.ReplacedChild, n.MovedChild);
             ProduceNotification(n, success);
         });
@@ -374,7 +374,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         AnnotationMovedAndReplacedInSameParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
-            CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation, n.Parent.GetAnnotations(), n.NewIndex);
+            CheckMatchingNodeId("Replaced annotation", n, n.ReplacedAnnotation, n.Parent.GetAnnotations(), n.OldIndex + n.IndexOffset);
             var success = ReplaceChildOrAnnotation(n.ReplacedAnnotation, n.MovedAnnotation);
             ProduceNotification(n, success);
         });

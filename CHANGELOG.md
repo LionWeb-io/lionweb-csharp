@@ -14,6 +14,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * `ReconnectRequest`: added `DeltaProtocolVersion`, `ClientId`, `RepositoryId`
   * Introduced `IDeltaSplittable` and `IDeltaContinued` types (no functionality yet)
   * Introduced `ICustomDeltaContent` types (no functionality yet)
+  * Introduced `IndexOffset` to all move/moveAndReplace in same list
 ### Removed
 ### Deprecated
 ### Security

@@ -106,21 +106,30 @@ public record MoveChildFromOtherContainment(
     TargetNode NewParent,
     MetaPointer NewContainment,
     Index NewIndex,
+    TargetNode OldParent,
+    MetaPointer OldContainment,
+    Index OldIndex,
     TargetNode MovedChild,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveChildFromOtherContainmentInSameParent(
+    TargetNode Parent,
     MetaPointer NewContainment,
     Index NewIndex,
+    MetaPointer OldContainment,
+    Index OldIndex,
     TargetNode MovedChild,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveChildInSameContainment(
-    Index NewIndex,
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index OldIndex,
+    IndexOffset IndexOffset,
     TargetNode MovedChild,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
@@ -140,8 +149,11 @@ public record MoveAndReplaceChildFromOtherContainment(
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveAndReplaceChildFromOtherContainmentInSameParent(
+    TargetNode Parent,
     MetaPointer NewContainment,
     Index NewIndex,
+    MetaPointer OldContainment,
+    Index OldIndex,
     TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
@@ -149,7 +161,10 @@ public record MoveAndReplaceChildFromOtherContainmentInSameParent(
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveAndReplaceChildInSameContainment(
-    Index NewIndex,
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index OldIndex,
+    IndexOffset IndexOffset,
     TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
@@ -190,13 +205,17 @@ public record ReplaceAnnotation(
 public record MoveAnnotationFromOtherParent(
     TargetNode NewParent,
     Index NewIndex,
+    TargetNode OldParent,
+    Index OldIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record MoveAnnotationInSameParent(
-    Index NewIndex,
+    TargetNode Parent,
+    Index OldIndex,
+    IndexOffset IndexOffset,
     TargetNode MovedAnnotation,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
@@ -205,6 +224,8 @@ public record MoveAnnotationInSameParent(
 public record MoveAndReplaceAnnotationFromOtherParent(
     TargetNode NewParent,
     Index NewIndex,
+    TargetNode OldParent,
+    Index OldIndex,
     TargetNode ReplacedAnnotation,
     TargetNode MovedAnnotation,
     CommandId CommandId,
@@ -212,7 +233,9 @@ public record MoveAndReplaceAnnotationFromOtherParent(
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationInSameParent(
-    Index NewIndex,
+    TargetNode Parent,
+    Index OldIndex,
+    IndexOffset IndexOffset,
     TargetNode ReplacedAnnotation,
     TargetNode MovedAnnotation,
     CommandId CommandId,

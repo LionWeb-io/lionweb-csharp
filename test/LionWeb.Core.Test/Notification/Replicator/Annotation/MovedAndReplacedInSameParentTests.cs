@@ -124,9 +124,9 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newIndex = 1;
+        var newIndex = 0;
         var oldIndex = 0;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex, +1,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
@@ -148,7 +148,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         var newIndex = 0;
         var oldIndex = 1;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex, -1,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
@@ -170,7 +170,7 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         var newIndex = 1;
         var oldIndex = 3;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex, -2,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
@@ -191,9 +191,9 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newIndex = 3;
+        var newIndex = 2;
         var oldIndex = 1;
-        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex, +2,
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
@@ -214,9 +214,9 @@ public class MovedAndReplacedInSameParentTests : ReplicatorTestsBase
 
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newIndex = 1;
+        var newIndex = 0;
         var oldIndex = 0;
-        var notification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex,
+        var notification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalParent, oldIndex, +1,
             nodeWithAnotherId, new NumericNotificationId("annotationMovedAndReplaced", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>

@@ -63,7 +63,7 @@ public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmit
 
                 case not null when old.Parent == DestinationParent:
                     ProduceNotification(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
-                        old.Index, GetNotificationId()));
+                        old.Index, _newIndex - old.Index, GetNotificationId()));
                     break;
 
                 default:

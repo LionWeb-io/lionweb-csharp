@@ -20,4 +20,5 @@ global using PropertyValue = string;
 global using ResolveInfo = string;
 global using MetaPointerKey = string;
 global using Index = int;
+global using IndexOffset = int;
 global using NotificationId = string;

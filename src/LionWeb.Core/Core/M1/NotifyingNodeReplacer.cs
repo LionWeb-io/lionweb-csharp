@@ -30,7 +30,7 @@ internal class NotifyingNodeReplacer<T>(INode self, T replacement) : NodeReplace
     
     private INode? _oldParent;
     private Containment? _oldContainment;
-    private Index _oldIndex;
+    private Index _replacementIndex;
     private IPartitionInstance? _oldPartition;
     private IPartitionNotificationProducer? _oldProducer;
 
@@ -65,13 +65,13 @@ internal class NotifyingNodeReplacer<T>(INode self, T replacement) : NodeReplace
             _oldPartition = _oldParent.GetPartition();
             _oldProducer = _oldPartition?.GetNotificationProducer();
             _oldContainment = _oldParent.GetContainmentOf(replacement);
-            _oldIndex = RetrieveOldIndex();
+            _replacementIndex = RetrieveReplacementIndex();
         }
 
         _notificationId = _newProducer?.CreateNotificationId() ?? _oldProducer?.CreateNotificationId();
     }
 
-    private Index RetrieveOldIndex()
+    private Index RetrieveReplacementIndex()
     {
         if (_oldParent == null)
         {
@@ -111,43 +111,53 @@ internal class NotifyingNodeReplacer<T>(INode self, T replacement) : NodeReplace
         return oldIndex;
     }
 
-    private INotification CreateAnnotationNotification() =>
-        _oldParent switch
+    private INotification CreateAnnotationNotification()
+    {
+        switch (_oldParent)
         {
-            null =>
-                new AnnotationReplacedNotification(replacement, self, _parent, _index, _notificationId),
-
-            not null when _oldParent == _parent =>
-                new AnnotationMovedAndReplacedInSameParentNotification(_index, replacement, _parent, _oldIndex, self,
-                    _notificationId),
-            not null when _oldParent != _parent =>
-                new AnnotationMovedAndReplacedFromOtherParentNotification(_parent, _index, replacement, _oldParent,
-                    _oldIndex, self, _notificationId),
-            _ =>
-                throw new ArgumentException()
-        };
+            case null:
+                return new AnnotationReplacedNotification(replacement, self, _parent, _replacedIndex, _notificationId);
+            case not null when _oldParent == _parent:
+                var (newIndex, indexOffset) = MoveAndReplaceInSameList();
+                return new AnnotationMovedAndReplacedInSameParentNotification(newIndex, replacement, _parent, _replacementIndex, indexOffset, self, _notificationId);
+            case not null when _oldParent != _parent:
+                return new AnnotationMovedAndReplacedFromOtherParentNotification(_parent, _replacedIndex, replacement, _oldParent, _replacementIndex, self, _notificationId);
+            default:
+                throw new ArgumentException();
+        }
+    }
 
     private INotification CreateContainmentNotification()
     {
         if (_oldParent is null)
-            return new ChildReplacedNotification(replacement, self, _parent, _containment, _index, _notificationId);
+            return new ChildReplacedNotification(replacement, self, _parent, _containment, _replacedIndex, _notificationId);
 
         Debug.Assert(_oldContainment is not null);
 
-        return _oldParent switch
+        switch (_oldParent)
         {
-            not null when _oldParent == _parent && _oldContainment == _containment =>
-                new ChildMovedAndReplacedInSameContainmentNotification(_index, replacement, _parent, _containment, self,
-                    _oldIndex, _notificationId),
-            not null when _oldParent == _parent && _oldContainment != _containment =>
-                new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(_containment, _index, replacement,
-                    _parent, _oldContainment, _oldIndex, self, _notificationId),
-            not null when _oldParent != _parent =>
-                new ChildMovedAndReplacedFromOtherContainmentNotification(_parent, _containment, _index, replacement,
-                    _oldParent, _oldContainment, _oldIndex, self, _notificationId),
-            _ =>
-                throw new ArgumentException()
-        };
+            case not null when _oldParent == _parent && _oldContainment == _containment:
+                var (newIndex, indexOffset) = MoveAndReplaceInSameList();
+                return new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, _parent, _containment, self, _replacementIndex, indexOffset, _notificationId);
+            case not null when _oldParent == _parent && _oldContainment != _containment:
+                return new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(_containment, _replacedIndex, replacement, _parent, _oldContainment, _replacementIndex, self,
+                    _notificationId);
+            case not null when _oldParent != _parent:
+                return new ChildMovedAndReplacedFromOtherContainmentNotification(_parent, _containment, _replacedIndex, replacement, _oldParent, _oldContainment, _replacementIndex, self,
+                    _notificationId);
+            default:
+                throw new ArgumentException();
+        }
+    }
+
+    private (Index newIndex, IndexOffset indexOffset) MoveAndReplaceInSameList()
+    {
+        // move left
+        if (_replacedIndex < _replacementIndex)
+            return (_replacedIndex, _replacedIndex - _replacementIndex);
+        
+        // move right
+        return (_replacedIndex - 1, _replacedIndex - _replacementIndex);
     }
 
     private void ProduceNotifications(INotification notification)

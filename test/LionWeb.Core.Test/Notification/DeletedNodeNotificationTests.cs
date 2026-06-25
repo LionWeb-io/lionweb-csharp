@@ -124,6 +124,7 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
             replacement,
             parent,
             0,
+            +1,
             ann,
             new NumericNotificationId("a", 0));
         CollectionAssert.AreEquivalent(new List<IReadableNode>
@@ -280,6 +281,7 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
             TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1,
             child,
             0,
+            +1,
             new NumericNotificationId("a", 0));
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {

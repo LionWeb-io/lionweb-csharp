@@ -33,6 +33,7 @@ public abstract class JsonTestsBase
     private static int _nextPropertyValue;
     private static int _nextResolveInfo;
     private static Index _nextIndex;
+    private static IndexOffset _nextIndexOffset;
     private static int _nextQueryId;
     private static EventSequenceNumber _nextSequence;
     private static int _nextCommandId;
@@ -43,6 +44,7 @@ public abstract class JsonTestsBase
         _nextPropertyValue = 0;
         _nextResolveInfo = 0;
         _nextIndex = 0;
+        _nextIndexOffset = 1;
         _nextQueryId = 0;
         _nextSequence = 0;
         _nextCommandId = 0;
@@ -165,15 +167,15 @@ public abstract class JsonTestsBase
             AdditionalInfos());
 
     protected static MoveChildFromOtherContainment CreateMoveChildFromOtherContainment() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
     protected static MoveChildFromOtherContainmentInSameParent CreateMoveChildFromOtherContainmentInSameParent() =>
-        new(MetaPointer(), Index(), TargetNode(), CommandId(),
+        new(TargetNode(), MetaPointer(), Index(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
     protected static MoveChildInSameContainment CreateMoveChildInSameContainment() =>
-        new(Index(), TargetNode(), CommandId(), AdditionalInfos());
+        new(TargetNode(), MetaPointer(), Index(), IndexOffset(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildFromOtherContainment CreateMoveAndReplaceChildFromOtherContainment() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(),
@@ -181,11 +183,10 @@ public abstract class JsonTestsBase
 
     protected static MoveAndReplaceChildFromOtherContainmentInSameParent
         CreateMoveAndReplaceChildFromOtherContainmentInSameParent() =>
-        new(MetaPointer(), Index(), TargetNode(),
-            TargetNode(), CommandId(), AdditionalInfos());
+        new(TargetNode(), MetaPointer(), Index(), MetaPointer(), Index(),TargetNode(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildInSameContainment CreateMoveAndReplaceChildInSameContainment() =>
-        new(Index(), TargetNode(), TargetNode(), CommandId(),
+        new(TargetNode(), MetaPointer(), Index(), IndexOffset(), TargetNode(), TargetNode(), CommandId(),
             AdditionalInfos());
 
     #endregion
@@ -203,18 +204,18 @@ public abstract class JsonTestsBase
             AdditionalInfos());
 
     protected static MoveAnnotationFromOtherParent CreateMoveAnnotationFromOtherParent() =>
-        new(TargetNode(), Index(), TargetNode(), CommandId(),
+        new(TargetNode(), Index(), TargetNode(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
     protected static MoveAnnotationInSameParent CreateMoveAnnotationInSameParent() =>
-        new(Index(), TargetNode(), CommandId(), AdditionalInfos());
+        new(TargetNode(), Index(), IndexOffset(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceAnnotationFromOtherParent CreateMoveAndReplaceAnnotationFromOtherParent() =>
-        new(TargetNode(), Index(), TargetNode(), TargetNode(),
+        new(TargetNode(), Index(), TargetNode(), Index(), TargetNode(), TargetNode(),
             CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceAnnotationInSameParent CreateMoveAndReplaceAnnotationInSameParent() =>
-        new(Index(), TargetNode(), TargetNode(), CommandId(),
+        new(TargetNode(), Index(), IndexOffset(), TargetNode(), TargetNode(), CommandId(),
             AdditionalInfos());
 
     #endregion
@@ -345,7 +346,7 @@ public abstract class JsonTestsBase
         };
 
     protected static ChildMovedInSameContainment CreateChildMovedInSameContainment() =>
-        new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(), AdditionalInfos())
+        new(TargetNode(), TargetNode(), MetaPointer(), Index(), IndexOffset(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
@@ -360,7 +361,7 @@ public abstract class JsonTestsBase
             Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static ChildMovedAndReplacedInSameContainment CreateChildMovedAndReplacedInSameContainment() =>
-        new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(), Origin(),
+        new(TargetNode(), TargetNode(), MetaPointer(), Index(), IndexOffset(), TargetNode(), Descendants(), Origin(),
             AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
@@ -389,14 +390,14 @@ public abstract class JsonTestsBase
         };
 
     protected static AnnotationMovedInSameParent CreateAnnotationMovedInSameParent() =>
-        new(Index(), TargetNode(), TargetNode(), Index(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
+        new(TargetNode(), TargetNode(), Index(), IndexOffset(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static AnnotationMovedAndReplacedFromOtherParent CreateAnnotationMovedAndReplacedFromOtherParent() =>
         new(TargetNode(), Index(), TargetNode(), TargetNode(), Index(), TargetNode(), Descendants(), Origin(),
             AdditionalInfos()) { SequenceNumber = Sequence() };
 
     protected static AnnotationMovedAndReplacedInSameParent CreateAnnotationMovedAndReplacedInSameParent() =>
-        new(Index(), TargetNode(), TargetNode(), Index(), TargetNode(), Descendants(), Origin(), AdditionalInfos())
+        new(TargetNode(), TargetNode(), Index(), IndexOffset(), TargetNode(), Descendants(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
@@ -522,6 +523,13 @@ public abstract class JsonTestsBase
     protected static Index Index() =>
         ++_nextIndex;
 
+    protected static Index IndexOffset()
+    {
+        var next = ++_nextIndexOffset;
+        var clamped = (next % 6);
+        var moved = clamped - 3;
+        return moved != 0 ? moved : 1;
+    }
 
     protected static CommandId CommandId() =>
         (++_nextCommandId).ToString();

@@ -256,6 +256,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             parent,
             notification.Containment,
             notification.OldIndex,
+            notification.IndexOffset,
             notification.NotificationId
         );
     }
@@ -273,6 +274,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.Containment,
             replacedChild,
             notification.OldIndex,
+            notification.IndexOffset,
             notification.NotificationId
         );
     }
@@ -366,6 +368,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             movedAnnotation,
             parent,
             notification.OldIndex,
+            notification.IndexOffset,
             notification.NotificationId
         );
     }
@@ -381,6 +384,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             movedAnnotation,
             parent,
             notification.OldIndex,
+            notification.IndexOffset,
             replacedAnnotation,
             notification.NotificationId
         );
