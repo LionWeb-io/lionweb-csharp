@@ -38,7 +38,7 @@ public class JsonSchemaCompatibilityTests : JsonTestsBase
 
     [TestMethod]
     [DynamicData(nameof(GetTestData), DynamicDataSourceType.Method)]
-    public void SchemaCompatibility(IDeltaContent delta)
+    public void SchemaCompatibility(IDeltaContent delta, Type messageType)
     {
         var deltaSerializer = new DeltaSerializer();
         var serialized = deltaSerializer.Serialize(delta);
@@ -49,6 +49,13 @@ public class JsonSchemaCompatibilityTests : JsonTestsBase
         {
             OutputFormat = OutputFormat.List
         });
+        var errors = evaluationResults
+            .Details
+            .Where(d => d.SchemaLocation.ToString().Contains(messageType.Name))
+            .Where(d => d is {Annotations: not null} or {Errors: not null})
+            .SelectMany(d => (d.Annotations?.Select(p => KeyValuePair.Create(p.Key, p.Value?.ToString() ?? "")) ?? []).Concat(d.Errors ?? (Dictionary<string, string>)[]))
+            .ToList();
+        TestContext.WriteLine(string.Join("\n", errors.Select(e => $"{e.Key}: {e.Value}") ?? []));
         Assert.IsTrue(evaluationResults.IsValid, serialized);
     }
 }

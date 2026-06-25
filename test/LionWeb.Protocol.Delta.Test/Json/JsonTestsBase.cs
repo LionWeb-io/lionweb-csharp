@@ -99,22 +99,22 @@ public abstract class JsonTestsBase
     
     protected static IEnumerable<object[]> CollectQueryMessages() =>
     [
-        [CreateSubscribeToChangingPartitionsRequest()],
-        [CreateSubscribeToChangingPartitionsResponse()],
-        [CreateSubscribeToPartitionContentsRequest()],
-        [CreateSubscribeToPartitionContentsResponse()],
-        [CreateUnsubscribeFromPartitionContentsRequest()],
-        [CreateUnsubscribeFromPartitionContentsResponse()],
-        [CreateGetAvailableIdsRequest()],
-        [CreateGetAvailableIdsResponse()],
-        [CreateListPartitionsRequest()],
-        [CreateListPartitionsResponse()],
-        [CreateSignOnRequest()],
-        [CreateSignOnResponse()],
-        [CreateSignOffRequest()],
-        [CreateSignOffResponse()],
-        [CreateReconnectRequest()],
-        [CreateReconnectResponse()]
+        [CreateSubscribeToChangingPartitionsRequest(), typeof(SubscribeToChangingPartitionsRequest)],
+        [CreateSubscribeToChangingPartitionsResponse(), typeof(SubscribeToChangingPartitionsResponse)],
+        [CreateSubscribeToPartitionContentsRequest(), typeof(SubscribeToPartitionContentsRequest)],
+        [CreateSubscribeToPartitionContentsResponse(), typeof(SubscribeToPartitionContentsResponse)],
+        [CreateUnsubscribeFromPartitionContentsRequest(), typeof(UnsubscribeFromPartitionContentsRequest)],
+        [CreateUnsubscribeFromPartitionContentsResponse(), typeof(UnsubscribeFromPartitionContentsResponse)],
+        [CreateGetAvailableIdsRequest(), typeof(GetAvailableIdsRequest)],
+        [CreateGetAvailableIdsResponse(), typeof(GetAvailableIdsResponse)],
+        [CreateListPartitionsRequest(), typeof(ListPartitionsRequest)],
+        [CreateListPartitionsResponse(), typeof(ListPartitionsResponse)],
+        [CreateSignOnRequest(), typeof(SignOnRequest)],
+        [CreateSignOnResponse(), typeof(SignOnResponse)],
+        [CreateSignOffRequest(), typeof(SignOffRequest)],
+        [CreateSignOffResponse(), typeof(SignOffResponse)],
+        [CreateReconnectRequest(), typeof(ReconnectRequest)],
+        [CreateReconnectResponse(), typeof(ReconnectResponse)]
     ];
 
     #endregion
@@ -246,32 +246,32 @@ public abstract class JsonTestsBase
 
     protected static IEnumerable<object[]> CollectCommandMessages() =>
     [
-        [CreateAddPartition()],
-        [CreateDeletePartition()],
-        [CreateChangeClassifier()],
-        [CreateAddProperty()],
-        [CreateDeleteProperty()],
-        [CreateChangeProperty()],
-        [CreateAddChild()],
-        [CreateDeleteChild()],
-        [CreateReplaceChild()],
-        [CreateMoveChildFromOtherContainment()],
-        [CreateMoveChildFromOtherContainmentInSameParent()],
-        [CreateMoveChildInSameContainment()],
-        [CreateMoveAndReplaceChildFromOtherContainment()],
-        [CreateMoveAndReplaceChildFromOtherContainmentInSameParent()],
-        [CreateMoveAndReplaceChildInSameContainment()],
-        [CreateAddAnnotation()],
-        [CreateDeleteAnnotation()],
-        [CreateReplaceAnnotation()],
-        [CreateMoveAnnotationFromOtherParent()],
-        [CreateMoveAnnotationInSameParent()],
-        [CreateMoveAndReplaceAnnotationFromOtherParent()],
-        [CreateMoveAndReplaceAnnotationInSameParent()],
-        [CreateAddReference()],
-        [CreateDeleteReference()],
-        [CreateChangeReference()],
-        [CreateCompositeCommand()]
+        [CreateAddPartition(), typeof(AddPartition)],
+        [CreateDeletePartition(), typeof(DeletePartition)],
+        [CreateChangeClassifier(), typeof(ChangeClassifier)],
+        [CreateAddProperty(), typeof(AddProperty)],
+        [CreateDeleteProperty(), typeof(DeleteProperty)],
+        [CreateChangeProperty(), typeof(ChangeProperty)],
+        [CreateAddChild(), typeof(AddChild)],
+        [CreateDeleteChild(), typeof(DeleteChild)],
+        [CreateReplaceChild(), typeof(ReplaceChild)],
+        [CreateMoveChildFromOtherContainment(), typeof(MoveChildFromOtherContainment)],
+        [CreateMoveChildFromOtherContainmentInSameParent(), typeof(MoveChildFromOtherContainmentInSameParent)],
+        [CreateMoveChildInSameContainment(), typeof(MoveChildInSameContainment)],
+        [CreateMoveAndReplaceChildFromOtherContainment(), typeof(MoveAndReplaceChildFromOtherContainment)],
+        [CreateMoveAndReplaceChildFromOtherContainmentInSameParent(), typeof(MoveAndReplaceChildFromOtherContainmentInSameParent)],
+        [CreateMoveAndReplaceChildInSameContainment(), typeof(MoveAndReplaceChildInSameContainment)],
+        [CreateAddAnnotation(), typeof(AddAnnotation)],
+        [CreateDeleteAnnotation(), typeof(DeleteAnnotation)],
+        [CreateReplaceAnnotation(), typeof(ReplaceAnnotation)],
+        [CreateMoveAnnotationFromOtherParent(), typeof(MoveAnnotationFromOtherParent)],
+        [CreateMoveAnnotationInSameParent(), typeof(MoveAnnotationInSameParent)],
+        [CreateMoveAndReplaceAnnotationFromOtherParent(), typeof(MoveAndReplaceAnnotationFromOtherParent)],
+        [CreateMoveAndReplaceAnnotationInSameParent(), typeof(MoveAndReplaceAnnotationInSameParent)],
+        [CreateAddReference(), typeof(AddReference)],
+        [CreateDeleteReference(), typeof(DeleteReference)],
+        [CreateChangeReference(), typeof(ChangeReference)],
+        [CreateCompositeCommand(), typeof(CompositeCommand)]
     ];
 
     #endregion
@@ -437,41 +437,41 @@ public abstract class JsonTestsBase
     protected static NoOpEvent CreateNoOpEvent() =>
         new(Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
-    protected static ErrorEvent CreateError() =>
+    protected static ErrorEvent CreateErrorEvent() =>
         new("myError", "very nice message", Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
     #endregion
 
     protected static IEnumerable<object[]> CollectEventMessages() =>
     [
-        [CreatePartitionAdded()],
-        [CreatePartitionDeleted()],
-        [CreateClassifierChanged()],
-        [CreatePropertyAdded()],
-        [CreatePropertyDeleted()],
-        [CreatePropertyChanged()],
-        [CreateChildAdded()],
-        [CreateChildDeleted()],
-        [CreateChildReplaced()],
-        [CreateChildMovedFromOtherContainment()],
-        [CreateChildMovedFromOtherContainmentInSameParent()],
-        [CreateChildMovedInSameContainment()],
-        [CreateChildMovedAndReplacedFromOtherContainment()],
-        [CreateChildMovedAndReplacedFromOtherContainmentInSameParent()],
-        [CreateChildMovedAndReplacedInSameContainment()],
-        [CreateAnnotationAdded()],
-        [CreateAnnotationDeleted()],
-        [CreateAnnotationReplaced()],
-        [CreateAnnotationMovedFromOtherParent()],
-        [CreateAnnotationMovedInSameParent()],
-        [CreateAnnotationMovedAndReplacedFromOtherParent()],
-        [CreateAnnotationMovedAndReplacedInSameParent()],
-        [CreateReferenceAdded()],
-        [CreateReferenceDeleted()],
-        [CreateReferenceChanged()],
-        [CreateCompositeEvent()],
-        [CreateNoOpEvent()],
-        [CreateError()]
+        [CreatePartitionAdded(), typeof(PartitionAdded)],
+        [CreatePartitionDeleted(), typeof(PartitionDeleted)],
+        [CreateClassifierChanged(), typeof(ClassifierChanged)],
+        [CreatePropertyAdded(), typeof(PropertyAdded)],
+        [CreatePropertyDeleted(), typeof(PropertyDeleted)],
+        [CreatePropertyChanged(), typeof(PropertyChanged)],
+        [CreateChildAdded(), typeof(ChildAdded)],
+        [CreateChildDeleted(), typeof(ChildDeleted)],
+        [CreateChildReplaced(), typeof(ChildReplaced)],
+        [CreateChildMovedFromOtherContainment(), typeof(ChildMovedFromOtherContainment)],
+        [CreateChildMovedFromOtherContainmentInSameParent(), typeof(ChildMovedFromOtherContainmentInSameParent)],
+        [CreateChildMovedInSameContainment(), typeof(ChildMovedInSameContainment)],
+        [CreateChildMovedAndReplacedFromOtherContainment(), typeof(ChildMovedAndReplacedFromOtherContainment)],
+        [CreateChildMovedAndReplacedFromOtherContainmentInSameParent(), typeof(ChildMovedAndReplacedFromOtherContainmentInSameParent)],
+        [CreateChildMovedAndReplacedInSameContainment(), typeof(ChildMovedAndReplacedInSameContainment)],
+        [CreateAnnotationAdded(), typeof(AnnotationAdded)],
+        [CreateAnnotationDeleted(), typeof(AnnotationDeleted)],
+        [CreateAnnotationReplaced(), typeof(AnnotationReplaced)],
+        [CreateAnnotationMovedFromOtherParent(), typeof(AnnotationMovedFromOtherParent)],
+        [CreateAnnotationMovedInSameParent(), typeof(AnnotationMovedInSameParent)],
+        [CreateAnnotationMovedAndReplacedFromOtherParent(), typeof(AnnotationMovedAndReplacedFromOtherParent)],
+        [CreateAnnotationMovedAndReplacedInSameParent(), typeof(AnnotationMovedAndReplacedInSameParent)],
+        [CreateReferenceAdded(), typeof(ReferenceAdded)],
+        [CreateReferenceDeleted(), typeof(ReferenceDeleted)],
+        [CreateReferenceChanged(), typeof(ReferenceChanged)],
+        [CreateCompositeEvent(), typeof(CompositeEvent)],
+        [CreateNoOpEvent(), typeof(NoOpEvent)],
+        [CreateErrorEvent(), typeof(ErrorEvent)]
     ];
 
     #endregion
@@ -509,7 +509,7 @@ public abstract class JsonTestsBase
     protected static AdditionalInfo[] AdditionalInfos() =>
     [
         new AdditionalInfo("MyKind", "MyMessage",
-            [new AdditionalInfoData("key0", "value0"), new AdditionalInfoData("key1", "value1")]
+            new() { { "key0", "value0" }, { "key1", "value1" } }
         )
     ];
 

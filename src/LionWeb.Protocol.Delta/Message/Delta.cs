@@ -78,7 +78,7 @@ public record DeltaSerializationChunk(SerializedNode[] Nodes)
     }
 }
 
-public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoData[]? Data)
+public record AdditionalInfo(MessageKind Kind, string Message, Dictionary<string, string>? Data = null, bool? Distribute = false)
 {
     /// <inheritdoc />
     public virtual bool Equals(AdditionalInfo? other)
@@ -94,8 +94,9 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
         }
 
         return string.Equals(Kind, other.Kind, StringComparison.InvariantCulture) &&
+               Distribute == other.Distribute &&
                string.Equals(Message, other.Message, StringComparison.InvariantCulture) &&
-               Data.ArrayEquals(other.Data);
+               Data.DictionaryEquals(other.Data);
     }
 
     /// <inheritdoc />
@@ -103,8 +104,9 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
     {
         var hashCode = new HashCode();
         hashCode.Add(Kind, StringComparer.InvariantCulture);
+        hashCode.Add(Distribute);
         hashCode.Add(Message, StringComparer.InvariantCulture);
-        hashCode.ArrayHashCode(Data);
+        hashCode.DictionaryHashCode(Data);
         return hashCode.ToHashCode();
     }
 
@@ -115,6 +117,11 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
         builder.Append(Kind);
         builder.Append(", ");
 
+        builder.Append(nameof(Distribute));
+        builder.Append(" = ");
+        builder.Append(Distribute);
+        builder.Append(", ");
+
         builder.Append(nameof(Message));
         builder.Append(" = ");
         builder.Append(Message);
@@ -122,38 +129,9 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
 
         builder.Append(nameof(Data));
         builder.Append(" = ");
-        builder.ArrayPrintMembers(Data);
+        builder.DictionaryPrintMembers(Data);
 
         return true;
-    }
-}
-
-public record AdditionalInfoData(AdditionalInfoDataKey Key, string Value)
-{
-    /// <inheritdoc />
-    public virtual bool Equals(AdditionalInfoData? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return string.Equals(Key, other.Key, StringComparison.InvariantCulture) &&
-               string.Equals(Value, other.Value, StringComparison.InvariantCulture);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        var hashCode = new HashCode();
-        hashCode.Add(Key, StringComparer.InvariantCulture);
-        hashCode.Add(Value, StringComparer.InvariantCulture);
-        return hashCode.ToHashCode();
     }
 }
 
