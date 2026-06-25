@@ -389,23 +389,23 @@ public class InsertTests
     }
 
     [TestMethod]
-    [Ignore("expected indices unclear")]
     public void FromSameContainment()
     {
-        var line = new Line("myId");
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
+        var line = new Line("line");
+        var circleA = new Circle("circleA");
+        var circleB = new Circle("circleB");
         var compositeShape = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, args) =>
+        parent.GetNotificationSender()!.Subscribe<ChildMovedInSameContainmentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(2, args.NewIndex);
+            Assert.AreEqual(+1, args.IndexOffset);
             Assert.AreEqual(line, args.MovedChild);
         });
 
