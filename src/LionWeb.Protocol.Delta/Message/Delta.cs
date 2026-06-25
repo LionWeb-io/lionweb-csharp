@@ -25,6 +25,7 @@ using Event;
 using Query;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 public sealed class DeltaProtocolVersion
 {

@@ -13,6 +13,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * `AdditionalInfo`: `Distribute` flag, Dictionary instead of array of `AdditionalInfoData`
   * `ReconnectRequest`: added `DeltaProtocolVersion`, `ClientId`, `RepositoryId`
   * Introduced `IDeltaSplittable` and `IDeltaContinued` types (no functionality yet)
+  * Introduced `ICustomDeltaContent` types (no functionality yet)
 ### Removed
 ### Deprecated
 ### Security

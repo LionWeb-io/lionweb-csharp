@@ -278,3 +278,8 @@ public record CompositeCommand(
         return true;
     }
 }
+
+public abstract record CustomCommandBase(
+    CommandId CommandId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaCommandBase(CommandId, AdditionalInfos), ICustomDeltaContent;

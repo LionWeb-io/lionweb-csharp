@@ -373,4 +373,9 @@ public record ErrorEvent(
     public override HashSet<TargetNode> AffectedNodes => [];
 }
 
+public abstract record CustomEventBase(
+    CommandSource[] OriginCommands,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), ICustomDeltaContent;
+
 #endregion
