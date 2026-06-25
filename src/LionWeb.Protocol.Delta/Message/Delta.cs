@@ -142,11 +142,12 @@ public interface IDeltaError
 }
 
 /// <remarks>
-/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaCommand"/> and <see cref="IDeltaEvent"/> in lockstep.
+/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaCommand"/>, <see cref="INonContinuedCommand"/>, <see cref="IDeltaEvent"/> and <see cref="INonContinuedDeltaEvent"/> in lockstep.
 /// </remarks> 
 #region Command
 
 [JsonDerivedType(typeof(CompositeCommand), nameof(CompositeCommand))]
+[JsonDerivedType(typeof(ContinuedCommand), nameof(ContinuedCommand))]
 
 #region Forest
 
@@ -217,7 +218,8 @@ public interface IDeltaError
 
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
 [JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
-[JsonDerivedType(typeof(NoOpEvent), nameof(NoOpEvent))]
+[JsonDerivedType(typeof(NoOpEvent), "NoOp")]
+[JsonDerivedType(typeof(ContinuedEvent), nameof(ContinuedEvent))]
 
 #region Forest
 
@@ -292,6 +294,7 @@ public interface IDeltaError
 [JsonDerivedType(typeof(GetAvailableIdsResponse), nameof(GetAvailableIdsResponse))]
 [JsonDerivedType(typeof(ListPartitionsRequest), nameof(ListPartitionsRequest))]
 [JsonDerivedType(typeof(ListPartitionsResponse), nameof(ListPartitionsResponse))]
+[JsonDerivedType(typeof(ContinuedQueryResponse), nameof(ContinuedQueryResponse))]
 
 #endregion
 
@@ -332,6 +335,26 @@ public interface IDeltaContent
 
     [JsonIgnore]
     string Id { get; }
+}
+
+public interface IDeltaSplittable : IDeltaContent
+{
+    SplitFlag Split { get; }
+}
+
+public interface IDeltaContinued : IDeltaContent
+{
+    DeltaSerializationChunk Chunk { get; }
+    ContinuedChunkCompleted ContinuedChunkCompleted { get; }
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber { get; }
+}
+
+public partial interface ICustomDeltaContent : IDeltaContent
+{
+    public static bool IsValidMessageKind(string messageKind) => ValidMessageKindRegex().IsMatch(messageKind);
+    
+    [GeneratedRegex("^Custom_[a-zA-Z0-9_-]+$")]
+    private static partial Regex ValidMessageKindRegex();
 }
 
 public abstract record DeltaContentBase(AdditionalInfo[]? AdditionalInfos) : IDeltaContent

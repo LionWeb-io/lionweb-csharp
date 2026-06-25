@@ -379,7 +379,7 @@ public class NotificationToDeltaEventMapper
 
     private CompositeEvent OnComposite(CompositeNotification compositeNotification) =>
         new(
-            [.. compositeNotification.Parts.Select(Map)],
+            [.. compositeNotification.Parts.Select(notification => (INonContinuedDeltaEvent)Map(notification))],
             ToCommandSources(compositeNotification),
             []
         );

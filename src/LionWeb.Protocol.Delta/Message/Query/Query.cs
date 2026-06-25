@@ -81,6 +81,14 @@ public abstract record DeltaQueryBase(
     }
 }
 
+public record ContinuedQueryResponse(
+    DeltaSerializationChunk Chunk,
+    ContinuedChunkCompleted ContinuedChunkCompleted,
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IDeltaQueryResponse, IDeltaContinued;
+
 #region Subscription
 
 public interface ISubscriptionDeltaQuery : IDeltaQuery;
@@ -286,7 +294,25 @@ public record ListPartitionsResponse(
     SplitFlag Split,
     QueryId QueryId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse, IDeltaSplittable;
+
+#endregion
+
+#region Custom
+
+public interface ICustomDeltaQuery : ICustomDeltaContent, IDeltaQuery
+{
+}
+
+public abstract record CustomQueryRequestBase(
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ICustomDeltaQuery, IDeltaQueryRequest;
+
+public abstract record CustomQueryResponseBase(
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ICustomDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 

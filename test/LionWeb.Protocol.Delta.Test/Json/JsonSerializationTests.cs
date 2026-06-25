@@ -48,7 +48,7 @@ public class JsonSerializationTests : JsonTestsBase
 
     [TestMethod]
     [DynamicData(nameof(CollectMessagesInsideCompositeCommand), DynamicDataSourceType.Method)]
-    public void CompositeCommandSerialization(IDeltaCommand command, Type commandType)
+    public void CompositeCommandSerialization(INonContinuedCommand command, Type commandType)
     {
         var deltaSerializer = new DeltaSerializer();
         var compositeCommand = new CompositeCommand([command], "compositeCommandId", []);
@@ -61,7 +61,7 @@ public class JsonSerializationTests : JsonTestsBase
 
     [TestMethod]
     [DynamicData(nameof(CollectMessagesInsideCompositeEvent), DynamicDataSourceType.Method)]
-    public void CompositeEventSerialization(IDeltaEvent @event, Type eventType)
+    public void CompositeEventSerialization(INonContinuedDeltaEvent @event, Type eventType)
     {
         var deltaSerializer = new DeltaSerializer();
         var compositeEvent = new CompositeEvent([@event], null, []);

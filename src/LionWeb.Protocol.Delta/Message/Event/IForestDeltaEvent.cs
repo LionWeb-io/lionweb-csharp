@@ -21,7 +21,7 @@ using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
-public interface IForestDeltaEvent : IDeltaEvent;
+public interface IForestDeltaEvent : INonContinuedDeltaEvent;
 
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,

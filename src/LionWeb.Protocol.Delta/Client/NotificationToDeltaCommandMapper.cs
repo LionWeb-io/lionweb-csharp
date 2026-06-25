@@ -341,7 +341,7 @@ public class NotificationToDeltaCommandMapper
 
     private CompositeCommand OnComposite(CompositeNotification compositeNotification) =>
         new(
-            compositeNotification.Parts.Select(Map).ToArray(),
+            compositeNotification.Parts.Select(notification => (INonContinuedCommand)Map(notification)).ToArray(),
             ToCommandId(compositeNotification),
             []
         );

@@ -23,7 +23,10 @@ using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
-public record CommandSource(ParticipationId ParticipationId, CommandId CommandId)
+public record CommandSource(
+    ParticipationId ParticipationId,
+    CommandId CommandId
+)
 {
     /// <summary>
     /// Represents this command source as NodeId-compatible string.
@@ -34,13 +37,14 @@ public record CommandSource(ParticipationId ParticipationId, CommandId CommandId
 };
 
 /// <remarks>
-/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> in lockstep.
+/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> and <see cref="INonContinuedDeltaEvent"/> in lockstep.
 /// </remarks> 
 #region Event
 
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
 [JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
-[JsonDerivedType(typeof(NoOpEvent), nameof(NoOpEvent))]
+[JsonDerivedType(typeof(NoOpEvent), "NoOp")]
+[JsonDerivedType(typeof(ContinuedEvent), nameof(ContinuedEvent))]
 
 #region Forest
 
@@ -109,7 +113,7 @@ public record CommandSource(ParticipationId ParticipationId, CommandId CommandId
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface IDeltaEvent : IDeltaContent
 {
-    public const EventSequenceNumber DefaultEventSequenceNumber = -1;
+    const EventSequenceNumber DefaultEventSequenceNumber = -1;
 
     EventSequenceNumber SequenceNumber { get; set; }
 
@@ -118,9 +122,87 @@ public interface IDeltaEvent : IDeltaContent
     [JsonIgnore] HashSet<TargetNode> AffectedNodes { get; }
 }
 
+/// <remarks>
+/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> and <see cref="IDeltaEvent"/> in lockstep.
+/// </remarks> 
+#region Event
+
+[JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
+[JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
+[JsonDerivedType(typeof(NoOpEvent), "NoOp")]
+
+#region Forest
+
+[JsonDerivedType(typeof(PartitionAdded), nameof(PartitionAdded))]
+[JsonDerivedType(typeof(PartitionDeleted), nameof(PartitionDeleted))]
+
+#endregion
+
+#region Partition
+
+#region Annotation
+
+[JsonDerivedType(typeof(AnnotationAdded), nameof(AnnotationAdded))]
+[JsonDerivedType(typeof(AnnotationDeleted), nameof(AnnotationDeleted))]
+[JsonDerivedType(typeof(AnnotationMovedAndReplacedFromOtherParent), nameof(AnnotationMovedAndReplacedFromOtherParent))]
+[JsonDerivedType(typeof(AnnotationMovedAndReplacedInSameParent), nameof(AnnotationMovedAndReplacedInSameParent))]
+[JsonDerivedType(typeof(AnnotationMovedFromOtherParent), nameof(AnnotationMovedFromOtherParent))]
+[JsonDerivedType(typeof(AnnotationMovedInSameParent), nameof(AnnotationMovedInSameParent))]
+[JsonDerivedType(typeof(AnnotationReplaced), nameof(AnnotationReplaced))]
+
+#endregion
+
+#region Feature
+
+#region Containment
+
+[JsonDerivedType(typeof(ChildAdded), nameof(ChildAdded))]
+[JsonDerivedType(typeof(ChildDeleted), nameof(ChildDeleted))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedFromOtherContainment), nameof(ChildMovedAndReplacedFromOtherContainment))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedFromOtherContainmentInSameParent), nameof(ChildMovedAndReplacedFromOtherContainmentInSameParent))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedInSameContainment), nameof(ChildMovedAndReplacedInSameContainment))]
+[JsonDerivedType(typeof(ChildMovedFromOtherContainment), nameof(ChildMovedFromOtherContainment))]
+[JsonDerivedType(typeof(ChildMovedFromOtherContainmentInSameParent), nameof(ChildMovedFromOtherContainmentInSameParent))]
+[JsonDerivedType(typeof(ChildMovedInSameContainment), nameof(ChildMovedInSameContainment))]
+[JsonDerivedType(typeof(ChildReplaced), nameof(ChildReplaced))]
+
+#endregion
+
+#region Property
+
+[JsonDerivedType(typeof(PropertyAdded), nameof(PropertyAdded))]
+[JsonDerivedType(typeof(PropertyChanged), nameof(PropertyChanged))]
+[JsonDerivedType(typeof(PropertyDeleted), nameof(PropertyDeleted))]
+
+#endregion
+
+#region Reference
+
+[JsonDerivedType(typeof(ReferenceAdded), nameof(ReferenceAdded))]
+[JsonDerivedType(typeof(ReferenceChanged), nameof(ReferenceChanged))]
+[JsonDerivedType(typeof(ReferenceDeleted), nameof(ReferenceDeleted))]
+
+#endregion
+
+#endregion
+
+#region Node
+
+[JsonDerivedType(typeof(ClassifierChanged), nameof(ClassifierChanged))]
+
+#endregion
+
+#endregion
+
+#endregion
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
+public interface INonContinuedDeltaEvent : IDeltaEvent;
+
 public abstract record DeltaEventBase(
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaContentBase(AdditionalInfos), IDeltaEvent
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaContentBase(AdditionalInfos), IDeltaEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -182,13 +264,26 @@ public abstract record DeltaEventBase(
     }
 }
 
+public record ContinuedEvent(
+    DeltaSerializationChunk Chunk,
+    ContinuedChunkCompleted ContinuedChunkCompleted,
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
+    EventSequenceNumber continuedEventSequenceNumber,
+    CommandSource[] OriginCommands,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaContinued
+{
+    public override HashSet<TargetNode> AffectedNodes { get; }
+}
+
 #region Miscellaneous
 
-public record CompositeEvent : DeltaEventBase, IDeltaEvent
+public record CompositeEvent : DeltaEventBase, INonContinuedDeltaEvent
 {
-    public CompositeEvent(IDeltaEvent[] Parts,
+    public CompositeEvent(INonContinuedDeltaEvent[] Parts,
         CommandSource[] OriginCommands,
-        AdditionalInfo[]? AdditionalInfos) : base(OriginCommands, AdditionalInfos)
+        AdditionalInfo[]? AdditionalInfos
+    ) : base(OriginCommands, AdditionalInfos)
     {
         this.Parts = Parts;
     }
@@ -201,7 +296,7 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
     [JsonIgnore]
     public override HashSet<TargetNode> AffectedNodes => Parts.SelectMany(p => p.AffectedNodes).ToHashSet();
 
-    public IDeltaEvent[] Parts { get; init; }
+    public INonContinuedDeltaEvent[] Parts { get; init; }
 
     /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)
@@ -258,7 +353,8 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
 public record NoOpEvent(
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaEvent
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), INonContinuedDeltaEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -269,7 +365,8 @@ public record ErrorEvent(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaEvent, IDeltaError
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), INonContinuedDeltaEvent, IDeltaError
 {
     /// <inheritdoc />
     [JsonIgnore]
