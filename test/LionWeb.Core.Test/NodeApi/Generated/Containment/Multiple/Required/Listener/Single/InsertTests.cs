@@ -18,8 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.Listener.Single;
 
 using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class InsertTests
@@ -27,21 +26,21 @@ public class InsertTests
     [TestMethod]
     public void Empty()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var compositeShape = new LinkTestConcept("cs");
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             notifications++;
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        });
+        }));
 
-        compositeShape.InsertParts(0, [line]);
+        compositeShape.InsertContainment_0_n(0, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -49,22 +48,22 @@ public class InsertTests
     [TestMethod]
     public void One_Before()
     {
-        var circle = new Circle("cId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circle] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circle] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             notifications++;
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        });
+        }));
 
-        compositeShape.InsertParts(0, [line]);
+        compositeShape.InsertContainment_0_n(0, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -72,22 +71,22 @@ public class InsertTests
     [TestMethod]
     public void One_Before_Reflective()
     {
-        var circle = new Circle("cId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circle] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circle] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             notifications++;
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line, circle });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<INode> { line, circle });
 
         Assert.AreEqual(1, notifications);
     }
@@ -95,22 +94,22 @@ public class InsertTests
     [TestMethod]
     public void One_After()
     {
-        var circle = new Circle("cId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circle] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circle] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             notifications++;
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        });
-
-        compositeShape.InsertParts(1, [line]);
+        }));
+        
+        compositeShape.InsertContainment_0_n(1, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -118,22 +117,22 @@ public class InsertTests
     [TestMethod]
     public void One_After_Reflective()
     {
-        var circle = new Circle("cId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circle] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circle] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             notifications++;
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle, line });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<INode> { circle, line });
 
         Assert.AreEqual(1, notifications);
     }
@@ -141,23 +140,23 @@ public class InsertTests
     [TestMethod]
     public void Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             notifications++;
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        });
-
-        compositeShape.InsertParts(0, [line]);
+        }));
+        
+        compositeShape.InsertContainment_0_n(0, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -165,23 +164,23 @@ public class InsertTests
     [TestMethod]
     public void Two_Before_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             notifications++;
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line, circleA, circleB });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<INode> { line, circleA, circleB });
 
         Assert.AreEqual(1, notifications);
     }
@@ -189,23 +188,23 @@ public class InsertTests
     [TestMethod]
     public void Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
             notifications++;
-        });
-
-        compositeShape.InsertParts(1, [line]);
+        }));
+        
+        compositeShape.InsertContainment_0_n(1, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -213,23 +212,23 @@ public class InsertTests
     [TestMethod]
     public void Two_Between_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
             notifications++;
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, line, circleB });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<INode> { circleA, line, circleB });
 
         Assert.AreEqual(1, notifications);
     }
@@ -237,23 +236,23 @@ public class InsertTests
     [TestMethod]
     public void Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(line, args.NewChild);
             notifications++;
-        });
-
-        compositeShape.InsertParts(2, [line]);
+        }));
+        
+        compositeShape.InsertContainment_0_n(2, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -261,23 +260,23 @@ public class InsertTests
     [TestMethod]
     public void Two_After_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
+        var line = new LinkTestConcept("myId");
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildAddedNotification>(args =>
         {
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(line, args.NewChild);
             notifications++;
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB, line });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<INode> { circleA, circleB, line });
 
         Assert.AreEqual(1, notifications);
     }
@@ -285,26 +284,26 @@ public class InsertTests
     [TestMethod]
     public void FromOtherParent()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        var parent = new Geometry("g") { Shapes = [compositeShape, line] };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        var parent = new TestPartition("g") { Links = [compositeShape, line] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromOtherContainmentNotification>(args =>
         {
             notifications++;
             Assert.AreSame(parent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.OldContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, args.OldContainment);
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(compositeShape, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.NewContainment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        });
-
-        compositeShape.InsertParts(2, [line]);
+        }));
+        
+        compositeShape.InsertContainment_0_n(2, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -312,26 +311,26 @@ public class InsertTests
     [TestMethod]
     public void FromOtherParent_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        var parent = new Geometry("g") { Shapes = [compositeShape, line] };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        var parent = new TestPartition("g") { Links = [compositeShape, line] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromOtherContainmentNotification>(args =>
         {
             notifications++;
             Assert.AreSame(parent, args.OldParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.OldContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, args.OldContainment);
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(compositeShape, args.NewParent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.NewContainment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB, line });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<INode> { circleA, circleB, line });
 
         Assert.AreEqual(1, notifications);
     }
@@ -339,25 +338,25 @@ public class InsertTests
     [TestMethod]
     public void FromSameParent()
     {
-        var line = new Line("myId");
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { DisabledParts = [line], Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var line = new LinkTestConcept("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [line], Containment_1_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromOtherContainmentInSameParentNotification>(args =>
         {
             notifications++;
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, args.NewContainment);
             Assert.AreEqual(1, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        });
-
-        compositeShape.InsertParts(1, [line]);
+        }));
+        
+        compositeShape.InsertContainment_1_n(1, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -365,25 +364,25 @@ public class InsertTests
     [TestMethod]
     public void FromSameParent_Reflective()
     {
-        var line = new Line("myId");
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { DisabledParts = [line], Parts = [circleA, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var line = new LinkTestConcept("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [line], Containment_1_n = [circleA, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromOtherContainmentInSameParentNotification>(args =>
         {
             notifications++;
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, args.NewContainment);
             Assert.AreEqual(1, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, line, circleB });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { circleA, line, circleB });
 
         Assert.AreEqual(1, notifications);
     }
@@ -391,25 +390,25 @@ public class InsertTests
     [TestMethod]
     public void FromSameContainment()
     {
-        var line = new Line("line");
-        var circleA = new Circle("circleA");
-        var circleB = new Circle("circleB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var line = new LinkTestConcept("line");
+        var circleA = new LinkTestConcept("circleA");
+        var circleB = new LinkTestConcept("circleB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, line, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender()!.Subscribe<ChildMovedInSameContainmentNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(args =>
         {
             notifications++;
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(+1, args.IndexOffset);
             Assert.AreEqual(line, args.MovedChild);
-        });
+        }));
 
-        compositeShape.InsertParts(2, [line]);
+        compositeShape.InsertContainment_0_n(2, [line]);
 
         Assert.AreEqual(1, notifications);
     }
@@ -417,24 +416,24 @@ public class InsertTests
     [TestMethod]
     public void FromSameContainment_Reflective()
     {
-        var line = new Line("myId");
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var line = new LinkTestConcept("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, line, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, args) =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(args =>
         {
             notifications++;
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
+            Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, args.Containment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        });
-
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB, line });
+        }));
+        
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<INode> { circleA, circleB, line });
 
         Assert.AreEqual(1, notifications);
     }
@@ -442,17 +441,17 @@ public class InsertTests
     [TestMethod]
     public void FromSameContainment_NoOp()
     {
-        var lineA = new Line("myA");
-        var lineB = new Line("myB");
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, lineA, lineB, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var lineA = new LinkTestConcept("myA");
+        var lineB = new LinkTestConcept("myB");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, lineA, lineB, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-
-        compositeShape.InsertParts(1, [lineA, lineB]);
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(_ => notifications++));
+        
+        compositeShape.InsertContainment_0_n(1, [lineA, lineB]);
 
         Assert.AreEqual(0, notifications);
     }
@@ -460,17 +459,17 @@ public class InsertTests
     [TestMethod]
     public void FromSameContainment_NoOp_Reflective()
     {
-        var lineA = new Line("myA");
-        var lineB = new Line("myB");
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, lineA, lineB, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var lineA = new LinkTestConcept("myA");
+        var lineB = new LinkTestConcept("myB");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var compositeShape = new LinkTestConcept("cs") { Containment_0_n = [circleA, lineA, lineB, circleB] };
+        var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(_ => notifications++));
 
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts,
+        compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n,
             new List<INode> { circleA, lineA, lineB, circleB });
 
         Assert.AreEqual(0, notifications);
