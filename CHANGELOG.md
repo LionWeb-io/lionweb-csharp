@@ -9,7 +9,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Added
 ### Fixed
 ### Changed
-* Adjusted `AdditionalInfo` to latest spec changes (`distribute` flag, Dictionary instead of array of `AdditionalInfoData`). 
+* Adjusted to latest spec changes:
+  * `AdditionalInfo`: `Distribute` flag, Dictionary instead of array of `AdditionalInfoData`
+  * `ReconnectRequest`: added `DeltaProtocolVersion`, `ClientId`, `RepositoryId`
 ### Removed
 ### Deprecated
 ### Security

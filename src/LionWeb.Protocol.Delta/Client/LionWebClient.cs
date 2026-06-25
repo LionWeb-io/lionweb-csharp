@@ -218,6 +218,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         var signOnResponse =
             await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId,
                 IdUtils.NewId(), repositoryId, null));
+        _repositoryId = repositoryId;
         ParticipationId = signOnResponse.ParticipationId;
         return signOnResponse;
     }
@@ -236,7 +237,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         if(SignedIn)
             throw new DeltaException(DeltaErrorCode.AlreadySignedOn.AsErrorResponse(null, null));
 
-        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId, EventSequenceNumber, QueryId(), null));
+        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(_lionWebVersion.VersionString, ClientId, _repositoryId, participationId, EventSequenceNumber, QueryId(), null));
         ParticipationId = participationId;
         return response;
     }

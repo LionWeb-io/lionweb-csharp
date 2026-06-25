@@ -92,7 +92,7 @@ public abstract class JsonTestsBase
         new(QueryId(), AdditionalInfos());
 
     protected static ReconnectRequest CreateReconnectRequest() =>
-        new(ParticipationId(), Sequence(), QueryId(), AdditionalInfos());
+        new(LionWebVersions.v2026_1.VersionString, ClientId(), RepositoryId(), ParticipationId(), Sequence(), QueryId(), AdditionalInfos());
 
     protected static ReconnectResponse CreateReconnectResponse() =>
         new(Sequence(), QueryId(), AdditionalInfos());

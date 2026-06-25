@@ -37,6 +37,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly ConcurrentDictionary<INotificationId, bool> _ownNotifications = [];
 
     protected ParticipationId? _participationId;
+    protected RepositoryId? _repositoryId;
     private readonly ClientId? _clientId;
 
     protected internal ParticipationId ParticipationId
