@@ -219,7 +219,7 @@ public interface IDeltaError
 
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
 [JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
-[JsonDerivedType(typeof(NoOpEvent), "NoOp")]
+[JsonDerivedType(typeof(NoOpEvent), nameof(NoOpEvent))]
 [JsonDerivedType(typeof(ContinuedEvent), nameof(ContinuedEvent))]
 
 #region Forest

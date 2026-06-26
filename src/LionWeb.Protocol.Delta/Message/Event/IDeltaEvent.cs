@@ -43,7 +43,7 @@ public record CommandSource(
 
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
 [JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
-[JsonDerivedType(typeof(NoOpEvent), "NoOp")]
+[JsonDerivedType(typeof(NoOpEvent), nameof(NoOpEvent))]
 [JsonDerivedType(typeof(ContinuedEvent), nameof(ContinuedEvent))]
 
 #region Forest
@@ -129,7 +129,7 @@ public interface IDeltaEvent : IDeltaContent
 
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
 [JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
-[JsonDerivedType(typeof(NoOpEvent), "NoOp")]
+[JsonDerivedType(typeof(NoOpEvent), nameof(NoOpEvent))]
 
 #region Forest
 
