@@ -21,7 +21,7 @@ using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
-public interface IPartitionDeltaEvent : IDeltaEvent;
+public interface IPartitionDeltaEvent : INonContinuedDeltaEvent;
 
 #region Nodes
 
@@ -344,11 +344,11 @@ public record ChildMovedFromOtherContainmentInSameParent(
 }
 
 public record ChildMovedInSameContainment(
-    Index NewIndex,
     TargetNode MovedChild,
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,
+    IndexOffset IndexOffset,
     CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos),
     IContainmentEvent
@@ -586,11 +586,11 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
 }
 
 public record ChildMovedAndReplacedInSameContainment(
-    Index NewIndex,
     TargetNode MovedChild,
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,
+    IndexOffset IndexOffset,
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
     CommandSource[] OriginCommands,
@@ -614,11 +614,11 @@ public record ChildMovedAndReplacedInSameContainment(
         }
 
         return base.Equals(other) &&
-               NewIndex == other.NewIndex &&
                string.Equals(MovedChild, other.MovedChild, StringComparison.InvariantCulture) &&
                string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
                Containment.Equals(other.Containment) &&
                OldIndex == other.OldIndex &&
+               IndexOffset == other.IndexOffset &&
                string.Equals(ReplacedChild, other.ReplacedChild, StringComparison.InvariantCulture) &&
                ReplacedDescendants.ArrayEquals(other.ReplacedDescendants);
     }
@@ -628,11 +628,11 @@ public record ChildMovedAndReplacedInSameContainment(
     {
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
-        hashCode.Add(NewIndex);
         hashCode.Add(MovedChild, StringComparer.InvariantCulture);
         hashCode.Add(Parent, StringComparer.InvariantCulture);
         hashCode.Add(Containment);
         hashCode.Add(OldIndex);
+        hashCode.Add(IndexOffset);
         hashCode.Add(ReplacedChild, StringComparer.InvariantCulture);
         hashCode.ArrayHashCode(ReplacedDescendants);
 
@@ -643,11 +643,6 @@ public record ChildMovedAndReplacedInSameContainment(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        builder.Append(", ");
-
-        builder.Append(nameof(NewIndex));
-        builder.Append(" = ");
-        builder.Append(NewIndex);
         builder.Append(", ");
 
         builder.Append(nameof(MovedChild));
@@ -668,6 +663,11 @@ public record ChildMovedAndReplacedInSameContainment(
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
+        builder.Append(", ");
+
+        builder.Append(nameof(IndexOffset));
+        builder.Append(" = ");
+        builder.Append(IndexOffset);
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedChild));
@@ -874,10 +874,10 @@ public record AnnotationMovedFromOtherParent(
 }
 
 public record AnnotationMovedInSameParent(
-    Index NewIndex,
     TargetNode MovedAnnotation,
     TargetNode Parent,
     Index OldIndex,
+    IndexOffset IndexOffset,
     CommandSource[] OriginCommands,
     AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
@@ -989,10 +989,10 @@ public record AnnotationMovedAndReplacedFromOtherParent(
 }
 
 public record AnnotationMovedAndReplacedInSameParent(
-    Index NewIndex,
     TargetNode MovedAnnotation,
     TargetNode Parent,
     Index OldIndex,
+    IndexOffset IndexOffset,
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
     CommandSource[] OriginCommands,
@@ -1016,10 +1016,10 @@ public record AnnotationMovedAndReplacedInSameParent(
         }
 
         return base.Equals(other) &&
-               NewIndex == other.NewIndex &&
                string.Equals(MovedAnnotation, other.MovedAnnotation, StringComparison.InvariantCulture) &&
                string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
                OldIndex == other.OldIndex &&
+               IndexOffset == other.IndexOffset &&
                string.Equals(ReplacedAnnotation, other.ReplacedAnnotation, StringComparison.InvariantCulture) &&
                ReplacedDescendants.ArrayEquals(other.ReplacedDescendants);
     }
@@ -1029,10 +1029,10 @@ public record AnnotationMovedAndReplacedInSameParent(
     {
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
-        hashCode.Add(NewIndex);
         hashCode.Add(MovedAnnotation, StringComparer.InvariantCulture);
         hashCode.Add(Parent, StringComparer.InvariantCulture);
         hashCode.Add(OldIndex);
+        hashCode.Add(IndexOffset);
         hashCode.Add(ReplacedAnnotation, StringComparer.InvariantCulture);
         hashCode.ArrayHashCode(ReplacedDescendants);
 
@@ -1043,11 +1043,6 @@ public record AnnotationMovedAndReplacedInSameParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        builder.Append(", ");
-
-        builder.Append(nameof(NewIndex));
-        builder.Append(" = ");
-        builder.Append(NewIndex);
         builder.Append(", ");
 
         builder.Append(nameof(MovedAnnotation));
@@ -1063,6 +1058,11 @@ public record AnnotationMovedAndReplacedInSameParent(
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
+        builder.Append(", ");
+
+        builder.Append(nameof(IndexOffset));
+        builder.Append(" = ");
+        builder.Append(IndexOffset);
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedAnnotation));

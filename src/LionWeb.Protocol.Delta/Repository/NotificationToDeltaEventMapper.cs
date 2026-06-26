@@ -229,11 +229,11 @@ public class NotificationToDeltaEventMapper
     private ChildMovedAndReplacedInSameContainment OnChildMovedAndReplacedInSameContainment(
         ChildMovedAndReplacedInSameContainmentNotification childMovedNotification) =>
         new(
-            childMovedNotification.NewIndex,
             childMovedNotification.MovedChild.GetId(),
             childMovedNotification.Parent.GetId(),
             childMovedNotification.Containment.ToMetaPointer(),
             childMovedNotification.OldIndex,
+            childMovedNotification.IndexOffset,
             childMovedNotification.ReplacedChild.GetId(),
             ToDescendants(childMovedNotification.ReplacedChild),
             ToCommandSources(childMovedNotification),
@@ -243,11 +243,11 @@ public class NotificationToDeltaEventMapper
     private ChildMovedInSameContainment OnChildMovedInSameContainment(
         ChildMovedInSameContainmentNotification childMovedNotification) =>
         new(
-            childMovedNotification.NewIndex,
             childMovedNotification.MovedChild.GetId(),
             childMovedNotification.Parent.GetId(),
             childMovedNotification.Containment.ToMetaPointer(),
             childMovedNotification.OldIndex,
+            childMovedNotification.IndexOffset,
             ToCommandSources(childMovedNotification),
             []
         );
@@ -301,10 +301,10 @@ public class NotificationToDeltaEventMapper
     private AnnotationMovedInSameParent OnAnnotationMovedInSameParent(
         AnnotationMovedInSameParentNotification annotationMovedNotification) =>
         new(
-            annotationMovedNotification.NewIndex,
             annotationMovedNotification.MovedAnnotation.GetId(),
             annotationMovedNotification.Parent.GetId(),
             annotationMovedNotification.OldIndex,
+            annotationMovedNotification.IndexOffset,
             ToCommandSources(annotationMovedNotification),
             []
         );
@@ -326,10 +326,10 @@ public class NotificationToDeltaEventMapper
     private AnnotationMovedAndReplacedInSameParent OnAnnotationMovedAndReplacedInSameParent(
         AnnotationMovedAndReplacedInSameParentNotification annotationMovedNotification) =>
         new(
-            annotationMovedNotification.NewIndex,
             annotationMovedNotification.MovedAnnotation.GetId(),
             annotationMovedNotification.Parent.GetId(),
             annotationMovedNotification.OldIndex,
+            annotationMovedNotification.IndexOffset,
             annotationMovedNotification.ReplacedAnnotation.GetId(),
             ToDescendants(annotationMovedNotification.ReplacedAnnotation),
             ToCommandSources(annotationMovedNotification),
@@ -379,7 +379,7 @@ public class NotificationToDeltaEventMapper
 
     private CompositeEvent OnComposite(CompositeNotification compositeNotification) =>
         new(
-            [.. compositeNotification.Parts.Select(Map)],
+            [.. compositeNotification.Parts.Select(notification => (INonContinuedDeltaEvent)Map(notification))],
             ToCommandSources(compositeNotification),
             []
         );

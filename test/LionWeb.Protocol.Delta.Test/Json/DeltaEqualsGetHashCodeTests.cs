@@ -299,7 +299,7 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     private AdditionalInfo[] CreateAdditionalInfos(string message) =>
     [
         new AdditionalInfo("MyKind", message,
-            [new AdditionalInfoData("key0", "value0"), new AdditionalInfoData("key1", "value1")]
+            new() { { "key0", "value0" }, { "key1", "value1" } }
         )
     ];
 }

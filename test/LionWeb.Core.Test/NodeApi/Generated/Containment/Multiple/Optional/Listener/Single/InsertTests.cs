@@ -378,26 +378,29 @@ public class InsertTests
     }
 
     [TestMethod]
-    [Ignore("expected indices unclear")]
     public void FromSameContainment()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
+        var circleA = new Circle("circleA");
+        var circleB = new Circle("circleB");
         var lineA = new Line("lineA");
         var lineB = new Line("lineB");
         var compositeShape = new CompositeShape("parent") { Parts = [lineA, circleA, lineB, circleB] };
+        // after first replacement: [circleA, lineB, lineA, circleB]
+        // after second replacement: [circleA, lineA, lineB, circleB]
         var parent = new Geometry("g") { Shapes = [compositeShape] };
         List<IShape> values = [lineA, lineB];
 
         int notifications = 0;
-        int[] oldIndices = [0, 2];
+        int[] oldIndices = [0, 1];
         int[] indices = [2, 3];
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, args) =>
+        int[] offsets = [+2, +2];
+        parent.GetNotificationSender()!.Subscribe<ChildMovedInSameContainmentNotification>((_, args) =>
         {
             Assert.AreEqual(oldIndices[notifications], args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(indices[notifications], args.NewIndex);
+            Assert.AreEqual(offsets[notifications], args.IndexOffset);
             Assert.AreEqual(values[notifications], args.MovedChild);
             notifications++;
         });

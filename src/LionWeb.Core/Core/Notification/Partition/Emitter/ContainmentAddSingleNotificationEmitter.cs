@@ -68,13 +68,13 @@ public class ContainmentAddSingleNotificationEmitter<T> : ContainmentMultipleNot
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment == Containment:
-                    if (_newIndex ==  _existingValues.Count)
+                    if (_newIndex == _existingValues.Count)
                         _newIndex--;
                     if (old.Index == _newIndex)
                         break;
                     
                     ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added,
-                        DestinationParent, old.Containment, old.Index, GetNotificationId()));
+                        DestinationParent, old.Containment, old.Index, _newIndex - old.Index, GetNotificationId()));
 
                     break;
 

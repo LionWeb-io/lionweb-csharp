@@ -280,6 +280,7 @@ public record ChildMovedInSameContainmentNotification(
     IWritableNode Parent,
     Containment Containment,
     Index OldIndex,
+    IndexOffset IndexOffset,
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
@@ -367,6 +368,7 @@ public record ChildMovedAndReplacedInSameContainmentNotification(
     Containment Containment,
     IWritableNode ReplacedChild,
     Index OldIndex,
+    IndexOffset IndexOffset,
     INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
 {
     /// <inheritdoc />
@@ -506,6 +508,7 @@ public record AnnotationMovedInSameParentNotification(
     IWritableNode MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
+    IndexOffset IndexOffset,
     INotificationId NotificationId) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
@@ -554,6 +557,7 @@ public record AnnotationMovedAndReplacedInSameParentNotification(
     IWritableNode MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
+    IndexOffset IndexOffset,
     IWritableNode ReplacedAnnotation,
     INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
 {

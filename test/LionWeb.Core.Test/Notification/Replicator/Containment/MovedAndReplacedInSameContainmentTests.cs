@@ -57,10 +57,10 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
         var originalPartition = new TestPartition("a") { Links =  [moved, replaced] };
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newIndex = 1;
+        var newIndex = 0;
         var oldIndex = 0;
         var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+            replaced, oldIndex, +1, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
@@ -103,7 +103,7 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
         var newIndex = 0;
         var oldIndex = 1;
         var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+            replaced, oldIndex, -1, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
@@ -114,56 +114,56 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
     [TestMethod]
     public void Backward_MoreThanThreeChildren_ProducesNotification()
     {
-        var replacement = new LinkTestConcept("E");
+        var moved = new LinkTestConcept("E");
         var replaced = new LinkTestConcept("B");
 
         var originalPartition = new TestPartition("container")
         {
-            Links =  [new LinkTestConcept("A"), replaced, new LinkTestConcept("C"), new LinkTestConcept("D"), replacement, new LinkTestConcept("F")]
+            Links =  [new LinkTestConcept("A"), replaced, new LinkTestConcept("C"), new LinkTestConcept("D"), moved, new LinkTestConcept("F")]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
         var newIndex = 1;
         var oldIndex = 4;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
+            replaced, oldIndex, -3, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         var sharedNodeMap = new SharedNodeMap();
         
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
 
-        replaced.ReplaceWith(replacement);
+        replaced.ReplaceWith(moved);
 
         Assert.AreEqual(5, clonedPartition.Links.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Links[1].GetId());
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[1].GetId());
 
         Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
-        Assert.IsTrue(sharedNodeMap.ContainsKey(replacement.GetId()));
+        Assert.IsTrue(sharedNodeMap.ContainsKey(moved.GetId()));
     }
 
     [TestMethod]
     public void Forward_MoreThanThreeChildren_ProducesNotification()
     {
-        var replacement = new LinkTestConcept("E");
+        var moved = new LinkTestConcept("E");
         var replaced = new LinkTestConcept("B");
 
         var originalPartition = new TestPartition("container")
         {
-            Links =  [new LinkTestConcept("A"), replacement, new LinkTestConcept("C"), new LinkTestConcept("D"), replaced, new LinkTestConcept("F")]
+            Links =  [new LinkTestConcept("A"), moved, new LinkTestConcept("C"), new LinkTestConcept("D"), replaced, new LinkTestConcept("F")]
         };
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newIndex = 4;
+        var newIndex = 3;
         var oldIndex = 1;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
+            replaced, oldIndex, +3, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         CreatePartitionReplicator(clonedPartition, notification);
 
-        replaced.ReplaceWith(replacement);
+        replaced.ReplaceWith(moved);
 
         Assert.AreEqual(5, clonedPartition.Links.Count);
-        Assert.AreEqual(replacement.GetId(), clonedPartition.Links[^2].GetId());
+        Assert.AreEqual(moved.GetId(), clonedPartition.Links[^2].GetId());
     }
 
     [TestMethod]
@@ -175,10 +175,10 @@ public class MovedAndReplacedInSameContainmentTests : ReplicatorTestsBase
         var originalPartition = new TestPartition("a") { Links =  [moved, replaced, nodeWithAnotherId] };
         var clonedPartition = ClonePartition(originalPartition);
 
-        var newIndex = 1;
+        var newIndex = 0;
         var oldIndex = 0;
         var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
-            nodeWithAnotherId, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+            nodeWithAnotherId, oldIndex, +1, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {

@@ -134,7 +134,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent];
 
         Assert.IsEmpty(Test<MoveAndReplaceAnnotationInSameParent, AnnotationMovedAndReplacedInSameParent>(nodes,
-            new AnnotationMovedAndReplacedInSameParentNotification(2, moved, parent, 0, replaced, _notificationIdProvider.Create())
+            new AnnotationMovedAndReplacedInSameParentNotification(1, moved, parent, 0, +2, replaced, _notificationIdProvider.Create())
         ));
     }
 
@@ -149,7 +149,7 @@ public class MapperTests : DeltaTestsBase
 
         Assert.ContainsSingle(e => e.Message.StartsWith("Invalid notification: Replaced annotation node with id replaced does not match with actual node with id other at index 1"),
             Test<MoveAndReplaceAnnotationInSameParent, AnnotationMovedAndReplacedInSameParent>(nodes,
-                new AnnotationMovedAndReplacedInSameParentNotification(1, moved, parent, 0, replaced, _notificationIdProvider.Create())
+                new AnnotationMovedAndReplacedInSameParentNotification(0, moved, parent, 0, +1, replaced, _notificationIdProvider.Create())
             ));
     }
 
@@ -163,7 +163,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent, moved];
 
         Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedAnnotation[moved] unset", Test<MoveAndReplaceAnnotationInSameParent, AnnotationMovedAndReplacedInSameParent>(nodes,
-            new AnnotationMovedAndReplacedInSameParentNotification(1, moved, parent, 0, replaced, _notificationIdProvider.Create())
+            new AnnotationMovedAndReplacedInSameParentNotification(0, moved, parent, 0, +1, replaced, _notificationIdProvider.Create())
         ));
     }
 
@@ -204,7 +204,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent];
 
         Assert.IsEmpty(Test<MoveAnnotationInSameParent, AnnotationMovedInSameParent>(nodes,
-            new AnnotationMovedInSameParentNotification(1, moved, parent, 0, _notificationIdProvider.Create())
+            new AnnotationMovedInSameParentNotification(0, moved, parent, 0, +1, _notificationIdProvider.Create())
         ));
     }
 
@@ -217,7 +217,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent, moved];
 
         Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedAnnotation[moved] unset", Test<MoveAnnotationInSameParent, AnnotationMovedInSameParent>(nodes,
-            new AnnotationMovedInSameParentNotification(1, moved, parent, 0, _notificationIdProvider.Create())
+            new AnnotationMovedInSameParentNotification(0, moved, parent, 0, +1, _notificationIdProvider.Create())
         ));
     }
 
@@ -397,7 +397,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent];
 
         Assert.IsEmpty(Test<MoveAndReplaceChildInSameContainment, ChildMovedAndReplacedInSameContainment>(nodes,
-            new ChildMovedAndReplacedInSameContainmentNotification(2, moved, parent, Containment, replaced, 0, _notificationIdProvider.Create())
+            new ChildMovedAndReplacedInSameContainmentNotification(1, moved, parent, Containment, replaced, 0, +2, _notificationIdProvider.Create())
         ));
         }
 
@@ -413,7 +413,7 @@ public class MapperTests : DeltaTestsBase
         Assert.ContainsSingle(
             e => e.Message.StartsWith("Invalid notification: Replaced node node with id replaced does not match with actual node with id other at index 1 in containment containment_0_n"),
             Test<MoveAndReplaceChildInSameContainment, ChildMovedAndReplacedInSameContainment>(nodes,
-                new ChildMovedAndReplacedInSameContainmentNotification(1, moved, parent, Containment, replaced, 0, _notificationIdProvider.Create())
+                new ChildMovedAndReplacedInSameContainmentNotification(0, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
             ));
     }
 
@@ -427,7 +427,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent, moved];
 
         Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveAndReplaceChildInSameContainment, ChildMovedAndReplacedInSameContainment>(nodes,
-            new ChildMovedAndReplacedInSameContainmentNotification(1, moved, parent, Containment, replaced, 0, _notificationIdProvider.Create())
+            new ChildMovedAndReplacedInSameContainmentNotification(0, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
         ));
     }
 
@@ -494,7 +494,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent];
 
         Assert.IsEmpty(Test<MoveChildInSameContainment, ChildMovedInSameContainment>(nodes,
-            new ChildMovedInSameContainmentNotification(1, moved, parent, Containment, 0, _notificationIdProvider.Create())
+            new ChildMovedInSameContainmentNotification(0, moved, parent, Containment, 0, +1, _notificationIdProvider.Create())
         ));
     }
 
@@ -507,7 +507,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [parent, moved];
 
         Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveChildInSameContainment, ChildMovedInSameContainment>(nodes,
-            new ChildMovedInSameContainmentNotification(1, moved, parent, Containment, 0, _notificationIdProvider.Create())
+            new ChildMovedInSameContainmentNotification(0, moved, parent, Containment, 0, +1, _notificationIdProvider.Create())
         ));
     }
 
@@ -855,7 +855,7 @@ public class MapperTests : DeltaTestsBase
                     break;
                 
                 default:
-                    Assert.AreEqual(ex, act);
+                    Assert.AreEqual(ex, act, propertyInfo.ToString());
                     break;
             }
         }

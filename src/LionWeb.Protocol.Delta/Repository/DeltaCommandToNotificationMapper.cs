@@ -190,13 +190,14 @@ public class DeltaCommandToNotificationMapper
         var movedChild = ToNode(command.MovedChild);
         var oldContainment = GetContainmentAndParent(movedChild, nameof(command.MovedChild), out var oldParent);
         var newParent = ToNode(command.NewParent);
+        var newIndex = command.NewIndex;
         var newContainment = ToContainment(command.NewContainment, newParent);
         var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
 
         return new ChildMovedFromOtherContainmentNotification(
             newParent,
             newContainment,
-            command.NewIndex,
+            newIndex,
             movedChild,
             oldParent,
             oldContainment,
@@ -276,12 +277,13 @@ public class DeltaCommandToNotificationMapper
         var oldIndex = GetChildIndex(parent, containment, movedChild);
 
         return new ChildMovedAndReplacedInSameContainmentNotification(
-            command.NewIndex,
+            NewIndex(command.OldIndex, command.IndexOffset),
             movedChild,
             parent,
             containment,
             ToNode(command.ReplacedChild),
             oldIndex,
+            command.IndexOffset,
             ToNotificationId(command)
         );
     }
@@ -293,11 +295,12 @@ public class DeltaCommandToNotificationMapper
         var oldIndex = GetChildIndex(parent, containment, movedChild);
 
         return new ChildMovedInSameContainmentNotification(
-            command.NewIndex,
+            NewIndex(command.OldIndex, command.IndexOffset),
             movedChild,
             parent,
             containment,
             oldIndex,
+            command.IndexOffset,
             ToNotificationId(command)
         );
     }
@@ -404,10 +407,11 @@ public class DeltaCommandToNotificationMapper
         var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
         return new AnnotationMovedInSameParentNotification(
-            moveAnnotationCommand.NewIndex,
+            NewIndex(moveAnnotationCommand.OldIndex, moveAnnotationCommand.IndexOffset),
             movedAnnotation,
             parent,
             oldIndex,
+            moveAnnotationCommand.IndexOffset,
             ToNotificationId(moveAnnotationCommand)
         );
     }
@@ -439,10 +443,11 @@ public class DeltaCommandToNotificationMapper
         var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
         return new AnnotationMovedAndReplacedInSameParentNotification(
-            moveAnnotationCommand.NewIndex,
+            NewIndex(moveAnnotationCommand.OldIndex, moveAnnotationCommand.IndexOffset),
             movedAnnotation,
             parent,
             oldIndex,
+            moveAnnotationCommand.IndexOffset,
             ToNode(moveAnnotationCommand.ReplacedAnnotation),
             ToNotificationId(moveAnnotationCommand)
         );
@@ -519,6 +524,14 @@ public class DeltaCommandToNotificationMapper
 
     private static INotificationId ToNotificationId(IDeltaCommand command) =>
         new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
+
+    private Index NewIndex(Index oldIndex, IndexOffset indexOffset) =>
+        indexOffset switch
+        {
+            0 => throw new LionWebMappingException("IndexOffset", "0"),
+            > 0 => oldIndex + indexOffset - 1,
+            _ => oldIndex + indexOffset
+        };
 
     private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
     {

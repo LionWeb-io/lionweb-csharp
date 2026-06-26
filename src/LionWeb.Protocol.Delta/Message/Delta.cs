@@ -25,6 +25,7 @@ using Event;
 using Query;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 public sealed class DeltaProtocolVersion
 {
@@ -78,7 +79,7 @@ public record DeltaSerializationChunk(SerializedNode[] Nodes)
     }
 }
 
-public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoData[]? Data)
+public record AdditionalInfo(MessageKind Kind, string Message, Dictionary<string, string>? Data = null, bool? Distribute = false)
 {
     /// <inheritdoc />
     public virtual bool Equals(AdditionalInfo? other)
@@ -94,8 +95,9 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
         }
 
         return string.Equals(Kind, other.Kind, StringComparison.InvariantCulture) &&
+               Distribute == other.Distribute &&
                string.Equals(Message, other.Message, StringComparison.InvariantCulture) &&
-               Data.ArrayEquals(other.Data);
+               Data.DictionaryEquals(other.Data);
     }
 
     /// <inheritdoc />
@@ -103,8 +105,9 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
     {
         var hashCode = new HashCode();
         hashCode.Add(Kind, StringComparer.InvariantCulture);
+        hashCode.Add(Distribute);
         hashCode.Add(Message, StringComparer.InvariantCulture);
-        hashCode.ArrayHashCode(Data);
+        hashCode.DictionaryHashCode(Data);
         return hashCode.ToHashCode();
     }
 
@@ -115,6 +118,11 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
         builder.Append(Kind);
         builder.Append(", ");
 
+        builder.Append(nameof(Distribute));
+        builder.Append(" = ");
+        builder.Append(Distribute);
+        builder.Append(", ");
+
         builder.Append(nameof(Message));
         builder.Append(" = ");
         builder.Append(Message);
@@ -122,38 +130,9 @@ public record AdditionalInfo(MessageKind Kind, string Message, AdditionalInfoDat
 
         builder.Append(nameof(Data));
         builder.Append(" = ");
-        builder.ArrayPrintMembers(Data);
+        builder.DictionaryPrintMembers(Data);
 
         return true;
-    }
-}
-
-public record AdditionalInfoData(AdditionalInfoDataKey Key, string Value)
-{
-    /// <inheritdoc />
-    public virtual bool Equals(AdditionalInfoData? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return string.Equals(Key, other.Key, StringComparison.InvariantCulture) &&
-               string.Equals(Value, other.Value, StringComparison.InvariantCulture);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        var hashCode = new HashCode();
-        hashCode.Add(Key, StringComparer.InvariantCulture);
-        hashCode.Add(Value, StringComparer.InvariantCulture);
-        return hashCode.ToHashCode();
     }
 }
 
@@ -164,11 +143,12 @@ public interface IDeltaError
 }
 
 /// <remarks>
-/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaCommand"/> and <see cref="IDeltaEvent"/> in lockstep.
+/// IMPORTANT: Make sure to update attributes on <see cref="IDeltaCommand"/>, <see cref="INonContinuedCommand"/>, <see cref="IDeltaEvent"/> and <see cref="INonContinuedDeltaEvent"/> in lockstep.
 /// </remarks> 
 #region Command
 
 [JsonDerivedType(typeof(CompositeCommand), nameof(CompositeCommand))]
+[JsonDerivedType(typeof(ContinuedCommand), nameof(ContinuedCommand))]
 
 #region Forest
 
@@ -240,6 +220,7 @@ public interface IDeltaError
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
 [JsonDerivedType(typeof(ErrorEvent), nameof(ErrorEvent))]
 [JsonDerivedType(typeof(NoOpEvent), nameof(NoOpEvent))]
+[JsonDerivedType(typeof(ContinuedEvent), nameof(ContinuedEvent))]
 
 #region Forest
 
@@ -314,6 +295,7 @@ public interface IDeltaError
 [JsonDerivedType(typeof(GetAvailableIdsResponse), nameof(GetAvailableIdsResponse))]
 [JsonDerivedType(typeof(ListPartitionsRequest), nameof(ListPartitionsRequest))]
 [JsonDerivedType(typeof(ListPartitionsResponse), nameof(ListPartitionsResponse))]
+[JsonDerivedType(typeof(ContinuedQueryResponse), nameof(ContinuedQueryResponse))]
 
 #endregion
 
@@ -354,6 +336,26 @@ public interface IDeltaContent
 
     [JsonIgnore]
     string Id { get; }
+}
+
+public interface IDeltaSplittable : IDeltaContent
+{
+    SplitFlag Split { get; }
+}
+
+public interface IDeltaContinued : IDeltaContent
+{
+    DeltaSerializationChunk Chunk { get; }
+    ContinuedChunkCompleted ContinuedChunkCompleted { get; }
+    ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber { get; }
+}
+
+public partial interface ICustomDeltaContent : IDeltaContent
+{
+    public static bool IsValidMessageKind(string messageKind) => ValidMessageKindRegex().IsMatch(messageKind);
+    
+    [GeneratedRegex("^Custom_[a-zA-Z0-9_-]+$")]
+    private static partial Regex ValidMessageKindRegex();
 }
 
 public abstract record DeltaContentBase(AdditionalInfo[]? AdditionalInfos) : IDeltaContent

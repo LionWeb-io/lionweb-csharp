@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.x.y] - tbd
+### Added
+### Fixed
+### Changed
+* Adjusted to latest spec changes:
+  * `AdditionalInfo`: `Distribute` flag, Dictionary instead of array of `AdditionalInfoData`
+  * `ReconnectRequest`: added `DeltaProtocolVersion`, `ClientId`, `RepositoryId`
+  * Introduced `IDeltaSplittable` and `IDeltaContinued` types (no functionality yet)
+  * Introduced `ICustomDeltaContent` types (no functionality yet)
+  * Introduced `IndexOffset` to all move/moveAndReplace in same list
+### Removed
+### Deprecated
+### Security
+
 ## [0.5.0] - 2026-06-19
 
 This release focuses on performance.

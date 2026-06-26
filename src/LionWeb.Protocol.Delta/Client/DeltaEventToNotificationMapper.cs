@@ -274,12 +274,13 @@ public class DeltaEventToNotificationMapper
         var movedChild = ToNode(childMovedEvent.MovedChild);
         var containment = ToContainment(childMovedEvent.Containment, parent);
         return new ChildMovedAndReplacedInSameContainmentNotification(
-            childMovedEvent.NewIndex,
+            NewIndex(childMovedEvent.OldIndex, childMovedEvent.IndexOffset),
             movedChild,
             parent,
             containment,
             ToNode(childMovedEvent.ReplacedChild),
             childMovedEvent.OldIndex,
+            childMovedEvent.IndexOffset,
             ToNotificationId(childMovedEvent)
         );
     }
@@ -291,11 +292,12 @@ public class DeltaEventToNotificationMapper
         var movedChild = ToNode(childMovedEvent.MovedChild);
         var containment = ToContainment(childMovedEvent.Containment, parent);
         return new ChildMovedInSameContainmentNotification(
-            childMovedEvent.NewIndex,
+            NewIndex(childMovedEvent.OldIndex, childMovedEvent.IndexOffset),
             movedChild,
             parent,
             containment,
             childMovedEvent.OldIndex,
+            childMovedEvent.IndexOffset,
             ToNotificationId(childMovedEvent)
         );
     }
@@ -380,10 +382,11 @@ public class DeltaEventToNotificationMapper
         var parent = ToNode(annotationMovedEvent.Parent);
         var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedInSameParentNotification(
-            annotationMovedEvent.NewIndex,
+            NewIndex(annotationMovedEvent.OldIndex, annotationMovedEvent.IndexOffset),
             movedAnnotation,
             parent,
             annotationMovedEvent.OldIndex,
+            annotationMovedEvent.IndexOffset,
             ToNotificationId(annotationMovedEvent)
         );
     }
@@ -411,10 +414,11 @@ public class DeltaEventToNotificationMapper
         var parent = ToNode(annotationMovedEvent.Parent);
         var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedAndReplacedInSameParentNotification(
-            annotationMovedEvent.NewIndex,
+            NewIndex(annotationMovedEvent.OldIndex, annotationMovedEvent.IndexOffset),
             movedAnnotation,
             parent,
             annotationMovedEvent.OldIndex,
+            annotationMovedEvent.IndexOffset,
             ToNode(annotationMovedEvent.ReplacedAnnotation),
             ToNotificationId(annotationMovedEvent)
         );
@@ -491,6 +495,14 @@ public class DeltaEventToNotificationMapper
 
     private static INotificationId ToNotificationId(IDeltaEvent deltaEvent) =>
         new ParticipationNotificationId(deltaEvent.InternalParticipationId, deltaEvent.Id);
+
+    private Index NewIndex(Index oldIndex, IndexOffset indexOffset) =>
+        indexOffset switch
+        {
+            0 => throw new LionWebMappingException("IndexOffset", "0"),
+            > 0 => oldIndex + indexOffset - 1,
+            _ => oldIndex + indexOffset
+        };
 
     private protected bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
     {

@@ -81,7 +81,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
 
                 case ListMoved<IWritableNode> moved:
                     ProduceNotification(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
-                        DestinationParent, moved.LeftIndex, GetNotificationId()));
+                        DestinationParent, moved.LeftIndex, moved.RightIndex - moved.LeftIndex, GetNotificationId()));
                     break;
 
                 case ListDeleted<IWritableNode> deleted:

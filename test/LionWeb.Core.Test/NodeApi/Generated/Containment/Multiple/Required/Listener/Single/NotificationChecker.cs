@@ -1,4 +1,4 @@
-﻿// Copyright 2025 TRUMPF Laser SE and other contributors
+// Copyright 2026 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,16 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-global using NodeId = string;
-global using PropertyValue = string;
-global using ResolveInfo = string;
-global using MetaPointerKey = string;
-global using Index = int;
-global using IndexOffset = int;
-global using NotificationId = string;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.Listener.Single;
+
+using Core.Notification;
+using Core.Notification.Pipe;
+
+public class NotificationChecker<T>(Action<T> checker) : INotificationReceiver where T : INotification
+{
+    public void Receive(INotificationSender correspondingSender, INotification notification)
+    {
+        if (notification is T t)
+            checker(t);
+    }
+}
