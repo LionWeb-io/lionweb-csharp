@@ -32,17 +32,25 @@ public class DeltaEventToNotificationMapper
 {
     private readonly SharedNodeMap _sharedNodeMap;
     private readonly SharedKeyedMap _sharedKeyedMap;
-    private readonly DeserializerBuilder _deserializerBuilder;
+    private readonly ReusableDeserializer _deserializer;
 
     public DeltaEventToNotificationMapper(
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
+    ) : this(sharedNodeMap, sharedKeyedMap, new ReusableDeserializer(sharedNodeMap, deserializerBuilder))
+    {
+    }
+
+    public DeltaEventToNotificationMapper(
+        SharedNodeMap sharedNodeMap,
+        SharedKeyedMap sharedKeyedMap,
+        ReusableDeserializer deserializer
     )
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedKeyedMap = sharedKeyedMap;
-        _deserializerBuilder = deserializerBuilder;
+        _deserializer = deserializer;
     }
 
     public INotification Map(IDeltaEvent deltaEvent) =>
@@ -135,7 +143,7 @@ public class DeltaEventToNotificationMapper
         ToFeature<Property>(deltaProperty, node);
 
     private SemanticPropertyValue ToPropertyValue(IReadableNode node, Property property, PropertyValue value) =>
-        _deserializerBuilder.Build().VersionSpecifics.ConvertDatatype(node, property, property.Type, value) ??
+        _deserializer.VersionSpecifics.ConvertDatatype(node, property, property.Type, value) ??
         throw new InvalidValueException(property, value);
 
     #endregion
@@ -308,7 +316,7 @@ public class DeltaEventToNotificationMapper
     private static Containment GetContainmentAndParent(IWritableNode child, string field, out IWritableNode parent)
     {
         parent = GetParent(child, field);
-        var containment =  parent.GetContainmentOf(child)!;
+        var containment = parent.GetContainmentOf(child)!;
         return containment;
     }
 
@@ -485,7 +493,7 @@ public class DeltaEventToNotificationMapper
 
     private CompositeNotification OnComposite(CompositeEvent compositeEvent)
     {
-        var mapper = new InterdependentDeltaEventToNotificationMapper(_sharedNodeMap, _sharedKeyedMap, _deserializerBuilder);
+        var mapper = new InterdependentDeltaEventToNotificationMapper(_sharedNodeMap, _sharedKeyedMap, _deserializer);
 
         return new(
             compositeEvent.Parts.Select(mapper.Map),
@@ -534,15 +542,22 @@ public class DeltaEventToNotificationMapper
 
     private protected virtual IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
-        var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-
-        var node = nodes.FirstOrDefault();
-        if (node is not IWritableNode w)
+        List<IWritableNode> nodes;
+        try
         {
-            throw new UnsupportedNodeTypeException(node, nameof(node));
+            foreach (var serializedNode in deltaChunk.Nodes)
+            {
+                _deserializer.Process(serializedNode);
+            }
+
+            nodes = _deserializer.Finish().ToList();
+        } finally
+        {
+            _deserializer.Reset();
         }
 
-        return w;
+        var node = nodes.FirstOrDefault();
+        return node ?? throw new UnsupportedNodeTypeException(node, nameof(node));
     }
 }
 
@@ -551,8 +566,8 @@ public class DeltaEventToNotificationMapper
 /// Variant of <see cref="DeltaEventToNotificationMapper"/>
 /// that resolves references to nodes that were created during mapping, but not yet added to <paramref name="sharedNodeMap"/>. 
 /// </summary>
-internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder)
-    : DeltaEventToNotificationMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, ReusableDeserializer deserializer)
+    : DeltaEventToNotificationMapper(sharedNodeMap, sharedKeyedMap, deserializer)
 {
     private readonly Dictionary<NodeId, IReadableNode> _interdependentNodeMap = new();
 
@@ -576,8 +591,8 @@ internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap shared
         foreach (IWritableNode node in M1Extensions.Descendants(result, true, true))
         {
             _interdependentNodeMap[node.GetId()] = node;
-            
         }
+
         return result;
     }
 }

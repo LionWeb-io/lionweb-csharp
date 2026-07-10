@@ -8,6 +8,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.x.y] - tbd
 ### Added
 * Added `IGlobalM2Cache`, defaults to unset. If available, used by `M2Extensions`.
+* Added `ReusableDeserializer` to avoid initialization effort during delta deserialization.
 ### Fixed
 ### Changed
 * Adjusted to latest spec changes:
