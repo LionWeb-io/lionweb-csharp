@@ -23,16 +23,23 @@ using M3;
 /// Builds an M1 (i.e. instance-level) <see cref="IDeserializer"/>.
 public class DeserializerBuilder
 {
-    private readonly Dictionary<Language, INodeFactory> _languages = new();
-    private readonly HashSet<IReadableNode> _dependentNodes = new();
-    private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
-    private bool _languageReferences = false;
-
     /// <inheritdoc cref="WithLionWebVersion"/>
     public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
-    
+
     /// <inheritdoc cref="WithHandler"/>
     public IDeserializerHandler? Handler { get; set; }
+
+    /// <inheritdoc cref="WithReferenceResolveInfoHandling"/>
+    public ReferenceResolveInfoHandling ResolveInfoHandling { get; set; } = ReferenceResolveInfoHandling.None;
+
+    /// <inheritdoc cref="WithLanguage"/>
+    public Dictionary<Language, INodeFactory> Languages { get; } = [];
+
+    /// <inheritdoc cref="WithLanguageReferences"/>
+    public bool LanguageReferences { get; set; } = false;
+
+    /// <inheritdoc cref="WithDependentNodes"/>
+    public HashSet<IReadableNode> DependentNodes { get; } = [];
 
     /// Registers a custom handler.
     /// Defaults to <see cref="DeserializerExceptionHandler"/>.
@@ -63,14 +70,14 @@ public class DeserializerBuilder
     /// Enables references to language elements of <see cref="IDeserializer.RegisterInstantiatedLanguage">instantiated languages</see>.
     public DeserializerBuilder WithLanguageReferences(bool languageReferences = true)
     {
-        _languageReferences = languageReferences;
+        LanguageReferences = languageReferences;
         return this;
     }
 
     /// Registers an <see cref="IDeserializer.RegisterInstantiatedLanguage">instantiated language</see> with custom factory.
     public DeserializerBuilder WithCustomFactory(Language language, INodeFactory factory)
     {
-        _languages[language] = factory;
+        Languages[language] = factory;
         return this;
     }
 
@@ -79,7 +86,7 @@ public class DeserializerBuilder
     {
         foreach (var dependentNode in dependentNodes)
         {
-            _dependentNodes.Add(dependentNode);
+            DependentNodes.Add(dependentNode);
         }
 
         return this;
@@ -101,7 +108,7 @@ public class DeserializerBuilder
     public DeserializerBuilder WithReferenceResolveInfoHandling(
         ReferenceResolveInfoHandling referenceResolveInfoHandling)
     {
-        _referenceResolveInfoHandling = referenceResolveInfoHandling;
+        ResolveInfoHandling = referenceResolveInfoHandling;
         return this;
     }
 
@@ -122,17 +129,17 @@ public class DeserializerBuilder
     {
         IDeserializer result = new Deserializer(LionWebVersion, Handler)
         {
-            ResolveInfoHandling = _referenceResolveInfoHandling
+            ResolveInfoHandling = ResolveInfoHandling
         };
-        foreach ((Language language, INodeFactory factory) in _languages)
+        foreach ((Language language, INodeFactory factory) in Languages)
         {
             result.RegisterInstantiatedLanguage(language, factory);
         }
 
-        result.RegisterDependentNodes(_dependentNodes);
+        result.RegisterDependentNodes(DependentNodes);
 
-        if (_languageReferences)
-            result.RegisterDependentNodes(_languages.Keys.SelectMany(k =>
+        if (LanguageReferences)
+            result.RegisterDependentNodes(Languages.Keys.SelectMany(k =>
                 M1Extensions.Descendants<IReadableNode>(k, true, true)));
 
         return result;

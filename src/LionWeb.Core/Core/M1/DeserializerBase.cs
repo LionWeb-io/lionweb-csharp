@@ -66,7 +66,9 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     public LionWebVersions LionWebVersion { get => _versionSpecifics.Version; }
 
     /// <inheritdoc />
-    IDeserializerVersionSpecifics IDeserializer.VersionSpecifics => _versionSpecifics;
+    IDeserializerVersionSpecifics IDeserializer.VersionSpecifics => VersionSpecifics;
+    /// <inheritdoc cref="IDeserializer.VersionSpecifics" />
+    public IDeserializerVersionSpecifics VersionSpecifics => _versionSpecifics;
 
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     public ReferenceResolveInfoHandling ResolveInfoHandling { get; init; }
@@ -221,7 +223,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             ({ } tid, _) =>
                 _deserializedNodesById.TryGetValue(tid, out var ownNode)
                     ? ownNode
-                    : _dependentNodesById.GetValueOrDefault(tid),
+                    : LookupDependentNodeByIdOrDefault(tid),
             (null, { } s) when s.StartsWith(ILionCoreLanguage.ResolveInfoPrefix) =>
                 ResolveResolveInfo(s, ILionCoreLanguage.ResolveInfoPrefix, LionWebVersion.LionCore),
             (null, { } s) when s.StartsWith(IBuiltInsLanguage.ResolveInfoPrefix) =>
@@ -245,7 +247,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     private IReadableNode? ResolveByName(string s)
     {
-        var namedNodes = _dependentNodesById.Values
+        var namedNodes = CollectDependentNodes()
             .Concat(_deserializedNodesById.Values)
             .OfType<INamed>()
             .Where(n => n.CollectAllSetFeatures().Contains(_builtIns.INamed_name));
@@ -368,7 +370,19 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     #endregion
 
+    #region Dependent nodes
+
     /// Checks whether <paramref name="nodeId"/> is contained in <see cref="_dependentNodesById"/>.
-    protected bool IsInDependentNodes(NodeId nodeId) =>
+    protected virtual bool IsInDependentNodes(NodeId nodeId) =>
         _dependentNodesById.ContainsKey(nodeId);
+
+    /// Tries to find dependent node with id <paramref name="nodeId"/>.
+    protected virtual IReadableNode? LookupDependentNodeByIdOrDefault(NodeId nodeId) =>
+        _dependentNodesById.GetValueOrDefault(nodeId);
+
+    /// Collects all dependent nodes.
+    protected virtual IEnumerable<IReadableNode> CollectDependentNodes() =>
+        _dependentNodesById.Values;
+    
+    #endregion
 }

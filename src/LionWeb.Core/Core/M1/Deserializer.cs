@@ -34,10 +34,10 @@ public partial class Deserializer : DeserializerBase<IWritableNode, IDeserialize
     /// 
     /// * Don't make any assumptions on feature validity. Rather, call <see cref="IWritableNode.Set"/>, let it decide, and react on exceptions.
     ///   Rationale: Different implementations might accept different levels of "broken" nodes. 
-    private readonly Dictionary<NodeId, SerializedContainment[]> _containmentsByOwnerId = new();
+    protected readonly Dictionary<NodeId, SerializedContainment[]> _containmentsByOwnerId = new();
 
-    private readonly Dictionary<NodeId, SerializedReference[]> _referencesByOwnerId = new();
-    private readonly Dictionary<NodeId, NodeId[]> _annotationsByOwnerId = new();
+    protected readonly Dictionary<NodeId, SerializedReference[]> _referencesByOwnerId = new();
+    protected readonly Dictionary<NodeId, NodeId[]> _annotationsByOwnerId = new();
 
     /// <inheritdoc />
     public Deserializer(LionWebVersions lionWebVersion, IDeserializerHandler? handler = null) :
