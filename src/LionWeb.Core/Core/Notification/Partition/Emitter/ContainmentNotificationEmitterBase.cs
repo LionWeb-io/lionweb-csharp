@@ -45,7 +45,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
         var oldPartition = value.GetPartition();
         if (oldPartition == null)
             return null;
-        
+
         var oldContainment = oldParent.GetContainmentOf(value);
         if (oldContainment == null)
             return null;
@@ -67,7 +67,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
         Index Index,
         IPartitionInstance? Partition);
 
-    protected void ProduceOriginMoveNotification(OldContainmentInfo old, ChildMovedFromOtherContainmentNotification notification)
+    protected void ProduceOriginNotification(OldContainmentInfo old, INotification notification)
     {
         if (old.Partition != null && old.Partition != DestinationPartition)
             old.Partition.GetNotificationProducer()?.ProduceNotification(notification);

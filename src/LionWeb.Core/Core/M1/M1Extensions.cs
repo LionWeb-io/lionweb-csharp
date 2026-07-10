@@ -39,8 +39,11 @@ public static class M1Extensions
         if (parent == null)
             throw new TreeShapeException(self, "Cannot insert before a node with no parent");
 
-        Containment containment = parent.GetContainmentOf(self)!;
-        if (!parent.TryGetContainmentsRaw(containment, out var siblings))
+        var containment = parent.GetContainmentOf(self);
+        IReadOnlyList<IReadableNode> siblings;
+        if (containment is null)
+            siblings = parent.GetAnnotations();
+        else if (!parent.TryGetContainmentsRaw(containment, out siblings))
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
         var index = siblings.IndexOf(self);
@@ -73,8 +76,11 @@ public static class M1Extensions
         if (parent == null)
             throw new TreeShapeException(self, "Cannot insert after a node with no parent");
 
-        Containment containment = parent.GetContainmentOf(self)!;
-        if (!parent.TryGetContainmentsRaw(containment, out var siblings))
+        var containment = parent.GetContainmentOf(self);
+        IReadOnlyList<IReadableNode> siblings;
+        if (containment is null)
+            siblings = parent.GetAnnotations();
+        else if (!parent.TryGetContainmentsRaw(containment, out siblings))
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
         var index = siblings.IndexOf(self);

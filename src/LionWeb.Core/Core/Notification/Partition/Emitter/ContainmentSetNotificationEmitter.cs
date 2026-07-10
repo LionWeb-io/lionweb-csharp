@@ -68,10 +68,14 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                                 added.RightIndex, GetNotificationId()));
                             break;
 
+                        case { Partition: not null } old when DestinationPartition is null:
+                            ProduceOriginNotification(old, new ChildDeletedNotification(added.Element, old.Parent, old.Containment, old.Index, GetNotificationId()));
+                            break;
+
                         case { } old when old.Parent != DestinationParent:
                             var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
                                 added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, GetNotificationId());
-                            ProduceOriginMoveNotification(old, notification);
+                            ProduceOriginNotification(old, notification);
                             ProduceNotification(notification);
                             break;
 
@@ -90,7 +94,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
 
                 case ListMoved<T> moved:
                     ProduceNotification(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
-                        DestinationParent, Containment, moved.LeftIndex,  moved.RightIndex - moved.LeftIndex, GetNotificationId()));
+                        DestinationParent, Containment, moved.LeftIndex, moved.RightIndex - moved.LeftIndex, GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
                     ProduceNotification(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,

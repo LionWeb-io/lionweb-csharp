@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
+using M1;
 using M3;
 
 /// Encapsulates notification-related logic and data for <i>multiple</i> <see cref="Containment"/>s.
@@ -40,6 +41,12 @@ public abstract class ContainmentMultipleNotificationEmitterBase<T> : Containmen
             throw new ArgumentException(string.Join(",", newValues?.Select(n => n.GetId()) ?? []), e);
         }
     }
+
+    /// <inheritdoc />
+    protected override bool IsActive() =>
+        base.IsActive() ||
+        NewValues.Values.Any(v => v?.Partition?.GetNotificationProducer()?.Handles() ?? false) ||
+        NewValues.Keys.Any(k => k.GetPartition()?.GetNotificationProducer()?.Handles() ?? false);
 
     /// <inheritdoc />
     public override void CollectOldData()

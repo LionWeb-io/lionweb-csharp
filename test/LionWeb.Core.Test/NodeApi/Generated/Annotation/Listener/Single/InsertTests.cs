@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener.Single;
 
 using Core.Notification.Partition;
+using Languages.Generated.V2024_1.TestLanguage;
 using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
 
@@ -284,17 +285,19 @@ public class InsertTests
     [TestMethod]
     public void FromOtherParent()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var line = new LinkTestConcept("g");
+        var parent = new LinkTestConcept("parent") { Containment_0_n = [line] };
         line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
-        var oldParent = new Line("oldParent");
-        oldParent.AddAnnotations([new Documentation("doc"), bom]);
+        var bom = new TestAnnotation("myId");
+        var oldParent = new LinkTestConcept("oldParent");
+        oldParent.AddAnnotations([new TestAnnotation("doc"), bom]);
+
+        var partition = new TestPartition("partition") { Links = [parent, oldParent] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
+        partition.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -312,17 +315,19 @@ public class InsertTests
     [TestMethod]
     public void FromOtherParent_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var line = new LinkTestConcept("g");
+        var parent = new LinkTestConcept("parent") { Containment_0_n = [line] };
         line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
-        var oldParent = new Line("oldParent");
-        oldParent.AddAnnotations([new Documentation("doc"), bom]);
+        var bom = new TestAnnotation("myId");
+        var oldParent = new LinkTestConcept("oldParent");
+        oldParent.AddAnnotations([new TestAnnotation("doc"), bom]);
+
+        var partition = new TestPartition("partition") { Links = [parent, oldParent] };
 
         int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
+        partition.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);

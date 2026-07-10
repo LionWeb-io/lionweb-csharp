@@ -116,7 +116,10 @@ internal class NotifyingNodeReplacer<T>(INode self, T replacement) : NodeReplace
         switch (_oldParent)
         {
             case null:
+            case not null when _oldParent.GetPartition() is null:
                 return new AnnotationReplacedNotification(replacement, self, _parent, _replacedIndex, _notificationId);
+            case not null when _parent.GetPartition() is null:
+                return new AnnotationDeletedNotification(replacement, _oldParent, _replacementIndex, _notificationId);
             case not null when _oldParent == _parent:
                 var (newIndex, indexOffset) = MoveAndReplaceInSameList();
                 return new AnnotationMovedAndReplacedInSameParentNotification(newIndex, replacement, _parent, _replacementIndex, indexOffset, self, _notificationId);
@@ -129,11 +132,14 @@ internal class NotifyingNodeReplacer<T>(INode self, T replacement) : NodeReplace
 
     private INotification CreateContainmentNotification()
     {
-        if (_oldParent is null)
+        if (_oldParent is null || _oldParent.GetPartition() is null)
             return new ChildReplacedNotification(replacement, self, _parent, _containment, _replacedIndex, _notificationId);
 
         Debug.Assert(_oldContainment is not null);
 
+        if (_parent.GetPartition() is null)
+            return new ChildDeletedNotification(replacement, _oldParent, _oldContainment, _replacementIndex, _notificationId);
+        
         switch (_oldParent)
         {
             case not null when _oldParent == _parent && _oldContainment == _containment:

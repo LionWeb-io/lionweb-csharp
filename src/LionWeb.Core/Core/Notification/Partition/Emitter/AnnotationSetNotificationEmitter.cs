@@ -64,11 +64,19 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                                 added.RightIndex, GetNotificationId()));
                             break;
 
+                        case { Partition: null } when DestinationPartition is not null:
+                            ProduceNotification(new AnnotationAddedNotification(DestinationParent, added.Element, added.RightIndex, GetNotificationId()));
+                            break;
+                        
+                        case { Partition: not null } old when DestinationPartition is null:
+                            ProduceOriginNotification(old, new AnnotationDeletedNotification(added.Element, old.Parent, old.Index, GetNotificationId()));
+                            break;
+
                         case { } old when old.Parent != DestinationParent:
                             var notificationId = GetNotificationId();
                             var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, added.RightIndex,
                                 added.Element, old.Parent, old.Index, notificationId);
-                            ProduceOriginMoveNotification(old, notification);
+                            ProduceOriginNotification(old, notification);
                             ProduceNotification(notification);
                             break;
 

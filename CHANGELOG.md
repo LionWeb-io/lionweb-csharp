@@ -10,6 +10,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `IGlobalM2Cache`, defaults to unset. If available, used by `M2Extensions`.
 * Added `ReusableDeserializer` to avoid initialization effort during delta deserialization.
 ### Fixed
+* `InsertBefore()` and `InsertAfter()` works now with annotations.
+* Moving or replacing nodes between partitions and free-floating nodes produces the proper added/deleted notifications.
 ### Changed
 * Adjusted to latest spec changes:
   * `AdditionalInfo`: `Distribute` flag, Dictionary instead of array of `AdditionalInfoData`

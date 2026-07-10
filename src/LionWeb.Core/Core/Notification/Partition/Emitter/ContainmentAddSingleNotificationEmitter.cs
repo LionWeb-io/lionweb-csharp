@@ -31,11 +31,13 @@ public class ContainmentAddSingleNotificationEmitter<T> : ContainmentMultipleNot
     /// <param name="addedValue">Newly added value.</param>
     /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <paramref name="containment"/>.</param>
-    public ContainmentAddSingleNotificationEmitter(Containment containment,
+    public ContainmentAddSingleNotificationEmitter(
+        Containment containment,
         INotifiableNode destinationParent,
         T addedValue,
         List<T> existingValues,
-        Index? startIndex = null) : base(containment, destinationParent, [addedValue])
+        Index? startIndex = null
+    ) : base(containment, destinationParent, [addedValue])
     {
         _existingValues = existingValues;
         _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
@@ -56,10 +58,18 @@ public class ContainmentAddSingleNotificationEmitter<T> : ContainmentMultipleNot
                         GetNotificationId()));
                     break;
 
+                case not null when old.Parent != DestinationParent && DestinationPartition is null:
+                    if (old.Partition?.GetNotificationProducer() is { } prod)
+                    {
+                        var deletedNotification = new ChildDeletedNotification(added, old.Parent, old.Containment, old.Index, GetNotificationId());
+                        prod.ProduceNotification(deletedNotification);
+                    }
+                    break;
+                
                 case not null when old.Parent != DestinationParent:
                     var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, _newIndex, added,
                         old.Parent, old.Containment, old.Index, GetNotificationId());
-                    ProduceOriginMoveNotification(old, notification);
+                    ProduceOriginNotification(old, notification);
                     ProduceNotification(notification);
                     break;
 
