@@ -53,7 +53,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// Whether this emitter should execute at all.
     /// </summary>
     [MemberNotNullWhen(true, nameof(_partitionProducer))]
-    protected bool IsActive() =>
+    protected virtual bool IsActive() =>
         _partitionProducer?.Handles() ?? false;
 
     /// <summary>

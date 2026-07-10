@@ -8,6 +8,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.x.y] - tbd
 ### Added
 ### Fixed
+* `InsertBefore()` and `InsertAfter()` works now with annotations.
+* Moving or replacing nodes between partitions and free-floating nodes produces the proper added/deleted notifications.
 ### Changed
 * Adjusted to latest spec changes:
   * `AdditionalInfo`: `Distribute` flag, Dictionary instead of array of `AdditionalInfoData`

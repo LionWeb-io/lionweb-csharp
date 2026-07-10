@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
+using M1;
 using M3;
 
 /// Encapsulates notification-related logic and data for changing <i>single</i> <see cref="Containment"/>s.
@@ -42,7 +43,14 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
     [Obsolete]
     public ContainmentSingleNotificationEmitter(Containment containment, INotifiableNode destinationParent, T? newValue,
         T? oldValue, INotificationId? notificationId = null) : this(containment, destinationParent, newValue, oldValue)
-    { }
+    {
+    }
+
+    /// <inheritdoc />
+    protected override bool IsActive() =>
+        base.IsActive() ||
+        (_oldContainmentInfo?.Partition?.GetNotificationProducer()?.Handles() ?? false) ||
+        (_newValue?.GetPartition()?.GetNotificationProducer()?.Handles() ?? false);
 
     /// <inheritdoc />
     public override void CollectOldData()
@@ -86,6 +94,12 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                     GetNotificationId()));
                 break;
 
+            case (_, not null, _)
+                when _oldContainmentInfo.Partition is not null && DestinationPartition is null:
+                ProduceOriginNotification(_oldContainmentInfo,
+                    new ChildDeletedNotification(_newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, GetNotificationId()));
+                break;
+
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
                 ProduceNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
@@ -113,7 +127,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 var notificationId = GetNotificationId();
                 var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, notificationId);
-                ProduceOriginMoveNotification(_oldContainmentInfo, notification);
+                ProduceOriginNotification(_oldContainmentInfo, notification);
                 ProduceNotification(notification);
                 break;
 

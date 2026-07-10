@@ -28,8 +28,9 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
 
     /// <summary>
     /// According to spec, all descendants in an added node MUST be new (i.e. not present in the model).
-    /// This test case is legal in api but results in delta error because the existingChild is attempted
-    /// to be added (as a new node) again to the model 
+    /// This test case USED TO be legal in api but results in delta error because the existingChild is attempted
+    /// to be added (as a new node) again to the model.
+    /// Fixed since we detect moving nodes in and out of partitions. 
     /// </summary>
     [TestMethod]
     public void AddChildWithNewChildContainingExistingNode()
@@ -53,24 +54,12 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         {
             Containment_0_1 = existingChild
         };
-        
+
         // Act
-        // This emits a ChildAddedNotification, "replacement" is a new node but its child "existingChild" is not.
-        // That's what makes the ChildAddedNotification "invalid".
-        Assert.ThrowsExactly<InvalidNotificationException>(() =>
-        {
-            originalPartition.AddLinks([replacement]);
-        });
+        originalPartition.AddLinks([replacement]);
         
         // Assert
-        // changes applied to original partition
-        // (node api maintains tree shape: moves existingChild from Links[0].Containment_0_1 to Containment_1)
-        Assert.AreSame(replacement, originalPartition.Links[1]);
-        Assert.IsNull(existingParent.Containment_0_1);
-        
-        // change has not replicated to the clone
-        Assert.HasCount(1, clonedPartition.Links);
-        Assert.AreEqual("existingChild", clonedPartition.Links[0]!.Containment_0_1!.GetId());
+        AssertEquals([originalPartition], [clonedPartition]);
     }
     
     [TestMethod]
@@ -100,20 +89,10 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
 
         // Act
         originalForest.AddPartitions([originalPartition]);
-        
-        Assert.ThrowsExactly<InvalidNotificationException>(() =>
-        {
-            originalPartition.AddLinks([replacement]);
-        });
-        
+        originalPartition.AddLinks([replacement]);
+
         // Assert
-        // changes applied to original partition
-        Assert.AreSame(replacement, originalPartition.Links[1]);
-        Assert.IsNull(existingParent.Containment_0_1);
-        
-        // change has not replicated to the clone
-        Assert.HasCount(1, clonedPartition.Links);
-        Assert.AreEqual("existingChild", clonedPartition.Links[0]!.Containment_0_1!.GetId());
+        AssertEquals([originalPartition], [clonedPartition]);
     }
     
     [TestMethod]
@@ -158,6 +137,7 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
     /// <summary>
     /// existingChild is part of another partition in the same forest.
     /// Therefore, it is considered as a known node (not a new node).
+    /// Fixed since we detect moving nodes in and out of partitions. 
     /// </summary>
     [TestMethod]
     public void AddChildWithNewChildContainingExistingNode_FromOtherPartition()
@@ -188,18 +168,10 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         };
 
         // Act
-        Assert.ThrowsExactly<InvalidNotificationException>(() =>
-        {
-            changedPartition.AddLinks([replacement]);
-        });
+        changedPartition.AddLinks([replacement]);
         
         // Assert
-        // changes applied to original partition
-        Assert.AreSame(replacement, changedPartition.Links[0]);
-        Assert.IsNull(existingParent.Containment_0_1);
-        
-        // change has not replicated to the clone
-        Assert.IsFalse(((TestPartition)clonedForest.Partitions.ToList()[1]).TryGetLinks(out var _));
+        AssertEquals(originalForest.Partitions, clonedForest.Partitions);
     }
 
     /// <summary>
@@ -423,22 +395,10 @@ public class DeserializeExistingNodesTests: DeltaTestsBase
         newParentAnnotation.AddAnnotations([existingChildAnnotation]);
         
         // Act
-        Assert.ThrowsExactly<InvalidNotificationException>(() =>
-        {
-            child1.AddAnnotations([newParentAnnotation]);
-        });
-        
+        child1.AddAnnotations([newParentAnnotation]);
+
         // Assert
-        // changes applied to original partition
-        Assert.HasCount(1,originalPartition.Links[0].GetAnnotations());
-        Assert.AreEqual("existingParentAnnotation", originalPartition.Links[0].GetAnnotations()[0].GetId());
-        Assert.HasCount(1, originalPartition.Links[1].GetAnnotations());
-        Assert.HasCount(1, originalPartition.Links[1].GetAnnotations()[0].GetAnnotations());
-        Assert.AreEqual("existingChildAnnotation", originalPartition.Links[1].GetAnnotations()[0].GetAnnotations()[0].GetId());
-        
-        // change has not replicated to the clone
-        Assert.HasCount(1,clonedPartition.Links[0]!.GetAnnotations());
-        Assert.IsEmpty(clonedPartition.Links[1].GetAnnotations());
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     

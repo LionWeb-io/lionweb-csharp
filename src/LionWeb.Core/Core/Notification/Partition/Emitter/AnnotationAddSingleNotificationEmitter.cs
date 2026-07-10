@@ -22,15 +22,21 @@ using M3;
 /// Encapsulates notification-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Annotation"/>s.
 public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmitterBase
 {
+    private readonly List<INode> _existingValues;
     private Index _newIndex;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>.</param>
     /// <param name="addedValue">Newly added value.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <see cref="Annotation"/>s.</param>
-    public AnnotationAddSingleNotificationEmitter(INotifiableNode destinationParent,
-        IWritableNode addedValue, Index? startIndex = null) : base(destinationParent, [addedValue])
+    public AnnotationAddSingleNotificationEmitter(
+        INotifiableNode destinationParent,
+        IWritableNode addedValue,
+        List<INode> existingValues,
+        Index? startIndex = null
+    ) : base(destinationParent, [addedValue])
     {
-        _newIndex = startIndex ?? Math.Max(destinationParent.GetAnnotations().Count - 1, 0);
+        _existingValues = existingValues;
+        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
     }
 
     /// <inheritdoc />
@@ -43,16 +49,25 @@ public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmit
         {
             switch (old)
             {
-                case null:
+                case null or { Partition: null }:
                     ProduceNotification(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
                         GetNotificationId()));
+                    break;
+
+                case not null when old.Parent != DestinationParent && DestinationPartition is null:
+                    if (old.Partition?.GetNotificationProducer() is { } prod)
+                    {
+                        var deletedNotification = new AnnotationDeletedNotification(added, old.Parent, old.Index, GetNotificationId());
+                        prod.ProduceNotification(deletedNotification);
+                    }
+
                     break;
 
                 case not null when old.Parent != DestinationParent:
                     var notificationId = GetNotificationId();
                     var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, notificationId);
-                    ProduceOriginMoveNotification(old, notification);
+                    ProduceOriginNotification(old, notification);
                     ProduceNotification(notification);
                     break;
 
@@ -62,6 +77,11 @@ public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmit
                     break;
 
                 case not null when old.Parent == DestinationParent:
+                    if (_newIndex == _existingValues.Count)
+                        _newIndex--;
+                    if (old.Index == _newIndex)
+                        break;
+
                     ProduceNotification(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
                         old.Index, _newIndex - old.Index, GetNotificationId()));
                     break;

@@ -29,7 +29,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationAddSingleNotif
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
     public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? addedValues,
-        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues.First(), startIndex)
+        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues.First(), existingValues, startIndex)
     {
     }
 }

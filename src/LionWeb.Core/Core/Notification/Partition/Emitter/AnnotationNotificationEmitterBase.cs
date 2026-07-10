@@ -34,6 +34,12 @@ public abstract class AnnotationNotificationEmitterBase : PartitionNotificationE
     }
 
     /// <inheritdoc />
+    protected override bool IsActive() =>
+        base.IsActive() ||
+        NewValues.Values.Any(v => v?.Partition?.GetNotificationProducer()?.Handles() ?? false) ||
+        NewValues.Keys.Any(k => k.GetPartition()?.GetNotificationProducer()?.Handles() ?? false);
+
+    /// <inheritdoc />
     public override void CollectOldData()
     {
         if (!IsActive())
@@ -58,7 +64,7 @@ public abstract class AnnotationNotificationEmitterBase : PartitionNotificationE
     /// <param name="Index"></param>
     protected record OldAnnotationInfo(IWritableNode Parent, Index Index, IPartitionInstance? Partition);
 
-    protected void ProduceOriginMoveNotification(OldAnnotationInfo old, AnnotationMovedFromOtherParentNotification notification)
+    protected void ProduceOriginNotification(OldAnnotationInfo old, INotification notification)
     {
         if (old.Partition != null && old.Partition != DestinationPartition)
             old.Partition.GetNotificationProducer()?.ProduceNotification(notification);
