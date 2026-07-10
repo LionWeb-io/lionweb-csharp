@@ -268,7 +268,7 @@ public class DynamicLanguageCloner(
         }
     }
 
-    private T Lookup<T>(T keyed) where T : IKeyed?
+    private T Lookup<T>(T keyed) where T : class, IKeyed?
     {
         if (keyed == null)
             throw new UnknownLookupException(typeof(T).FullName!);
@@ -278,7 +278,7 @@ public class DynamicLanguageCloner(
 #pragma warning restore CS8631
     }
 
-    private bool TryLookup<T>(T keyed, [NotNullWhen(true)] out T? result) where T : IKeyed
+    private bool TryLookup<T>(T keyed, [NotNullWhen(true)] out T? result) where T : class, IKeyed
     {
         var keyedLanguage = keyed.GetLanguage();
         if (keyedLanguage.Key == lionWebVersion.BuiltIns.Key)

@@ -21,6 +21,7 @@ using M2;
 using M3;
 using Serialization;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using Utilities;
 
@@ -35,7 +36,7 @@ public class Serializer : ISerializer
     private readonly HashSet<Language> _usedLanguages = new(new LanguageIdentityComparer());
     private readonly ISerializerHandler _handler = new SerializerExceptionHandler();
     private readonly Dictionary<IKeyed, MetaPointer> _metaPointers = [];
-    private readonly Dictionary<Classifier, ISet<Feature>> _allFeatures = [];
+    private readonly Dictionary<Classifier, IImmutableSet<Feature>> _allFeatures = [];
 
     /// <inheritdoc cref="ISerializer"/>
     public Serializer(LionWebVersions lionWebVersion)
@@ -189,7 +190,7 @@ public class Serializer : ISerializer
         return featureValues;
     }
 
-    private ISet<Feature> AllFeatures(Classifier classifier)
+    private IImmutableSet<Feature> AllFeatures(Classifier classifier)
     {
         if (!_allFeatures.TryGetValue(classifier, out var result))
         {
