@@ -26,6 +26,7 @@ using Utilities;
 /// <summary>
 /// Extension methods for LionCore M3 types of a "query-like" nature.
 /// </summary>
+/// <seealso cref="IGlobalM2Cache"/>
 public static class M2Extensions
 {
     /// <summary>
@@ -53,7 +54,8 @@ public static class M2Extensions
     /// <param name="key">Key of the requested thing.</param>
     /// <returns>A <typeparamref name="T"/> with the given key, or:</returns>
     /// <exception cref="KeyNotFoundException">If the given <paramref name="language"/> does not contain a thing with the given key.</exception>
-    public static T FindByKey<T>(this Language language, MetaPointerKey key) where T : IKeyed =>
+    public static T FindByKey<T>(this Language language, MetaPointerKey key) where T : class, IKeyed =>
+        IGlobalM2Cache.Instance?.FindByKey<T>(language, key) ??
         M1Extensions.Descendants<IKeyed>(language, true, false)
             .OfType<T>()
             .FindByKey(key);
@@ -66,8 +68,9 @@ public static class M2Extensions
     /// <param name="key">Key of the requested classifier.</param>
     /// <returns>Classifier with <paramref name="key"/> contained in <paramref name="language"/>.</returns>
     /// <exception cref="KeyNotFoundException">If <paramref name="language"/> does not contain a classifier with <paramref name="key"/>.</exception>
-    public static Classifier ClassifierByKey(this Language language, MetaPointerKey key)
-        => language
+    public static Classifier ClassifierByKey(this Language language, MetaPointerKey key) =>
+        IGlobalM2Cache.Instance?.FindByKey<Classifier>(language, key) ??
+        language
             .Entities
             .OfType<Classifier>()
             .FindByKey(key);
@@ -79,8 +82,9 @@ public static class M2Extensions
     /// <param name="key">Key of requested feature.</param>
     /// <returns>Feature with <paramref name="key"/> contained in <paramref name="classifier"/> or any of its generalizations.</returns>
     /// <exception cref="InvalidOperationException">If <paramref name="classifier"/> or any of its generalizations does not contain a feature with <paramref name="key"/>.</exception>
-    public static Feature FeatureByKey(this Classifier classifier, MetaPointerKey key)
-        => classifier
+    public static Feature FeatureByKey(this Classifier classifier, MetaPointerKey key) =>
+        IGlobalM2Cache.Instance?.FeatureByKey(classifier, key) ??
+        classifier
             .AllFeatures()
             .FindByKey(key);
 
@@ -89,7 +93,8 @@ public static class M2Extensions
     /// </summary>
     /// <param name="classifier">Classifier to find features of.</param>
     /// <returns>All features of <paramref name="classifier"/> and all its generalizations.</returns>
-    public static ISet<Feature> AllFeatures(this Classifier classifier) =>
+    public static IImmutableSet<Feature> AllFeatures(this Classifier classifier) =>
+        IGlobalM2Cache.Instance?.AllFeatures(classifier) ??
         classifier.AllGeneralizations()
             .Prepend(classifier)
             .SelectMany(c => c.Features)
@@ -104,7 +109,8 @@ public static class M2Extensions
     /// <seealso cref="DirectGeneralizations(Annotation)"/>
     /// <seealso cref="DirectGeneralizations(Concept)"/>
     /// <seealso cref="DirectGeneralizations(Interface)"/>
-    public static ISet<Classifier> DirectGeneralizations(this Classifier classifier) =>
+    public static IImmutableSet<Classifier> DirectGeneralizations(this Classifier classifier) =>
+        IGlobalM2Cache.Instance?.DirectGeneralizations(classifier) ??
         classifier switch
         {
             Annotation a => a.DirectGeneralizations(),
@@ -118,7 +124,7 @@ public static class M2Extensions
     /// </summary>
     /// <param name="annotation">Annotation to find generalizations of.</param>
     /// <returns><paramref name="annotation"/>'s <i>extended</i> Annotation and <i>implemented</i> Interfaces.</returns>
-    public static ISet<Classifier> DirectGeneralizations(this Annotation annotation)
+    public static IImmutableSet<Classifier> DirectGeneralizations(this Annotation annotation)
     {
         var result = new List<Classifier>();
         if (annotation.Extends != null)
@@ -135,7 +141,7 @@ public static class M2Extensions
     /// </summary>
     /// <param name="concept">Concept to find generalizations of.</param>
     /// <returns><paramref name="concept"/>'s <i>extended</i> Concept and <i>implemented</i> Interfaces.</returns>
-    public static ISet<Classifier> DirectGeneralizations(this Concept concept)
+    public static IImmutableSet<Classifier> DirectGeneralizations(this Concept concept)
     {
         var result = new List<Classifier>();
         if (concept.Extends != null)
@@ -152,7 +158,7 @@ public static class M2Extensions
     /// </summary>
     /// <param name="iface">Interface to find generalizations of.</param>
     /// <returns><paramref name="iface"/>'s <i>extended</i> Interfaces.</returns>
-    public static ISet<Classifier> DirectGeneralizations(this Interface iface) =>
+    public static IImmutableSet<Classifier> DirectGeneralizations(this Interface iface) =>
         iface.Extends.OfType<Classifier>().ToImmutableHashSet();
 
     /// <summary>
@@ -164,8 +170,11 @@ public static class M2Extensions
     /// <returns>All direct and indirect generalizations of <paramref name="classifier"/>.</returns>
     /// <exception cref="UnsupportedClassifierException">If <paramref name="classifier"/>'s type is unsupported (should not happen).</exception>
     /// <seealso cref="DirectGeneralizations(Classifier)"/>
-    public static ISet<Classifier> AllGeneralizations(this Classifier classifier, bool includeSelf = false)
+    public static IImmutableSet<Classifier> AllGeneralizations(this Classifier classifier, bool includeSelf = false)
     {
+        if (IGlobalM2Cache.Instance?.AllGeneralizations(classifier) is { } all)
+            return !includeSelf ? all : [classifier, .. all];
+           
         IEnumerable<Classifier> result = CollectGeneralizations(classifier, new HashSet<Classifier>());
 
         if (!includeSelf)
@@ -192,9 +201,12 @@ public static class M2Extensions
     /// <param name="classifier">Classifier to find specializations of.</param>
     /// <param name="languages">Languages to search through for specializations of <paramref name="classifier"/>.</param>
     /// <returns>All direct specializations of <paramref name="classifier"/> within <paramref name="languages"/>.</returns>
-    public static ISet<Classifier> DirectSpecializations(this Classifier classifier,
+    public static IImmutableSet<Classifier> DirectSpecializations(this Classifier classifier,
         IEnumerable<Language> languages)
     {
+        if (IGlobalM2Cache.Instance?.DirectSpecializations(classifier) is { } all)
+            return all;
+        
         ILookup<Classifier, Classifier> directSpecializations = MapDirectSpecializations(languages);
 
         return directSpecializations[classifier]
@@ -224,12 +236,15 @@ public static class M2Extensions
     /// <param name="languages">Languages to search through for specializations of <paramref name="classifier"/>.</param>
     /// <param name="includeSelf">If <c>true</c>, the result includes <paramref name="classifier"/>.</param>
     /// <returns>All direct and indirect specializations of <paramref name="classifier"/> within <paramref name="languages"/>.</returns>
-    public static ISet<Classifier> AllSpecializations(this Classifier classifier,
+    public static IImmutableSet<Classifier> AllSpecializations(this Classifier classifier,
         IEnumerable<Language> languages,
         bool includeSelf = false,
         ILookup<Classifier, Classifier>? directSpecializations = null
     )
     {
+        if (IGlobalM2Cache.Instance?.AllSpecializations(classifier) is { } all)
+            return !includeSelf ? all : [classifier, .. all];
+           
         directSpecializations ??= MapDirectSpecializations(languages);
 
         IEnumerable<Classifier> result =
@@ -305,8 +320,9 @@ public static class M2Extensions
     /// <param name="key">Key of the requested structured datatype.</param>
     /// <returns>Structured DataType with <paramref name="key"/> contained in <paramref name="language"/>.</returns>
     /// <exception cref="KeyNotFoundException">If <paramref name="language"/> does not contain a structured datatype with <paramref name="key"/>.</exception>
-    public static StructuredDataType StructuredDataTypeByKey(this Language language, MetaPointerKey key)
-        => language
+    public static StructuredDataType StructuredDataTypeByKey(this Language language, MetaPointerKey key) =>
+        IGlobalM2Cache.Instance?.FindByKey<StructuredDataType>(language, key) ??
+        language
             .Entities
             .OfType<StructuredDataType>()
             .FindByKey(key);
@@ -318,8 +334,9 @@ public static class M2Extensions
     /// <param name="key">Key of requested field.</param>
     /// <returns>Field with <paramref name="key"/> contained in <paramref name="structuredDataType"/>.</returns>
     /// <exception cref="InvalidOperationException">If <paramref name="structuredDataType"/> does not contain a field with <paramref name="key"/>.</exception>
-    public static Field FieldByKey(this StructuredDataType structuredDataType, MetaPointerKey key)
-        => structuredDataType
+    public static Field FieldByKey(this StructuredDataType structuredDataType, MetaPointerKey key) =>
+        IGlobalM2Cache.Instance?.FieldByKey(structuredDataType, key) ??
+        structuredDataType
             .Fields
             .FindByKey(key);
     
