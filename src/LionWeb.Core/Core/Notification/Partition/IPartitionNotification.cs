@@ -29,7 +29,9 @@ public interface IPartitionNotification : INotification
     IWritableNode ContextNode { get; }
 }
 
-public abstract record APartitionNotification(INotificationId NotificationId) : IPartitionNotification
+public abstract record APartitionNotification(
+    INotificationId NotificationId
+) : IPartitionNotification
 {
     /// <inheritdoc />
     public INotificationId NotificationId { get; set; } = NotificationId;
@@ -56,7 +58,8 @@ public record ClassifierChangedNotification(
     IWritableNode Node,
     Classifier NewClassifier,
     Classifier OldClassifier,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId)
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Node];
@@ -81,8 +84,8 @@ public record PropertyAddedNotification(
     IWritableNode Node,
     Property Property,
     SemanticPropertyValue NewValue,
-    INotificationId NotificationId)
-    : APartitionNotification(NotificationId), IPropertyNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IPropertyNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Node];
@@ -98,8 +101,8 @@ public record PropertyDeletedNotification(
     IWritableNode Node,
     Property Property,
     SemanticPropertyValue OldValue,
-    INotificationId NotificationId)
-    : APartitionNotification(NotificationId), IPropertyNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IPropertyNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Node];
@@ -117,8 +120,8 @@ public record PropertyChangedNotification(
     Property Property,
     SemanticPropertyValue NewValue,
     SemanticPropertyValue OldValue,
-    INotificationId NotificationId)
-    : APartitionNotification(NotificationId), IPropertyNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IPropertyNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Node];
@@ -131,6 +134,11 @@ public record PropertyChangedNotification(
 
 #region Children
 
+public interface IChildNotification : IPartitionNotification
+{
+    Containment Containment { get; }
+}
+
 /// <param name="Parent"></param>
 /// <param name="NewChild"></param>
 /// <param name="Containment"></param>
@@ -140,7 +148,8 @@ public record ChildAddedNotification(
     IWritableNode NewChild,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), INewNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), INewNodeNotification, IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -167,7 +176,8 @@ public record ChildDeletedNotification(
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IDeletedNodeNotification, IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -196,7 +206,8 @@ public record ChildReplacedNotification(
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), INewNodeNotification, IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), INewNodeNotification, IDeletedNodeNotification, IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -238,13 +249,17 @@ public record ChildMovedFromOtherContainmentNotification(
     IWritableNode OldParent,
     Containment OldContainment,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override IWritableNode ContextNode => NewParent;
+
+    /// <inheritdoc />
+    public Containment Containment => NewContainment;
 }
 
 /// <param name="NewContainment"></param>
@@ -260,13 +275,17 @@ public record ChildMovedFromOtherContainmentInSameParentNotification(
     IWritableNode Parent,
     Containment OldContainment,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override IWritableNode ContextNode => Parent;
+
+    /// <inheritdoc />
+    public Containment Containment => NewContainment;
 }
 
 /// <param name="NewIndex"></param>
@@ -281,7 +300,8 @@ public record ChildMovedInSameContainmentNotification(
     Containment Containment,
     Index OldIndex,
     IndexOffset IndexOffset,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -306,13 +326,17 @@ public record ChildMovedAndReplacedFromOtherContainmentNotification(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IDeletedNodeNotification, IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
 
     /// <inheritdoc />
     public override IWritableNode ContextNode => NewParent;
+
+    /// <inheritdoc />
+    public Containment Containment => NewContainment;
 
     /// <inheritdoc />
     public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
@@ -338,13 +362,17 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IDeletedNodeNotification, IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
 
     /// <inheritdoc />
     public override IWritableNode ContextNode => Parent;
+
+    /// <inheritdoc />
+    public Containment Containment => NewContainment;
 
     /// <inheritdoc />
     public IReadOnlyList<IReadableNode> DeletedNodes => _deletedNodes ?? CollectDeleted();
@@ -369,7 +397,8 @@ public record ChildMovedAndReplacedInSameContainmentNotification(
     IWritableNode ReplacedChild,
     Index OldIndex,
     IndexOffset IndexOffset,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IDeletedNodeNotification, IChildNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -391,6 +420,8 @@ public record ChildMovedAndReplacedInSameContainmentNotification(
 
 #region Annotations
 
+public interface IAnnotationNotification : IPartitionNotification;
+
 /// <param name="Parent"></param>
 /// <param name="NewAnnotation"></param>
 /// <param name="Index"></param>
@@ -398,8 +429,8 @@ public record AnnotationAddedNotification(
     IWritableNode Parent,
     IWritableNode NewAnnotation,
     Index Index,
-    INotificationId NotificationId)
-    : APartitionNotification(NotificationId), INewNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), INewNodeNotification, IAnnotationNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -424,8 +455,8 @@ public record AnnotationDeletedNotification(
     IWritableNode DeletedAnnotation,
     IWritableNode Parent,
     Index Index,
-    INotificationId NotificationId)
-    : APartitionNotification(NotificationId), IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IDeletedNodeNotification, IAnnotationNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -452,7 +483,8 @@ public record AnnotationReplacedNotification(
     IWritableNode ReplacedAnnotation,
     IWritableNode Parent,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), INewNodeNotification, IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), INewNodeNotification, IDeletedNodeNotification, IAnnotationNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -490,7 +522,8 @@ public record AnnotationMovedFromOtherParentNotification(
     IWritableNode MovedAnnotation,
     IWritableNode OldParent,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IAnnotationNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
@@ -509,7 +542,8 @@ public record AnnotationMovedInSameParentNotification(
     IWritableNode Parent,
     Index OldIndex,
     IndexOffset IndexOffset,
-    INotificationId NotificationId) : APartitionNotification(NotificationId)
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IAnnotationNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -530,7 +564,8 @@ public record AnnotationMovedAndReplacedFromOtherParentNotification(
     IWritableNode OldParent,
     Index OldIndex,
     IWritableNode ReplacedAnnotation,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IDeletedNodeNotification, IAnnotationNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [NewParent, OldParent];
@@ -559,7 +594,8 @@ public record AnnotationMovedAndReplacedInSameParentNotification(
     Index OldIndex,
     IndexOffset IndexOffset,
     IWritableNode ReplacedAnnotation,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IDeletedNodeNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IDeletedNodeNotification, IAnnotationNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -598,7 +634,8 @@ public record ReferenceAddedNotification(
     Reference Reference,
     Index Index,
     IReferenceTarget NewTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IReferenceNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IReferenceNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -619,7 +656,8 @@ public record ReferenceDeletedNotification(
     Reference Reference,
     Index Index,
     IReferenceTarget DeletedTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IReferenceNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IReferenceNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
@@ -642,7 +680,8 @@ public record ReferenceChangedNotification(
     Index Index,
     IReferenceTarget NewTarget,
     IReferenceTarget OldTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId), IReferenceNotification
+    INotificationId NotificationId
+) : APartitionNotification(NotificationId), IReferenceNotification
 {
     /// <inheritdoc />
     public override HashSet<IReadableNode> AffectedNodes => [Parent];
