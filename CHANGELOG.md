@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.x.y] - tbd
+## [0.6.0] - 2026-07-14
 ### Added
 * Added `IGlobalM2Cache`, defaults to unset. If available, used by `M2Extensions`.
 * Added `ReusableDeserializer` to avoid initialization effort during delta deserialization.

@@ -35,9 +35,10 @@ public interface IGlobalM2Cache
 
     /// <summary>
     /// Enables the cache.
-    /// No-op if already enabled. 
+    /// No-op if already enabled.
+    /// <returns>The current or created cache instance.</returns>
     /// </summary>
-    static void Enable() =>
+    static IGlobalM2Cache Enable() =>
         Instance ??= new M2Cache();
 
     /// <summary>
