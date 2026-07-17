@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener.Single;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener.Single;
 
 [TestClass]
 public class RemoveTests
@@ -32,12 +32,12 @@ public class RemoveTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceDeletedNotification>();
     }
 
     [TestMethod]
@@ -48,13 +48,13 @@ public class RemoveTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() =>
             materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { }));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceDeletedNotification>();
     }
 
     [TestMethod]
@@ -66,12 +66,12 @@ public class RemoveTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceDeletedNotification>();
     }
 
     [TestMethod]
@@ -82,12 +82,12 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceDeletedNotification>();
     }
 
     [TestMethod]
@@ -98,12 +98,12 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceDeletedNotification>();
     }
 
     [TestMethod]
@@ -115,19 +115,16 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [line, circle] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
@@ -139,19 +136,16 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [line, circle] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
@@ -163,19 +157,16 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [circle, line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
@@ -187,19 +178,16 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [circle, line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
@@ -212,19 +200,16 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [circleA, line, circleB] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
@@ -237,18 +222,15 @@ public class RemoveTests
         var materialGroup = new MaterialGroup("cs") { Materials = [circleA, line, circleB] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.DeletedTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circleA, circleB});
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
 }

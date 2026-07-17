@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional.Listener;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional.Listener;
 
 [TestClass]
 public class MultipleCollectionTests
@@ -32,19 +32,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.AddShapes(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
 
     [TestMethod]
@@ -55,19 +56,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
 
     #region Insert
@@ -80,19 +82,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new List<IShape> { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.InsertShapes(0, values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
 
     [TestMethod]
@@ -105,19 +108,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(1 + notifications, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.InsertShapes(1, values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(2, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
 
     #endregion
@@ -133,19 +137,20 @@ public class MultipleCollectionTests
         var values = new List<IShape> { valueA, valueB };
         parent.AddShapes(values);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(0, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
 
     [TestMethod]
@@ -158,12 +163,12 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceDeletedNotification>();
     }
 
     [TestMethod]
@@ -175,19 +180,16 @@ public class MultipleCollectionTests
         var valueA = new Line("sA");
         var values = new IShape[] { valueA, circleA };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(circleA), args.DeletedTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(circleA), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
@@ -198,19 +200,20 @@ public class MultipleCollectionTests
         var parent = new ReferenceGeometry("g") { Shapes = [valueA, valueB] };
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(0, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
 
     [TestMethod]
@@ -222,19 +225,20 @@ public class MultipleCollectionTests
         var parent = new ReferenceGeometry("g") { Shapes = [circle, valueA, valueB] };
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
 
     [TestMethod]
@@ -247,19 +251,20 @@ public class MultipleCollectionTests
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, valueA, valueB, circleB] };
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
 
     [TestMethod]
@@ -272,20 +277,20 @@ public class MultipleCollectionTests
         var parent = new ReferenceGeometry("g") { Shapes = [valueA, circleA, valueB, circleB] };
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        int[] indexes = { 0, 1 };
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(indexes[notifications], args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(values[notifications]), args.DeletedTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.OfType<ReferenceDeletedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
 
     #endregion

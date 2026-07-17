@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener.Single;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener.Single;
 
 [TestClass]
 public class InsertTests
@@ -33,19 +33,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.InsertMaterials(0, [line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -57,19 +54,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line, circle });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -81,19 +75,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.InsertMaterials(1, [line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -105,19 +96,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circle, line });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -130,19 +118,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.InsertMaterials(0, [line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -155,19 +140,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line, circleA, circleB });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -180,19 +162,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.InsertMaterials(1, [line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -205,19 +184,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circleA, line, circleB });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -230,19 +206,16 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(2, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.InsertMaterials(2, [line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(2, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 
     [TestMethod]
@@ -255,18 +228,15 @@ public class InsertTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(materialGroup, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(2, args.Index);
-            Assert.AreEqual(ReferenceTarget.FromNode(line), args.NewTarget);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circleA, circleB, line });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        Assert.AreSame(materialGroup, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreEqual(2, notifications[0].Index);
+        Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
 }
