@@ -28,6 +28,8 @@ using System.Collections.Immutable;
 /// </summary>
 public interface IGlobalM2Cache
 {
+    protected static readonly object _lockObject = new();
+
     /// <summary>
     /// Instance of the cache, if available.
     /// </summary>
@@ -38,18 +40,26 @@ public interface IGlobalM2Cache
     /// No-op if already enabled.
     /// <returns>The current or created cache instance.</returns>
     /// </summary>
-    static IGlobalM2Cache Enable() =>
-        Instance ??= new M2Cache();
+    static IGlobalM2Cache Enable()
+    {
+        lock (_lockObject)
+        {
+            return Instance ??= new M2Cache();
+        }
+    }
 
     /// <summary>
     /// Disables the cache.
     /// </summary>
     static void Disable()
     {
-        if (Instance is IDisposable disposable)
-            disposable.Dispose();
+        lock (_lockObject)
+        {
+            if (Instance is IDisposable disposable)
+                disposable.Dispose();
 
-        Instance = null;
+            Instance = null;
+        }
     }
 
     /// <inheritdoc cref="M2Extensions.FindByKey{T}"/>
