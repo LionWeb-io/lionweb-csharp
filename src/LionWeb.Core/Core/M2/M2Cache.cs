@@ -22,6 +22,7 @@ using System.Collections.Immutable;
 
 public class M2Cache : IGlobalM2Cache
 {
+    private readonly object _lockObject = new();
     private readonly Dictionary<(Language, MetaPointerKey), IKeyed> _keyed = [];
     private readonly Dictionary<Classifier, IImmutableSet<Feature>> _allFeatures = [];
     private readonly Dictionary<Classifier, IImmutableSet<Classifier>> _allGeneralizations = [];
@@ -76,27 +77,30 @@ public class M2Cache : IGlobalM2Cache
     /// <inheritdoc />
     public void Clear()
     {
-        _keyed.Clear();
-        _allFeatures.Clear();
-        _allGeneralizations.Clear();
-        _allSpecializations.Clear();
-        _directGeneralizations.Clear();
-        _directSpecializations.Clear();
-        _features.Clear();
-        _fields.Clear();
-        _literals.Clear();
+        lock (_lockObject)
+        {
+            _keyed.Clear();
+            _allFeatures.Clear();
+            _allGeneralizations.Clear();
+            _allSpecializations.Clear();
+            _directGeneralizations.Clear();
+            _directSpecializations.Clear();
+            _features.Clear();
+            _fields.Clear();
+            _literals.Clear();
+        }
     }
 
     /// <inheritdoc />
     public void Register(IEnumerable<Language> languages)
     {
-        PopulateDirectRelations(languages);
-
-        PopulateAllGeneralizationsAndFeatures();
-
-        PopulateDirectSpecializations();
-
-        PopulateAllSpecializations();
+        lock (_lockObject)
+        {
+            PopulateDirectRelations(languages);
+            PopulateAllGeneralizationsAndFeatures();
+            PopulateDirectSpecializations();
+            PopulateAllSpecializations();
+        }
     }
 
     private void PopulateDirectRelations(IEnumerable<Language> languages)

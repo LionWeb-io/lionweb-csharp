@@ -31,7 +31,7 @@ public class ClearTests
     {
         var cache = new M2Cache();
 
-        var fields = cache.GetType().GetRuntimeFields().ToList();
+        var fields = cache.GetType().GetRuntimeFields().Where(f => !f.FieldType.IsEquivalentTo(typeof(object))).ToList();
         Assert.IsNotEmpty(fields);
         
         foreach (var field in fields)
