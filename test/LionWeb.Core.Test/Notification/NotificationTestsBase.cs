@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification;
+using LionWeb.Core.M1;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Pipe;
+using LionWeb.Core.Utilities;
 
-using Core.Notification;
-using Core.Notification.Pipe;
-using Core.Utilities;
-using M1;
+namespace LionWeb.Core.Test.Notification;
 
 public abstract class NotificationTestsBase
 {
@@ -72,26 +72,4 @@ public class NotificationObserver : NotificationPipeBase, INotificationReceiver
 internal class NotificationForwarder : NotificationPipeBase, INotificationProducer
 {
     public void ProduceNotification(INotification notification) => Send(notification);
-}
-
-
-[Obsolete("Will be removed after tests are refactored with proper ConnectTo() calls")]
-public static class NotificationExtensions
-{
-    // TODO: Replace tests by proper ConnectTo() calls
-    public static void Subscribe<T>(this INotificationSender sender, Action<object?, T> handler) =>
-        sender.ConnectTo(new FilteredReceiver<T>(handler));
-}
-
-[Obsolete("Will be removed after tests are refactored with proper ConnectTo() calls")]
-internal class FilteredReceiver<T>(Action<object?, T> handler) : INotificationReceiver
-{
-    public bool Handles(params Type[] notificationTypes) =>
-        notificationTypes.Any(t => typeof(T).IsAssignableFrom(t));
-
-    public void Receive(INotificationSender correspondingSender, INotification notification)
-    {
-        if (notification is T t)
-            handler.Invoke(correspondingSender, t);
-    }
 }
