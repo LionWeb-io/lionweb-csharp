@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.Listener;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.Listener;
 
 [TestClass]
 public class EmptyCollectionTests
@@ -31,12 +31,12 @@ public class EmptyCollectionTests
         var parent = new Geometry("g") { Shapes = [compositeShape] };
         var values = new IShape[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.AddParts(values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ChildAddedNotification>();
     }
 
     [TestMethod]
@@ -45,14 +45,14 @@ public class EmptyCollectionTests
         var compositeShape = new CompositeShape("cs");
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         var values = new IShape[0];
         Assert.ThrowsExactly<InvalidValueException>(
             () => compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ChildAddedNotification>();
     }
 
     [TestMethod]
@@ -62,12 +62,12 @@ public class EmptyCollectionTests
         var parent = new Geometry("g") { Shapes = [compositeShape] };
         var values = new IShape[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.InsertParts(0, values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ChildAddedNotification>();
     }
 
     [TestMethod]
@@ -77,18 +77,12 @@ public class EmptyCollectionTests
         var parent = new Geometry("g") { Shapes = [compositeShape] };
         var values = new IShape[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertEmpty();
     }
 
     [TestMethod]
@@ -99,18 +93,13 @@ public class EmptyCollectionTests
         var value = new Circle("myId");
         compositeShape.AddParts([value]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         var values = new List<Coord>();
         Assert.ThrowsExactly<InvalidValueException>(
             () => compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertEmpty();
     }
 }

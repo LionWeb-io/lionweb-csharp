@@ -15,11 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Required.Listener;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Required.Listener;
 
 [TestClass]
 public class NullTests
@@ -30,17 +29,12 @@ public class NullTests
         var offsetDuplicate = new OffsetDuplicate("od");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertEmpty();
     }
 
     [TestMethod]
@@ -49,16 +43,11 @@ public class NullTests
         var offsetDuplicate = new OffsetDuplicate("od") { Offset = new Coord("myId") };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertEmpty();
     }
 }
