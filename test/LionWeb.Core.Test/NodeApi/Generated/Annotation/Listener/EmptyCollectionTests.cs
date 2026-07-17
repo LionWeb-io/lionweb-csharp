@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener;
 
 [TestClass]
 public class EmptyCollectionTests
@@ -31,12 +31,12 @@ public class EmptyCollectionTests
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.AddAnnotations(values);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationAddedNotification>();
     }
 
     [TestMethod]
@@ -46,12 +46,12 @@ public class EmptyCollectionTests
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, values);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationAddedNotification>();
     }
 
     [TestMethod]
@@ -61,12 +61,12 @@ public class EmptyCollectionTests
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.InsertAnnotations(0, values);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationAddedNotification>();
     }
 
     [TestMethod]
@@ -76,12 +76,12 @@ public class EmptyCollectionTests
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationDeletedNotification>();
     }
 
 
@@ -94,17 +94,14 @@ public class EmptyCollectionTests
         line.AddAnnotations([bom]);
         var values = new List<BillOfMaterials>();
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, values);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 }

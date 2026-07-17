@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener.Single;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener.Single;
 
 [TestClass]
 public class RemoveTests
@@ -31,12 +31,12 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         var bom = new BillOfMaterials("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationDeletedNotification>();
     }
 
     [TestMethod]
@@ -48,12 +48,12 @@ public class RemoveTests
         line.AddAnnotations([doc]);
         var bom = new BillOfMaterials("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationDeletedNotification>();
     }
 
     [TestMethod]
@@ -64,18 +64,15 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -86,18 +83,15 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> {  });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -109,18 +103,15 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom, doc]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -132,18 +123,15 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom, doc]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { doc });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -155,18 +143,15 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([doc, bom]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -178,18 +163,15 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([doc, bom]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { doc });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -202,18 +184,15 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([docA, bom, docB]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -226,17 +205,14 @@ public class RemoveTests
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([docA, bom, docB]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(bom, args.DeletedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { docA, docB });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
     }
 }
