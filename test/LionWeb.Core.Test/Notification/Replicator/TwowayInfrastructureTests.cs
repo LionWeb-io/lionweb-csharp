@@ -15,14 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification;
-
-using Core.Notification;
-using Core.Notification.Partition;
-using Core.Notification.Pipe;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Replicator;
 using System.Reflection;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Pipe;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification.Replicator;
+
+namespace LionWeb.Core.Test.Notification;
 
 [TestClass]
 public class TwowayInfrastructureTests : TwowayReplicatorTestsBase
@@ -38,18 +37,18 @@ public class TwowayInfrastructureTests : TwowayReplicatorTestsBase
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
-        int nodeCount = 0;
-        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
+        var nodeObserver = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(nodeObserver);
 
-        int cloneCount = 0;
-        clone.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
+        var cloneObserver = new NotificationObserver();
+        clone.GetNotificationSender()!.ConnectTo(cloneObserver);
 
         circle.Name = "Hello";
         cloneCircle.Name = "World";
 
         AssertEquals([node], [clone]);
-        Assert.AreEqual(2, nodeCount);
-        Assert.AreEqual(2, cloneCount);
+        Assert.AreEqual(2, nodeObserver.Count);
+        Assert.AreEqual(2, cloneObserver.Count);
     }
 
     [TestMethod]

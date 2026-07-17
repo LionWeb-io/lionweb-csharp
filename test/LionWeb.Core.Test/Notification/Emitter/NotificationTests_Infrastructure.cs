@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
+namespace LionWeb.Core.Test.Notification;
 
 [TestClass]
 public class NotificationTests_Infrastructure
@@ -39,9 +39,8 @@ public class NotificationTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => { } );
-        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => { });
-        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => { });
+        var observer = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(observer);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -55,15 +54,14 @@ public class NotificationTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        int addedCount = 0;
-        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
-        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => {});
+        var observer = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(observer);
 
         circle.Name = "Hello";
         circle.Name = "World";
         
         Assert.AreEqual("World", circle.Name);
-        Assert.AreEqual(1, addedCount);
+        observer.OfType<PropertyAddedNotification>(1);
     }
 
     [TestMethod]
@@ -72,21 +70,15 @@ public class NotificationTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        int addedCount = 0;
-        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
-        
-        int changedCount = 0;
-        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
-
-        int allCount = 0;
-        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => allCount++);
+        var observer = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(observer);
 
         circle.Name = "Hello";
         circle.Name = "World";
         
         Assert.AreEqual("World", circle.Name);
-        Assert.AreEqual(1, addedCount);
-        Assert.AreEqual(1, changedCount);
-        Assert.AreEqual(2, allCount);
+        Assert.AreEqual(2, observer.Count);
+        observer.OfType<PropertyAddedNotification>(1);
+        observer.OfType<PropertyChangedNotification>(1);
     }
 }
