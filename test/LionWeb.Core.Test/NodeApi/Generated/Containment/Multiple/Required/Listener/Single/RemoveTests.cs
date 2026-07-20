@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.Listener.Single;
@@ -27,14 +27,14 @@ public class RemoveTests
     [TestMethod]
     public void Empty()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var parentNode = new LinkTestConcept("cs");
+        var partition = new TestPartition("g") { Links = [parentNode] };
+        var child = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => parentNode.RemoveContainment_1_n([child]));
 
         observer.AssertNone<ChildDeletedNotification>();
     }
@@ -42,15 +42,15 @@ public class RemoveTests
     [TestMethod]
     public void Empty_Reflective()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var parentNode = new LinkTestConcept("cs");
+        var partition = new TestPartition("g") { Links = [parentNode] };
+        var child = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { }));
+            parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { }));
 
         observer.AssertNone<ChildDeletedNotification>();
     }
@@ -58,15 +58,15 @@ public class RemoveTests
     [TestMethod]
     public void NotContained()
     {
-        var circle = new Circle("myC");
-        var compositeShape = new CompositeShape("cs") { Parts = [circle] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var line = new Line("myId");
+        var childA = new LinkTestConcept("myC");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [childA] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
+        var child = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        compositeShape.RemoveParts([line]);
+        parentNode.RemoveContainment_1_n([child]);
 
         observer.AssertNone<ChildDeletedNotification>();
     }
@@ -74,14 +74,14 @@ public class RemoveTests
     [TestMethod]
     public void Only()
     {
-        var line = new Line("myId");
-        var compositeShape = new CompositeShape("cs") { Parts = [line] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var child = new LinkTestConcept("myId");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [child] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts([line]));
+        Assert.ThrowsExactly<InvalidValueException>(() => parentNode.RemoveContainment_1_n([child]));
 
         observer.AssertNone<ChildDeletedNotification>();
     }
@@ -89,122 +89,122 @@ public class RemoveTests
     [TestMethod]
     public void First()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var compositeShape = new CompositeShape("cs") { Parts = [line, circle] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var childA = new LinkTestConcept("cId");
+        var child = new LinkTestConcept("myId");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [child, childA] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        compositeShape.RemoveParts([line]);
+        parentNode.RemoveContainment_1_n([child]);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
-        Assert.AreSame(compositeShape, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
+        Assert.AreSame(parentNode, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(line, notifications[0].DeletedChild);
+        Assert.AreEqual(child, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void First_Reflective()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var compositeShape = new CompositeShape("cs") { Parts = [line, circle] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var childA = new LinkTestConcept("cId");
+        var child = new LinkTestConcept("myId");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [child, childA] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle });
+        parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { childA });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
-        Assert.AreSame(compositeShape, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
+        Assert.AreSame(parentNode, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(line, notifications[0].DeletedChild);
+        Assert.AreEqual(child, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void Last()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circle, line] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var childA = new LinkTestConcept("cId");
+        var child = new LinkTestConcept("myId");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [childA, child] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        compositeShape.RemoveParts([line]);
+        parentNode.RemoveContainment_1_n([child]);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
-        Assert.AreSame(compositeShape, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
+        Assert.AreSame(parentNode, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(line, notifications[0].DeletedChild);
+        Assert.AreEqual(child, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void Last_Reflective()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circle, line] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var childA = new LinkTestConcept("cId");
+        var child = new LinkTestConcept("myId");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [childA, child] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle });
+        parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { childA });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
-        Assert.AreSame(compositeShape, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
+        Assert.AreSame(parentNode, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(line, notifications[0].DeletedChild);
+        Assert.AreEqual(child, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var childA = new LinkTestConcept("cIdA");
+        var childB = new LinkTestConcept("cIdB");
+        var child = new LinkTestConcept("myId");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [childA, child, childB] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        compositeShape.RemoveParts([line]);
+        parentNode.RemoveContainment_1_n([child]);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
-        Assert.AreSame(compositeShape, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
+        Assert.AreSame(parentNode, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(line, notifications[0].DeletedChild);
+        Assert.AreEqual(child, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void Between_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var compositeShape = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var childA = new LinkTestConcept("cIdA");
+        var childB = new LinkTestConcept("cIdB");
+        var child = new LinkTestConcept("myId");
+        var parentNode = new LinkTestConcept("cs") { Containment_1_n = [childA, child, childB] };
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB });
+        parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { childA, childB });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
-        Assert.AreSame(compositeShape, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
+        Assert.AreSame(parentNode, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(line, notifications[0].DeletedChild);
+        Assert.AreEqual(child, notifications[0].DeletedChild);
     }
 }
