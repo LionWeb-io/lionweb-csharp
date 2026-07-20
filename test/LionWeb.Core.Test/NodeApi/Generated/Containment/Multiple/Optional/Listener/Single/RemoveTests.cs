@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional.Listener.Single;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional.Listener.Single;
 
 [TestClass]
 public class RemoveTests
@@ -30,12 +30,12 @@ public class RemoveTests
         var parent = new Geometry("g");
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ChildDeletedNotification>();
     }
 
     [TestMethod]
@@ -45,12 +45,12 @@ public class RemoveTests
         var parent = new Geometry("cs") { Shapes = [circle] };
         var line = new Line("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ChildDeletedNotification>();
     }
 
     [TestMethod]
@@ -59,19 +59,16 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [line] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 
     [TestMethod]
@@ -80,19 +77,16 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [line] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 
     [TestMethod]
@@ -102,19 +96,16 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 
     [TestMethod]
@@ -124,19 +115,16 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 
     [TestMethod]
@@ -146,19 +134,16 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 
     [TestMethod]
@@ -168,19 +153,16 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 
     [TestMethod]
@@ -191,19 +173,16 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [circleA, line, circleB] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 
     [TestMethod]
@@ -214,18 +193,15 @@ public class RemoveTests
         var line = new Line("myId");
         var parent = new Geometry("g") { Shapes = [circleA, line, circleB] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(line, args.DeletedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, circleB });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(line, notifications[0].DeletedChild);
     }
 }

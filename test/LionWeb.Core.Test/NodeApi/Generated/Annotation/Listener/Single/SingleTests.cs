@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener.Single;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Languages.Generated.V2024_1.TestLanguage;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener.Single;
 
 [TestClass]
 public class SingleTests
@@ -32,18 +32,15 @@ public class SingleTests
         var parent = new Geometry("parent") { Shapes = [line] };
         var bom = new BillOfMaterials("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(bom, args.NewAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
@@ -53,18 +50,15 @@ public class SingleTests
         var parent = new Geometry("parent") { Shapes = [line] };
         var bom = new BillOfMaterials("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(bom, args.NewAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { bom });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(bom, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
@@ -77,21 +71,18 @@ public class SingleTests
         oldParent.AddAnnotations([new TestAnnotation("doc"), bom]);
 
         var partition = new TestPartition("partition") { Links = [parent, oldParent] };
-        
-        int notifications = 0;
-        partition.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreEqual(1, args.OldIndex);
-            Assert.AreSame(line, args.NewParent);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(bom, args.MovedAnnotation);
-        });
+
+        var observer = new NotificationObserver();
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationMovedFromOtherParentNotification>(1);
+        Assert.AreSame(oldParent, notifications[0].OldParent);
+        Assert.AreEqual(1, notifications[0].OldIndex);
+        Assert.AreSame(line, notifications[0].NewParent);
+        Assert.AreEqual(0, notifications[0].NewIndex);
+        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
@@ -102,23 +93,20 @@ public class SingleTests
         var bom = new TestAnnotation("myId");
         var oldParent = new LinkTestConcept("oldParent");
         oldParent.AddAnnotations([new TestAnnotation("doc"), bom]);
-        
+
         var partition = new TestPartition("partition") { Links = [parent, oldParent] };
 
-        int notifications = 0;
-        partition.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(oldParent, args.OldParent);
-            Assert.AreEqual(1, args.OldIndex);
-            Assert.AreSame(line, args.NewParent);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(bom, args.MovedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { bom });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationMovedFromOtherParentNotification>(1);
+        Assert.AreSame(oldParent, notifications[0].OldParent);
+        Assert.AreEqual(1, notifications[0].OldIndex);
+        Assert.AreSame(line, notifications[0].NewParent);
+        Assert.AreEqual(0, notifications[0].NewIndex);
+        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
@@ -129,19 +117,16 @@ public class SingleTests
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([bom, new Documentation("doc")]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.NewIndex);
-            Assert.AreEqual(bom, args.MovedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationMovedInSameParentNotification>(1);
+        Assert.AreEqual(0, notifications[0].OldIndex);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].NewIndex);
+        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
@@ -153,19 +138,16 @@ public class SingleTests
         var doc = new Documentation("doc");
         line.AddAnnotations([bom, doc]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.NewIndex);
-            Assert.AreEqual(bom, args.MovedAnnotation);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { doc, bom });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationMovedInSameParentNotification>(1);
+        Assert.AreEqual(0, notifications[0].OldIndex);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].NewIndex);
+        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
@@ -176,12 +158,12 @@ public class SingleTests
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([new Documentation("doc"), bom]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationMovedInSameParentNotification>();
     }
 
     [TestMethod]
@@ -193,11 +175,11 @@ public class SingleTests
         var doc = new Documentation("doc");
         line.AddAnnotations([doc, bom]);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { doc, bom });
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationMovedInSameParentNotification>();
     }
 }

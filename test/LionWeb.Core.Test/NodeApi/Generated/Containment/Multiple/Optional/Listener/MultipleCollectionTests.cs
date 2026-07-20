@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional.Listener;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional.Listener;
 
 [TestClass]
 public class MultipleCollectionTests
@@ -32,19 +32,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(values[notifications], args.NewChild);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.AddShapes(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].NewChild);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].NewChild);
     }
 
     [TestMethod]
@@ -55,19 +56,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(values[notifications], args.NewChild);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].NewChild);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].NewChild);
     }
 
     #region Insert
@@ -80,19 +82,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(values[notifications], args.NewChild);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.InsertShapes(0, values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].NewChild);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].NewChild);
     }
 
     [TestMethod]
@@ -103,19 +106,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(notifications, args.Index);
-            Assert.AreEqual(values[notifications], args.NewChild);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].NewChild);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].NewChild);
     }
 
     [TestMethod]
@@ -128,19 +132,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(1 + notifications, args.Index);
-            Assert.AreEqual(values[notifications], args.NewChild);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.InsertShapes(1, values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].NewChild);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreEqual(2, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].NewChild);
     }
 
     [TestMethod]
@@ -153,19 +158,20 @@ public class MultipleCollectionTests
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
-            Assert.AreEqual(1 + notifications, args.Index);
-            Assert.AreEqual(values[notifications], args.NewChild);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, valueA, valueB, circleB });
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].NewChild);
+        Assert.AreSame(parent, notifications[1].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreEqual(2, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].NewChild);
     }
 
     #endregion

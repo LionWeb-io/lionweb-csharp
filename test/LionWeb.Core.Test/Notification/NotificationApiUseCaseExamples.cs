@@ -15,14 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification;
+using LionWeb.Core.M1;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Forest;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Notification.Pipe;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 
-using Core.Notification;
-using Core.Notification.Forest;
-using Core.Notification.Partition;
-using Core.Notification.Pipe;
-using Languages.Generated.V2024_1.Shapes.M2;
-using M1;
+namespace LionWeb.Core.Test.Notification;
 
 [TestClass]
 public class NotificationApiUseCaseExamples : NotificationTestsBase
@@ -34,17 +34,13 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     {
         var partition = new Geometry("geo");
 
-        int notificationCount = 0;
+        var observer = new NotificationObserver();
         var sender = partition.GetNotificationSender();
-        sender!.Subscribe<IPartitionNotification>((_, notification) =>
-        {
-            notificationCount++;
-            Console.WriteLine(notification);
-        });
+        sender!.ConnectTo(observer);
 
         partition.Documentation = new Documentation("added");
 
-        Assert.AreEqual(1, notificationCount);
+        Assert.AreEqual(1, observer.Count);
     }
 
 

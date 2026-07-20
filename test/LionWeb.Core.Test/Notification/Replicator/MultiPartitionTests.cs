@@ -15,11 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification.Replicator;
-
-using Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Notification.Partition;
-using NotificationId = string;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
+
+namespace LionWeb.Core.Test.Notification.Replicator;
 
 [TestClass]
 public class MultiPartitionTests : ReplicatorTestsBase
@@ -39,13 +38,15 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> deletions = [];
-        node.GetNotificationSender()!.Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
-        List<(NotificationId, IReadableNode)> moves = [];
-        node.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
+        var observer = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(observer);
 
         node.AddLinks([moved]);
+
+        var deletions = observer.Notifications.OfType<ChildDeletedNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.DeletedChild)).ToList();
+        var moves = observer.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
         Assert.IsFalse(deletions.Any());
@@ -70,14 +71,17 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
-        List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
+        var originObserver = new NotificationObserver();
+        originPartition.GetNotificationSender()!.ConnectTo(originObserver);
+        var destinationObserver = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(destinationObserver);
 
         node.AddLinks([moved]);
+
+        var originMoves = originObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
+        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -103,14 +107,17 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
-        List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
+        var originObserver = new NotificationObserver();
+        originPartition.GetNotificationSender()!.ConnectTo(originObserver);
+        var destinationObserver = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(destinationObserver);
 
         node.InsertLinks(0, [moved]);
+
+        var originMoves = originObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
+        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -128,13 +135,15 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> deletions = [];
-        node.GetNotificationSender()!.Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
-        List<(NotificationId, IReadableNode)> moves = [];
-        node.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
+        var observer = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(observer);
 
         node.Links[1].Containment_0_1 = moved;
+
+        var deletions = observer.Notifications.OfType<ChildDeletedNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.DeletedChild)).ToList();
+        var moves = observer.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
         Assert.IsFalse(deletions.Any());
@@ -158,14 +167,17 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
-        List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationSender()!
-            .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
+        var originObserver = new NotificationObserver();
+        originPartition.GetNotificationSender()!.ConnectTo(originObserver);
+        var destinationObserver = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(destinationObserver);
 
         node.Links[0].Containment_0_1 = moved;
+
+        var originMoves = originObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
+        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -195,14 +207,15 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> deletions = [];
-        node.GetNotificationSender()!
-            .Subscribe<AnnotationDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedAnnotation)));
-        List<(NotificationId, IReadableNode)> moves = [];
-        node.GetNotificationSender()!
-            .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
+        var observer = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(observer);
 
         node.AddAnnotations([moved]);
+
+        var deletions = observer.Notifications.OfType<AnnotationDeletedNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.DeletedAnnotation)).ToList();
+        var moves = observer.Notifications.OfType<AnnotationMovedFromOtherParentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedAnnotation)).ToList();
 
         AssertEquals([node], [clone]);
         Assert.IsFalse(deletions.Any());
@@ -228,15 +241,17 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationSender()!
-            .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
-        List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationSender()!
-            .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) =>
-                destinationMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
+        var originObserver = new NotificationObserver();
+        originPartition.GetNotificationSender()!.ConnectTo(originObserver);
+        var destinationObserver = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(destinationObserver);
 
         node.AddAnnotations([moved]);
+
+        var originMoves = originObserver.Notifications.OfType<AnnotationMovedFromOtherParentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedAnnotation)).ToList();
+        var destinationMoves = destinationObserver.Notifications.OfType<AnnotationMovedFromOtherParentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedAnnotation)).ToList();
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
@@ -263,15 +278,17 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         CreatePartitionReplicator(clone, node);
 
-        List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationSender()!
-            .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
-        List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationSender()!
-            .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) =>
-                destinationMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
+        var originObserver = new NotificationObserver();
+        originPartition.GetNotificationSender()!.ConnectTo(originObserver);
+        var destinationObserver = new NotificationObserver();
+        node.GetNotificationSender()!.ConnectTo(destinationObserver);
 
         node.InsertAnnotations(0, [moved]);
+
+        var originMoves = originObserver.Notifications.OfType<AnnotationMovedFromOtherParentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedAnnotation)).ToList();
+        var destinationMoves = destinationObserver.Notifications.OfType<AnnotationMovedFromOtherParentNotification>()
+            .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedAnnotation)).ToList();
 
         AssertEquals([node], [clone]);
         CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);

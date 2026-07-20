@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional.Listener;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional.Listener;
 
 [TestClass]
 public class SingleTests: NotificationTestsBase
@@ -30,19 +30,16 @@ public class SingleTests: NotificationTestsBase
         var parent = new Geometry("g");
         var doc = new Documentation("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(doc, args.NewChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Documentation = doc;
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(doc, notifications[0].NewChild);
     }
 
     [TestMethod]
@@ -51,19 +48,16 @@ public class SingleTests: NotificationTestsBase
         var parent = new Geometry("g");
         var doc = new Documentation("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(doc, args.NewChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.SetDocumentation(doc);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(doc, notifications[0].NewChild);
     }
 
     [TestMethod]
@@ -72,19 +66,16 @@ public class SingleTests: NotificationTestsBase
         var parent = new Geometry("g");
         var doc = new Documentation("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(doc, args.NewChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(doc, notifications[0].NewChild);
     }
 
     [TestMethod]
@@ -164,21 +155,18 @@ public class SingleTests: NotificationTestsBase
         var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(doc, args.MovedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         offsetDuplicate.Docs = doc;
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreEqual(0, notifications[0].OldIndex);
+        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreEqual(0, notifications[0].NewIndex);
+        Assert.AreEqual(doc, notifications[0].MovedChild);
     }
 
     [TestMethod]
@@ -188,21 +176,18 @@ public class SingleTests: NotificationTestsBase
         var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(doc, args.MovedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreEqual(0, notifications[0].OldIndex);
+        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreEqual(0, notifications[0].NewIndex);
+        Assert.AreEqual(doc, notifications[0].MovedChild);
     }
 
     [TestMethod]
@@ -213,22 +198,19 @@ public class SingleTests: NotificationTestsBase
         var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc, Docs = replacedDoc };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(doc, args.MovedChild);
-            Assert.AreEqual(replacedDoc, args.ReplacedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         offsetDuplicate.Docs = doc;
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreEqual(0, notifications[0].OldIndex);
+        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreEqual(0, notifications[0].NewIndex);
+        Assert.AreEqual(doc, notifications[0].MovedChild);
+        Assert.AreEqual(replacedDoc, notifications[0].ReplacedChild);
     }
 
     [TestMethod]
@@ -239,22 +221,19 @@ public class SingleTests: NotificationTestsBase
         var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc, Docs = replacedDoc };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
-            Assert.AreEqual(0, args.OldIndex);
-            Assert.AreSame(offsetDuplicate, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
-            Assert.AreEqual(0, args.NewIndex);
-            Assert.AreEqual(doc, args.MovedChild);
-            Assert.AreEqual(replacedDoc, args.ReplacedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreEqual(0, notifications[0].OldIndex);
+        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreEqual(0, notifications[0].NewIndex);
+        Assert.AreEqual(doc, notifications[0].MovedChild);
+        Assert.AreEqual(replacedDoc, notifications[0].ReplacedChild);
     }
 
     #region existing
@@ -266,20 +245,17 @@ public class SingleTests: NotificationTestsBase
         var parent = new Geometry("g") { Documentation = oldDoc };
         var doc = new Documentation("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(doc, args.NewChild);
-            Assert.AreEqual(oldDoc, args.ReplacedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Documentation = doc;
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildReplacedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(doc, notifications[0].NewChild);
+        Assert.AreEqual(oldDoc, notifications[0].ReplacedChild);
     }
 
     [TestMethod]
@@ -289,20 +265,17 @@ public class SingleTests: NotificationTestsBase
         var parent = new Geometry("g") { Documentation = oldDoc };
         var doc = new Documentation("myId");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(parent, args.Parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(doc, args.NewChild);
-            Assert.AreEqual(oldDoc, args.ReplacedChild);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<ChildReplacedNotification>(1);
+        Assert.AreSame(parent, notifications[0].Parent);
+        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(doc, notifications[0].NewChild);
+        Assert.AreEqual(oldDoc, notifications[0].ReplacedChild);
     }
 
     [TestMethod]
@@ -311,17 +284,12 @@ public class SingleTests: NotificationTestsBase
         var oldDoc = new Documentation("old");
         var parent = new Geometry("g") { Documentation = oldDoc };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Documentation = oldDoc;
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertEmpty();
     }
 
     [TestMethod]
@@ -330,17 +298,12 @@ public class SingleTests: NotificationTestsBase
         var oldDoc = new Documentation("old");
         var parent = new Geometry("g") { Documentation = oldDoc };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, oldDoc);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertEmpty();
     }
 
     #endregion

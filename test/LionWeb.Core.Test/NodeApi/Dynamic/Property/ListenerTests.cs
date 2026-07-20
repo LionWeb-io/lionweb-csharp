@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Dynamic.Property;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Dynamic.Property;
 
 [TestClass]
 public class ListenerTests : DynamicNodeTestsBase
@@ -30,18 +30,15 @@ public class ListenerTests : DynamicNodeTestsBase
         var doc = newDocumentation("d");
         parent.Set(Geometry_documentation, doc);
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(doc, args.Node);
-            Assert.AreSame(Documentation_text, args.Property);
-            Assert.AreEqual("hello", args.NewValue);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         doc.Set(Documentation_text, "hello");
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<PropertyAddedNotification>(1);
+        Assert.AreSame(doc, notifications[0].Node);
+        Assert.AreSame(Documentation_text, notifications[0].Property);
+        Assert.AreEqual("hello", notifications[0].NewValue);
     }
 
     [TestMethod]
@@ -52,18 +49,15 @@ public class ListenerTests : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
         doc.Set(Documentation_text, "hello");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(doc, args.Node);
-            Assert.AreSame(Documentation_text, args.Property);
-            Assert.AreEqual("hello", args.OldValue);
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
+
         doc.Set(Documentation_text, null);
 
-
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<PropertyDeletedNotification>(1);
+        Assert.AreSame(doc, notifications[0].Node);
+        Assert.AreSame(Documentation_text, notifications[0].Property);
+        Assert.AreEqual("hello", notifications[0].OldValue);
     }
 
     [TestMethod]
@@ -74,23 +68,17 @@ public class ListenerTests : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
         doc.Set(Documentation_text, "hello");
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<PropertyChangedNotification>((_, args) =>
-        {
-            notifications++;
-            Assert.AreSame(doc, args.Node);
-            Assert.AreSame(Documentation_text, args.Property);
-            Assert.AreEqual("hello", args.OldValue);
-            Assert.AreEqual("bye", args.NewValue);
-        });
-
-        int badNotifications = 0;
-        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
-        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         doc.Set(Documentation_text, "bye");
 
-        Assert.AreEqual(1, notifications);
-        Assert.AreEqual(0, badNotifications);
+        var notifications = observer.AssertOfType<PropertyChangedNotification>(1);
+        Assert.AreSame(doc, notifications[0].Node);
+        Assert.AreSame(Documentation_text, notifications[0].Property);
+        Assert.AreEqual("hello", notifications[0].OldValue);
+        Assert.AreEqual("bye", notifications[0].NewValue);
+        observer.AssertNone<PropertyAddedNotification>();
+        observer.AssertNone<PropertyDeletedNotification>();
     }
 }

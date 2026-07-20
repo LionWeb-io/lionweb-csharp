@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener;
 
 [TestClass]
 public class EmptyCollectionTests
@@ -32,12 +32,12 @@ public class EmptyCollectionTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.AddMaterials(values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceAddedNotification>();
     }
 
     [TestMethod]
@@ -48,12 +48,12 @@ public class EmptyCollectionTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() =>         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { }));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceAddedNotification>();
     }
 
     [TestMethod]
@@ -64,12 +64,12 @@ public class EmptyCollectionTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.InsertMaterials(0, values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceAddedNotification>();
     }
 
     [TestMethod]
@@ -80,12 +80,12 @@ public class EmptyCollectionTests
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceAddedNotification>();
     }
 
     [TestMethod]
@@ -98,12 +98,11 @@ public class EmptyCollectionTests
         materialGroup.AddMaterials([value]);
         var values = new List<Coord>();
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(
-            () => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<ReferenceDeletedNotification>();
     }
 }

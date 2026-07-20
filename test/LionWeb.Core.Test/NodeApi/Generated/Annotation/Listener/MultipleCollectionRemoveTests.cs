@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Notification;
 
-using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
+namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener;
 
 [TestClass]
 public class MultipleCollectionRemoveTests
@@ -34,18 +34,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([valueA, valueB]);
         var values = new List<INode>() { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(0, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -58,18 +58,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([valueA, valueB]);
         var values = new List<INode>() { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { });
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(0, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -81,12 +81,12 @@ public class MultipleCollectionRemoveTests
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationDeletedNotification>();
     }
 
     [TestMethod]
@@ -101,12 +101,12 @@ public class MultipleCollectionRemoveTests
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(0, notifications);
+        observer.AssertNone<AnnotationDeletedNotification>();
     }
 
     [TestMethod]
@@ -120,18 +120,15 @@ public class MultipleCollectionRemoveTests
         var valueA = new BillOfMaterials("sA");
         var values = new INode[] { valueA, docA };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(docA, args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(docA, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -145,18 +142,15 @@ public class MultipleCollectionRemoveTests
         var valueA = new BillOfMaterials("sA");
         var values = new INode[] { valueA, docA };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(docA, args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { docB });
 
-        Assert.AreEqual(1, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(docA, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -169,18 +163,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(0, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -193,18 +187,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> {  });
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(0, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -218,18 +212,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([doc, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -243,18 +237,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([doc, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { doc });
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -269,18 +263,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([docA, valueA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -295,18 +289,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([docA, valueA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { docA, docB });
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(1, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -321,19 +315,18 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([valueA, docA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        int[] indices = [0, 1];
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(indices[notifications], args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 
     [TestMethod]
@@ -348,18 +341,17 @@ public class MultipleCollectionRemoveTests
         line.AddAnnotations([valueA, docA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int notifications = 0;
-        int[] indices = [0, 1];
-        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
-        {
-            Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(indices[notifications], args.Index);
-            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
-            notifications++;
-        });
+        var observer = new NotificationObserver();
+        parent.GetNotificationSender()!.ConnectTo(observer);
 
         line.Set(null, new List<INode> { docA, docB });
 
-        Assert.AreEqual(2, notifications);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
+        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreEqual(0, notifications[0].Index);
+        Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
+        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreEqual(1, notifications[1].Index);
+        Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
 }

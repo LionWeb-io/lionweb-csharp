@@ -15,20 +15,20 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test;
+using LionWeb.Core;
+using LionWeb.Core.M1;
+using LionWeb.Core.M3;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Forest;
+using LionWeb.Core.Notification.Partition;
+using LionWeb.Core.Notification.Pipe;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
+using LionWeb.Core.Test.Notification;
+using LionWeb.Protocol.Delta.Client;
+using LionWeb.Protocol.Delta.Message.Command;
 
-using Core;
-using Core.M1;
-using Core.M3;
-using Core.Notification;
-using Core.Notification.Forest;
-using Core.Notification.Partition;
-using Core.Notification.Pipe;
-using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
-using Core.Test.Languages.Generated.V2024_1.TestLanguage;
-using Core.Test.Notification;
-using Delta.Client;
-using Message.Command;
+namespace LionWeb.Protocol.Delta.Test;
 
 public abstract class DeltaTestsBase: NotificationTestsBase
 {
@@ -97,11 +97,11 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
         var notificationToDeltaCommandMapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
         
-        originalSender.Subscribe<INotification>((sender, partitionNotification) =>
+        originalSender.ConnectTo(new ForwardingReceiver(notification =>
         {
-            var deltaCommand = notificationToDeltaCommandMapper.Map(partitionNotification);
+            var deltaCommand = notificationToDeltaCommandMapper.Map(notification);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
-        });
+        }));
     }
     
     /// <summary>
@@ -154,14 +154,23 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
         var notificationToDeltaCommandMapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
         
-        node.GetPartition()!.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
+        node.GetPartition()!.GetNotificationSender()!.ConnectTo(new ForwardingReceiver(notification =>
         {
-            var command = notificationToDeltaCommandMapper.Map(partitionNotification);
-            var json = deltaSerializer.Serialize(command);
-            var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
-            eventReceiver.Receive(commandToEventMapper.Map(deserialized));
-        });
+            if (notification is IPartitionNotification partitionNotification)
+            {
+                var command = notificationToDeltaCommandMapper.Map(partitionNotification);
+                var json = deltaSerializer.Serialize(command);
+                var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
+                eventReceiver.Receive(commandToEventMapper.Map(deserialized));
+            }
+        }));
 
         return clone;
+    }
+
+    private class ForwardingReceiver(Action<INotification> handler) : INotificationReceiver
+    {
+        public void Receive(INotificationSender correspondingSender, INotification notification) =>
+            handler(notification);
     }
 }
