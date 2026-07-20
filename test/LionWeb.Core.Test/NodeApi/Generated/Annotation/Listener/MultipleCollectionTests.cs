@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener;
@@ -27,22 +27,22 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.AddAnnotations(values);
+        child.AddAnnotations(values);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].NewAnnotation);
     }
@@ -50,22 +50,22 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array_Reflective()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, values);
+        child.Set(null, values);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].NewAnnotation);
     }
@@ -75,22 +75,22 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Empty()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(0, values);
+        child.InsertAnnotations(0, values);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].NewAnnotation);
     }
@@ -98,22 +98,22 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Empty_Reflective()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, values);
+        child.Set(null, values);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].NewAnnotation);
     }
@@ -121,25 +121,25 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Two_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(1, values);
+        child.InsertAnnotations(1, values);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(2, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].NewAnnotation);
     }
@@ -147,25 +147,25 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Two_Between_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, valueA, valueB, docB });
+        child.Set(null, new List<INode> { existingA, valueA, valueB, existingB });
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(2, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].NewAnnotation);
     }
