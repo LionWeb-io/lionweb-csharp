@@ -61,7 +61,8 @@ public class NotificationTests_Infrastructure
         circle.Name = "World";
         
         Assert.AreEqual("World", circle.Name);
-        observer.OfType<PropertyAddedNotification>(1);
+        Assert.AreEqual(2, observer.Count);
+        observer.OfTypeAmong<PropertyAddedNotification>(1);
     }
 
     [TestMethod]
@@ -78,7 +79,7 @@ public class NotificationTests_Infrastructure
         
         Assert.AreEqual("World", circle.Name);
         Assert.AreEqual(2, observer.Count);
-        observer.OfType<PropertyAddedNotification>(1);
-        observer.OfType<PropertyChangedNotification>(1);
+        observer.OfTypeAmong<PropertyAddedNotification>(1);
+        observer.OfTypeAmong<PropertyChangedNotification>(1);
     }
 }

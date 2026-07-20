@@ -25,10 +25,27 @@ namespace LionWeb.Core.Test.Notification;
 public static class NotificationListAssertExtensions
 {
     /// <summary>
-    /// Asserts that exactly <paramref name="count"/> notifications of type <typeparamref name="T"/> were received,
+    /// Asserts that <b>exactly</b> <paramref name="count"/> notifications were received, all of type <typeparamref name="T"/>,
     /// and returns them as a typed list.
+    /// Fails if any other notification types are present.
     /// </summary>
-    public static List<T> OfType<T>(this NotificationObserver observer, Index count) where T : INotification
+    public static List<T> OfType<T>(this NotificationObserver observer, int count) where T : INotification
+    {
+        var typed = observer.Notifications.OfType<T>().ToList();
+        Assert.AreEqual(count, typed.Count,
+            $"Expected {count} notification(s) of type {typeof(T).Name}, but got {typed.Count}. " +
+            $"All notifications: [{string.Join(", ", observer.Notifications.Select(n => n.GetType().Name))}]");
+        Assert.AreEqual(count, observer.Count,
+            $"Expected only {count} notification(s) of type {typeof(T).Name}, but observer has {observer.Count} total. " +
+            $"Unexpected: [{string.Join(", ", observer.Notifications.Where(n => n is not T).Select(n => n.GetType().Name))}]");
+        return typed;
+    }
+
+    /// <summary>
+    /// Asserts that exactly <paramref name="count"/> notifications of type <typeparamref name="T"/> were received
+    /// (other notification types may also be present), and returns them as a typed list.
+    /// </summary>
+    public static List<T> OfTypeAmong<T>(this NotificationObserver observer, int count) where T : INotification
     {
         var typed = observer.Notifications.OfType<T>().ToList();
         Assert.AreEqual(count, typed.Count,
