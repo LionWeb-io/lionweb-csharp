@@ -29,7 +29,7 @@ public static class NotificationListAssertExtensions
     /// and returns them as a typed list.
     /// Fails if any other notification types are present.
     /// </summary>
-    public static List<T> OfType<T>(this NotificationObserver observer, int count) where T : INotification
+    public static List<T> AssertOfType<T>(this NotificationObserver observer, int count) where T : INotification
     {
         var typed = observer.Notifications.OfType<T>().ToList();
         Assert.AreEqual(count, typed.Count,
@@ -45,7 +45,7 @@ public static class NotificationListAssertExtensions
     /// Asserts that exactly <paramref name="count"/> notifications of type <typeparamref name="T"/> were received
     /// (other notification types may also be present), and returns them as a typed list.
     /// </summary>
-    public static List<T> OfTypeAmong<T>(this NotificationObserver observer, int count) where T : INotification
+    public static List<T> AssertOfTypeAmong<T>(this NotificationObserver observer, int count) where T : INotification
     {
         var typed = observer.Notifications.OfType<T>().ToList();
         Assert.AreEqual(count, typed.Count,

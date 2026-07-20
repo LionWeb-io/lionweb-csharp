@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ public class RemoveTests
 
         materialGroup.RemoveMaterials([line]);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(materialGroup, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -141,7 +141,7 @@ public class RemoveTests
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(materialGroup, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -162,7 +162,7 @@ public class RemoveTests
 
         materialGroup.RemoveMaterials([line]);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(materialGroup, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -183,7 +183,7 @@ public class RemoveTests
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(materialGroup, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -205,7 +205,7 @@ public class RemoveTests
 
         materialGroup.RemoveMaterials([line]);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(materialGroup, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -227,7 +227,7 @@ public class RemoveTests
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circleA, circleB});
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(materialGroup, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);

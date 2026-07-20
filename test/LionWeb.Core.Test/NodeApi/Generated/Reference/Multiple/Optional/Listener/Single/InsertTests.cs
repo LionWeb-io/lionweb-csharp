@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class InsertTests
 
         parent.InsertShapes(0, [line]);
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -55,7 +55,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circle });
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -74,7 +74,7 @@ public class InsertTests
 
         parent.InsertShapes(1, [line]);
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -93,7 +93,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle, line });
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -113,7 +113,7 @@ public class InsertTests
 
         parent.InsertShapes(0, [line]);
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -133,7 +133,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circleA, circleB });
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -153,7 +153,7 @@ public class InsertTests
 
         parent.InsertShapes(1, [line]);
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -173,7 +173,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, line, circleB });
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -193,7 +193,7 @@ public class InsertTests
 
         parent.InsertShapes(2, [line]);
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(2, notifications[0].Index);
@@ -213,7 +213,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB, line });
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(2, notifications[0].Index);

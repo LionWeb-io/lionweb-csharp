@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class InsertTests
 
         line.InsertAnnotations(0, [bom]);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -57,7 +57,7 @@ public class InsertTests
 
         line.InsertAnnotations(0, [bom]);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -77,7 +77,7 @@ public class InsertTests
 
         line.Set(null, new List<INode> { bom, doc });
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -97,7 +97,7 @@ public class InsertTests
 
         line.InsertAnnotations(1, [bom]);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -117,7 +117,7 @@ public class InsertTests
 
         line.Set(null, new List<INode> { doc, bom });
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -138,7 +138,7 @@ public class InsertTests
 
         line.InsertAnnotations(0, [bom]);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -159,7 +159,7 @@ public class InsertTests
 
         line.Set(null, new List<INode> { bom, docA, docB });
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -180,7 +180,7 @@ public class InsertTests
 
         line.InsertAnnotations(1, [bom]);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -201,7 +201,7 @@ public class InsertTests
 
         line.Set(null, new List<INode> { docA, bom, docB });
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -222,7 +222,7 @@ public class InsertTests
 
         line.InsertAnnotations(2, [bom]);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -243,7 +243,7 @@ public class InsertTests
 
         line.Set(null, new List<INode> { docA, docB, bom });
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].NewAnnotation);
@@ -268,7 +268,7 @@ public class InsertTests
 
         line.InsertAnnotations(2, [bom]);
 
-        var notifications = observer.OfType<AnnotationMovedFromOtherParentNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationMovedFromOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreEqual(1, notifications[0].OldIndex);
         Assert.AreSame(line, notifications[0].NewParent);
@@ -295,7 +295,7 @@ public class InsertTests
 
         line.Set(null, new List<INode> { docA, docB, bom });
 
-        var notifications = observer.OfType<AnnotationMovedFromOtherParentNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationMovedFromOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreEqual(1, notifications[0].OldIndex);
         Assert.AreSame(line, notifications[0].NewParent);
@@ -318,7 +318,7 @@ public class InsertTests
 
         line.InsertAnnotations(2, [bom]);
 
-        var notifications = observer.OfType<AnnotationMovedInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationMovedInSameParentNotification>(1);
         Assert.AreEqual(1, notifications[0].OldIndex);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].NewIndex);
@@ -340,7 +340,7 @@ public class InsertTests
 
         line.Set(null, new List<INode> { docA, docB, bom });
 
-        var notifications = observer.OfType<AnnotationMovedInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationMovedInSameParentNotification>(1);
         Assert.AreEqual(1, notifications[0].OldIndex);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].NewIndex);

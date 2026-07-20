@@ -1,4 +1,4 @@
-﻿// Copyright 2025 TRUMPF Laser SE and other contributors
+// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public class NotificationTests_Infrastructure
         
         Assert.AreEqual("World", circle.Name);
         Assert.AreEqual(2, observer.Count);
-        observer.OfTypeAmong<PropertyAddedNotification>(1);
+        observer.AssertOfTypeAmong<PropertyAddedNotification>(1);
     }
 
     [TestMethod]
@@ -79,7 +79,7 @@ public class NotificationTests_Infrastructure
         
         Assert.AreEqual("World", circle.Name);
         Assert.AreEqual(2, observer.Count);
-        observer.OfTypeAmong<PropertyAddedNotification>(1);
-        observer.OfTypeAmong<PropertyChangedNotification>(1);
+        observer.AssertOfTypeAmong<PropertyAddedNotification>(1);
+        observer.AssertOfTypeAmong<PropertyChangedNotification>(1);
     }
 }

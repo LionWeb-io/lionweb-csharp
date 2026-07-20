@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class MultipleCollectionTests
 
         parent.AddShapes(values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -61,7 +61,7 @@ public class MultipleCollectionTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -87,7 +87,7 @@ public class MultipleCollectionTests
 
         parent.InsertShapes(0, values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -111,7 +111,7 @@ public class MultipleCollectionTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -137,7 +137,7 @@ public class MultipleCollectionTests
 
         parent.InsertShapes(1, values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -163,7 +163,7 @@ public class MultipleCollectionTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, valueA, valueB, circleB });
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);

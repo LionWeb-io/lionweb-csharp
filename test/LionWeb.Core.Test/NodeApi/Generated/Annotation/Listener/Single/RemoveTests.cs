@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class RemoveTests
 
         line.RemoveAnnotations([bom]);
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
@@ -88,7 +88,7 @@ public class RemoveTests
 
         line.Set(null, new List<INode> {  });
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
@@ -108,7 +108,7 @@ public class RemoveTests
 
         line.RemoveAnnotations([bom]);
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
@@ -128,7 +128,7 @@ public class RemoveTests
 
         line.Set(null, new List<INode> { doc });
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
@@ -148,7 +148,7 @@ public class RemoveTests
 
         line.RemoveAnnotations([bom]);
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
@@ -168,7 +168,7 @@ public class RemoveTests
 
         line.Set(null, new List<INode> { doc });
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
@@ -189,7 +189,7 @@ public class RemoveTests
 
         line.RemoveAnnotations([bom]);
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
@@ -210,7 +210,7 @@ public class RemoveTests
 
         line.Set(null, new List<INode> { docA, docB });
 
-        var notifications = observer.OfType<AnnotationDeletedNotification>(1);
+        var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(bom, notifications[0].DeletedAnnotation);

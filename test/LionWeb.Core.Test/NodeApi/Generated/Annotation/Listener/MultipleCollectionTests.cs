@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class MultipleCollectionTests
 
         line.AddAnnotations(values);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(2);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
@@ -61,7 +61,7 @@ public class MultipleCollectionTests
 
         line.Set(null, values);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(2);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
@@ -86,7 +86,7 @@ public class MultipleCollectionTests
 
         line.InsertAnnotations(0, values);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(2);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
@@ -109,7 +109,7 @@ public class MultipleCollectionTests
 
         line.Set(null, values);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(2);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
@@ -135,7 +135,7 @@ public class MultipleCollectionTests
 
         line.InsertAnnotations(1, values);
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(2);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);
@@ -161,7 +161,7 @@ public class MultipleCollectionTests
 
         line.Set(null, new List<INode> { docA, valueA, valueB, docB });
 
-        var notifications = observer.OfType<AnnotationAddedNotification>(2);
+        var notifications = observer.AssertOfType<AnnotationAddedNotification>(2);
         Assert.AreSame(line, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].NewAnnotation);

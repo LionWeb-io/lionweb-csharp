@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class ListenerTests
 
         source.AltSource = reference;
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -57,7 +57,7 @@ public class ListenerTests
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, reference);
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -78,7 +78,7 @@ public class ListenerTests
 
         source.AltSource = null;
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -99,7 +99,7 @@ public class ListenerTests
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, null);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -121,7 +121,7 @@ public class ListenerTests
 
         source.AltSource = newTarget;
 
-        var notifications = observer.OfType<ReferenceChangedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -146,7 +146,7 @@ public class ListenerTests
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, newTarget);
 
-        var notifications = observer.OfType<ReferenceChangedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -169,7 +169,7 @@ public class ListenerTests
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, reference);
 
-        var notifications = observer.OfType<ReferenceAddedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -226,7 +226,7 @@ public class ListenerTests
 
         source.Source = newTarget;
 
-        var notifications = observer.OfType<ReferenceChangedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -251,7 +251,7 @@ public class ListenerTests
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, newTarget);
 
-        var notifications = observer.OfType<ReferenceChangedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);

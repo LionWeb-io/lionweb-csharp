@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.AddShapes([line]);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -53,7 +53,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { line });
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -104,7 +104,7 @@ public class SingleTests: NotificationTestsBase
 
         compositeShape.AddParts([line]);
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(compositeShape, notifications[0].Parent);
@@ -125,7 +125,7 @@ public class SingleTests: NotificationTestsBase
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line });
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(compositeShape, notifications[0].Parent);
@@ -146,7 +146,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.AddShapes([line]);
 
-        var notifications = observer.OfType<ChildMovedInSameContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(1);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
@@ -166,7 +166,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle, line });
 
-        var notifications = observer.OfType<ChildMovedInSameContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(1);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);

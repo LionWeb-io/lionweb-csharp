@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ public class RemoveTests
 
         parent.RemoveShapes([line]);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -96,7 +96,7 @@ public class RemoveTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -115,7 +115,7 @@ public class RemoveTests
 
         parent.RemoveShapes([line]);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -134,7 +134,7 @@ public class RemoveTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
@@ -153,7 +153,7 @@ public class RemoveTests
 
         parent.RemoveShapes([line]);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -172,7 +172,7 @@ public class RemoveTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -192,7 +192,7 @@ public class RemoveTests
 
         parent.RemoveShapes([line]);
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
@@ -212,7 +212,7 @@ public class RemoveTests
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB });
 
-        var notifications = observer.OfType<ReferenceDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);

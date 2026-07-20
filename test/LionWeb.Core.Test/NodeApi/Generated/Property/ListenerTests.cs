@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class ListenerTests
 
         doc.Text = "hello";
 
-        var notifications = observer.OfType<PropertyAddedNotification>(1);
+        var notifications = observer.AssertOfType<PropertyAddedNotification>(1);
         Assert.AreSame(doc, notifications[0].Node);
         Assert.AreSame(ShapesLanguage.Instance.Documentation_text, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].NewValue);
@@ -55,7 +55,7 @@ public class ListenerTests
 
         doc.Text = null;
 
-        var notifications = observer.OfType<PropertyDeletedNotification>(1);
+        var notifications = observer.AssertOfType<PropertyDeletedNotification>(1);
         Assert.AreSame(doc, notifications[0].Node);
         Assert.AreSame(ShapesLanguage.Instance.Documentation_text, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].OldValue);
@@ -74,7 +74,7 @@ public class ListenerTests
 
         doc.Text = "bye";
 
-        var notifications = observer.OfType<PropertyChangedNotification>(1);
+        var notifications = observer.AssertOfType<PropertyChangedNotification>(1);
         Assert.AreSame(doc, notifications[0].Node);
         Assert.AreSame(ShapesLanguage.Instance.Documentation_text, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].OldValue);
@@ -95,7 +95,7 @@ public class ListenerTests
 
         circle.Uuid = "hello";
 
-        var notifications = observer.OfType<PropertyAddedNotification>(1);
+        var notifications = observer.AssertOfType<PropertyAddedNotification>(1);
         Assert.AreSame(circle, notifications[0].Node);
         Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].NewValue);
@@ -130,7 +130,7 @@ public class ListenerTests
 
         circle.Uuid = "bye";
 
-        var notifications = observer.OfType<PropertyChangedNotification>(1);
+        var notifications = observer.AssertOfType<PropertyChangedNotification>(1);
         Assert.AreSame(circle, notifications[0].Node);
         Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].OldValue);

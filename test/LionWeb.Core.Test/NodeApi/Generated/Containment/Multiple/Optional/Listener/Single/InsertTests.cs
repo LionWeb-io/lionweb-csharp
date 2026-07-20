@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class InsertTests
 
         parent.InsertShapes(0, [line]);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -54,7 +54,7 @@ public class InsertTests
 
         parent.InsertShapes(0, [line]);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -73,7 +73,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { line, circle });
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -92,7 +92,7 @@ public class InsertTests
 
         parent.InsertShapes(1, [line]);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -111,7 +111,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle, line });
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -131,7 +131,7 @@ public class InsertTests
 
         parent.InsertShapes(0, [line]);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -151,7 +151,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { line, circleA, circleB });
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -171,7 +171,7 @@ public class InsertTests
 
         parent.InsertShapes(1, [line]);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -191,7 +191,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, line, circleB });
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -211,7 +211,7 @@ public class InsertTests
 
         parent.InsertShapes(2, [line]);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(2, notifications[0].Index);
@@ -231,7 +231,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, circleB, line });
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
         Assert.AreEqual(2, notifications[0].Index);
@@ -252,7 +252,7 @@ public class InsertTests
 
         parent.InsertShapes(2, [line]);
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
@@ -276,7 +276,7 @@ public class InsertTests
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, circleB, line });
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
@@ -300,7 +300,7 @@ public class InsertTests
 
         compositeShape.InsertParts(1, [line]);
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(compositeShape, notifications[0].Parent);
@@ -323,7 +323,7 @@ public class InsertTests
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, line, circleB });
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(compositeShape, notifications[0].Parent);
@@ -348,7 +348,7 @@ public class InsertTests
 
         compositeShape.InsertParts(2, values);
 
-        var notifications = observer.OfType<ChildMovedInSameContainmentNotification>(2);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(2);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
@@ -377,7 +377,7 @@ public class InsertTests
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, lineA, circleB, lineB });
 
-        var notifications = observer.OfType<ChildMovedInSameContainmentNotification>(2);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(2);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);

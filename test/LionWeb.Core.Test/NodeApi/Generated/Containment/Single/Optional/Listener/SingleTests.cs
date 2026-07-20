@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.Documentation = doc;
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -53,7 +53,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.SetDocumentation(doc);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -71,7 +71,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
 
-        var notifications = observer.OfType<ChildAddedNotification>(1);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -160,7 +160,7 @@ public class SingleTests: NotificationTestsBase
 
         offsetDuplicate.Docs = doc;
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(offsetDuplicate, notifications[0].Parent);
@@ -181,7 +181,7 @@ public class SingleTests: NotificationTestsBase
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
 
-        var notifications = observer.OfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(offsetDuplicate, notifications[0].Parent);
@@ -203,7 +203,7 @@ public class SingleTests: NotificationTestsBase
 
         offsetDuplicate.Docs = doc;
 
-        var notifications = observer.OfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(offsetDuplicate, notifications[0].Parent);
@@ -226,7 +226,7 @@ public class SingleTests: NotificationTestsBase
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
 
-        var notifications = observer.OfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
         Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(offsetDuplicate, notifications[0].Parent);
@@ -250,7 +250,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.Documentation = doc;
 
-        var notifications = observer.OfType<ChildReplacedNotification>(1);
+        var notifications = observer.AssertOfType<ChildReplacedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -270,7 +270,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
 
-        var notifications = observer.OfType<ChildReplacedNotification>(1);
+        var notifications = observer.AssertOfType<ChildReplacedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);

@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class MultipleCollectionTests
 
         compositeShape.AddParts(values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -63,7 +63,7 @@ public class MultipleCollectionTests
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -90,7 +90,7 @@ public class MultipleCollectionTests
 
         compositeShape.InsertParts(0, values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -117,7 +117,7 @@ public class MultipleCollectionTests
 
         compositeShape.InsertParts(1, values);
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -145,7 +145,7 @@ public class MultipleCollectionTests
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts,
             new List<INode> { circleA, valueA, valueB, circleB });
 
-        var notifications = observer.OfType<ChildAddedNotification>(2);
+        var notifications = observer.AssertOfType<ChildAddedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -228,7 +228,7 @@ public class MultipleCollectionTests
 
         compositeShape.RemoveParts(values);
 
-        var notifications = observer.OfType<ChildDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -250,7 +250,7 @@ public class MultipleCollectionTests
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleB });
 
-        var notifications = observer.OfType<ChildDeletedNotification>(1);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -272,7 +272,7 @@ public class MultipleCollectionTests
 
         compositeShape.RemoveParts(values);
 
-        var notifications = observer.OfType<ChildDeletedNotification>(2);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -298,7 +298,7 @@ public class MultipleCollectionTests
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle });
 
-        var notifications = observer.OfType<ChildDeletedNotification>(2);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -325,7 +325,7 @@ public class MultipleCollectionTests
 
         compositeShape.RemoveParts(values);
 
-        var notifications = observer.OfType<ChildDeletedNotification>(2);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -352,7 +352,7 @@ public class MultipleCollectionTests
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB });
 
-        var notifications = observer.OfType<ChildDeletedNotification>(2);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
@@ -379,7 +379,7 @@ public class MultipleCollectionTests
 
         compositeShape.RemoveParts(values);
 
-        var notifications = observer.OfType<ChildDeletedNotification>(2);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
@@ -406,7 +406,7 @@ public class MultipleCollectionTests
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB });
 
-        var notifications = observer.OfType<ChildDeletedNotification>(2);
+        var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(compositeShape, notifications[0].Parent);
         Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
