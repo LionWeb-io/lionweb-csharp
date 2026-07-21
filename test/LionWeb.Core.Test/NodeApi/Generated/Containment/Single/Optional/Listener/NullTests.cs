@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional.Listener;
@@ -27,12 +27,12 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Documentation = null;
+        parent.Data = null;
 
         observer.AssertEmpty();
     }
@@ -40,12 +40,12 @@ public class NullTests
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, null);
 
         observer.AssertEmpty();
     }
@@ -53,36 +53,36 @@ public class NullTests
     [TestMethod]
     public void Existing()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
+        var oldChild = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldChild };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Documentation = null;
+        parent.Data = null;
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_data, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(oldDoc, notifications[0].DeletedChild);
+        Assert.AreEqual(oldChild, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void Existing_Reflective()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
+        var oldChild = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldChild };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, null);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_data, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(oldDoc, notifications[0].DeletedChild);
+        Assert.AreEqual(oldChild, notifications[0].DeletedChild);
     }
 }

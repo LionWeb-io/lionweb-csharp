@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional.Listener;
@@ -27,69 +27,69 @@ public class SingleTests: NotificationTestsBase
     [TestMethod]
     public void Single()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
+        var parent = new TestPartition("g");
+        var child = new DataTypeTestConcept("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Documentation = doc;
+        parent.Data = child;
 
         var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_data, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(doc, notifications[0].NewChild);
+        Assert.AreEqual(child, notifications[0].NewChild);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
+        var parent = new TestPartition("g");
+        var child = new DataTypeTestConcept("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.SetDocumentation(doc);
+        parent.SetData(child);
 
         var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_data, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(doc, notifications[0].NewChild);
+        Assert.AreEqual(child, notifications[0].NewChild);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
+        var parent = new TestPartition("g");
+        var child = new DataTypeTestConcept("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, child);
 
         var notifications = observer.AssertOfType<ChildAddedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_data, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(doc, notifications[0].NewChild);
+        Assert.AreEqual(child, notifications[0].NewChild);
     }
 
     [TestMethod]
     public void FromOtherParent()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
 
-        var doc = new Documentation("myId");
-        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
+        var child = new DataTypeTestConcept("myId");
+        var oldParent = new LinkTestConcept("oldParent") { Containment_0_1 = new LinkTestConcept("dummy") };
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.Documentation = doc;
+        parent.Data = child;
 
         Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
         Assert.AreEqual(1, notificationObserver.Count);
@@ -98,15 +98,15 @@ public class SingleTests: NotificationTestsBase
     [TestMethod]
     public void FromOtherParent_Reflective()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
 
-        var doc = new Documentation("myId");
-        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
+        var child = new DataTypeTestConcept("myId");
+        var oldParent = new LinkTestConcept("oldParent") { Containment_0_1 = new LinkTestConcept("dummy") };
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, child);
 
         Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[0]);
         Assert.AreEqual(1, notificationObserver.Count);
@@ -115,16 +115,16 @@ public class SingleTests: NotificationTestsBase
     [TestMethod]
     public void FromOtherParent_Replace()
     {
-        var replacedDoc = new Documentation("replacedDoc");
-        var parent = new Geometry("g") { Documentation = replacedDoc };
+        var replacedChild = new DataTypeTestConcept("replacedChild");
+        var parent = new TestPartition("g") { Data = replacedChild };
 
-        var doc = new Documentation("myId");
-        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
+        var child = new DataTypeTestConcept("myId");
+        var oldParent = new LinkTestConcept("oldParent") { Containment_0_1 = new LinkTestConcept("dummy") };
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.Documentation = doc;
+        parent.Data = child;
 
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
         Assert.AreEqual(1, notificationObserver.Count);
@@ -133,16 +133,16 @@ public class SingleTests: NotificationTestsBase
     [TestMethod]
     public void FromOtherParent_Replace_Reflective()
     {
-        var replacedDoc = new Documentation("replacedDoc");
-        var parent = new Geometry("g") { Documentation = replacedDoc };
+        var replacedChild = new DataTypeTestConcept("replacedChild");
+        var parent = new TestPartition("g") { Data = replacedChild };
 
-        var doc = new Documentation("myId");
-        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
+        var child = new DataTypeTestConcept("myId");
+        var oldParent = new LinkTestConcept("oldParent") { Containment_0_1 = new LinkTestConcept("dummy") };
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, child);
 
         Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
         Assert.AreEqual(1, notificationObserver.Count);
@@ -151,89 +151,89 @@ public class SingleTests: NotificationTestsBase
     [TestMethod]
     public void FromSameParent()
     {
-        var doc = new Documentation("myId");
-        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+        var child = new LinkTestConcept("myId");
+        var node = new LinkTestConcept("g") { Containment_0_n = [child] };
+        var partition = new TestPartition("g") { Links = [node] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        offsetDuplicate.Docs = doc;
+        node.Containment_0_1 = child;
 
         var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
-        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreSame(node, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, notifications[0].NewContainment);
         Assert.AreEqual(0, notifications[0].NewIndex);
-        Assert.AreEqual(doc, notifications[0].MovedChild);
+        Assert.AreEqual(child, notifications[0].MovedChild);
     }
 
     [TestMethod]
     public void FromSameParent_Reflective()
     {
-        var doc = new Documentation("myId");
-        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+        var child = new LinkTestConcept("myId");
+        var node = new LinkTestConcept("g") { Containment_0_n = [child] };
+        var partition = new TestPartition("g") { Links = [node] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
+        node.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentInSameParentNotification>(1);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
-        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreSame(node, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, notifications[0].NewContainment);
         Assert.AreEqual(0, notifications[0].NewIndex);
-        Assert.AreEqual(doc, notifications[0].MovedChild);
+        Assert.AreEqual(child, notifications[0].MovedChild);
     }
 
     [TestMethod]
     public void FromSameParent_Replace()
     {
-        var replacedDoc = new Documentation("replacedDoc");
-        var doc = new Documentation("myId");
-        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc, Docs = replacedDoc };
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+        var replacedChild = new LinkTestConcept("replacedChild");
+        var child = new LinkTestConcept("myId");
+        var node = new LinkTestConcept("g") { Containment_0_n = [child], Containment_0_1 = replacedChild };
+        var partition = new TestPartition("g") { Links = [node] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        offsetDuplicate.Docs = doc;
+        node.Containment_0_1 = child;
 
         var notifications = observer.AssertOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
-        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreSame(node, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, notifications[0].NewContainment);
         Assert.AreEqual(0, notifications[0].NewIndex);
-        Assert.AreEqual(doc, notifications[0].MovedChild);
-        Assert.AreEqual(replacedDoc, notifications[0].ReplacedChild);
+        Assert.AreEqual(child, notifications[0].MovedChild);
+        Assert.AreEqual(replacedChild, notifications[0].ReplacedChild);
     }
 
     [TestMethod]
     public void FromSameParent_Replace_Reflective()
     {
-        var replacedDoc = new Documentation("replacedDoc");
-        var doc = new Documentation("myId");
-        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc, Docs = replacedDoc };
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+        var replacedChild = new LinkTestConcept("replacedChild");
+        var child = new LinkTestConcept("myId");
+        var node = new LinkTestConcept("g") { Containment_0_n = [child], Containment_0_1 = replacedChild };
+        var partition = new TestPartition("g") { Links = [node] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
+        node.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         var notifications = observer.AssertOfType<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>(1);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, notifications[0].OldContainment);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
-        Assert.AreSame(offsetDuplicate, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, notifications[0].NewContainment);
+        Assert.AreSame(node, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, notifications[0].NewContainment);
         Assert.AreEqual(0, notifications[0].NewIndex);
-        Assert.AreEqual(doc, notifications[0].MovedChild);
-        Assert.AreEqual(replacedDoc, notifications[0].ReplacedChild);
+        Assert.AreEqual(child, notifications[0].MovedChild);
+        Assert.AreEqual(replacedChild, notifications[0].ReplacedChild);
     }
 
     #region existing
@@ -241,53 +241,53 @@ public class SingleTests: NotificationTestsBase
     [TestMethod]
     public void Existing()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
-        var doc = new Documentation("myId");
+        var oldChild = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldChild };
+        var child = new DataTypeTestConcept("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Documentation = doc;
+        parent.Data = child;
 
         var notifications = observer.AssertOfType<ChildReplacedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_data, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(doc, notifications[0].NewChild);
-        Assert.AreEqual(oldDoc, notifications[0].ReplacedChild);
+        Assert.AreEqual(child, notifications[0].NewChild);
+        Assert.AreEqual(oldChild, notifications[0].ReplacedChild);
     }
 
     [TestMethod]
     public void Existing_Reflective()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
-        var doc = new Documentation("myId");
+        var oldChild = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldChild };
+        var child = new DataTypeTestConcept("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, child);
 
         var notifications = observer.AssertOfType<ChildReplacedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_data, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(doc, notifications[0].NewChild);
-        Assert.AreEqual(oldDoc, notifications[0].ReplacedChild);
+        Assert.AreEqual(child, notifications[0].NewChild);
+        Assert.AreEqual(oldChild, notifications[0].ReplacedChild);
     }
 
     [TestMethod]
     public void Existing_Same()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
+        var oldChild = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldChild };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Documentation = oldDoc;
+        parent.Data = oldChild;
 
         observer.AssertEmpty();
     }
@@ -295,13 +295,13 @@ public class SingleTests: NotificationTestsBase
     [TestMethod]
     public void Existing_Same_Reflective()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
+        var oldChild = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldChild };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, oldDoc);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, oldChild);
 
         observer.AssertEmpty();
     }
