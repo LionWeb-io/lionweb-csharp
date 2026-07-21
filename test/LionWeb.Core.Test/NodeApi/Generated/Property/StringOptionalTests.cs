@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class StringOptionalTests
@@ -27,76 +27,76 @@ public class StringOptionalTests
     [TestMethod]
     public void Property()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = "Hi";
-        parent.Text = value;
-        Assert.AreEqual("Hi", parent.Text);
+        parent.StringValue_0_1 = value;
+        Assert.AreEqual("Hi", parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = "Hi";
-        parent.SetText(value);
-        Assert.AreEqual("Hi", parent.Text);
+        parent.SetStringValue_0_1(value);
+        Assert.AreEqual("Hi", parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = "Hi";
-        parent.Set(ShapesLanguage.Instance.Documentation_text, value);
-        Assert.AreEqual("Hi", parent.Text);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, value);
+        Assert.AreEqual("Hi", parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Get_Reflective()
     {
-        var parent = new Documentation("od") { Text = "Hi" };
-        Assert.AreEqual("Hi", parent.Get(ShapesLanguage.Instance.Documentation_text));
+        var parent = new DataTypeTestConcept("od") { StringValue_0_1 = "Hi" };
+        Assert.AreEqual("Hi", parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1));
     }
 
     [TestMethod]
     public void Bye_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = "Bye";
-        parent.Set(ShapesLanguage.Instance.Documentation_text, value);
-        Assert.AreEqual("Bye", parent.Text);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, value);
+        Assert.AreEqual("Bye", parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Boolean_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = true;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Documentation_text, value));
-        Assert.AreEqual(null, parent.Text);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, value));
+        Assert.AreEqual(null, parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Integer_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = 10;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Documentation_text, value));
-        Assert.AreEqual(null, parent.Text);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, value));
+        Assert.AreEqual(null, parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var parent = new Documentation("myId") { Text = "Hi" };
-        Assert.AreEqual("Hi", parent.Text);
+        var parent = new DataTypeTestConcept("myId") { StringValue_0_1 = "Hi" };
+        Assert.AreEqual("Hi", parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new Documentation("myId") { Text = "Hi" };
-        Assert.IsTrue(parent.TryGetText(out var o));
+        var parent = new DataTypeTestConcept("myId") { StringValue_0_1 = "Hi" };
+        Assert.IsTrue(parent.TryGetStringValue_0_1(out var o));
         Assert.AreEqual("Hi", o);
     }
 
@@ -107,57 +107,57 @@ public class StringOptionalTests
     [TestMethod]
     public void Null()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.Text = (string?)value;
-        Assert.AreEqual(null, parent.Text);
+        parent.StringValue_0_1 = (string?)value;
+        Assert.AreEqual(null, parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Null_Setter()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.SetText((string?)value);
-        Assert.AreEqual(null, parent.Text);
+        parent.SetStringValue_0_1((string?)value);
+        Assert.AreEqual(null, parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Null_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.Set(ShapesLanguage.Instance.Documentation_text, null);
-        Assert.AreEqual(null, parent.Text);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, null);
+        Assert.AreEqual(null, parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Null_Get()
     {
-        var parent = new Documentation("od");
-        Assert.AreEqual(null, parent.Text);
+        var parent = new DataTypeTestConcept("od");
+        Assert.AreEqual(null, parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
-        var parent = new Documentation("od");
-        Assert.AreEqual(null, parent.Get(ShapesLanguage.Instance.Documentation_text));
+        var parent = new DataTypeTestConcept("od");
+        Assert.AreEqual(null, parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1));
     }
 
     [TestMethod]
     public void Null_Constructor()
     {
         object value = null;
-        var parent = new Documentation("od") { Text = (string?)value };
-        Assert.AreEqual(null, parent.Text);
+        var parent = new DataTypeTestConcept("od") { StringValue_0_1 = (string?)value };
+        Assert.AreEqual(null, parent.StringValue_0_1);
     }
 
     [TestMethod]
     public void Null_TryGet()
     {
-        var parent = new Documentation("od");
-        Assert.IsFalse(parent.TryGetText(out var o));
+        var parent = new DataTypeTestConcept("od");
+        Assert.IsFalse(parent.TryGetStringValue_0_1(out var o));
         Assert.IsNull(o);
     }
 

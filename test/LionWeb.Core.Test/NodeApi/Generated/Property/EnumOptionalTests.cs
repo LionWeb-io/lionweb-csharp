@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class EnumOptionalTests
@@ -27,114 +27,114 @@ public class EnumOptionalTests
     [TestMethod]
     public void Property()
     {
-        var parent = new MaterialGroup("od");
-        var value = MatterState.liquid;
-        parent.MatterState = value;
-        Assert.AreEqual(MatterState.liquid, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        var value = TestEnumeration.literal1;
+        parent.EnumValue_0_1 = value;
+        Assert.AreEqual(TestEnumeration.literal1, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new MaterialGroup("od");
-        var value = MatterState.liquid;
-        parent.SetMatterState(value);
-        Assert.AreEqual(MatterState.liquid, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        var value = TestEnumeration.literal1;
+        parent.SetEnumValue_0_1(value);
+        Assert.AreEqual(TestEnumeration.literal1, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new MaterialGroup("od");
-        var value = MatterState.liquid;
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value);
-        Assert.AreEqual(MatterState.liquid, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        var value = TestEnumeration.literal1;
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, value);
+        Assert.AreEqual(TestEnumeration.literal1, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Get_Reflective()
     {
-        var parent = new MaterialGroup("od") { MatterState = MatterState.liquid };
-        Assert.AreEqual(MatterState.liquid, parent.Get(ShapesLanguage.Instance.MaterialGroup_matterState));
+        var parent = new DataTypeTestConcept("od") { EnumValue_0_1 = TestEnumeration.literal1 };
+        Assert.AreEqual(TestEnumeration.literal1, parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1));
     }
 
     [TestMethod]
     public void Gas_Reflective()
     {
-        var parent = new MaterialGroup("od");
-        var value = MatterState.gas;
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value);
-        Assert.AreEqual(MatterState.gas, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        var value = TestEnumeration.literal2;
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, value);
+        Assert.AreEqual(TestEnumeration.literal2, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Boolean_Reflective()
     {
-        var parent = new MaterialGroup("od");
+        var parent = new DataTypeTestConcept("od");
         var value = true;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
-        Assert.AreEqual(null, parent.MatterState);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, value));
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
-    private enum TestEnum
+    private enum OtherEnum
     {
         a,
-        solid,
-        gas
+        literal1,
+        literal2
     }
     
     [TestMethod]
     public void OtherEnum_Reflective()
     {
         
-        var parent = new MaterialGroup("od");
-        var value = TestEnum.a;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
-        Assert.AreEqual(null, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        var value = OtherEnum.a;
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, value));
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void SimilarEnum_Reflective()
     {
         
-        var parent = new MaterialGroup("od");
-        var value = TestEnum.solid;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
-        Assert.AreEqual(null, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        var value = OtherEnum.literal1;
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, value));
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void VerySimilarEnum_Reflective()
     {
         
-        var parent = new MaterialGroup("od");
-        var value = TestEnum.gas;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
-        Assert.AreEqual(null, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        var value = OtherEnum.literal2;
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, value));
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Integer_Reflective()
     {
-        var parent = new MaterialGroup("od");
+        var parent = new DataTypeTestConcept("od");
         var value = 10;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, value));
-        Assert.AreEqual(null, parent.MatterState);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, value));
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var parent = new MaterialGroup("myId") { MatterState = MatterState.liquid };
-        Assert.AreEqual(MatterState.liquid, parent.MatterState);
+        var parent = new DataTypeTestConcept("myId") { EnumValue_0_1 = TestEnumeration.literal1 };
+        Assert.AreEqual(TestEnumeration.literal1, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new MaterialGroup("myId") { MatterState = MatterState.liquid };
-        Assert.IsTrue(parent.TryGetMatterState(out var o));
-        Assert.AreEqual(MatterState.liquid, o);
+        var parent = new DataTypeTestConcept("myId") { EnumValue_0_1 = TestEnumeration.literal1 };
+        Assert.IsTrue(parent.TryGetEnumValue_0_1(out var o));
+        Assert.AreEqual(TestEnumeration.literal1, o);
     }
 
     #endregion
@@ -144,57 +144,57 @@ public class EnumOptionalTests
     [TestMethod]
     public void Null()
     {
-        var parent = new MaterialGroup("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.MatterState = (MatterState?)value;
-        Assert.AreEqual(null, parent.MatterState);
+        parent.EnumValue_0_1 = (TestEnumeration?)value;
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Null_Setter()
     {
-        var parent = new MaterialGroup("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.SetMatterState((MatterState?)value);
-        Assert.AreEqual(null, parent.MatterState);
+        parent.SetEnumValue_0_1((TestEnumeration?)value);
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Null_Reflective()
     {
-        var parent = new MaterialGroup("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, null);
-        Assert.AreEqual(null, parent.MatterState);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, null);
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Null_Get()
     {
-        var parent = new MaterialGroup("od");
-        Assert.AreEqual(null, parent.MatterState);
+        var parent = new DataTypeTestConcept("od");
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
-        var parent = new MaterialGroup("od");
-        Assert.AreEqual(null, parent.Get(ShapesLanguage.Instance.MaterialGroup_matterState));
+        var parent = new DataTypeTestConcept("od");
+        Assert.AreEqual(null, parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1));
     }
 
     [TestMethod]
     public void Null_Constructor()
     {
         object value = null;
-        var parent = new MaterialGroup("od") { MatterState = (MatterState?)value };
-        Assert.AreEqual(null, parent.MatterState);
+        var parent = new DataTypeTestConcept("od") { EnumValue_0_1 = (TestEnumeration?)value };
+        Assert.AreEqual(null, parent.EnumValue_0_1);
     }
 
     [TestMethod]
     public void Null_TryGet()
     {
-        var parent = new MaterialGroup("od");
-        Assert.IsFalse(parent.TryGetMatterState(out var o));
+        var parent = new DataTypeTestConcept("od");
+        Assert.IsFalse(parent.TryGetEnumValue_0_1(out var o));
         Assert.IsNull(o);
     }
 

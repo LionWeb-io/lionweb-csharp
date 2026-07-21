@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M3;
 
 [TestClass]
@@ -28,43 +28,43 @@ public class SetFeaturesTests
     [TestMethod]
     public void String_Init()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void String_Set()
     {
-        var parent = new Documentation("od");
-        parent.Text = "hello";
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Documentation_text },
+        var parent = new DataTypeTestConcept("od");
+        parent.StringValue_0_1 = "hello";
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void String_Set_Reflective()
     {
-        var parent = new Documentation("od");
-        parent.Set(ShapesLanguage.Instance.Documentation_text, "hello");
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Documentation_text },
+        var parent = new DataTypeTestConcept("od");
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, "hello");
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void String_Unset()
     {
-        var parent = new Documentation("od");
-        parent.Text = "hello";
-        parent.Text = null;
+        var parent = new DataTypeTestConcept("od");
+        parent.StringValue_0_1 = "hello";
+        parent.StringValue_0_1 = null;
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void String_Unset_Reflective()
     {
-        var parent = new Documentation("od");
-        parent.Text = "hello";
-        parent.Set(ShapesLanguage.Instance.Documentation_text, null);
+        var parent = new DataTypeTestConcept("od");
+        parent.StringValue_0_1 = "hello";
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, null);
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
@@ -75,43 +75,43 @@ public class SetFeaturesTests
     [TestMethod]
     public void Integer_Init()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Integer_Set_Positive()
     {
-        var parent = new Circle("od");
-        parent.R = 10;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Circle_r },
+        var parent = new DataTypeTestConcept("od");
+        parent.IntegerValue_1 = 10;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Integer_Set_Zero()
     {
-        var parent = new Circle("od");
-        parent.R = 0;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Circle_r },
+        var parent = new DataTypeTestConcept("od");
+        parent.IntegerValue_1 = 0;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Integer_Set_Negative()
     {
-        var parent = new Circle("od");
-        parent.R = -10;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Circle_r },
+        var parent = new DataTypeTestConcept("od");
+        parent.IntegerValue_1 = -10;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Integer_Set_Reflective()
     {
-        var parent = new Circle("od");
-        parent.Set(ShapesLanguage.Instance.Circle_r, 10);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Circle_r },
+        var parent = new DataTypeTestConcept("od");
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, 10);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
@@ -122,52 +122,52 @@ public class SetFeaturesTests
     [TestMethod]
     public void Boolean_Init()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Boolean_Set_True()
     {
-        var parent = new Documentation("od");
-        parent.Technical = true;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Documentation_technical },
+        var parent = new DataTypeTestConcept("od");
+        parent.BooleanValue_0_1 = true;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Boolean_Set_False()
     {
-        var parent = new Documentation("od");
-        parent.Technical = true;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Documentation_technical },
+        var parent = new DataTypeTestConcept("od");
+        parent.BooleanValue_0_1 = true;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Boolean_Set_Reflective()
     {
-        var parent = new Documentation("od");
-        parent.Set(ShapesLanguage.Instance.Documentation_technical, true);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Documentation_technical },
+        var parent = new DataTypeTestConcept("od");
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, true);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Boolean_Unset()
     {
-        var parent = new Documentation("od");
-        parent.Technical = true;
-        parent.Technical = null;
+        var parent = new DataTypeTestConcept("od");
+        parent.BooleanValue_0_1 = true;
+        parent.BooleanValue_0_1 = null;
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Boolean_Unset_Reflective()
     {
-        var parent = new Documentation("od");
-        parent.Technical = true;
-        parent.Set(ShapesLanguage.Instance.Documentation_technical, null);
+        var parent = new DataTypeTestConcept("od");
+        parent.BooleanValue_0_1 = true;
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, null);
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
@@ -178,43 +178,43 @@ public class SetFeaturesTests
     [TestMethod]
     public void Enum_Init()
     {
-        var parent = new MaterialGroup("od");
+        var parent = new DataTypeTestConcept("od");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Enum_Set()
     {
-        var parent = new MaterialGroup("od");
-        parent.MatterState = MatterState.gas;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.MaterialGroup_matterState },
+        var parent = new DataTypeTestConcept("od");
+        parent.EnumValue_0_1 = TestEnumeration.literal2;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Enum_Set_Reflective()
     {
-        var parent = new MaterialGroup("od");
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, MatterState.gas);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.MaterialGroup_matterState },
+        var parent = new DataTypeTestConcept("od");
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, TestEnumeration.literal2);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Enum_Unset()
     {
-        var parent = new MaterialGroup("od");
-        parent.MatterState = MatterState.gas;
-        parent.MatterState = null;
+        var parent = new DataTypeTestConcept("od");
+        parent.EnumValue_0_1 = TestEnumeration.literal2;
+        parent.EnumValue_0_1 = null;
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void Enum_Unset_Reflective()
     {
-        var parent = new MaterialGroup("od");
-        parent.MatterState = MatterState.gas;
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_matterState, null);
+        var parent = new DataTypeTestConcept("od");
+        parent.EnumValue_0_1 = TestEnumeration.literal2;
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, null);
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 

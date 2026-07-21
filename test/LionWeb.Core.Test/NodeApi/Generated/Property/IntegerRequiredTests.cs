@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class IntegerRequiredTests
@@ -27,76 +27,76 @@ public class IntegerRequiredTests
     [TestMethod]
     public void Property()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         var value = 10;
-        parent.R = value;
-        Assert.AreEqual(10, parent.R);
+        parent.IntegerValue_1 = value;
+        Assert.AreEqual(10, parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         var value = 10;
-        parent.SetR(value);
-        Assert.AreEqual(10, parent.R);
+        parent.SetIntegerValue_1(value);
+        Assert.AreEqual(10, parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         var value = 10;
-        parent.Set(ShapesLanguage.Instance.Circle_r, value);
-        Assert.AreEqual(10, parent.R);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, value);
+        Assert.AreEqual(10, parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Get_Reflective()
     {
-        var parent = new Circle("od") { R = 10 };
-        Assert.AreEqual(10, parent.Get(ShapesLanguage.Instance.Circle_r));
+        var parent = new DataTypeTestConcept("od") { IntegerValue_1 = 10 };
+        Assert.AreEqual(10, parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1));
     }
 
     [TestMethod]
     public void Long_Reflective()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         var value = 10L;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void String_Reflective()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         var value = "10";
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Boolean_Reflective()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         var value = true;
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var parent = new Circle("myId") { R = 10 };
-        Assert.AreEqual(10, parent.R);
+        var parent = new DataTypeTestConcept("myId") { IntegerValue_1 = 10 };
+        Assert.AreEqual(10, parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new Circle("myId") { R = 10 };
-        Assert.IsTrue(parent.TryGetR(out var o));
+        var parent = new DataTypeTestConcept("myId") { IntegerValue_1 = 10 };
+        Assert.IsTrue(parent.TryGetIntegerValue_1(out var o));
         Assert.AreEqual(10, o);
     }
 
@@ -107,59 +107,59 @@ public class IntegerRequiredTests
     [TestMethod]
     public void Null()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        Assert.ThrowsExactly<NullReferenceException>(() => parent.R = (int)value);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<NullReferenceException>(() => parent.IntegerValue_1 = (int)value);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Null_Setter()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        Assert.ThrowsExactly<NullReferenceException>(() => parent.SetR((int)value));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
+        Assert.ThrowsExactly<NullReferenceException>(() => parent.SetIntegerValue_1((int)value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Null_Reflective()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Circle_r, value));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
+            () => parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, value));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Null_Get()
     {
-        var parent = new Circle("od");
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.R);
+        var parent = new DataTypeTestConcept("od");
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.IntegerValue_1);
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
-        var parent = new Circle("od");
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(ShapesLanguage.Instance.Circle_r));
+        var parent = new DataTypeTestConcept("od");
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1));
     }
 
     [TestMethod]
     public void Null_Constructor()
     {
-        var parent = new Circle("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
         Assert.ThrowsExactly<NullReferenceException>(
-            () => new Circle("od") { R = (int)value });
+            () => new DataTypeTestConcept("od") { IntegerValue_1 = (int)value });
     }
 
     [TestMethod]
     public void Null_TryGet()
     {
-        var parent = new Circle("od");
-        Assert.IsFalse(parent.TryGetR(out var o));
+        var parent = new DataTypeTestConcept("od");
+        Assert.IsFalse(parent.TryGetIntegerValue_1(out var o));
         Assert.IsNull(o);
     }
 
