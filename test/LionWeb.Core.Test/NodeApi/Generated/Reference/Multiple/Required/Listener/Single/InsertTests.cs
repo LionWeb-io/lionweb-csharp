@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener.Single;
@@ -27,20 +27,19 @@ public class InsertTests
     [TestMethod]
     public void One_Before()
     {
-        var circle = new Circle("cId");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circle] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.InsertMaterials(0, [line]);
+        source.InsertReference_1_n(0, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -48,20 +47,19 @@ public class InsertTests
     [TestMethod]
     public void One_Before_Reflective()
     {
-        var circle = new Circle("cId");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circle] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line, circle });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { line, circle });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -69,20 +67,19 @@ public class InsertTests
     [TestMethod]
     public void One_After()
     {
-        var circle = new Circle("cId");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circle] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.InsertMaterials(1, [line]);
+        source.InsertReference_1_n(1, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -90,20 +87,19 @@ public class InsertTests
     [TestMethod]
     public void One_After_Reflective()
     {
-        var circle = new Circle("cId");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circle] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circle, line });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { circle, line });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -111,21 +107,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.InsertMaterials(0, [line]);
+        source.InsertReference_1_n(0, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -133,21 +128,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Before_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line, circleA, circleB });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { line, circleA, circleB });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -155,21 +149,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.InsertMaterials(1, [line]);
+        source.InsertReference_1_n(1, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -177,21 +170,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Between_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circleA, line, circleB });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { circleA, line, circleB });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -199,21 +191,20 @@ public class InsertTests
     [TestMethod]
     public void Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.InsertMaterials(2, [line]);
+        source.InsertReference_1_n(2, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(2, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -221,21 +212,20 @@ public class InsertTests
     [TestMethod]
     public void Two_After_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circleA, circleB, line });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { circleA, circleB, line });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(2, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }

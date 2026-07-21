@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener.Single;
@@ -27,19 +27,18 @@ public class SingleTests
     [TestMethod]
     public void Add()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.AddMaterials([line]);
+        source.AddReference_1_n([line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -47,19 +46,18 @@ public class SingleTests
     [TestMethod]
     public void Add_Reflective()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var line = new Line("myId");
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { line });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }

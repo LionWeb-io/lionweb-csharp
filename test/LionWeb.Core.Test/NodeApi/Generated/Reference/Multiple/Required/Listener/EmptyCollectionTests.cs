@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener;
@@ -27,15 +27,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyArray()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[0];
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[0];
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.AddMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => source.AddReference_1_n(values));
 
         observer.AssertNone<ReferenceAddedNotification>();
     }
@@ -43,15 +42,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[0];
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[0];
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { }));
+        Assert.ThrowsExactly<InvalidValueException>(() => source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { }));
 
         observer.AssertNone<ReferenceAddedNotification>();
     }
@@ -59,15 +57,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[0];
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[0];
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.InsertMaterials(0, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => source.InsertReference_1_n(0, values));
 
         observer.AssertNone<ReferenceAddedNotification>();
     }
@@ -75,15 +72,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[0];
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[0];
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => source.RemoveReference_1_n(values));
 
         observer.AssertNone<ReferenceAddedNotification>();
     }
@@ -91,17 +87,16 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyList_Reset_Reflective()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var value = new Circle("myId");
-        materialGroup.AddMaterials([value]);
-        var values = new List<Coord>();
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var value = new LinkTestConcept("myId");
+        source.AddReference_1_n([value]);
+        var values = new List<LinkTestConcept>();
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, values));
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }

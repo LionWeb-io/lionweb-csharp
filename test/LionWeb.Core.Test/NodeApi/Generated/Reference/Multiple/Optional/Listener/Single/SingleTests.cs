@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional.Listener.Single;
@@ -27,17 +27,18 @@ public class SingleTests
     [TestMethod]
     public void Add()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.AddShapes([line]);
+        source.AddReference_0_n([line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -45,17 +46,18 @@ public class SingleTests
     [TestMethod]
     public void Add_Reflective()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { line });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
