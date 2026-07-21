@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Required;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class NullTests
@@ -25,40 +25,40 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var parent = new OffsetDuplicate("od");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Offset = null);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+        var parent = new LinkTestConcept("od");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Containment_1 = null);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new OffsetDuplicate("od");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.SetOffset(null));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+        var parent = new LinkTestConcept("od");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.SetContainment_1(null));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new OffsetDuplicate("od");
+        var parent = new LinkTestConcept("od");
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, null));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            () => parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, null));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
     }
 
     [TestMethod]
     public void Constructor()
     {
         Assert.ThrowsExactly<InvalidValueException>(
-            () => new OffsetDuplicate("od") { Offset = null });
+            () => new LinkTestConcept("od") { Containment_1 = null });
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new OffsetDuplicate("od");
-        Assert.IsFalse(parent.TryGetOffset(out var o));
+        var parent = new LinkTestConcept("od");
+        Assert.IsFalse(parent.TryGetContainment_1(out var o));
         Assert.IsNull(o);
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using System.Collections;
 
 [TestClass]
@@ -28,100 +28,100 @@ public class CollectionTests
     [TestMethod]
     public void EmptyArray()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[0];
-        parent.AddShapes(values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[0];
+        parent.AddLinks(values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptyArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[0];
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[0];
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptyArray_Constructor()
     {
-        var values = new IShape[0];
-        var parent = new Geometry("g") { Shapes = values };
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var values = new LinkTestConcept[0];
+        var parent = new TestPartition("g") { Links = values };
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[0];
-        parent.InsertShapes(0, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[0];
+        parent.InsertLinks(0, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[0];
-        parent.RemoveShapes(values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[0];
+        parent.RemoveLinks(values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptyUntypedList_Reflective()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
         var values = new ArrayList();
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptyListMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<IShape>();
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new List<LinkTestConcept>();
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptyListSubtype_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Shape>();
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new List<LinkTestConcept>();
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptySet_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new HashSet<IShape>();
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new HashSet<LinkTestConcept>();
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptyListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Coord>();
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new List<DataTypeTestConcept>();
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void EmptyList_Reset_Reflective()
     {
-        var parent = new Geometry("g");
-        parent.AddShapes([new Circle("myId")]);
-        var values = new List<Coord>();
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        parent.AddLinks([new LinkTestConcept("myId")]);
+        var values = new List<DataTypeTestConcept>();
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     #endregion
@@ -131,95 +131,95 @@ public class CollectionTests
     [TestMethod]
     public void NullArray()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddShapes(values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[] { null };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddLinks(values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void NullArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[] { null };
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[] { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void NullArray_Constructor()
     {
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => new Geometry("g") { Shapes = values });
+        var values = new LinkTestConcept[] { null };
+        Assert.ThrowsExactly<InvalidValueException>(() => new TestPartition("g") { Links = values });
     }
 
     [TestMethod]
     public void Insert_NullArray()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertShapes(0, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[] { null };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertLinks(0, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void Remove_NullArray()
     {
-        var parent = new Geometry("g");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveShapes(values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+        var parent = new TestPartition("g");
+        var values = new LinkTestConcept[] { null };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveLinks(values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void NullUntypedList_Reflective()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
         var values = new ArrayList() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void NullListMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<IShape>() { null };
+        var parent = new TestPartition("g");
+        var values = new List<LinkTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void NullListSubtype_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Shape>() { null };
+        var parent = new TestPartition("g");
+        var values = new List<LinkTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void NullListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Coord>() { null };
+        var parent = new TestPartition("g");
+        var values = new List<DataTypeTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void NullSet_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new HashSet<IShape>() { null };
+        var parent = new TestPartition("g");
+        var values = new HashSet<LinkTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     #endregion
@@ -229,57 +229,57 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.AddShapes(values);
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
+        var values = new LinkTestConcept[] { value };
+        parent.AddLinks(values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void SingleArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
+        var values = new LinkTestConcept[] { value };
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void SingleArray_Existing_Reflective()
     {
-        var circle = new Circle("cc");
-        var parent = new Geometry("g") { Shapes = [circle] };
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        var circle = new LinkTestConcept("cc");
+        var parent = new TestPartition("g") { Links = [circle] };
+        var value = new LinkTestConcept("s");
+        var values = new LinkTestConcept[] { value };
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
         Assert.IsNull(circle.GetParent());
         Assert.AreSame(parent, value.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { value }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { value }, parent.Links.ToList());
     }
 
     [TestMethod]
     public void SingleArray_Constructor()
     {
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        var parent = new Geometry("g") { Shapes = values };
+        var value = new LinkTestConcept("s");
+        var values = new LinkTestConcept[] { value };
+        var parent = new TestPartition("g") { Links = values };
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void Insert_SingleArray()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.InsertShapes(0, values);
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
+        var values = new LinkTestConcept[] { value };
+        parent.InsertLinks(0, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     #region Remove
@@ -287,64 +287,64 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Empty()
     {
-        var parent = new Geometry("g");
-        var line = new Line("myId");
-        var values = new IShape[] { line };
-        parent.RemoveShapes(values);
+        var parent = new TestPartition("g");
+        var line = new LinkTestConcept("myId");
+        var values = new LinkTestConcept[] { line };
+        parent.RemoveLinks(values);
         Assert.IsNull(line.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(line));
+        Assert.IsFalse(parent.Links.Contains(line));
     }
 
     [TestMethod]
     public void SingleArray_Remove_Only()
     {
-        var line = new Line("myId");
-        var parent = new Geometry("g") { Shapes = [line] };
-        var values = new IShape[] { line };
-        parent.RemoveShapes(values);
+        var line = new LinkTestConcept("myId");
+        var parent = new TestPartition("g") { Links = [line] };
+        var values = new LinkTestConcept[] { line };
+        parent.RemoveLinks(values);
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { }, parent.Links.ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_First()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new Geometry("g") { Shapes = [line, circle] };
-        var values = new IShape[] { line };
-        parent.RemoveShapes(values);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new TestPartition("g") { Links = [line, circle] };
+        var values = new LinkTestConcept[] { line };
+        parent.RemoveLinks(values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Links.ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_Last()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new Geometry("g") { Shapes = [circle, line] };
-        var values = new IShape[] { line };
-        parent.RemoveShapes(values);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new TestPartition("g") { Links = [circle, line] };
+        var values = new LinkTestConcept[] { line };
+        parent.RemoveLinks(values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Links.ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new Geometry("g") { Shapes = [circleA, line, circleB] };
-        var values = new IShape[] { line };
-        parent.RemoveShapes(values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var line = new LinkTestConcept("myId");
+        var parent = new TestPartition("g") { Links = [circleA, line, circleB] };
+        var values = new LinkTestConcept[] { line };
+        parent.RemoveLinks(values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Links.ToList());
     }
 
     #endregion
@@ -352,89 +352,89 @@ public class CollectionTests
     [TestMethod]
     public void SingleUntypedArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
         var values = new object[] { value };
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void SingleUntypedList_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
         var values = new ArrayList() { value };
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void SingleListMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
-        var values = new List<IShape>() { value };
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
+        var values = new List<LinkTestConcept>() { value };
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void SingleListSubtype_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
-        var values = new List<Shape>() { value };
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
+        var values = new List<LinkTestConcept>() { value };
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void SingleSet_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Line("s");
-        var values = new HashSet<IShape>() { value };
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("s");
+        var values = new HashSet<LinkTestConcept>() { value };
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(value));
+        Assert.IsTrue(parent.Links.Contains(value));
     }
 
     [TestMethod]
     public void SingleListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Coord("c");
-        var values = new List<Coord>() { value };
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("c");
+        var values = new List<DataTypeTestConcept>() { value };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void SingleUntypedListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Coord("c");
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("c");
         var values = new ArrayList() { value };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     [TestMethod]
     public void SingleUntypedArrayNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Coord("c");
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("c");
         var values = new object[] { value };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values));
+        Assert.IsTrue(parent.Links.Count == 0);
     }
 
     #endregion

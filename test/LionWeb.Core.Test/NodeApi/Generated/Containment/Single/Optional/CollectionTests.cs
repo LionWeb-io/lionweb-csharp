@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using System.Collections;
 
 [TestClass]
@@ -28,46 +28,46 @@ public class CollectionTests
     [TestMethod]
     public void EmptyArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new Documentation[0];
+        var parent = new TestPartition("g");
+        var values = new DataTypeTestConcept[0];
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void EmptyUntypedList_Reflective()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
         var values = new ArrayList();
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void EmptyListMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Documentation>();
+        var parent = new TestPartition("g");
+        var values = new List<DataTypeTestConcept>();
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void EmptySet_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new HashSet<Documentation>();
+        var parent = new TestPartition("g");
+        var values = new HashSet<DataTypeTestConcept>();
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void EmptyListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Coord>();
+        var parent = new TestPartition("g");
+        var values = new List<LinkTestConcept>();
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     #endregion
@@ -77,46 +77,46 @@ public class CollectionTests
     [TestMethod]
     public void NullArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new Documentation[] { null };
+        var parent = new TestPartition("g");
+        var values = new DataTypeTestConcept[] { null };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void NullUntypedList_Reflective()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
         var values = new ArrayList() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void NullListMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Documentation>() { null };
+        var parent = new TestPartition("g");
+        var values = new List<DataTypeTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void NullListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new List<Coord>() { null };
+        var parent = new TestPartition("g");
+        var values = new List<LinkTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void NullSet_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = new HashSet<Documentation>() { null };
+        var parent = new TestPartition("g");
+        var values = new HashSet<DataTypeTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     #endregion
@@ -126,92 +126,92 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Documentation("s");
-        var values = new Documentation[] { value };
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("s");
+        var values = new DataTypeTestConcept[] { value };
 
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
-        Assert.IsNull(parent.Documentation);
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
+        Assert.IsNull(parent.Data);
         Assert.IsNull(value.GetParent());
     }
 
     [TestMethod]
     public void SingleUntypedArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Documentation("s");
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("s");
         var values = new object[] { value };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
-        Assert.IsNull(parent.Documentation);
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
+        Assert.IsNull(parent.Data);
         Assert.IsNull(value.GetParent());
     }
 
     [TestMethod]
     public void SingleUntypedList_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Documentation("s");
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("s");
         var values = new ArrayList() { value };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
-        Assert.IsNull(parent.Documentation);
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
+        Assert.IsNull(parent.Data);
         Assert.IsNull(value.GetParent());
     }
 
     [TestMethod]
     public void SingleListMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Documentation("s");
-        var values = new List<Documentation>() { value };
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("s");
+        var values = new List<DataTypeTestConcept>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
-        Assert.IsNull(parent.Documentation);
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
+        Assert.IsNull(parent.Data);
         Assert.IsNull(value.GetParent());
     }
 
     [TestMethod]
     public void SingleSet_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Documentation("s");
-        var values = new HashSet<Documentation>() { value };
+        var parent = new TestPartition("g");
+        var value = new DataTypeTestConcept("s");
+        var values = new HashSet<DataTypeTestConcept>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
-        Assert.IsNull(parent.Documentation);
+            parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
+        Assert.IsNull(parent.Data);
         Assert.IsNull(value.GetParent());
     }
 
     [TestMethod]
     public void SingleListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Coord("c");
-        var values = new List<Coord>() { value };
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("c");
+        var values = new List<LinkTestConcept>() { value };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void SingleUntypedListNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Coord("c");
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("c");
         var values = new ArrayList() { value };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     [TestMethod]
     public void SingleUntypedArrayNonMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Coord("c");
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("c");
         var values = new object[] { value };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.Geometry_documentation, values));
+            () => parent.Set(TestLanguageLanguage.Instance.TestPartition_data, values));
     }
 
     #endregion

@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Required;
 
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using System.Collections;
 
 [TestClass]
@@ -26,13 +26,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Coord("sA");
-        var valueB = new Coord("sB");
-        var values = new Coord[] { valueA, valueB };
+        var parent = new LinkTestConcept("od");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -40,13 +40,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedArray_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Coord("sA");
-        var valueB = new Coord("sB");
+        var parent = new LinkTestConcept("od");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
         var values = new object[] { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -54,13 +54,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedList_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Coord("sA");
-        var valueB = new Coord("sB");
+        var parent = new LinkTestConcept("od");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
         var values = new ArrayList() { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -68,13 +68,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListMatchingType_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Coord("sA");
-        var valueB = new Coord("sB");
-        var values = new List<Coord>() { valueA, valueB };
+        var parent = new LinkTestConcept("od");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept>() { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -82,13 +82,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Set_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Coord("sA");
-        var valueB = new Coord("sB");
-        var values = new HashSet<Coord>() { valueA, valueB };
+        var parent = new LinkTestConcept("od");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new HashSet<LinkTestConcept>() { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -96,13 +96,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListNonMatchingType_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Line("cA");
-        var valueB = new Line("cB");
-        var values = new List<Line>() { valueA, valueB };
+        var parent = new LinkTestConcept("od");
+        var valueA = new DataTypeTestConcept("cA");
+        var valueB = new DataTypeTestConcept("cB");
+        var values = new List<DataTypeTestConcept>() { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            () => parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -110,13 +110,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedListNonMatchingType_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Line("cA");
-        var valueB = new Line("cB");
+        var parent = new LinkTestConcept("od");
+        var valueA = new DataTypeTestConcept("cA");
+        var valueB = new DataTypeTestConcept("cB");
         var values = new ArrayList() { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            () => parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }
@@ -124,13 +124,13 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedArrayNonMatchingType_Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var valueA = new Line("cA");
-        var valueB = new Line("cB");
+        var parent = new LinkTestConcept("od");
+        var valueA = new DataTypeTestConcept("cA");
+        var valueB = new DataTypeTestConcept("cB");
         var values = new object[] { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Offset);
+            () => parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
     }

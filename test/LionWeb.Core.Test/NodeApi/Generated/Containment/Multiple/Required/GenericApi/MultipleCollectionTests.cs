@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.GenericApi;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class MultipleCollectionTests
@@ -25,15 +25,15 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, valueA.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueA));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueA));
         Assert.AreSame(parent, valueB.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueB));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueB));
     }
 
     #region Insert
@@ -41,147 +41,147 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_ListMatchingType()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape> { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_ListSubtype()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<Shape> { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Set()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new HashSet<IShape> { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new HashSet<LinkTestConcept> { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_SingleEnumerable()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new SingleEnumerable<IShape> { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new SingleEnumerable<LinkTestConcept> { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_One_Before()
     {
-        var circle = new Circle("cId");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB, circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB, circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_One_After()
     {
-        var circle = new Circle("cId");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 1, values);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 1, values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle, valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB, circleA, circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB, circleA, circleB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 1, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 1, values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, valueA, valueB, circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, valueA, valueB, circleB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 2, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 2, values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB, valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB, valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     #endregion
@@ -191,180 +191,180 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_ListMatchingType()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape> { valueA, valueB };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueB));
     }
 
     [TestMethod]
     public void Remove_ListSubtype()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<Shape> { valueA, valueB };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueB));
     }
 
     [TestMethod]
     public void Remove_Set()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new HashSet<IShape> { valueA, valueB };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new HashSet<LinkTestConcept> { valueA, valueB };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueB));
     }
 
     [TestMethod]
     public void Remove_SingleEnumerable()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new SingleEnumerable<IShape> { valueA, valueB };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new SingleEnumerable<LinkTestConcept> { valueA, valueB };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueB));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueA));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(valueB));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueA));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(valueB));
     }
 
     [TestMethod]
     public void Remove_Only()
     {
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new CompositeShape("cs") { Parts = [valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [valueA, valueB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_NonContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circleA = new LinkTestConcept("cA");
+        var circleB = new LinkTestConcept("cB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_HalfContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var values = new IShape[] { valueA, circleA };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circleA = new LinkTestConcept("cA");
+        var circleB = new LinkTestConcept("cB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var values = new LinkTestConcept[] { valueA, circleA };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(circleA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_First()
     {
-        var circle = new Circle("cId");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new CompositeShape("cs") { Parts = [valueA, valueB, circle] };
-        var values = new IShape[] { valueA, valueB };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circle = new LinkTestConcept("cId");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [valueA, valueB, circle] };
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Last()
     {
-        var circle = new Circle("cId");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new CompositeShape("cs") { Parts = [circle, valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circle = new LinkTestConcept("cId");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle, valueA, valueB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, valueA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, valueA, valueB, circleB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Mixed()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new CompositeShape("cs") { Parts = [valueA, circleA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [valueA, circleA, valueB, circleB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Containment_1_n.ToList());
     }
 
     #endregion
@@ -372,57 +372,57 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListMatchingType()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape>() { valueA, valueB };
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept>() { valueA, valueB };
+        parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, valueA.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueA));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueA));
         Assert.AreSame(parent, valueB.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueB));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueB));
     }
 
     [TestMethod]
     public void ListSubtype()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<Shape>() { valueA, valueB };
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept>() { valueA, valueB };
+        parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, valueA.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueA));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueA));
         Assert.AreSame(parent, valueB.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueB));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueB));
     }
 
     [TestMethod]
     public void Set()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new HashSet<IShape>() { valueA, valueB };
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new HashSet<LinkTestConcept>() { valueA, valueB };
+        parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, valueA.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueA));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueA));
         Assert.AreSame(parent, valueB.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueB));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueB));
     }
 
 
     [TestMethod]
     public void SingleEnumerable()
     {
-        var parent = new CompositeShape("cs");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new SingleEnumerable<IShape>() { valueA, valueB };
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var parent = new LinkTestConcept("cs");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new SingleEnumerable<LinkTestConcept>() { valueA, valueB };
+        parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, valueA.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueA));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueA));
         Assert.AreSame(parent, valueB.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(valueB));
+        Assert.IsTrue(parent.Containment_1_n.Contains(valueB));
     }
 }

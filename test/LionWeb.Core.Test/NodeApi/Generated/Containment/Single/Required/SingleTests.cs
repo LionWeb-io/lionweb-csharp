@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Required;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleTests
@@ -25,56 +25,56 @@ public class SingleTests
     [TestMethod]
     public void Single()
     {
-        var parent = new OffsetDuplicate("od");
-        var coord = new Coord("myId");
-        parent.Offset = coord;
+        var parent = new LinkTestConcept("od");
+        var coord = new LinkTestConcept("myId");
+        parent.Containment_1 = coord;
         Assert.AreSame(parent, coord.GetParent());
-        Assert.AreSame(coord, parent.Offset);
+        Assert.AreSame(coord, parent.Containment_1);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new OffsetDuplicate("od");
-        var coord = new Coord("myId");
-        parent.SetOffset(coord);
+        var parent = new LinkTestConcept("od");
+        var coord = new LinkTestConcept("myId");
+        parent.SetContainment_1(coord);
         Assert.AreSame(parent, coord.GetParent());
-        Assert.AreSame(coord, parent.Offset);
+        Assert.AreSame(coord, parent.Containment_1);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new OffsetDuplicate("od");
-        var coord = new Coord("myId");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
+        var parent = new LinkTestConcept("od");
+        var coord = new LinkTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, coord);
         Assert.AreSame(parent, coord.GetParent());
-        Assert.AreSame(coord, parent.Offset);
+        Assert.AreSame(coord, parent.Containment_1);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var coord = new Coord("myId");
-        var parent = new OffsetDuplicate("od") { Offset = coord };
+        var coord = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("od") { Containment_1 = coord };
         Assert.AreSame(parent, coord.GetParent());
-        Assert.AreSame(coord, parent.Offset);
+        Assert.AreSame(coord, parent.Containment_1);
     }
 
     [TestMethod]
     public void Result_Reflective()
     {
-        var coord = new Coord("myId");
-        var parent = new OffsetDuplicate("od") { Offset = coord };
-        Assert.AreSame(coord, parent.Get(ShapesLanguage.Instance.OffsetDuplicate_offset));
+        var coord = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("od") { Containment_1 = coord };
+        Assert.AreSame(coord, parent.Get(TestLanguageLanguage.Instance.LinkTestConcept_containment_1));
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var coord = new Coord("myId");
-        var parent = new OffsetDuplicate("od") { Offset = coord };
-        Assert.IsTrue(parent.TryGetOffset(out var o));
+        var coord = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("od") { Containment_1 = coord };
+        Assert.IsTrue(parent.TryGetContainment_1(out var o));
         Assert.AreSame(coord, o);
     }
 
@@ -83,37 +83,37 @@ public class SingleTests
     [TestMethod]
     public void Existing()
     {
-        var oldCoord = new Coord("old");
-        var parent = new OffsetDuplicate("g") { Offset = oldCoord };
-        var coord = new Coord("myId");
-        parent.Offset = coord;
+        var oldCoord = new LinkTestConcept("old");
+        var parent = new LinkTestConcept("g") { Containment_1 = oldCoord };
+        var coord = new LinkTestConcept("myId");
+        parent.Containment_1 = coord;
         Assert.IsNull(oldCoord.GetParent());
         Assert.AreSame(parent, coord.GetParent());
-        Assert.AreSame(coord, parent.Offset);
+        Assert.AreSame(coord, parent.Containment_1);
     }
 
     [TestMethod]
     public void Existing_Setter()
     {
-        var oldCoord = new Coord("old");
-        var parent = new OffsetDuplicate("g") { Offset = oldCoord };
-        var coord = new Coord("myId");
-        parent.SetOffset(coord);
+        var oldCoord = new LinkTestConcept("old");
+        var parent = new LinkTestConcept("g") { Containment_1 = oldCoord };
+        var coord = new LinkTestConcept("myId");
+        parent.SetContainment_1(coord);
         Assert.IsNull(oldCoord.GetParent());
         Assert.AreSame(parent, coord.GetParent());
-        Assert.AreSame(coord, parent.Offset);
+        Assert.AreSame(coord, parent.Containment_1);
     }
 
     [TestMethod]
     public void Existing_Reflective()
     {
-        var oldCoord = new Coord("old");
-        var parent = new OffsetDuplicate("g") { Offset = oldCoord };
-        var coord = new Coord("myId");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
+        var oldCoord = new LinkTestConcept("old");
+        var parent = new LinkTestConcept("g") { Containment_1 = oldCoord };
+        var coord = new LinkTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, coord);
         Assert.IsNull(oldCoord.GetParent());
         Assert.AreSame(parent, coord.GetParent());
-        Assert.AreSame(coord, parent.Offset);
+        Assert.AreSame(coord, parent.Containment_1);
     }
 
     #endregion

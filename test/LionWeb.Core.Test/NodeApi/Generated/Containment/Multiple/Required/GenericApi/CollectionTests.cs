@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.GenericApi;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class CollectionTests
@@ -27,29 +27,29 @@ public class CollectionTests
     [TestMethod]
     public void EmptyArray()
     {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[0];
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        var parent = new LinkTestConcept("cs");
+        var values = new LinkTestConcept[0];
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Count == 0);
     }
 
 
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[0];
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        var parent = new LinkTestConcept("cs");
+        var values = new LinkTestConcept[0];
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Count == 0);
     }
 
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[0];
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        var parent = new LinkTestConcept("cs");
+        var values = new LinkTestConcept[0];
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Count == 0);
     }
 
     #endregion
@@ -59,28 +59,28 @@ public class CollectionTests
     [TestMethod]
     public void NullArray()
     {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        var parent = new LinkTestConcept("cs");
+        var values = new LinkTestConcept[] { null };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Count == 0);
     }
 
     [TestMethod]
     public void Insert_NullArray()
     {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        var parent = new LinkTestConcept("cs");
+        var values = new LinkTestConcept[] { null };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Count == 0);
     }
 
     [TestMethod]
     public void Remove_NullArray()
     {
-        var parent = new CompositeShape("cs");
-        var values = new IShape[] { null };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Count == 0);
+        var parent = new LinkTestConcept("cs");
+        var values = new LinkTestConcept[] { null };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Count == 0);
     }
 
     #endregion
@@ -90,23 +90,23 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray()
     {
-        var parent = new CompositeShape("cs");
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.Add(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var parent = new LinkTestConcept("cs");
+        var value = new LinkTestConcept("s");
+        var values = new LinkTestConcept[] { value };
+        parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(value));
+        Assert.IsTrue(parent.Containment_1_n.Contains(value));
     }
 
     [TestMethod]
     public void Insert_SingleArray()
     {
-        var parent = new CompositeShape("cs");
-        var value = new Line("s");
-        var values = new IShape[] { value };
-        parent.Insert(ShapesLanguage.Instance.CompositeShape_parts, 0, values);
+        var parent = new LinkTestConcept("cs");
+        var value = new LinkTestConcept("s");
+        var values = new LinkTestConcept[] { value };
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, 0, values);
         Assert.AreSame(parent, value.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(value));
+        Assert.IsTrue(parent.Containment_1_n.Contains(value));
     }
 
     #region Remove
@@ -114,64 +114,64 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Empty()
     {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        var values = new IShape[] { line };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        var values = new LinkTestConcept[] { line };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void SingleArray_Remove_Only()
     {
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line] };
-        var values = new IShape[] { line };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values));
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [line] };
+        var values = new LinkTestConcept[] { line };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
         Assert.AreSame(parent, line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { line }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_First()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line, circle] };
-        var values = new IShape[] { line };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [line, circle] };
+        var values = new LinkTestConcept[] { line };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_Last()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circle, line] };
-        var values = new IShape[] { line };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle, line] };
+        var values = new LinkTestConcept[] { line };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        var values = new IShape[] { line };
-        parent.Remove(ShapesLanguage.Instance.CompositeShape_parts, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, line, circleB] };
+        var values = new LinkTestConcept[] { line };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Containment_1_n.ToList());
     }
 
     #endregion

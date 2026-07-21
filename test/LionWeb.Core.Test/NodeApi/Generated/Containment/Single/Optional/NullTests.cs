@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class NullTests
@@ -25,39 +25,39 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var parent = new Geometry("g");
-        parent.Documentation = null;
-        Assert.IsNull(parent.Documentation);
+        var parent = new TestPartition("g");
+        parent.Data = null;
+        Assert.IsNull(parent.Data);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new Geometry("g");
-        parent.SetDocumentation(null);
-        Assert.IsNull(parent.Documentation);
+        var parent = new TestPartition("g");
+        parent.SetData(null);
+        Assert.IsNull(parent.Data);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Geometry("g");
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
-        Assert.IsNull(parent.Documentation);
+        var parent = new TestPartition("g");
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, null);
+        Assert.IsNull(parent.Data);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var parent = new Geometry("g") { Documentation = null };
-        Assert.IsNull(parent.Documentation);
+        var parent = new TestPartition("g") { Data = null };
+        Assert.IsNull(parent.Data);
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new Geometry("g");
-        Assert.IsFalse(parent.TryGetDocumentation(out var o));
+        var parent = new TestPartition("g");
+        Assert.IsFalse(parent.TryGetData(out var o));
         Assert.IsNull(o);
     }
 }

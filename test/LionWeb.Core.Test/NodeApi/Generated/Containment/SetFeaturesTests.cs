@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M3;
 
 [TestClass]
@@ -30,47 +30,47 @@ public class SetFeaturesTests
     [TestMethod]
     public void ContainmentSingleOptional_Init()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentSingleOptional_Set()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
-        parent.Documentation = doc;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_documentation },
+        var parent = new TestPartition("g");
+        var doc = new DataTypeTestConcept("myId");
+        parent.Data = doc;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_data },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentSingleOptional_Set_Reflective()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_documentation },
+        var parent = new TestPartition("g");
+        var doc = new DataTypeTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, doc);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_data },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentSingleOptional_Unset()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
-        parent.Documentation = doc;
-        parent.Documentation = null;
+        var parent = new TestPartition("g");
+        var doc = new DataTypeTestConcept("myId");
+        parent.Data = doc;
+        parent.Data = null;
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentSingleOptional_Unset_Reflective()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
-        parent.Documentation = doc;
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
+        var parent = new TestPartition("g");
+        var doc = new DataTypeTestConcept("myId");
+        parent.Data = doc;
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, null);
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
@@ -81,27 +81,27 @@ public class SetFeaturesTests
     [TestMethod]
     public void ContainmentSingleRequired_Init()
     {
-        var parent = new OffsetDuplicate("g");
+        var parent = new LinkTestConcept("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentSingleRequired_Set()
     {
-        var parent = new OffsetDuplicate("g");
-        var coord = new Coord("myId");
-        parent.Offset = coord;
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.OffsetDuplicate_offset },
+        var parent = new LinkTestConcept("g");
+        var coord = new LinkTestConcept("myId");
+        parent.Containment_1 = coord;
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_containment_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentSingleRequired_Set_Reflective()
     {
-        var parent = new OffsetDuplicate("g");
-        var coord = new Coord("myId");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.OffsetDuplicate_offset },
+        var parent = new LinkTestConcept("g");
+        var coord = new LinkTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, coord);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_containment_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
@@ -116,66 +116,66 @@ public class SetFeaturesTests
     [TestMethod]
     public void ContainmentMultipleOptional_Init()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleOptional_Add()
     {
-        var parent = new Geometry("g");
-        parent.AddShapes([new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        parent.AddLinks([new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleOptional_Insert()
     {
-        var parent = new Geometry("g");
-        parent.InsertShapes(0, [new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        parent.InsertLinks(0, [new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleOptional_Set_Reflective()
     {
-        var parent = new Geometry("g");
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<IShape> { new Circle("myId") });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<LinkTestConcept> { new LinkTestConcept("myId") });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleOptional_Remove()
     {
-        var parent = new Geometry("g");
-        var value = new Circle("myId");
-        parent.AddShapes([value]);
-        parent.RemoveShapes([value]);
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("myId");
+        parent.AddLinks([value]);
+        parent.RemoveLinks([value]);
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleOptional_RemovePart()
     {
-        var parent = new Geometry("g");
-        var valueA = new Circle("myA");
-        var valueB = new Circle("myB");
-        parent.AddShapes([valueA, valueB]);
-        parent.RemoveShapes([valueA]);
-        CollectionAssert.AreEqual(new List<Feature>() { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        var valueA = new LinkTestConcept("myA");
+        var valueB = new LinkTestConcept("myB");
+        parent.AddLinks([valueA, valueB]);
+        parent.RemoveLinks([valueA]);
+        CollectionAssert.AreEqual(new List<Feature>() { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleOptional_Reset_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Circle("myId");
-        parent.AddShapes([value]);
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<IShape>());
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("myId");
+        parent.AddLinks([value]);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<LinkTestConcept>());
         CollectionAssert.AreEqual(new List<Feature>(),
             parent.CollectAllSetFeatures().ToList());
     }
@@ -183,11 +183,11 @@ public class SetFeaturesTests
     [TestMethod]
     public void ContainmentMultipleOptional_Overwrite_Reflective()
     {
-        var parent = new Geometry("g");
-        var value = new Circle("myA");
-        parent.AddShapes([value]);
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<IShape> { new Circle("myB") });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        var value = new LinkTestConcept("myA");
+        parent.AddLinks([value]);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<LinkTestConcept> { new LinkTestConcept("myB") });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
@@ -198,46 +198,46 @@ public class SetFeaturesTests
     [TestMethod]
     public void ContainmentMultipleRequired_Init()
     {
-        var parent = new Geometry("g");
+        var parent = new TestPartition("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleRequired_Add()
     {
-        var parent = new Geometry("g");
-        parent.AddShapes([new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        parent.AddLinks([new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleRequired_Insert()
     {
-        var parent = new Geometry("g");
-        parent.InsertShapes(0, [new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        parent.InsertLinks(0, [new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleRequired_Set_Reflective()
     {
-        var parent = new Geometry("g");
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<IShape> { new Circle("myId") });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<LinkTestConcept> { new LinkTestConcept("myId") });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ContainmentMultipleRequired_RemovePart()
     {
-        var parent = new Geometry("g");
-        var valueA = new Circle("myA");
-        var valueB = new Circle("myB");
-        parent.AddShapes([valueA, valueB]);
-        parent.RemoveShapes([valueA]);
-        CollectionAssert.AreEqual(new List<Feature>() { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        var valueA = new LinkTestConcept("myA");
+        var valueB = new LinkTestConcept("myB");
+        parent.AddLinks([valueA, valueB]);
+        parent.RemoveLinks([valueA]);
+        CollectionAssert.AreEqual(new List<Feature>() { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
@@ -245,12 +245,12 @@ public class SetFeaturesTests
     [TestMethod]
     public void ContainmentMultipleRequired_Overwrite_Reflective()
     {
-        var parent = new Geometry("g");
-        var valueA = new Circle("myA");
-        parent.AddShapes([valueA]);
-        var valueB = new Circle("myB");
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<IShape> { valueB });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Geometry_shapes },
+        var parent = new TestPartition("g");
+        var valueA = new LinkTestConcept("myA");
+        parent.AddLinks([valueA]);
+        var valueB = new LinkTestConcept("myB");
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<LinkTestConcept> { valueB });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.TestPartition_links },
             parent.CollectAllSetFeatures().ToList());
     }
 
