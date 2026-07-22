@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Single.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleTests
@@ -27,56 +27,56 @@ public class SingleTests
     [TestMethod]
     public void Single()
     {
-        var parent = new OffsetDuplicate("g");
-        var reference = new Line("myId");
-        parent.AltSource = reference;
+        var parent = new LinkTestConcept("g");
+        var reference = new LinkTestConcept("myId");
+        parent.Reference_0_1 = reference;
         Assert.IsNull(reference.GetParent());
-        Assert.AreSame(reference, parent.AltSource);
+        Assert.AreSame(reference, parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Single_Setter()
     {
-        var parent = new OffsetDuplicate("g");
-        var reference = new Line("myId");
-        parent.SetAltSource(reference);
+        var parent = new LinkTestConcept("g");
+        var reference = new LinkTestConcept("myId");
+        parent.SetReference_0_1(reference);
         Assert.IsNull(reference.GetParent());
-        Assert.AreSame(reference, parent.AltSource);
+        Assert.AreSame(reference, parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Single_Reflective()
     {
-        var parent = new OffsetDuplicate("g");
-        var reference = new Line("myId");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, reference);
+        var parent = new LinkTestConcept("g");
+        var reference = new LinkTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, reference);
         Assert.IsNull(reference.GetParent());
-        Assert.AreSame(reference, parent.AltSource);
+        Assert.AreSame(reference, parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Single_Constructor()
     {
-        var reference = new Line("myId");
-        var parent = new OffsetDuplicate("g") { AltSource = reference };
+        var reference = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_1 = reference };
         Assert.IsNull(reference.GetParent());
-        Assert.AreSame(reference, parent.AltSource);
+        Assert.AreSame(reference, parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Result_Reflective()
     {
-        var reference = new Line("myId");
-        var parent = new OffsetDuplicate("g") { AltSource = reference };
-        Assert.AreSame(reference, parent.Get(ShapesLanguage.Instance.OffsetDuplicate_altSource));
+        var reference = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_1 = reference };
+        Assert.AreSame(reference, parent.Get(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1));
     }
 
     [TestMethod]
     public void Single_TryGet()
     {
-        var reference = new Line("myId");
-        var parent = new OffsetDuplicate("g") { AltSource = reference };
-        Assert.IsTrue(parent.TryGetAltSource(out var o));
+        var reference = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_1 = reference };
+        Assert.IsTrue(parent.TryGetReference_0_1(out var o));
         Assert.AreSame(reference, o);
     }
 
@@ -85,37 +85,37 @@ public class SingleTests
     [TestMethod]
     public void Existing()
     {
-        var oldReference = new Line("old");
-        var parent = new OffsetDuplicate("g") { AltSource = oldReference };
-        var reference = new Line("myId");
-        parent.AltSource = reference;
+        var oldReference = new LinkTestConcept("old");
+        var parent = new LinkTestConcept("g") { Reference_0_1 = oldReference };
+        var reference = new LinkTestConcept("myId");
+        parent.Reference_0_1 = reference;
         Assert.IsNull(oldReference.GetParent());
         Assert.IsNull(reference.GetParent());
-        Assert.AreSame(reference, parent.AltSource);
+        Assert.AreSame(reference, parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Existing_Setter()
     {
-        var oldReference = new Line("old");
-        var parent = new OffsetDuplicate("g") { AltSource = oldReference };
-        var reference = new Line("myId");
-        parent.SetAltSource(reference);
+        var oldReference = new LinkTestConcept("old");
+        var parent = new LinkTestConcept("g") { Reference_0_1 = oldReference };
+        var reference = new LinkTestConcept("myId");
+        parent.SetReference_0_1(reference);
         Assert.IsNull(oldReference.GetParent());
         Assert.IsNull(reference.GetParent());
-        Assert.AreSame(reference, parent.AltSource);
+        Assert.AreSame(reference, parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Existing_Reflective()
     {
-        var oldReference = new Line("old");
-        var parent = new OffsetDuplicate("g") { AltSource = oldReference };
-        var reference = new Line("myId");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, reference);
+        var oldReference = new LinkTestConcept("old");
+        var parent = new LinkTestConcept("g") { Reference_0_1 = oldReference };
+        var reference = new LinkTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, reference);
         Assert.IsNull(oldReference.GetParent());
         Assert.IsNull(reference.GetParent());
-        Assert.AreSame(reference, parent.AltSource);
+        Assert.AreSame(reference, parent.Reference_0_1);
     }
 
     #endregion
@@ -127,39 +127,39 @@ public class SingleTests
     [TestMethod]
     public void Null()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.AltSource = null;
-        Assert.IsNull(parent.AltSource);
+        var parent = new LinkTestConcept("g");
+        parent.Reference_0_1 = null;
+        Assert.IsNull(parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Null_Setter()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.SetAltSource(null);
-        Assert.IsNull(parent.AltSource);
+        var parent = new LinkTestConcept("g");
+        parent.SetReference_0_1(null);
+        Assert.IsNull(parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Null_Reflective()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, null);
-        Assert.IsNull(parent.AltSource);
+        var parent = new LinkTestConcept("g");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, null);
+        Assert.IsNull(parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Null_Constructor()
     {
-        var parent = new OffsetDuplicate("g") { AltSource = null };
-        Assert.IsNull(parent.AltSource);
+        var parent = new LinkTestConcept("g") { Reference_0_1 = null };
+        Assert.IsNull(parent.Reference_0_1);
     }
 
     [TestMethod]
     public void Null_TryGet()
     {
-        var parent = new OffsetDuplicate("g") { AltSource = null };
-        Assert.IsFalse(parent.TryGetAltSource(out var o));
+        var parent = new LinkTestConcept("g") { Reference_0_1 = null };
+        Assert.IsFalse(parent.TryGetReference_0_1(out var o));
         Assert.IsNull(o);
     }
 

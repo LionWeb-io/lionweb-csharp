@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M3;
 
 [TestClass]
@@ -30,43 +30,43 @@ public class SetFeaturesTests
     [TestMethod]
     public void ReferenceSingleOptional_Init()
     {
-        var parent = new OffsetDuplicate("g");
+        var parent = new LinkTestConcept("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceSingleOptional_Set()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.AltSource = new Line("myId");
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.OffsetDuplicate_altSource },
+        var parent = new LinkTestConcept("g");
+        parent.Reference_0_1 = new LinkTestConcept("myId");
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceSingleOptional_Set_Reflective()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, new Line("myId"));
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.OffsetDuplicate_altSource },
+        var parent = new LinkTestConcept("g");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, new LinkTestConcept("myId"));
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceSingleOptional_Unset()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.AltSource = new Line("myId");
-        parent.AltSource = null;
+        var parent = new LinkTestConcept("g");
+        parent.Reference_0_1 = new LinkTestConcept("myId");
+        parent.Reference_0_1 = null;
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceSingleOptional_Unset_Reflective()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.AltSource = new Line("myId");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, null);
+        var parent = new LinkTestConcept("g");
+        parent.Reference_0_1 = new LinkTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, null);
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
@@ -77,25 +77,25 @@ public class SetFeaturesTests
     [TestMethod]
     public void ReferenceSingleRequired_Init()
     {
-        var parent = new OffsetDuplicate("g");
+        var parent = new LinkTestConcept("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceSingleRequired_Set()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.Source = new Line("myId");
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.OffsetDuplicate_source },
+        var parent = new LinkTestConcept("g");
+        parent.Reference_1 = new LinkTestConcept("myId");
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceSingleRequired_Set_Reflective()
     {
-        var parent = new OffsetDuplicate("g");
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_source, new Line("myId"));
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.OffsetDuplicate_source },
+        var parent = new LinkTestConcept("g");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, new LinkTestConcept("myId"));
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 
@@ -110,66 +110,66 @@ public class SetFeaturesTests
     [TestMethod]
     public void ReferenceMultipleOptional_Init()
     {
-        var parent = new ReferenceGeometry("g");
+        var parent = new LinkTestConcept("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleOptional_Add()
     {
-        var parent = new ReferenceGeometry("g");
-        parent.AddShapes([new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.ReferenceGeometry_shapes },
+        var parent = new LinkTestConcept("g");
+        parent.AddReference_0_n([new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleOptional_Insert()
     {
-        var parent = new ReferenceGeometry("g");
-        parent.InsertShapes(0, [new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.ReferenceGeometry_shapes },
+        var parent = new LinkTestConcept("g");
+        parent.InsertReference_0_n(0, [new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleOptional_Set_Reflective()
     {
-        var parent = new ReferenceGeometry("g");
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<IShape> { new Circle("myId") });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.ReferenceGeometry_shapes },
+        var parent = new LinkTestConcept("g");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<LinkTestConcept> { new LinkTestConcept("myId") });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleOptional_Remove()
     {
-        var parent = new ReferenceGeometry("g");
-        var value = new Circle("myId");
-        parent.AddShapes([value]);
-        parent.RemoveShapes([value]);
+        var parent = new LinkTestConcept("g");
+        var value = new LinkTestConcept("myId");
+        parent.AddReference_0_n([value]);
+        parent.RemoveReference_0_n([value]);
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleOptional_RemovePart()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Circle("myA");
-        var valueB = new Circle("myB");
-        parent.AddShapes([valueA, valueB]);
-        parent.RemoveShapes([valueA]);
-        CollectionAssert.AreEqual(new List<Feature>() { ShapesLanguage.Instance.ReferenceGeometry_shapes },
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("myA");
+        var valueB = new LinkTestConcept("myB");
+        parent.AddReference_0_n([valueA, valueB]);
+        parent.RemoveReference_0_n([valueA]);
+        CollectionAssert.AreEqual(new List<Feature>() { TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleOptional_Reset_Reflective()
     {
-        var parent = new ReferenceGeometry("g");
-        var value = new Circle("myId");
-        parent.AddShapes([value]);
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<IShape>());
+        var parent = new LinkTestConcept("g");
+        var value = new LinkTestConcept("myId");
+        parent.AddReference_0_n([value]);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<LinkTestConcept>());
         CollectionAssert.AreEqual(new List<Feature>(),
             parent.CollectAllSetFeatures().ToList());
     }
@@ -177,11 +177,11 @@ public class SetFeaturesTests
     [TestMethod]
     public void ReferenceMultipleOptional_Overwrite_Reflective()
     {
-        var parent = new ReferenceGeometry("g");
-        var value = new Circle("myA");
-        parent.AddShapes([value]);
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<IShape> { new Circle("myB") });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.ReferenceGeometry_shapes },
+        var parent = new LinkTestConcept("g");
+        var value = new LinkTestConcept("myA");
+        parent.AddReference_0_n([value]);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<LinkTestConcept> { new LinkTestConcept("myB") });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
@@ -192,46 +192,46 @@ public class SetFeaturesTests
     [TestMethod]
     public void ReferenceMultipleRequired_Init()
     {
-        var parent = new MaterialGroup("g");
+        var parent = new LinkTestConcept("g");
         CollectionAssert.AreEqual(new List<Feature>(), parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleRequired_Add()
     {
-        var parent = new MaterialGroup("g");
-        parent.AddMaterials([new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.MaterialGroup_materials },
+        var parent = new LinkTestConcept("g");
+        parent.AddReference_1_n([new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleRequired_Insert()
     {
-        var parent = new MaterialGroup("g");
-        parent.InsertMaterials(0, [new Circle("myId")]);
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.MaterialGroup_materials },
+        var parent = new LinkTestConcept("g");
+        parent.InsertReference_1_n(0, [new LinkTestConcept("myId")]);
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleRequired_Set_Reflective()
     {
-        var parent = new MaterialGroup("g");
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { new Circle("myId") });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.MaterialGroup_materials },
+        var parent = new LinkTestConcept("g");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { new LinkTestConcept("myId") });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void ReferenceMultipleRequired_RemovePart()
     {
-        var parent = new MaterialGroup("g");
-        var valueA = new Circle("myA");
-        var valueB = new Circle("myB");
-        parent.AddMaterials([valueA, valueB]);
-        parent.RemoveMaterials([valueA]);
-        CollectionAssert.AreEqual(new List<Feature>() { ShapesLanguage.Instance.MaterialGroup_materials },
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("myA");
+        var valueB = new LinkTestConcept("myB");
+        parent.AddReference_1_n([valueA, valueB]);
+        parent.RemoveReference_1_n([valueA]);
+        CollectionAssert.AreEqual(new List<Feature>() { TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n },
             parent.CollectAllSetFeatures().ToList());
     }
 
@@ -239,12 +239,12 @@ public class SetFeaturesTests
     [TestMethod]
     public void ReferenceMultipleRequired_Overwrite_Reflective()
     {
-        var parent = new MaterialGroup("g");
-        var valueA = new Circle("myA");
-        parent.AddMaterials([valueA]);
-        var valueB = new Circle("myB");
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { valueB });
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.MaterialGroup_materials },
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("myA");
+        parent.AddReference_1_n([valueA]);
+        var valueB = new LinkTestConcept("myB");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept> { valueB });
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n },
             parent.CollectAllSetFeatures().ToList());
     }
 

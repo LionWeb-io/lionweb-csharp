@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.GenericApi;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class GenericApiTests
@@ -27,11 +27,11 @@ public class GenericApiTests
     [TestMethod]
     public void Single_Add()
     {
-        var parent = new MaterialGroup("cs");
-        var line = new Line("myId");
-        parent.Add(ShapesLanguage.Instance.MaterialGroup_materials, [line]);
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [line]);
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Materials.Contains(line));
+        Assert.IsTrue(parent.Reference_1_n.Contains(line));
     }
 
     #region Insert
@@ -39,102 +39,102 @@ public class GenericApiTests
     [TestMethod]
     public void Single_Insert_Empty()
     {
-        var parent = new MaterialGroup("cs");
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 0, [line]);
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, [line]);
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Materials.Contains(line));
+        Assert.IsTrue(parent.Reference_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Single_Insert_Empty_UnderBounds()
     {
-        var parent = new MaterialGroup("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, -1, [line]));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, -1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Single_Insert_Empty_OverBounds()
     {
-        var parent = new MaterialGroup("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 1, [line]));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Single_Insert_One_Before()
     {
-        var circle = new Circle("cId");
-        var parent = new MaterialGroup("cs") { Materials = [circle] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 0, [line]);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, [line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Materials.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circle }, parent.Materials.ToList());
+        Assert.IsTrue(parent.Reference_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circle }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Insert_One_After()
     {
-        var circle = new Circle("cId");
-        var parent = new MaterialGroup("cs") { Materials = [circle] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 1, [line]);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, [line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Materials.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circle, line }, parent.Materials.ToList());
+        Assert.IsTrue(parent.Reference_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Insert_Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 0, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, [line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Materials.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circleA, circleB }, parent.Materials.ToList());
+        Assert.IsTrue(parent.Reference_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circleA, circleB }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Insert_Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 1, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, [line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Materials.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, line, circleB }, parent.Materials.ToList());
+        Assert.IsTrue(parent.Reference_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, line, circleB }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Insert_Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 2, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 2, [line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Materials.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB, line }, parent.Materials.ToList());
+        Assert.IsTrue(parent.Reference_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB, line }, parent.Reference_1_n.ToList());
     }
 
     #endregion
@@ -144,71 +144,71 @@ public class GenericApiTests
     [TestMethod]
     public void Single_Remove_Empty()
     {
-        var parent = new MaterialGroup("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.MaterialGroup_materials, [line]));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Materials.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Reference_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Single_Remove_NotContained()
     {
-        var circle = new Circle("myC");
-        var parent = new MaterialGroup("cs") { Materials = [circle] };
-        var line = new Line("myId");
-        parent.Remove(ShapesLanguage.Instance.MaterialGroup_materials, [line]);
+        var circle = new LinkTestConcept("myC");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Materials.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Remove_Only()
     {
-        var line = new Line("myId");
-        var parent = new MaterialGroup("cs") { Materials = [line] };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.MaterialGroup_materials, [line]));
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [line] };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [line]));
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { line }, parent.Materials.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Remove_First()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new MaterialGroup("cs") { Materials = [line, circle] };
-        parent.Remove(ShapesLanguage.Instance.MaterialGroup_materials, [line]);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [line, circle] };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Materials.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Remove_Last()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new MaterialGroup("cs") { Materials = [circle, line] };
-        parent.Remove(ShapesLanguage.Instance.MaterialGroup_materials, [line]);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circle, line] };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Materials.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_1_n.ToList());
     }
 
     [TestMethod]
     public void Single_Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new MaterialGroup("cs") { Materials = [circleA, line, circleB] };
-        parent.Remove(ShapesLanguage.Instance.MaterialGroup_materials, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Reference_1_n = [circleA, line, circleB] };
+        parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, [line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Materials.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Reference_1_n.ToList());
     }
 
     #endregion
@@ -220,29 +220,29 @@ public class GenericApiTests
     [TestMethod]
     public void Null()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(ShapesLanguage.Instance.MaterialGroup_materials, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, null));
     }
 
     [TestMethod]
     public void Null_Insert_Empty()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 0, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 0, null));
     }
 
     [TestMethod]
     public void Null_Insert_Empty_OutOfBounds()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(ShapesLanguage.Instance.MaterialGroup_materials, 1, [null]));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, 1, [null]));
     }
 
     [TestMethod]
     public void Null_Remove_Empty()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(ShapesLanguage.Instance.MaterialGroup_materials, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, null));
     }
 
     #endregion

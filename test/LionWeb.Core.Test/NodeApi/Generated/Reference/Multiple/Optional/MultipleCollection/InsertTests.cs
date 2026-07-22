@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional.MultipleCollection;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class InsertTests
@@ -25,146 +25,146 @@ public class InsertTests
     [TestMethod]
     public void ListMatchingType()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape> { valueA, valueB };
-        parent.InsertShapes(0, values);
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
+        parent.InsertReference_0_n(0, values);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void ListSubtype()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<Shape> { valueA, valueB };
-        parent.InsertShapes(0, values);
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
+        parent.InsertReference_0_n(0, values);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Set()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new HashSet<IShape> { valueA, valueB };
-        parent.InsertShapes(0, values);
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new HashSet<LinkTestConcept> { valueA, valueB };
+        parent.InsertReference_0_n(0, values);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void SingleEnumerable()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new SingleEnumerable<IShape> { valueA, valueB };
-        parent.InsertShapes(0, values);
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new SingleEnumerable<LinkTestConcept> { valueA, valueB };
+        parent.InsertReference_0_n(0, values);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Empty()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.InsertShapes(0, values);
+        var parent = new LinkTestConcept("g");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.InsertReference_0_n(0, values);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void One_Before()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.InsertShapes(0, values);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circle] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.InsertReference_0_n(0, values);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB, circle }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB, circle }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void One_After()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.InsertShapes(1, values);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circle] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.InsertReference_0_n(1, values);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle, valueA, valueB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, valueA, valueB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.InsertShapes(0, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.InsertReference_0_n(0, values);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { valueA, valueB, circleA, circleB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { valueA, valueB, circleA, circleB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.InsertShapes(1, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.InsertReference_0_n(1, values);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, valueA, valueB, circleB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, valueA, valueB, circleB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.InsertShapes(2, values);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circleA, circleB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
+        parent.InsertReference_0_n(2, values);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB, valueA, valueB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB, valueA, valueB }, parent.Reference_0_n.ToList());
     }
 }
