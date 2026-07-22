@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleTests
@@ -25,21 +25,21 @@ public class SingleTests
     [TestMethod]
     public void Add()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
-        parent.AddAnnotations([bom]);
-        Assert.AreSame(parent, bom.GetParent());
-        Assert.IsTrue(parent.GetAnnotations().Contains(bom));
+        var parent = new LinkTestConcept("g");
+        var annotation = new TestAnnotation("myId");
+        parent.AddAnnotations([annotation]);
+        Assert.AreSame(parent, annotation.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, bom));
-        Assert.AreSame(null, bom.GetParent());
-        Assert.IsFalse(parent.GetAnnotations().Contains(bom));
+        var parent = new LinkTestConcept("g");
+        var annotation = new TestAnnotation("myId");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, annotation));
+        Assert.AreSame(null, annotation.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
 
     #region Insert
@@ -47,107 +47,107 @@ public class SingleTests
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
-        parent.InsertAnnotations(0, [bom]);
-        Assert.AreSame(parent, bom.GetParent());
-        Assert.IsTrue(parent.GetAnnotations().Contains(bom));
+        var parent = new LinkTestConcept("g");
+        var annotation = new TestAnnotation("myId");
+        parent.InsertAnnotations(0, [annotation]);
+        Assert.AreSame(parent, annotation.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
     }
 
     [TestMethod]
     public void Insert_Empty_UnderBounds()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(-1, [bom]));
-        Assert.IsNull(bom.GetParent());
-        Assert.IsFalse(parent.GetAnnotations().Contains(bom));
+        var parent = new LinkTestConcept("g");
+        var annotation = new TestAnnotation("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(-1, [annotation]));
+        Assert.IsNull(annotation.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
 
     [TestMethod]
     public void Insert_Empty_OverBounds()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, [bom]));
-        Assert.IsNull(bom.GetParent());
-        Assert.IsFalse(parent.GetAnnotations().Contains(bom));
+        var parent = new LinkTestConcept("g");
+        var annotation = new TestAnnotation("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertAnnotations(1, [annotation]));
+        Assert.IsNull(annotation.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
 
     [TestMethod]
     public void Insert_One_Before()
     {
-        var doc = new Documentation("cId");
-        var parent = new Line("g");
-        parent.AddAnnotations([doc]);
-        var bom = new BillOfMaterials("myId");
-        parent.InsertAnnotations(0, [bom]);
-        Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(parent, bom.GetParent());
-        Assert.IsTrue(parent.GetAnnotations().Contains(bom));
-        CollectionAssert.AreEqual(new List<INode> { bom, doc }, parent.GetAnnotations().ToList());
+        var existing = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([existing]);
+        var annotation = new TestAnnotation("myId");
+        parent.InsertAnnotations(0, [annotation]);
+        Assert.AreSame(parent, existing.GetParent());
+        Assert.AreSame(parent, annotation.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
+        CollectionAssert.AreEqual(new List<INode> { annotation, existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Insert_One_After()
     {
-        var doc = new Documentation("cId");
-        var parent = new Line("g");
-        parent.AddAnnotations([doc]);
-        var bom = new BillOfMaterials("myId");
-        parent.InsertAnnotations(1, [bom]);
-        Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(parent, bom.GetParent());
-        Assert.IsTrue(parent.GetAnnotations().Contains(bom));
-        CollectionAssert.AreEqual(new List<INode> { doc, bom }, parent.GetAnnotations().ToList());
+        var existing = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([existing]);
+        var annotation = new TestAnnotation("myId");
+        parent.InsertAnnotations(1, [annotation]);
+        Assert.AreSame(parent, existing.GetParent());
+        Assert.AreSame(parent, annotation.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
+        CollectionAssert.AreEqual(new List<INode> { existing, annotation }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Before()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
-        parent.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
-        parent.InsertAnnotations(0, [bom]);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
-        Assert.AreSame(parent, bom.GetParent());
-        Assert.IsTrue(parent.GetAnnotations().Contains(bom));
-        CollectionAssert.AreEqual(new List<INode> { bom, docA, docB }, parent.GetAnnotations().ToList());
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
+        parent.InsertAnnotations(0, [annotation]);
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
+        Assert.AreSame(parent, annotation.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
+        CollectionAssert.AreEqual(new List<INode> { annotation, existingA, existingB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
-        parent.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
-        parent.InsertAnnotations(1, [bom]);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
-        Assert.AreSame(parent, bom.GetParent());
-        Assert.IsTrue(parent.GetAnnotations().Contains(bom));
-        CollectionAssert.AreEqual(new List<INode> { docA, bom, docB }, parent.GetAnnotations().ToList());
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
+        parent.InsertAnnotations(1, [annotation]);
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
+        Assert.AreSame(parent, annotation.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
+        CollectionAssert.AreEqual(new List<INode> { existingA, annotation, existingB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Insert_Two_After()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
-        parent.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
-        parent.InsertAnnotations(2, [bom]);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
-        Assert.AreSame(parent, bom.GetParent());
-        Assert.IsTrue(parent.GetAnnotations().Contains(bom));
-        CollectionAssert.AreEqual(new List<INode> { docA, docB, bom }, parent.GetAnnotations().ToList());
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
+        parent.InsertAnnotations(2, [annotation]);
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
+        Assert.AreSame(parent, annotation.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(annotation));
+        CollectionAssert.AreEqual(new List<INode> { existingA, existingB, annotation }, parent.GetAnnotations().ToList());
     }
 
     #endregion
@@ -157,76 +157,76 @@ public class SingleTests
     [TestMethod]
     public void Remove_Empty()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
-        parent.RemoveAnnotations([bom]);
-        Assert.IsNull(bom.GetParent());
-        Assert.IsFalse(parent.GetAnnotations().Contains(bom));
+        var parent = new LinkTestConcept("g");
+        var annotation = new TestAnnotation("myId");
+        parent.RemoveAnnotations([annotation]);
+        Assert.IsNull(annotation.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
 
     [TestMethod]
     public void Remove_NotContained()
     {
-        var doc = new Documentation("myC");
-        var parent = new Line("cs");
-        parent.AddAnnotations([doc]);
-        var bom = new BillOfMaterials("myId");
-        parent.RemoveAnnotations([bom]);
-        Assert.AreSame(parent, doc.GetParent());
-        Assert.IsNull(bom.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+        var existing = new TestAnnotation("myC");
+        var parent = new LinkTestConcept("cs");
+        parent.AddAnnotations([existing]);
+        var annotation = new TestAnnotation("myId");
+        parent.RemoveAnnotations([annotation]);
+        Assert.AreSame(parent, existing.GetParent());
+        Assert.IsNull(annotation.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Remove_Only()
     {
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
-        parent.AddAnnotations([bom]);
-        parent.RemoveAnnotations([bom]);
-        Assert.IsNull(bom.GetParent());
+        var annotation = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([annotation]);
+        parent.RemoveAnnotations([annotation]);
+        Assert.IsNull(annotation.GetParent());
         CollectionAssert.AreEqual(new List<INode> { }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Remove_First()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
-        parent.AddAnnotations([bom, doc]);
-        parent.RemoveAnnotations([bom]);
-        Assert.AreSame(parent, doc.GetParent());
-        Assert.IsNull(bom.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+        var existing = new TestAnnotation("cId");
+        var annotation = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([annotation, existing]);
+        parent.RemoveAnnotations([annotation]);
+        Assert.AreSame(parent, existing.GetParent());
+        Assert.IsNull(annotation.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Remove_Last()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
-        parent.AddAnnotations([doc, bom]);
-        parent.RemoveAnnotations([bom]);
-        Assert.AreSame(parent, doc.GetParent());
-        Assert.IsNull(bom.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+        var existing = new TestAnnotation("cId");
+        var annotation = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([existing, annotation]);
+        parent.RemoveAnnotations([annotation]);
+        Assert.AreSame(parent, existing.GetParent());
+        Assert.IsNull(annotation.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Remove_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
-        parent.AddAnnotations([docA, bom, docB]);
-        parent.RemoveAnnotations([bom]);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
-        Assert.IsNull(bom.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docA, docB }, parent.GetAnnotations().ToList());
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var annotation = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
+        parent.AddAnnotations([existingA, annotation, existingB]);
+        parent.RemoveAnnotations([annotation]);
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
+        Assert.IsNull(annotation.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existingA, existingB }, parent.GetAnnotations().ToList());
     }
 
     #endregion

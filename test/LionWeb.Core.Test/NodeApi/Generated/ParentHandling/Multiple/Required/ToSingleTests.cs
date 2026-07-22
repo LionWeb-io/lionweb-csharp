@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.ParentHandling.Multiple.Required;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class ToSingleTests
@@ -27,29 +27,29 @@ public class ToSingleTests
     [TestMethod]
     public void Other()
     {
-        var child = new Line("myId");
-        var source = new Geometry("src") { Shapes = [child] };
-        var target = new CompositeShape("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new TestPartition("src") { Links = [child] };
+        var target = new LinkTestConcept("tgt");
 
-        target.EvilPart = child;
+        target.Containment_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.EvilPart);
-        Assert.AreEqual(0, source.Shapes.Count);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.AreEqual(0, source.Links.Count);
     }
 
     [TestMethod]
     public void Other_Reflective()
     {
-        var child = new Line("myId");
-        var source = new Geometry("src") { Shapes = [child] };
-        var target = new CompositeShape("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new TestPartition("src") { Links = [child] };
+        var target = new LinkTestConcept("tgt");
 
-        target.Set(ShapesLanguage.Instance.CompositeShape_evilPart, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.EvilPart);
-        Assert.AreEqual(0, source.Shapes.Count);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.AreEqual(0, source.Links.Count);
     }
 
     #endregion
@@ -59,27 +59,27 @@ public class ToSingleTests
     [TestMethod]
     public void OtherInSameInstance()
     {
-        var child = new Line("myId");
-        var parent = new CompositeShape("src") { Parts = [child] };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_1_n = [child] };
 
-        parent.EvilPart = child;
+        parent.Containment_1 = child;
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.EvilPart);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts);
+        Assert.AreSame(child, parent.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n);
     }
 
     [TestMethod]
     public void OtherInSameInstance_Reflective()
     {
-        var child = new Line("myId");
-        var parent = new CompositeShape("src") { Parts = [child] };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_1_n = [child] };
 
-        parent.Set(ShapesLanguage.Instance.CompositeShape_evilPart, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, child);
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.EvilPart);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts);
+        Assert.AreSame(child, parent.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n);
     }
 
     #endregion

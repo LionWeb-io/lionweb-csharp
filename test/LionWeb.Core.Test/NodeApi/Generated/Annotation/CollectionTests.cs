@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using System.Collections;
 
 [TestClass]
@@ -28,7 +28,7 @@ public class CollectionTests
     [TestMethod]
     public void EmptyArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[0];
         parent.AddAnnotations(values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -37,7 +37,7 @@ public class CollectionTests
     [TestMethod]
     public void EmptyArray_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[0];
         parent.Set(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -46,7 +46,7 @@ public class CollectionTests
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[0];
         parent.InsertAnnotations(0, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -55,7 +55,7 @@ public class CollectionTests
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[0];
         parent.RemoveAnnotations(values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -64,7 +64,7 @@ public class CollectionTests
     [TestMethod]
     public void EmptyUntypedList_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new ArrayList();
         parent.Set(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -73,7 +73,7 @@ public class CollectionTests
     [TestMethod]
     public void EmptyListMatchingType_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new List<INode>();
         parent.Set(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -82,8 +82,8 @@ public class CollectionTests
     [TestMethod]
     public void EmptyListSubtype_Reflective()
     {
-        var parent = new Line("g");
-        var values = new List<Shape>();
+        var parent = new LinkTestConcept("g");
+        var values = new List<LinkTestConcept>();
         parent.Set(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -91,7 +91,7 @@ public class CollectionTests
     [TestMethod]
     public void EmptySet_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new HashSet<INode>();
         parent.Set(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -100,8 +100,8 @@ public class CollectionTests
     [TestMethod]
     public void EmptyListNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var values = new List<Coord>();
+        var parent = new LinkTestConcept("g");
+        var values = new List<DataTypeTestConcept>();
         parent.Set(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
     }
@@ -113,7 +113,7 @@ public class CollectionTests
     [TestMethod]
     public void NullArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[] { null };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.AddAnnotations(values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -122,7 +122,7 @@ public class CollectionTests
     [TestMethod]
     public void NullArray_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[] { null };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
@@ -132,7 +132,7 @@ public class CollectionTests
     [TestMethod]
     public void Insert_NullArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[] { null };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertAnnotations(0, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -141,7 +141,7 @@ public class CollectionTests
     [TestMethod]
     public void Remove_NullArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[] { null };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveAnnotations(values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -150,7 +150,7 @@ public class CollectionTests
     [TestMethod]
     public void NullUntypedList_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new ArrayList() { null };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
@@ -160,7 +160,7 @@ public class CollectionTests
     [TestMethod]
     public void NullListMatchingType_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new List<INode>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
@@ -170,8 +170,8 @@ public class CollectionTests
     [TestMethod]
     public void NullListSubtype_Reflective()
     {
-        var parent = new Line("g");
-        var values = new List<Shape>() { null };
+        var parent = new LinkTestConcept("g");
+        var values = new List<LinkTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -180,8 +180,8 @@ public class CollectionTests
     [TestMethod]
     public void NullListNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var values = new List<Coord>() { null };
+        var parent = new LinkTestConcept("g");
+        var values = new List<DataTypeTestConcept>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -190,7 +190,7 @@ public class CollectionTests
     [TestMethod]
     public void NullSet_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new HashSet<INode>() { null };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
@@ -204,8 +204,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new INode[] { value };
         parent.AddAnnotations(values);
         Assert.AreSame(parent, value.GetParent());
@@ -215,8 +215,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Reflective()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new INode[] { value };
         parent.Set(null, values);
         Assert.AreSame(parent, value.GetParent());
@@ -226,10 +226,10 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Existing_Reflective()
     {
-        var doc = new Documentation("cc");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cc");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([]);
-        var value = new BillOfMaterials("s");
+        var value = new TestAnnotation("s");
         var values = new INode[] { value };
         parent.Set(null, values);
         Assert.IsNull(doc.GetParent());
@@ -240,8 +240,8 @@ public class CollectionTests
     [TestMethod]
     public void Insert_SingleArray()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new INode[] { value };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, value.GetParent());
@@ -253,8 +253,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Empty()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
+        var parent = new LinkTestConcept("g");
+        var bom = new TestAnnotation("myId");
         var values = new INode[] { bom };
         parent.RemoveAnnotations(values);
         Assert.IsNull(bom.GetParent());
@@ -264,8 +264,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Only()
     {
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([bom]);
         var values = new INode[] { bom };
         parent.RemoveAnnotations(values);
@@ -276,9 +276,9 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_First()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([bom, doc]);
         var values = new INode[] { bom };
         parent.RemoveAnnotations(values);
@@ -290,9 +290,9 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Last()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([doc, bom]);
         var values = new INode[] { bom };
         parent.RemoveAnnotations(values);
@@ -304,10 +304,10 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([docA, bom, docB]);
         var values = new INode[] { bom };
         parent.RemoveAnnotations(values);
@@ -322,8 +322,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleUntypedArray_Reflective()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new object[] { value };
         parent.Set(null, values);
         Assert.AreSame(parent, value.GetParent());
@@ -333,8 +333,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleUntypedList_Reflective()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new ArrayList() { value };
         parent.Set(null, values);
         Assert.AreSame(parent, value.GetParent());
@@ -344,8 +344,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleListMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new List<INode>() { value };
         parent.Set(null, values);
         Assert.AreSame(parent, value.GetParent());
@@ -355,9 +355,9 @@ public class CollectionTests
     [TestMethod]
     public void SingleListSubtype_Reflective()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
-        var values = new List<BillOfMaterials>() { value };
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
+        var values = new List<TestAnnotation>() { value };
         parent.Set(null, values);
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(value));
@@ -366,8 +366,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleSet_Reflective()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new HashSet<INode>() { value };
         parent.Set(null, values);
         Assert.AreSame(parent, value.GetParent());
@@ -377,9 +377,9 @@ public class CollectionTests
     [TestMethod]
     public void SingleListNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var value = new Coord("c");
-        var values = new List<Coord>() { value };
+        var parent = new LinkTestConcept("g");
+        var value = new DataTypeTestConcept("c");
+        var values = new List<DataTypeTestConcept>() { value };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -388,8 +388,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleUntypedListNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var value = new Coord("c");
+        var parent = new LinkTestConcept("g");
+        var value = new DataTypeTestConcept("c");
         var values = new ArrayList() { value };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
@@ -399,8 +399,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleUntypedArrayNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var value = new Coord("c");
+        var parent = new LinkTestConcept("g");
+        var value = new DataTypeTestConcept("c");
         var values = new object[] { value };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));

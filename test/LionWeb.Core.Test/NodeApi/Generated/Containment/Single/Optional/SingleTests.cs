@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleTests
@@ -25,58 +25,58 @@ public class SingleTests
     [TestMethod]
     public void Single()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
-        parent.Documentation = doc;
+        var parent = new TestPartition("g");
+        var doc = new DataTypeTestConcept("myId");
+        parent.Data = doc;
         Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(doc, parent.Documentation);
+        Assert.AreSame(doc, parent.Data);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
-        parent.SetDocumentation(doc);
+        var parent = new TestPartition("g");
+        var doc = new DataTypeTestConcept("myId");
+        parent.SetData(doc);
         Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(doc, parent.Documentation);
+        Assert.AreSame(doc, parent.Data);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("myId");
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+        var parent = new TestPartition("g");
+        var doc = new DataTypeTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, doc);
         Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(doc, parent.Documentation);
+        Assert.AreSame(doc, parent.Data);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var doc = new Documentation("myId");
-        var parent = new Geometry("g") { Documentation = doc };
+        var doc = new DataTypeTestConcept("myId");
+        var parent = new TestPartition("g") { Data = doc };
         Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(doc, parent.Documentation);
+        Assert.AreSame(doc, parent.Data);
     }
 
     [TestMethod]
     public void Result_Reflective()
     {
-        var doc = new Documentation("myId");
-        var parent = new Geometry("g") { Documentation = doc };
-        Assert.AreSame(doc, parent.Get(ShapesLanguage.Instance.Geometry_documentation));
+        var doc = new DataTypeTestConcept("myId");
+        var parent = new TestPartition("g") { Data = doc };
+        Assert.AreSame(doc, parent.Get(TestLanguageLanguage.Instance.TestPartition_data));
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var doc = new Documentation("myId");
-        var parent = new Geometry("g") { Documentation = doc };
-        Assert.IsTrue(parent.TryGetDocumentation(out var o));
+        var doc = new DataTypeTestConcept("myId");
+        var parent = new TestPartition("g") { Data = doc };
+        Assert.IsTrue(parent.TryGetData(out var o));
         // `o` should NOT have a warning
-        Documentation documentation = o;
+        DataTypeTestConcept documentation = o;
         Assert.AreSame(doc, documentation);
     }
 
@@ -85,37 +85,37 @@ public class SingleTests
     [TestMethod]
     public void Existing()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
-        var doc = new Documentation("myId");
-        parent.Documentation = doc;
+        var oldDoc = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldDoc };
+        var doc = new DataTypeTestConcept("myId");
+        parent.Data = doc;
         Assert.IsNull(oldDoc.GetParent());
         Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(doc, parent.Documentation);
+        Assert.AreSame(doc, parent.Data);
     }
 
     [TestMethod]
     public void Existing_Setter()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
-        var doc = new Documentation("myId");
-        parent.SetDocumentation(doc);
+        var oldDoc = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldDoc };
+        var doc = new DataTypeTestConcept("myId");
+        parent.SetData(doc);
         Assert.IsNull(oldDoc.GetParent());
         Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(doc, parent.Documentation);
+        Assert.AreSame(doc, parent.Data);
     }
 
     [TestMethod]
     public void Existing_Reflective()
     {
-        var oldDoc = new Documentation("old");
-        var parent = new Geometry("g") { Documentation = oldDoc };
-        var doc = new Documentation("myId");
-        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+        var oldDoc = new DataTypeTestConcept("old");
+        var parent = new TestPartition("g") { Data = oldDoc };
+        var doc = new DataTypeTestConcept("myId");
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_data, doc);
         Assert.IsNull(oldDoc.GetParent());
         Assert.AreSame(parent, doc.GetParent());
-        Assert.AreSame(doc, parent.Documentation);
+        Assert.AreSame(doc, parent.Data);
     }
 
     #endregion

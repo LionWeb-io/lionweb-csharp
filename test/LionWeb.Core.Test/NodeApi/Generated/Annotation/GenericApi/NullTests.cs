@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.GenericApi;
 
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class NullTests
@@ -25,35 +25,35 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(null, [null]));
     }
 
     [TestMethod]
     public void Null_Reflective()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, null));
     }
 
     [TestMethod]
     public void Null_Insert_Empty()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(null, 0, [null]));
     }
 
     [TestMethod]
     public void Null_Insert_Empty_OutOfBounds()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(null, 1, [null]));
     }
 
     [TestMethod]
     public void Null_Remove_Empty()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(null, [null]));
     }
 }

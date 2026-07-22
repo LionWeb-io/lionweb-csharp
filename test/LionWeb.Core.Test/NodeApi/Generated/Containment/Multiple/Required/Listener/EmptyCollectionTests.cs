@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required.Listener;
@@ -27,14 +27,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyArray()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var values = new IShape[0];
+        var parentNode = new LinkTestConcept("cs");
+        var partition = new TestPartition("g") { Links = [parentNode] };
+        var values = new LinkTestConcept[0];
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.AddParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parentNode.AddContainment_1_n(values));
 
         observer.AssertNone<ChildAddedNotification>();
     }
@@ -42,15 +42,15 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyArray_Reflective()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        var parentNode = new LinkTestConcept("cs");
+        var partition = new TestPartition("g") { Links = [parentNode] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        var values = new IShape[0];
+        var values = new LinkTestConcept[0];
         Assert.ThrowsExactly<InvalidValueException>(
-            () => compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
+            () => parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
 
         observer.AssertNone<ChildAddedNotification>();
     }
@@ -58,14 +58,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var values = new IShape[0];
+        var parentNode = new LinkTestConcept("cs");
+        var partition = new TestPartition("g") { Links = [parentNode] };
+        var values = new LinkTestConcept[0];
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.InsertParts(0, values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parentNode.InsertContainment_1_n(0, values));
 
         observer.AssertNone<ChildAddedNotification>();
     }
@@ -73,14 +73,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var values = new IShape[0];
+        var parentNode = new LinkTestConcept("cs");
+        var partition = new TestPartition("g") { Links = [parentNode] };
+        var values = new LinkTestConcept[0];
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => compositeShape.RemoveParts(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => parentNode.RemoveContainment_1_n(values));
 
         observer.AssertEmpty();
     }
@@ -88,17 +88,17 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyList_Reset_Reflective()
     {
-        var compositeShape = new CompositeShape("cs");
-        var parent = new Geometry("g") { Shapes = [compositeShape] };
-        var value = new Circle("myId");
-        compositeShape.AddParts([value]);
+        var parentNode = new LinkTestConcept("cs");
+        var partition = new TestPartition("g") { Links = [parentNode] };
+        var value = new LinkTestConcept("myId");
+        parentNode.AddContainment_1_n([value]);
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        var values = new List<Coord>();
+        var values = new List<LinkTestConcept>();
         Assert.ThrowsExactly<InvalidValueException>(
-            () => compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values));
+            () => parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, values));
 
         observer.AssertEmpty();
     }

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.MultipleConnection;
 
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using System.Collections;
 
 [TestClass]
@@ -26,9 +27,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.AddAnnotations(values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -40,9 +41,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Set(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -54,9 +55,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedArray_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new object[] { valueA, valueB };
         parent.Set(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -68,9 +69,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedList_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new ArrayList() { valueA, valueB };
         parent.Set(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -82,9 +83,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListMatchingType()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new List<INode>() { valueA, valueB };
         parent.AddAnnotations(values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -96,9 +97,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new List<INode>() { valueA, valueB };
         parent.Set(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -110,10 +111,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListSubtype()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var values = new List<BillOfMaterials>() { valueA, valueB };
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var values = new List<TestAnnotation>() { valueA, valueB };
         parent.AddAnnotations(values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(valueA));
@@ -124,10 +125,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListSubtype_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var values = new List<BillOfMaterials>() { valueA, valueB };
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var values = new List<TestAnnotation>() { valueA, valueB };
         parent.Set(null, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(valueA));
@@ -138,9 +139,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Set()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new HashSet<INode>() { valueA, valueB };
         parent.AddAnnotations(values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -152,9 +153,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Set_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new HashSet<INode>() { valueA, valueB };
         parent.Set(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -166,9 +167,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleEnumerable()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new SingleEnumerable<INode> { valueA, valueB };
         parent.AddAnnotations(values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -180,9 +181,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleEnumerable_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new SingleEnumerable<INode> { valueA, valueB };
         parent.Set(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -194,10 +195,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ListNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new Coord("cA");
-        var valueB = new Coord("cB");
-        var values = new List<Coord>() { valueA, valueB };
+        var parent = new LinkTestConcept("g");
+        var valueA = new DataTypeTestConcept("cA");
+        var valueB = new DataTypeTestConcept("cB");
+        var values = new List<DataTypeTestConcept>() { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -206,9 +207,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedListNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new Coord("cA");
-        var valueB = new Coord("cB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new DataTypeTestConcept("cA");
+        var valueB = new DataTypeTestConcept("cB");
         var values = new ArrayList() { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
@@ -218,9 +219,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void UntypedArrayNonMatchingType_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new Coord("cA");
-        var valueB = new Coord("cB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new DataTypeTestConcept("cA");
+        var valueB = new DataTypeTestConcept("cB");
         var values = new object[] { valueA, valueB };
         Assert.ThrowsExactly<InvalidValueException>(
             () => parent.Set(null, values));
@@ -230,7 +231,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating()
     {
-        var parent = new Geometry("g");
+        var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.AddAnnotations(values));
@@ -241,7 +242,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Reflective()
     {
-        var parent = new Geometry("g");
+        var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, values));
@@ -252,7 +253,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Insert()
     {
-        var parent = new Geometry("g");
+        var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertAnnotations(0, values));
@@ -263,7 +264,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Remove()
     {
-        var parent = new Geometry("g");
+        var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
         parent.RemoveAnnotations(values);
@@ -274,9 +275,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Result_Reflective()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Set(null, values);
         var result = parent.Get(null);
@@ -286,9 +287,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ResultUnmodifiable_Set()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Set(null, values);
         var result = parent.Get(null);
@@ -298,7 +299,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void ResultUnmodifiable_Unset()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var result = parent.Get(null);
         Assert.IsInstanceOfType<IReadOnlyList<INode>>(result);
     }

@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.ParentHandling.Multiple.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class FromSingleTests
@@ -27,43 +27,43 @@ public class FromSingleTests
     [TestMethod]
     public void Other_Add()
     {
-        var child = new Line("myId");
-        var source = new MaterialGroup("src") { DefaultShape = child };
-        var target = new Geometry("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var target = new TestPartition("tgt");
 
-        target.AddShapes([child]);
+        target.AddLinks([child]);
 
         Assert.AreSame(target, child.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.IsNull(source.DefaultShape);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, target.Links.ToList());
+        Assert.IsNull(source.Containment_0_1);
     }
 
     [TestMethod]
     public void Other_Insert()
     {
-        var child = new Line("myId");
-        var source = new MaterialGroup("src") { DefaultShape = child };
-        var target = new Geometry("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var target = new TestPartition("tgt");
 
-        target.InsertShapes(0, [child]);
+        target.InsertLinks(0, [child]);
 
         Assert.AreSame(target, child.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.IsNull(source.DefaultShape);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, target.Links.ToList());
+        Assert.IsNull(source.Containment_0_1);
     }
 
     [TestMethod]
     public void Other_Reflective()
     {
-        var child = new Line("myId");
-        var source = new MaterialGroup("src") { DefaultShape = child };
-        var target = new Geometry("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var target = new TestPartition("tgt");
 
-        target.Set(ShapesLanguage.Instance.Geometry_shapes, new List<IShape> { child });
+        target.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<LinkTestConcept> { child });
 
         Assert.AreSame(target, child.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { child }, target.Shapes.ToList());
-        Assert.IsNull(source.DefaultShape);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, target.Links.ToList());
+        Assert.IsNull(source.Containment_0_1);
     }
 
     #endregion
@@ -73,40 +73,40 @@ public class FromSingleTests
     [TestMethod]
     public void OtherInSameInstance_Add()
     {
-        var child = new MaterialGroup("myId");
-        var parent = new BillOfMaterials("src") { DefaultGroup = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_0_1 = child };
 
-        parent.AddAltGroups([child]);
+        parent.AddContainment_0_n([child]);
 
         Assert.AreSame(parent, child.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { child }, parent.AltGroups.ToList());
-        Assert.IsNull(parent.DefaultGroup);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, parent.Containment_0_n.ToList());
+        Assert.IsNull(parent.Containment_0_1);
     }
 
     [TestMethod]
     public void OtherInSameInstance_Insert()
     {
-        var child = new MaterialGroup("myId");
-        var parent = new BillOfMaterials("src") { DefaultGroup = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_0_1 = child };
 
-        parent.InsertAltGroups(0, [child]);
+        parent.InsertContainment_0_n(0, [child]);
 
         Assert.AreSame(parent, child.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { child }, parent.AltGroups.ToList());
-        Assert.IsNull(parent.DefaultGroup);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, parent.Containment_0_n.ToList());
+        Assert.IsNull(parent.Containment_0_1);
     }
 
     [TestMethod]
     public void OtherInSameInstance_Reflective()
     {
-        var child = new MaterialGroup("myId");
-        var parent = new BillOfMaterials("src") { DefaultGroup = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_0_1 = child };
 
-        parent.Set(ShapesLanguage.Instance.BillOfMaterials_altGroups, new List<MaterialGroup> { child });
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<LinkTestConcept> { child });
 
         Assert.AreSame(parent, child.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { child }, parent.AltGroups.ToList());
-        Assert.IsNull(parent.DefaultGroup);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, parent.Containment_0_n.ToList());
+        Assert.IsNull(parent.Containment_0_1);
     }
 
     #endregion

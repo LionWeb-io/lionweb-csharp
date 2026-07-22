@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference;
 
-using Languages.Generated.V2023_1.Shapes.M2;
+using Languages.Generated.V2023_1.TestLanguage;
 using M3;
 using System.Collections;
 
@@ -30,36 +30,28 @@ public class VersionSpecificsTests
     [DataRow(typeof(IVersion2024_1_Compatible))]
     public void SingleArray_Reflective(Type versionIface)
     {
-        var parent = newReferenceGeometry("g", versionIface);
-        var value = newLine("s", versionIface);
+        var parent = newLinkTestConcept("g", versionIface);
+        var value = newLinkTestConcept("s", versionIface);
         var values = new INode[] { value };
-        parent.Set(ReferenceGeometry_shapes(versionIface), values);
+        parent.Set(LinkTestConcept_reference_0_n(versionIface), values);
         Assert.IsNull(value.GetParent());
-        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes(versionIface)) as IEnumerable).Cast<INode>().Contains(value));
+        Assert.IsTrue((parent.Get(LinkTestConcept_reference_0_n(versionIface)) as IEnumerable).Cast<INode>().Contains(value));
     }
 
-    private INode newReferenceGeometry(string id, Type versionIface) =>
+    private INode newLinkTestConcept(string id, Type versionIface) =>
         LionWebVersions.GetByInterface(versionIface) switch
         {
-            IVersion2023_1 => new ReferenceGeometry(id),
-            IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.ReferenceGeometry(id),
-            IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.ReferenceGeometry(id),
+            IVersion2023_1 => new LinkTestConcept(id),
+            IVersion2024_1 => new Languages.Generated.V2024_1.TestLanguage.LinkTestConcept(id),
+            IVersion2024_1_Compatible => new Languages.Generated.V2024_1.TestLanguage.LinkTestConcept(id),
             var v => throw new UnsupportedVersionException(v)
         };
 
-    private INode newLine(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
+    private Feature LinkTestConcept_reference_0_n(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Line(id),
-        IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Line(id),
-        IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Line(id),
-        var v => throw new UnsupportedVersionException(v)
-    };
-
-    private Feature ReferenceGeometry_shapes(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
-    {
-        IVersion2023_1 => ShapesLanguage.Instance.ReferenceGeometry_shapes,
-        IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.ReferenceGeometry_shapes,
-        IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.ReferenceGeometry_shapes,
+        IVersion2023_1 => TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+        IVersion2024_1 => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+        IVersion2024_1_Compatible => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
         var v => throw new UnsupportedVersionException(v)
     };
 }

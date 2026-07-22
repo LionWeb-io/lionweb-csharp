@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional.Listener.Single;
@@ -27,13 +27,14 @@ public class RemoveTests
     [TestMethod]
     public void Empty()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes([line]);
+        source.RemoveReference_0_n([line]);
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -41,13 +42,14 @@ public class RemoveTests
     [TestMethod]
     public void Empty_Reflective()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> {  });
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -55,14 +57,15 @@ public class RemoveTests
     [TestMethod]
     public void NotContained()
     {
-        var circle = new Circle("myC");
-        var parent = new ReferenceGeometry("cs") { Shapes = [circle] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("myC");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes([line]);
+        source.RemoveReference_0_n([line]);
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -70,17 +73,18 @@ public class RemoveTests
     [TestMethod]
     public void Only()
     {
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line] };
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [line] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes([line]);
+        source.RemoveReference_0_n([line]);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
@@ -88,17 +92,18 @@ public class RemoveTests
     [TestMethod]
     public void Only_Reflective()
     {
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line] };
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [line] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> {  });
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
@@ -106,18 +111,19 @@ public class RemoveTests
     [TestMethod]
     public void First()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [line, circle] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes([line]);
+        source.RemoveReference_0_n([line]);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
@@ -125,18 +131,19 @@ public class RemoveTests
     [TestMethod]
     public void First_Reflective()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [line, circle] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { circle });
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
@@ -144,18 +151,19 @@ public class RemoveTests
     [TestMethod]
     public void Last()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle, line] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes([line]);
+        source.RemoveReference_0_n([line]);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
@@ -163,18 +171,19 @@ public class RemoveTests
     [TestMethod]
     public void Last_Reflective()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle, line] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { circle });
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
@@ -182,19 +191,20 @@ public class RemoveTests
     [TestMethod]
     public void Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, line, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes([line]);
+        source.RemoveReference_0_n([line]);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }
@@ -202,19 +212,20 @@ public class RemoveTests
     [TestMethod]
     public void Between_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var line = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, line, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { circleA, circleB });
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].DeletedTarget);
     }

@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Single.Required.Listener;
@@ -26,13 +26,13 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var offsetDuplicate = new OffsetDuplicate("od");
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+        var node = new LinkTestConcept("od");
+        var partition = new TestPartition("g") { Links = [node] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => offsetDuplicate.Offset = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => node.Containment_1 = null);
 
         observer.AssertEmpty();
     }
@@ -40,13 +40,13 @@ public class NullTests
     [TestMethod]
     public void Existing()
     {
-        var offsetDuplicate = new OffsetDuplicate("od") { Offset = new Coord("myId") };
-        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+        var node = new LinkTestConcept("od") { Containment_1 = new LinkTestConcept("myId") };
+        var partition = new TestPartition("g") { Links = [node] };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => offsetDuplicate.Offset = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => node.Containment_1 = null);
 
         observer.AssertEmpty();
     }

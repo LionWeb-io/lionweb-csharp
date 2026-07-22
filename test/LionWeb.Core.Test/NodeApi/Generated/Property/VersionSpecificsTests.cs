@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
-using Languages.Generated.V2023_1.Shapes.M2;
+using Languages.Generated.V2023_1.TestLanguage;
 using M3;
 
 [TestClass]
@@ -29,10 +29,10 @@ public class VersionSpecificsTests
     [DataRow(typeof(IVersion2024_1_Compatible))]
     public void String(Type versionIface)
     {
-        var parent = newDocumentation("od", versionIface);
+        var parent = newDataTypeTestConcept("od", versionIface);
         var value = "Hi";
-        parent.Set(Documentation_text(versionIface), value);
-        Assert.AreEqual("Hi", parent.Get(Documentation_text(versionIface)));
+        parent.Set(DataTypeTestConcept_stringValue_0_1(versionIface), value);
+        Assert.AreEqual("Hi", parent.Get(DataTypeTestConcept_stringValue_0_1(versionIface)));
     }
 
     [TestMethod]
@@ -41,10 +41,10 @@ public class VersionSpecificsTests
     [DataRow(typeof(IVersion2024_1_Compatible))]
     public void Integer(Type versionIface)
     {
-        var parent = newCircle("od", versionIface);
+        var parent = newDataTypeTestConcept("od", versionIface);
         var value = 10;
-        parent.Set(Circle_r(versionIface), value);
-        Assert.AreEqual(10, parent.Get(Circle_r(versionIface)));
+        parent.Set(DataTypeTestConcept_integerValue_1(versionIface), value);
+        Assert.AreEqual(10, parent.Get(DataTypeTestConcept_integerValue_1(versionIface)));
     }
 
     [TestMethod]
@@ -53,10 +53,10 @@ public class VersionSpecificsTests
     [DataRow(typeof(IVersion2024_1_Compatible))]
     public void Boolean(Type versionIface)
     {
-        var parent = newDocumentation("od", versionIface);
+        var parent = newDataTypeTestConcept("od", versionIface);
         var value = true;
-        parent.Set(Documentation_technical(versionIface), value);
-        Assert.AreEqual(true, parent.Get(Documentation_technical(versionIface)));
+        parent.Set(DataTypeTestConcept_booleanValue_0_1(versionIface), value);
+        Assert.AreEqual(true, parent.Get(DataTypeTestConcept_booleanValue_0_1(versionIface)));
     }
 
     [TestMethod]
@@ -65,73 +65,57 @@ public class VersionSpecificsTests
     [DataRow(typeof(IVersion2024_1_Compatible))]
     public void Enum(Type versionIface)
     {
-        var parent = newMaterialGroup("od", versionIface);
-        var value = MatterState_liquid(versionIface);
-        parent.Set(MaterialGroup_matterState(versionIface), value);
-        Assert.AreEqual(MatterState_liquid(versionIface), parent.Get(MaterialGroup_matterState(versionIface)));
+        var parent = newDataTypeTestConcept("od", versionIface);
+        var value = TestEnumeration_literal1(versionIface);
+        parent.Set(DataTypeTestConcept_enumValue_0_1(versionIface), value);
+        Assert.AreEqual(TestEnumeration_literal1(versionIface), parent.Get(DataTypeTestConcept_enumValue_0_1(versionIface)));
     }
 
-    private INode newDocumentation(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
+    private INode newDataTypeTestConcept(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Documentation(id),
-        IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Documentation(id),
-        IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Documentation(id),
+        IVersion2023_1 => new DataTypeTestConcept(id),
+        IVersion2024_1 => new Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept(id),
+        IVersion2024_1_Compatible => new Languages.Generated.V2024_1.TestLanguage.DataTypeTestConcept(id),
         var v => throw new UnsupportedVersionException(v)
     };
 
-    private Feature Documentation_text(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
+    private Feature DataTypeTestConcept_stringValue_0_1(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => ShapesLanguage.Instance.Documentation_text,
-        IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_text,
-        IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_text,
+        IVersion2023_1 => TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1,
+        IVersion2024_1 => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1,
+        IVersion2024_1_Compatible => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1,
         var v => throw new UnsupportedVersionException(v)
     };
 
-    private Feature Documentation_technical(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
+    private Feature DataTypeTestConcept_booleanValue_0_1(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => ShapesLanguage.Instance.Documentation_technical,
-        IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_technical,
-        IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Documentation_technical,
+        IVersion2023_1 => TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1,
+        IVersion2024_1 => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1,
+        IVersion2024_1_Compatible => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1,
         var v => throw new UnsupportedVersionException(v)
     };
 
-    private INode newCircle(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
+    private Feature DataTypeTestConcept_integerValue_1(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new Circle(id),
-        IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.Circle(id),
-        IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.Circle(id),
+        IVersion2023_1 => TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1,
+        IVersion2024_1 => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1,
+        IVersion2024_1_Compatible => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1,
         var v => throw new UnsupportedVersionException(v)
     };
 
-    private Feature Circle_r(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
+    private Feature DataTypeTestConcept_enumValue_0_1(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => ShapesLanguage.Instance.Circle_r,
-        IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Circle_r,
-        IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.Circle_r,
+        IVersion2023_1 => TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1,
+        IVersion2024_1 => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1,
+        IVersion2024_1_Compatible => Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1,
         var v => throw new UnsupportedVersionException(v)
     };
 
-    private INode newMaterialGroup(string id, Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
+    private object? TestEnumeration_literal1(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
     {
-        IVersion2023_1 => new MaterialGroup(id),
-        IVersion2024_1 => new Languages.Generated.V2024_1.Shapes.M2.MaterialGroup(id),
-        IVersion2024_1_Compatible => new Languages.Generated.V2024_1.Shapes.M2.MaterialGroup(id),
-        var v => throw new UnsupportedVersionException(v)
-    };
-
-    private object? MatterState_liquid(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
-    {
-        IVersion2023_1 => MatterState.liquid,
-        IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.MatterState.liquid,
-        IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.MatterState.liquid,
-        var v => throw new UnsupportedVersionException(v)
-    };
-
-    private Feature MaterialGroup_matterState(Type versionIface) => LionWebVersions.GetByInterface(versionIface) switch
-    {
-        IVersion2023_1 => ShapesLanguage.Instance.MaterialGroup_matterState,
-        IVersion2024_1 => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.MaterialGroup_matterState,
-        IVersion2024_1_Compatible => Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance.MaterialGroup_matterState,
+        IVersion2023_1 => TestEnumeration.literal1,
+        IVersion2024_1 => Languages.Generated.V2024_1.TestLanguage.TestEnumeration.literal1,
+        IVersion2024_1_Compatible => Languages.Generated.V2024_1.TestLanguage.TestEnumeration.literal1,
         var v => throw new UnsupportedVersionException(v)
     };
 }

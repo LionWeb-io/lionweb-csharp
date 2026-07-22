@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.MultipleConnection;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class InsertTests
@@ -25,9 +25,9 @@ public class InsertTests
     [TestMethod]
     public void ListMatchingType()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new List<INode> { valueA, valueB };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -38,10 +38,10 @@ public class InsertTests
     [TestMethod]
     public void ListSubtype()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var values = new List<BillOfMaterials> { valueA, valueB };
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var values = new List<TestAnnotation> { valueA, valueB };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
@@ -51,9 +51,9 @@ public class InsertTests
     [TestMethod]
     public void Set()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new HashSet<INode> { valueA, valueB };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -64,9 +64,9 @@ public class InsertTests
     [TestMethod]
     public void SingleEnumerable()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new SingleEnumerable<INode> { valueA, valueB };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -77,9 +77,9 @@ public class InsertTests
     [TestMethod]
     public void Empty()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -90,11 +90,11 @@ public class InsertTests
     [TestMethod]
     public void One_Before()
     {
-        var doc = new Documentation("cId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([doc]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, doc.GetParent());
@@ -106,11 +106,11 @@ public class InsertTests
     [TestMethod]
     public void One_After()
     {
-        var ann = new BillOfMaterials("cId");
-        var parent = new Line("g");
+        var ann = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([ann]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.InsertAnnotations(1, values);
         Assert.AreSame(parent, ann.GetParent());
@@ -122,12 +122,12 @@ public class InsertTests
     [TestMethod]
     public void Two_Before()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.InsertAnnotations(0, values);
         Assert.AreSame(parent, docA.GetParent());
@@ -140,12 +140,12 @@ public class InsertTests
     [TestMethod]
     public void Two_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.InsertAnnotations(1, values);
         Assert.AreSame(parent, docA.GetParent());
@@ -158,12 +158,12 @@ public class InsertTests
     [TestMethod]
     public void Two_After()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.InsertAnnotations(2, values);
         Assert.AreSame(parent, docA.GetParent());

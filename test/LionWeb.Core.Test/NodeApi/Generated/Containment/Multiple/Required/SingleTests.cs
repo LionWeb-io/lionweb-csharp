@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleTests
@@ -25,38 +25,38 @@ public class SingleTests
     [TestMethod]
     public void Add()
     {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        parent.AddParts([line]);
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        parent.AddContainment_1_n([line]);
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, line));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, line));
         Assert.AreSame(null, line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line] };
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [line] };
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line] };
-        Assert.IsTrue(parent.TryGetParts(out var o));
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [line] };
+        Assert.IsTrue(parent.TryGetContainment_1_n(out var o));
         Assert.AreSame(line, o.FirstOrDefault());
     }
 
@@ -65,102 +65,102 @@ public class SingleTests
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        parent.InsertParts(0, [line]);
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        parent.InsertContainment_1_n(0, [line]);
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Insert_Empty_UnderBounds()
     {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(-1, [line]));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertContainment_1_n(-1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Insert_Empty_OverBounds()
     {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(1, [line]));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertContainment_1_n(1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Insert_One_Before()
     {
-        var circle = new Circle("cId");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var line = new Line("myId");
-        parent.InsertParts(0, [line]);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertContainment_1_n(0, [line]);
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circle }, parent.Parts.ToList());
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_One_After()
     {
-        var circle = new Circle("cId");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var line = new Line("myId");
-        parent.InsertParts(1, [line]);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertContainment_1_n(1, [line]);
         Assert.AreSame(parent, circle.GetParent());
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circle, line }, parent.Parts.ToList());
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.InsertParts(0, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertContainment_1_n(0, [line]);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circleA, circleB }, parent.Parts.ToList());
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circleA, circleB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.InsertParts(1, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertContainment_1_n(1, [line]);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, line, circleB }, parent.Parts.ToList());
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, line, circleB }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new CompositeShape("cs") { Parts = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.InsertParts(2, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertContainment_1_n(2, [line]);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.AreSame(parent, line.GetParent());
-        Assert.IsTrue(parent.Parts.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB, line }, parent.Parts.ToList());
+        Assert.IsTrue(parent.Containment_1_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB, line }, parent.Containment_1_n.ToList());
     }
 
     #endregion
@@ -170,71 +170,71 @@ public class SingleTests
     [TestMethod]
     public void Remove_Empty()
     {
-        var parent = new CompositeShape("cs");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts([line]));
+        var parent = new LinkTestConcept("cs");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveContainment_1_n([line]));
         Assert.IsNull(line.GetParent());
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Parts.Contains(line));
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1_n.Contains(line));
     }
 
     [TestMethod]
     public void Remove_NotContained()
     {
-        var circle = new Circle("myC");
-        var parent = new CompositeShape("cs") { Parts = [circle] };
-        var line = new Line("myId");
-        parent.RemoveParts([line]);
+        var circle = new LinkTestConcept("myC");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.RemoveContainment_1_n([line]);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Only()
     {
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line] };
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts([line]));
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [line] };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveContainment_1_n([line]));
         Assert.AreSame(parent, line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { line }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_First()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [line, circle] };
-        parent.RemoveParts([line]);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [line, circle] };
+        parent.RemoveContainment_1_n([line]);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Last()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circle, line] };
-        parent.RemoveParts([line]);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circle, line] };
+        parent.RemoveContainment_1_n([line]);
         Assert.AreSame(parent, circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Containment_1_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new CompositeShape("cs") { Parts = [circleA, line, circleB] };
-        parent.RemoveParts([line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("cs") { Containment_1_n = [circleA, line, circleB] };
+        parent.RemoveContainment_1_n([line]);
         Assert.AreSame(parent, circleA.GetParent());
         Assert.AreSame(parent, circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Parts.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Containment_1_n.ToList());
     }
 
     #endregion

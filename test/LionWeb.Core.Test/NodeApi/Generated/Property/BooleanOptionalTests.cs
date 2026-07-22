@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class BooleanOptionalTests
@@ -27,78 +27,78 @@ public class BooleanOptionalTests
     [TestMethod]
     public void Property()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = true;
-        parent.Technical = value;
-        Assert.AreEqual(true, parent.Technical);
+        parent.BooleanValue_0_1 = value;
+        Assert.AreEqual(true, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Setter()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = true;
-        parent.SetTechnical(value);
-        Assert.AreEqual(true, parent.Technical);
+        parent.SetBooleanValue_0_1(value);
+        Assert.AreEqual(true, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = true;
-        parent.Set(ShapesLanguage.Instance.Documentation_technical, value);
-        Assert.AreEqual(true, parent.Technical);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, value);
+        Assert.AreEqual(true, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Get_Reflective()
     {
-        var parent = new Documentation("od") { Technical = true };
-        Assert.AreEqual(true, parent.Get(ShapesLanguage.Instance.Documentation_technical));
+        var parent = new DataTypeTestConcept("od") { BooleanValue_0_1 = true };
+        Assert.AreEqual(true, parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1));
     }
 
     [TestMethod]
     public void False_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = false;
-        parent.Set(ShapesLanguage.Instance.Documentation_technical, value);
-        Assert.AreEqual(false, parent.Technical);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, value);
+        Assert.AreEqual(false, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void String_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = "10";
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Documentation_technical, value));
-        Assert.AreEqual(null, parent.Technical);
+            parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, value));
+        Assert.AreEqual(null, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Integer_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         var value = 10;
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.Documentation_technical, value));
-        Assert.AreEqual(null, parent.Technical);
+            parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, value));
+        Assert.AreEqual(null, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var parent = new Documentation("myId") { Technical = true };
-        Assert.AreEqual(true, parent.Technical);
+        var parent = new DataTypeTestConcept("myId") { BooleanValue_0_1 = true };
+        Assert.AreEqual(true, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new Documentation("myId") { Technical = true };
-        Assert.IsTrue(parent.TryGetTechnical(out var o));
+        var parent = new DataTypeTestConcept("myId") { BooleanValue_0_1 = true };
+        Assert.IsTrue(parent.TryGetBooleanValue_0_1(out var o));
         Assert.AreEqual(true, o);
     }
 
@@ -109,57 +109,57 @@ public class BooleanOptionalTests
     [TestMethod]
     public void Null()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.Technical = (bool?)value;
-        Assert.AreEqual(null, parent.Technical);
+        parent.BooleanValue_0_1 = (bool?)value;
+        Assert.AreEqual(null, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Null_Setter()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.SetTechnical((bool?)value);
-        Assert.AreEqual(null, parent.Technical);
+        parent.SetBooleanValue_0_1((bool?)value);
+        Assert.AreEqual(null, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Null_Reflective()
     {
-        var parent = new Documentation("od");
+        var parent = new DataTypeTestConcept("od");
         object value = null;
-        parent.Set(ShapesLanguage.Instance.Documentation_technical, null);
-        Assert.AreEqual(null, parent.Technical);
+        parent.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, null);
+        Assert.AreEqual(null, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Null_Get()
     {
-        var parent = new Documentation("od");
-        Assert.AreEqual(null, parent.Technical);
+        var parent = new DataTypeTestConcept("od");
+        Assert.AreEqual(null, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Null_Get_Reflective()
     {
-        var parent = new Documentation("od");
-        Assert.AreEqual(null, parent.Get(ShapesLanguage.Instance.Documentation_technical));
+        var parent = new DataTypeTestConcept("od");
+        Assert.AreEqual(null, parent.Get(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1));
     }
 
     [TestMethod]
     public void Null_Constructor()
     {
         object value = null;
-        var parent = new Documentation("od") { Technical = (bool?)value };
-        Assert.AreEqual(null, parent.Text);
+        var parent = new DataTypeTestConcept("od") { BooleanValue_0_1 = (bool?)value };
+        Assert.AreEqual(null, parent.BooleanValue_0_1);
     }
 
     [TestMethod]
     public void Null_TryGet()
     {
-        var parent = new Documentation("od");
-        Assert.IsFalse(parent.TryGetTechnical(out var o));
+        var parent = new DataTypeTestConcept("od");
+        Assert.IsFalse(parent.TryGetBooleanValue_0_1(out var o));
         Assert.IsNull(o);
     }
 

@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Single.Listener;
@@ -27,103 +27,103 @@ public class ListenerTests
     [TestMethod]
     public void ReferenceAdded_Optional()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var reference = new Line("myId");
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var target = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.AltSource = reference;
+        source.Reference_0_1 = target;
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(ReferenceTarget.FromNode(reference), notifications[0].NewTarget);
+        Assert.AreEqual(ReferenceTarget.FromNode(target), notifications[0].NewTarget);
     }
 
     [TestMethod]
     public void ReferenceAdded_Optional_Reflective()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var reference = new Line("myId");
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var target = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, reference);
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, target);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(ReferenceTarget.FromNode(reference), notifications[0].NewTarget);
+        Assert.AreEqual(ReferenceTarget.FromNode(target), notifications[0].NewTarget);
     }
 
     [TestMethod]
     public void ReferenceDeleted_Optional()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var reference = new Line("myId");
-        source.AltSource = reference;
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var target = new LinkTestConcept("myId");
+        source.Reference_0_1 = target;
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.AltSource = null;
+        source.Reference_0_1 = null;
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(ReferenceTarget.FromNode(reference), notifications[0].DeletedTarget);
+        Assert.AreEqual(ReferenceTarget.FromNode(target), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
     public void ReferenceDeleted_Optional_Reflective()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var reference = new Line("myId");
-        source.AltSource = reference;
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var target = new LinkTestConcept("myId");
+        source.Reference_0_1 = target;
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, null);
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, null);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(ReferenceTarget.FromNode(reference), notifications[0].DeletedTarget);
+        Assert.AreEqual(ReferenceTarget.FromNode(target), notifications[0].DeletedTarget);
     }
 
     [TestMethod]
     public void ReferenceChanged_Optional()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var oldTarget = new Line("oldTarget");
-        source.AltSource = oldTarget;
-        var newTarget = new Line("newTarget");
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var oldTarget = new LinkTestConcept("oldTarget");
+        source.Reference_0_1 = oldTarget;
+        var newTarget = new LinkTestConcept("newTarget");
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.AltSource = newTarget;
+        source.Reference_0_1 = newTarget;
 
         var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(oldTarget), notifications[0].OldTarget);
         Assert.AreEqual(ReferenceTarget.FromNode(newTarget), notifications[0].NewTarget);
@@ -134,21 +134,21 @@ public class ListenerTests
     [TestMethod]
     public void ReferenceChanged_Optional_Reflective()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var oldTarget = new Line("oldTarget");
-        source.AltSource = oldTarget;
-        var newTarget = new Line("newTarget");
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var oldTarget = new LinkTestConcept("oldTarget");
+        source.Reference_0_1 = oldTarget;
+        var newTarget = new LinkTestConcept("newTarget");
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, newTarget);
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, newTarget);
 
         var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(oldTarget), notifications[0].OldTarget);
         Assert.AreEqual(ReferenceTarget.FromNode(newTarget), notifications[0].NewTarget);
@@ -159,36 +159,36 @@ public class ListenerTests
     [TestMethod]
     public void ReferenceAdded_Required_Reflective()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var reference = new Line("myId");
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var target = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, reference);
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, target);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(ReferenceTarget.FromNode(reference), notifications[0].NewTarget);
+        Assert.AreEqual(ReferenceTarget.FromNode(target), notifications[0].NewTarget);
     }
 
     [TestMethod]
     public void ReferenceDeleted_Required()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var reference = new Line("myId");
-        source.Source = reference;
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var target = new LinkTestConcept("myId");
+        source.Reference_1 = target;
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => source.Source = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => source.Reference_1 = null);
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -196,17 +196,17 @@ public class ListenerTests
     [TestMethod]
     public void ReferenceDeleted_Required_Reflective()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var reference = new Line("myId");
-        source.Source = reference;
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var target = new LinkTestConcept("myId");
+        source.Reference_1 = target;
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, null));
+            source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, null));
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -214,21 +214,21 @@ public class ListenerTests
     [TestMethod]
     public void ReferenceChanged_Required()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var oldTarget = new Line("oldTarget");
-        source.Source = oldTarget;
-        var newTarget = new Line("newTarget");
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var oldTarget = new LinkTestConcept("oldTarget");
+        source.Reference_1 = oldTarget;
+        var newTarget = new LinkTestConcept("newTarget");
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.Source = newTarget;
+        source.Reference_1 = newTarget;
 
         var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(oldTarget), notifications[0].OldTarget);
         Assert.AreEqual(ReferenceTarget.FromNode(newTarget), notifications[0].NewTarget);
@@ -239,21 +239,21 @@ public class ListenerTests
     [TestMethod]
     public void ReferenceChanged_Required_Reflective()
     {
-        var partition = new Geometry("g");
-        var source = new OffsetDuplicate("g");
-        partition.AddShapes([source]);
-        var oldTarget = new Line("oldTarget");
-        source.Source = oldTarget;
-        var newTarget = new Line("newTarget");
+        var partition = new TestPartition("g");
+        var source = new LinkTestConcept("g");
+        partition.AddLinks([source]);
+        var oldTarget = new LinkTestConcept("oldTarget");
+        source.Reference_1 = oldTarget;
+        var newTarget = new LinkTestConcept("newTarget");
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, newTarget);
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, newTarget);
 
         var notifications = observer.AssertOfType<ReferenceChangedNotification>(1);
         Assert.AreSame(source, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, notifications[0].Reference);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(oldTarget), notifications[0].OldTarget);
         Assert.AreEqual(ReferenceTarget.FromNode(newTarget), notifications[0].NewTarget);

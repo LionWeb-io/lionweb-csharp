@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional.Listener;
@@ -27,24 +27,24 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void ListMatchingType()
     {
-        var parent = new Geometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape>() { valueA, valueB };
-        parent.AddShapes(values);
+        var parent = new TestPartition("g");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept>() { valueA, valueB };
+        parent.AddLinks(values);
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -52,24 +52,24 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void ListMatchingType_Reflective()
     {
-        var parent = new Geometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape>() { valueA, valueB };
-        parent.AddShapes(values);
+        var parent = new TestPartition("g");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept>() { valueA, valueB };
+        parent.AddLinks(values);
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { });
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -77,17 +77,17 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void NonContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new Geometry("cs") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var childA = new LinkTestConcept("cA");
+        var childB = new LinkTestConcept("cB");
+        var parent = new TestPartition("cs") { Links = [childA, childB] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         observer.AssertNone<ChildDeletedNotification>();
     }
@@ -95,65 +95,65 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void HalfContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new Geometry("cs") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var values = new IShape[] { valueA, circleA };
+        var childA = new LinkTestConcept("cA");
+        var childB = new LinkTestConcept("cB");
+        var parent = new TestPartition("cs") { Links = [childA, childB] };
+        var valueA = new LinkTestConcept("sA");
+        var values = new LinkTestConcept[] { valueA, childA };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(circleA, notifications[0].DeletedChild);
+        Assert.AreEqual(childA, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void HalfContained_Reflective()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new Geometry("cs") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var values = new IShape[] { valueA, circleA };
+        var childA = new LinkTestConcept("cA");
+        var childB = new LinkTestConcept("cB");
+        var parent = new TestPartition("cs") { Links = [childA, childB] };
+        var valueA = new LinkTestConcept("sA");
+        var values = new LinkTestConcept[] { valueA, childA };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleB });
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { childB });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(1);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(circleA, notifications[0].DeletedChild);
+        Assert.AreEqual(childA, notifications[0].DeletedChild);
     }
 
     [TestMethod]
     public void Only()
     {
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [valueA, valueB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -161,23 +161,23 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Only_Reflective()
     {
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [valueA, valueB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { });
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -185,24 +185,24 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Last()
     {
-        var circle = new Circle("cId");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [circle, valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
+        var child = new LinkTestConcept("cId");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [child, valueA, valueB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -210,24 +210,24 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Last_Reflective()
     {
-        var circle = new Circle("cId");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [circle, valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
+        var child = new LinkTestConcept("cId");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [child, valueA, valueB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle });
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { child });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -235,25 +235,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [circleA, valueA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
+        var childA = new LinkTestConcept("cIdA");
+        var childB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [childA, valueA, valueB, childB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -261,25 +261,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Between_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [circleA, valueA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
+        var childA = new LinkTestConcept("cIdA");
+        var childB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [childA, valueA, valueB, childB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, circleB });
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { childA, childB });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -287,25 +287,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Mixed()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [valueA, circleA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
+        var childA = new LinkTestConcept("cIdA");
+        var childB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [valueA, childA, valueB, childB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }
@@ -313,25 +313,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Mixed_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g") { Shapes = [valueA, circleA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
+        var childA = new LinkTestConcept("cIdA");
+        var childB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var parent = new TestPartition("g") { Links = [valueA, childA, valueB, childB] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circleA, circleB });
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { childA, childB });
 
         var notifications = observer.AssertOfType<ChildDeletedNotification>(2);
         Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[0].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedChild);
         Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, notifications[1].Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[1].Containment);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedChild);
     }

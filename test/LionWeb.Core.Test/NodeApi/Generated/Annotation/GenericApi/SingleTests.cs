@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.GenericApi;
 
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleTests
@@ -25,8 +25,8 @@ public class SingleTests
     [TestMethod]
     public void Single_Add()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
+        var parent = new LinkTestConcept("g");
+        var bom = new TestAnnotation("myId");
         parent.Add(null, [bom]);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
@@ -37,8 +37,8 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_Empty()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
+        var parent = new LinkTestConcept("g");
+        var bom = new TestAnnotation("myId");
         parent.Insert(null, 0, [bom]);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
@@ -47,8 +47,8 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_Empty_UnderBounds()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
+        var parent = new LinkTestConcept("g");
+        var bom = new TestAnnotation("myId");
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(null, -1, [bom]));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
@@ -57,8 +57,8 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_Empty_OverBounds()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
+        var parent = new LinkTestConcept("g");
+        var bom = new TestAnnotation("myId");
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(null, 1, [bom]));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
@@ -67,10 +67,10 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_One_Before()
     {
-        var doc = new Documentation("cId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [doc]);
-        var bom = new BillOfMaterials("myId");
+        var bom = new TestAnnotation("myId");
         parent.Insert(null, 0, [bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -81,10 +81,10 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_One_After()
     {
-        var doc = new Documentation("cId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [doc]);
-        var bom = new BillOfMaterials("myId");
+        var bom = new TestAnnotation("myId");
         parent.Insert(null, 1, [bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -95,11 +95,11 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_Two_Before()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var bom = new TestAnnotation("myId");
         parent.Insert(null, 0, [bom]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
@@ -111,11 +111,11 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_Two_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var bom = new TestAnnotation("myId");
         parent.Insert(null, 1, [bom]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
@@ -127,11 +127,11 @@ public class SingleTests
     [TestMethod]
     public void Single_Insert_Two_After()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var bom = new TestAnnotation("myId");
         parent.Insert(null, 2, [bom]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
@@ -147,8 +147,8 @@ public class SingleTests
     [TestMethod]
     public void Single_Remove_Empty()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
+        var parent = new LinkTestConcept("g");
+        var bom = new TestAnnotation("myId");
         parent.Remove(null, [bom]);
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
@@ -157,10 +157,10 @@ public class SingleTests
     [TestMethod]
     public void Single_Remove_NotContained()
     {
-        var doc = new Documentation("myC");
-        var parent = new Line("cs");
+        var doc = new TestAnnotation("myC");
+        var parent = new LinkTestConcept("cs");
         parent.Add(null, [doc]);
-        var bom = new BillOfMaterials("myId");
+        var bom = new TestAnnotation("myId");
         parent.Remove(null, [bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(bom.GetParent());
@@ -170,8 +170,8 @@ public class SingleTests
     [TestMethod]
     public void Single_Remove_Only()
     {
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [bom]);
         parent.Remove(null, [bom]);
         Assert.IsNull(bom.GetParent());
@@ -181,9 +181,9 @@ public class SingleTests
     [TestMethod]
     public void Single_Remove_First()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [bom, doc]);
         parent.Remove(null, [bom]);
         Assert.AreSame(parent, doc.GetParent());
@@ -194,9 +194,9 @@ public class SingleTests
     [TestMethod]
     public void Single_Remove_Last()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [doc, bom]);
         parent.Remove(null, [bom]);
         Assert.AreSame(parent, doc.GetParent());
@@ -207,10 +207,10 @@ public class SingleTests
     [TestMethod]
     public void Single_Remove_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, bom, docB]);
         parent.Remove(null, [bom]);
         Assert.AreSame(parent, docA.GetParent());

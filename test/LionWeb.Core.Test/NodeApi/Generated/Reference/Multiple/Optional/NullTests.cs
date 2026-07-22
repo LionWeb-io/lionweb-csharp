@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class NullTests
@@ -25,50 +25,50 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var parent = new ReferenceGeometry("g");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddShapes(null));
+        var parent = new LinkTestConcept("g");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddReference_0_n(null));
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new ReferenceGeometry("g");
+        var parent = new LinkTestConcept("g");
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, null));
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, null));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        Assert.ThrowsExactly<InvalidValueException>(() => new ReferenceGeometry("g") { Shapes = [null] });
+        Assert.ThrowsExactly<InvalidValueException>(() => new LinkTestConcept("g") { Reference_0_n = [null] });
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new ReferenceGeometry("g");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertShapes(0, null));
+        var parent = new LinkTestConcept("g");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertReference_0_n(0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
-        var parent = new ReferenceGeometry("g");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertShapes(1, null));
+        var parent = new LinkTestConcept("g");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertReference_0_n(1, null));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
-        var parent = new ReferenceGeometry("g");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveShapes(null));
+        var parent = new LinkTestConcept("g");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveReference_0_n(null));
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new ReferenceGeometry("g");
-        Assert.IsFalse(parent.TryGetShapes(out var o));
+        var parent = new LinkTestConcept("g");
+        Assert.IsFalse(parent.TryGetReference_0_n(out var o));
         Assert.IsFalse(o.Any());
     }
 }

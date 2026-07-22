@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional.Listener.Single;
@@ -27,18 +27,19 @@ public class InsertTests
     [TestMethod]
     public void One_Before()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.InsertShapes(0, [line]);
+        source.InsertReference_0_n(0, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -46,18 +47,19 @@ public class InsertTests
     [TestMethod]
     public void One_Before_Reflective()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circle });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { line, circle });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -65,18 +67,19 @@ public class InsertTests
     [TestMethod]
     public void One_After()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.InsertShapes(1, [line]);
+        source.InsertReference_0_n(1, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -84,18 +87,19 @@ public class InsertTests
     [TestMethod]
     public void One_After_Reflective()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var line = new Line("myId");
+        var circle = new LinkTestConcept("cId");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle, line });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { circle, line });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -103,19 +107,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.InsertShapes(0, [line]);
+        source.InsertReference_0_n(0, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -123,19 +128,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Before_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circleA, circleB });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { line, circleA, circleB });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -143,19 +149,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.InsertShapes(1, [line]);
+        source.InsertReference_0_n(1, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -163,19 +170,20 @@ public class InsertTests
     [TestMethod]
     public void Two_Between_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, line, circleB });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { circleA, line, circleB });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -183,19 +191,20 @@ public class InsertTests
     [TestMethod]
     public void Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.InsertShapes(2, [line]);
+        source.InsertReference_0_n(2, [line]);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(2, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }
@@ -203,19 +212,20 @@ public class InsertTests
     [TestMethod]
     public void Two_After_Reflective()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var line = new LinkTestConcept("myId");
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB, line });
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, new List<INode> { circleA, circleB, line });
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(2, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(line), notifications[0].NewTarget);
     }

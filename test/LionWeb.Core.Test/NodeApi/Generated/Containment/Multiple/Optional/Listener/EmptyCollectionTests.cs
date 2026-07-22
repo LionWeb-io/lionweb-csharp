@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Optional.Listener;
 
 using Core.Notification.Partition;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using Notification;
 
 [TestClass]
@@ -27,13 +27,13 @@ public class EmptyCollectionTests: NotificationTestsBase
     [TestMethod]
     public void EmptyArray()
     {
-        var parent = new Geometry("g");
-        var values = Array.Empty<IShape>();
+        var parent = new TestPartition("g");
+        var values = Array.Empty<LinkTestConcept>();
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.AddShapes(values);
+        parent.AddLinks(values);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
@@ -41,13 +41,13 @@ public class EmptyCollectionTests: NotificationTestsBase
     [TestMethod]
     public void EmptyArray_Reflective()
     {
-        var parent = new Geometry("g");
-        var values = Array.Empty<IShape>();
+        var parent = new TestPartition("g");
+        var values = Array.Empty<LinkTestConcept>();
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
@@ -55,13 +55,13 @@ public class EmptyCollectionTests: NotificationTestsBase
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var parent = new Geometry("g");
-        var values = Array.Empty<IShape>();
+        var parent = new TestPartition("g");
+        var values = Array.Empty<LinkTestConcept>();
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.InsertShapes(0, values);
+        parent.InsertLinks(0, values);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
@@ -69,13 +69,13 @@ public class EmptyCollectionTests: NotificationTestsBase
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var parent = new Geometry("g");
-        var values = Array.Empty<IShape>();
+        var parent = new TestPartition("g");
+        var values = Array.Empty<LinkTestConcept>();
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.RemoveShapes(values);
+        parent.RemoveLinks(values);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
@@ -83,21 +83,21 @@ public class EmptyCollectionTests: NotificationTestsBase
     [TestMethod]
     public void EmptyList_Reset_Reflective()
     {
-        var parent = new Geometry("g");
-        var circle = new Circle("myId");
-        parent.AddShapes([circle]);
-        var values = new List<Coord>();
+        var parent = new TestPartition("g");
+        var child = new LinkTestConcept("myId");
+        parent.AddLinks([child]);
+        var values = new List<LinkTestConcept>();
 
         var notificationObserver = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
+        parent.Set(TestLanguageLanguage.Instance.TestPartition_links, values);
 
         var childDeletedNotification = (ChildDeletedNotification)notificationObserver.Notifications[0];
         Assert.AreEqual(1, notificationObserver.Count);
         Assert.AreSame(parent, childDeletedNotification.Parent);
-        Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, childDeletedNotification.Containment);
+        Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, childDeletedNotification.Containment);
         Assert.AreEqual(0, childDeletedNotification.Index);
-        Assert.AreSame(circle, childDeletedNotification.DeletedChild);
+        Assert.AreSame(child, childDeletedNotification.DeletedChild);
     }
 }

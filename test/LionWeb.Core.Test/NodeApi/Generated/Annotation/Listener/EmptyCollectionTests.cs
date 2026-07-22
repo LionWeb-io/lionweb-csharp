@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener;
@@ -27,14 +27,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyArray()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
         var values = new INode[0];
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.AddAnnotations(values);
+        child.AddAnnotations(values);
 
         observer.AssertNone<AnnotationAddedNotification>();
     }
@@ -42,14 +42,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyArray_Reflective()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
         var values = new INode[0];
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, values);
+        child.Set(null, values);
 
         observer.AssertNone<AnnotationAddedNotification>();
     }
@@ -57,14 +57,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
         var values = new INode[0];
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(0, values);
+        child.InsertAnnotations(0, values);
 
         observer.AssertNone<AnnotationAddedNotification>();
     }
@@ -72,14 +72,14 @@ public class EmptyCollectionTests
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
         var values = new INode[0];
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         observer.AssertNone<AnnotationDeletedNotification>();
     }
@@ -88,20 +88,20 @@ public class EmptyCollectionTests
     [TestMethod]
     public void EmptyList_Reset_Reflective()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var bom = new BillOfMaterials("myId");
-        line.AddAnnotations([bom]);
-        var values = new List<BillOfMaterials>();
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var annotation = new TestAnnotation("myId");
+        child.AddAnnotations([annotation]);
+        var values = new List<TestAnnotation>();
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, values);
+        child.Set(null, values);
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].DeletedAnnotation);
+        Assert.AreEqual(annotation, notifications[0].DeletedAnnotation);
     }
 }

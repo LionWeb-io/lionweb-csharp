@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.ParentHandling.Multiple.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class ToSingleTests
@@ -27,29 +27,29 @@ public class ToSingleTests
     [TestMethod]
     public void Other()
     {
-        var child = new Line("myId");
-        var source = new Geometry("src") { Shapes = [child] };
-        var target = new MaterialGroup("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new TestPartition("src") { Links = [child] };
+        var target = new LinkTestConcept("tgt");
 
-        target.DefaultShape = child;
+        target.Containment_0_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.DefaultShape);
-        Assert.AreEqual(0, source.Shapes.Count);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.AreEqual(0, source.Links.Count);
     }
 
     [TestMethod]
     public void Other_Reflective()
     {
-        var child = new Line("myId");
-        var source = new Geometry("src") { Shapes = [child] };
-        var target = new MaterialGroup("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new TestPartition("src") { Links = [child] };
+        var target = new LinkTestConcept("tgt");
 
-        target.Set(ShapesLanguage.Instance.MaterialGroup_defaultShape, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.DefaultShape);
-        Assert.AreEqual(0, source.Shapes.Count);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.AreEqual(0, source.Links.Count);
     }
 
     #endregion
@@ -59,27 +59,27 @@ public class ToSingleTests
     [TestMethod]
     public void OtherInSameInstance()
     {
-        var child = new MaterialGroup("myId");
-        var parent = new BillOfMaterials("src") { AltGroups = [child] };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [child] };
 
-        parent.DefaultGroup = child;
+        parent.Containment_0_1 = child;
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.DefaultGroup);
-        Assert.AreEqual(0, parent.AltGroups.Count);
+        Assert.AreSame(child, parent.Containment_0_1);
+        Assert.AreEqual(0, parent.Containment_0_n.Count);
     }
 
     [TestMethod]
     public void OtherInSameInstance_Reflective()
     {
-        var child = new MaterialGroup("myId");
-        var parent = new BillOfMaterials("src") { AltGroups = [child] };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [child] };
 
-        parent.Set(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.DefaultGroup);
-        Assert.AreEqual(0, parent.AltGroups.Count);
+        Assert.AreSame(child, parent.Containment_0_1);
+        Assert.AreEqual(0, parent.Containment_0_n.Count);
     }
 
     #endregion

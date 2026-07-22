@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Property;
@@ -24,59 +24,60 @@ namespace LionWeb.Core.Test.NodeApi.Generated.Property;
 [TestClass]
 public class ListenerTests
 {
+    private static readonly M3.Property _iNamedName = LionWebVersions.v2024_1.BuiltIns.INamed_name;
     [TestMethod]
     public void PropertyAdded_Optional()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("d");
-        parent.Documentation = doc;
+        var parent = new TestPartition("g");
+        var node = new DataTypeTestConcept("d");
+        parent.Data = node;
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        doc.Text = "hello";
+        node.StringValue_0_1 = "hello";
 
         var notifications = observer.AssertOfType<PropertyAddedNotification>(1);
-        Assert.AreSame(doc, notifications[0].Node);
-        Assert.AreSame(ShapesLanguage.Instance.Documentation_text, notifications[0].Property);
+        Assert.AreSame(node, notifications[0].Node);
+        Assert.AreSame(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].NewValue);
     }
 
     [TestMethod]
     public void PropertyDeleted_Optional()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("d");
-        parent.Documentation = doc;
-        doc.Text = "hello";
+        var parent = new TestPartition("g");
+        var node = new DataTypeTestConcept("d");
+        parent.Data = node;
+        node.StringValue_0_1 = "hello";
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        doc.Text = null;
+        node.StringValue_0_1 = null;
 
         var notifications = observer.AssertOfType<PropertyDeletedNotification>(1);
-        Assert.AreSame(doc, notifications[0].Node);
-        Assert.AreSame(ShapesLanguage.Instance.Documentation_text, notifications[0].Property);
+        Assert.AreSame(node, notifications[0].Node);
+        Assert.AreSame(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].OldValue);
     }
 
     [TestMethod]
     public void PropertyChanged_Optional()
     {
-        var parent = new Geometry("g");
-        var doc = new Documentation("d");
-        parent.Documentation = doc;
-        doc.Text = "hello";
+        var parent = new TestPartition("g");
+        var node = new DataTypeTestConcept("d");
+        parent.Data = node;
+        node.StringValue_0_1 = "hello";
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        doc.Text = "bye";
+        node.StringValue_0_1 = "bye";
 
         var notifications = observer.AssertOfType<PropertyChangedNotification>(1);
-        Assert.AreSame(doc, notifications[0].Node);
-        Assert.AreSame(ShapesLanguage.Instance.Documentation_text, notifications[0].Property);
+        Assert.AreSame(node, notifications[0].Node);
+        Assert.AreSame(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].OldValue);
         Assert.AreEqual("bye", notifications[0].NewValue);
         observer.AssertNone<PropertyAddedNotification>();
@@ -86,33 +87,33 @@ public class ListenerTests
     [TestMethod]
     public void PropertyAdded_Required()
     {
-        var parent = new Geometry("g");
-        var circle = new Circle("d");
-        parent.AddShapes([circle]);
+        var parent = new TestPartition("g");
+        var child = new LinkTestConcept("d");
+        parent.AddLinks([child]);
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        circle.Uuid = "hello";
+        child.Name = "hello";
 
         var notifications = observer.AssertOfType<PropertyAddedNotification>(1);
-        Assert.AreSame(circle, notifications[0].Node);
-        Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, notifications[0].Property);
+        Assert.AreSame(child, notifications[0].Node);
+        Assert.AreSame(_iNamedName, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].NewValue);
     }
 
     [TestMethod]
     public void PropertyDeleted_Required()
     {
-        var parent = new Geometry("g");
-        var circle = new Circle("d");
-        parent.AddShapes([circle]);
-        circle.Uuid = "hello";
+        var parent = new TestPartition("g");
+        var child = new LinkTestConcept("d");
+        parent.AddLinks([child]);
+        child.Name = "hello";
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => circle.Uuid = null);
+        Assert.ThrowsExactly<InvalidValueException>(() => child.Name = null);
 
         observer.AssertEmpty();
     }
@@ -120,19 +121,19 @@ public class ListenerTests
     [TestMethod]
     public void PropertyChanged_Required()
     {
-        var parent = new Geometry("g");
-        var circle = new Circle("d");
-        parent.AddShapes([circle]);
-        circle.Uuid = "hello";
+        var parent = new TestPartition("g");
+        var child = new LinkTestConcept("d");
+        parent.AddLinks([child]);
+        child.Name = "hello";
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        circle.Uuid = "bye";
+        child.Name = "bye";
 
         var notifications = observer.AssertOfType<PropertyChangedNotification>(1);
-        Assert.AreSame(circle, notifications[0].Node);
-        Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, notifications[0].Property);
+        Assert.AreSame(child, notifications[0].Node);
+        Assert.AreSame(_iNamedName, notifications[0].Property);
         Assert.AreEqual("hello", notifications[0].OldValue);
         Assert.AreEqual("bye", notifications[0].NewValue);
         observer.AssertNone<PropertyAddedNotification>();

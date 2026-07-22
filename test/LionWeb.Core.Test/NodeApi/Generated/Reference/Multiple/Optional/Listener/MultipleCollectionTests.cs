@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional.Listener;
@@ -27,23 +27,24 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.AddShapes(values);
+        source.AddReference_0_n(values);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -51,23 +52,24 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array_Reflective()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, values);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -77,23 +79,24 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape> { valueA, valueB };
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.InsertShapes(0, values);
+        source.InsertReference_0_n(0, values);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -101,25 +104,26 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.InsertShapes(1, values);
+        source.InsertReference_0_n(1, values);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(2, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -131,24 +135,25 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_ListMatchingType()
     {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape> { valueA, valueB };
-        parent.AddShapes(values);
+        var source = new LinkTestConcept("src");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
+        source.AddReference_0_n(values);
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        source.RemoveReference_0_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
@@ -156,17 +161,18 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_NonContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new ReferenceGeometry("cs") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cA");
+        var circleB = new LinkTestConcept("cB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        source.RemoveReference_0_n(values);
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -174,20 +180,21 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_HalfContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new ReferenceGeometry("cs") { Shapes = [circleA, circleB] };
-        var valueA = new Line("sA");
-        var values = new IShape[] { valueA, circleA };
+        var circleA = new LinkTestConcept("cA");
+        var circleB = new LinkTestConcept("cB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var values = new LinkTestConcept[] { valueA, circleA };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        source.RemoveReference_0_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(circleA), notifications[0].DeletedTarget);
     }
@@ -195,23 +202,24 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Only()
     {
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new ReferenceGeometry("g") { Shapes = [valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [valueA, valueB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        source.RemoveReference_0_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
@@ -219,24 +227,25 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Last()
     {
-        var circle = new Circle("cId");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle, valueA, valueB] };
-        var values = new IShape[] { valueA, valueB };
+        var circle = new LinkTestConcept("cId");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circle, valueA, valueB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        source.RemoveReference_0_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
@@ -244,25 +253,26 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, valueA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [circleA, valueA, valueB, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        source.RemoveReference_0_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
@@ -270,25 +280,26 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Mixed()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new ReferenceGeometry("g") { Shapes = [valueA, circleA, valueB, circleB] };
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("src") { Reference_0_n = [valueA, circleA, valueB, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        parent.RemoveShapes(values);
+        source.RemoveReference_0_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(parent, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(parent, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }

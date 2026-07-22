@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.Listener;
@@ -27,23 +27,23 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void ListMatchingType()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        line.AddAnnotations([valueA, valueB]);
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        child.AddAnnotations([valueA, valueB]);
         var values = new List<INode>() { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -51,23 +51,23 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void ListMatchingType_Reflective()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        line.AddAnnotations([valueA, valueB]);
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        child.AddAnnotations([valueA, valueB]);
         var values = new List<INode>() { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { });
+        child.Set(null, new List<INode> { });
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -75,16 +75,16 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Empty()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         observer.AssertNone<AnnotationDeletedNotification>();
     }
@@ -92,19 +92,19 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void NonContained()
     {
-        var docA = new Documentation("cA");
-        var docB = new Documentation("cB");
-        var line = new Line("cs");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var existingA = new TestAnnotation("cA");
+        var existingB = new TestAnnotation("cB");
+        var child = new LinkTestConcept("cs");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         observer.AssertNone<AnnotationDeletedNotification>();
     }
@@ -112,67 +112,67 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void HalfContained()
     {
-        var docA = new Documentation("cA");
-        var docB = new Documentation("cB");
-        var line = new Line("cs");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var values = new INode[] { valueA, docA };
+        var existingA = new TestAnnotation("cA");
+        var existingB = new TestAnnotation("cB");
+        var child = new LinkTestConcept("cs");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var valueA = new TestAnnotation("sA");
+        var values = new INode[] { valueA, existingA };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(docA, notifications[0].DeletedAnnotation);
+        Assert.AreEqual(existingA, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
     public void HalfContained_Reflective()
     {
-        var docA = new Documentation("cA");
-        var docB = new Documentation("cB");
-        var line = new Line("cs");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var values = new INode[] { valueA, docA };
+        var existingA = new TestAnnotation("cA");
+        var existingB = new TestAnnotation("cB");
+        var child = new LinkTestConcept("cs");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var valueA = new TestAnnotation("sA");
+        var values = new INode[] { valueA, existingA };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docB });
+        child.Set(null, new List<INode> { existingB });
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(docA, notifications[0].DeletedAnnotation);
+        Assert.AreEqual(existingA, notifications[0].DeletedAnnotation);
     }
 
     [TestMethod]
     public void Only()
     {
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([valueA, valueB]);
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -180,23 +180,23 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Only_Reflective()
     {
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([valueA, valueB]);
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> {  });
+        child.Set(null, new List<INode> {  });
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(0, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -204,24 +204,24 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Last()
     {
-        var doc = new Documentation("cId");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([doc, valueA, valueB]);
+        var existingA = new TestAnnotation("cId");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -229,24 +229,24 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Last_Reflective()
     {
-        var doc = new Documentation("cId");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([doc, valueA, valueB]);
+        var existingA = new TestAnnotation("cId");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { doc });
+        child.Set(null, new List<INode> { existingA });
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -254,25 +254,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, valueA, valueB, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, valueA, valueB, existingB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -280,25 +280,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Between_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, valueA, valueB, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, valueA, valueB, existingB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, docB });
+        child.Set(null, new List<INode> { existingA, existingB });
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -306,25 +306,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Mixed()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([valueA, docA, valueB, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([valueA, existingA, valueB, existingB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.RemoveAnnotations(values);
+        child.RemoveAnnotations(values);
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }
@@ -332,25 +332,25 @@ public class MultipleCollectionRemoveTests
     [TestMethod]
     public void Mixed_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([valueA, docA, valueB, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([valueA, existingA, valueB, existingB]);
         var values = new INode[] { valueA, valueB };
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, docB });
+        child.Set(null, new List<INode> { existingA, existingB });
 
         var notifications = observer.AssertOfType<AnnotationDeletedNotification>(2);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(valueA, notifications[0].DeletedAnnotation);
-        Assert.AreSame(line, notifications[1].Parent);
+        Assert.AreSame(child, notifications[1].Parent);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(valueB, notifications[1].DeletedAnnotation);
     }

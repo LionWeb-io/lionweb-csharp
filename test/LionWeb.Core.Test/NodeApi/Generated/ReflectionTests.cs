@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Core.Utilities;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M2;
 using M3;
 
@@ -30,8 +30,8 @@ public class ReflectionTests
     [TestMethod]
     public void GetClassifier()
     {
-        var node = new Circle("id");
-        Assert.AreEqual(ShapesLanguage.Instance.Circle, node.GetClassifier(), new LanguageEntityIdentityComparer());
+        var node = new LinkTestConcept("id");
+        Assert.AreEqual(TestLanguageLanguage.Instance.LinkTestConcept, node.GetClassifier(), new LanguageEntityIdentityComparer());
     }
 
     #region inherited
@@ -41,21 +41,21 @@ public class ReflectionTests
     [TestMethod]
     public void GetInheritedProperty()
     {
-        var node = new Circle("id") { Name = "hi" };
+        var node = new LinkTestConcept("id") { Name = "hi" };
         Assert.AreEqual("hi", node.Get(_builtIns.INamed_name));
     }
 
     [TestMethod]
     public void GetInheritedProperty_Unset()
     {
-        var node = new Circle("id");
+        var node = new LinkTestConcept("id");
         Assert.ThrowsExactly<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
     }
 
     [TestMethod]
     public void SetInheritedProperty()
     {
-        var node = new Circle("id");
+        var node = new LinkTestConcept("id");
         node.Name = "hi";
         Assert.AreEqual("hi", node.Name);
     }
@@ -63,7 +63,7 @@ public class ReflectionTests
     [TestMethod]
     public void SetInheritedProperty_Setter()
     {
-        var node = new Circle("id");
+        var node = new LinkTestConcept("id");
         node.SetName("hi");
         Assert.AreEqual("hi", node.Name);
     }
@@ -71,14 +71,14 @@ public class ReflectionTests
     [TestMethod]
     public void SetInheritedProperty_Constructor()
     {
-        var node = new Circle("id") { Name = "hi" };
+        var node = new LinkTestConcept("id") { Name = "hi" };
         Assert.AreEqual("hi", node.Name);
     }
 
     [TestMethod]
     public void SetInheritedProperty_Reflective()
     {
-        var node = new Circle("id");
+        var node = new LinkTestConcept("id");
         node.Set(_builtIns.INamed_name, "hi");
         Assert.AreEqual("hi", node.Name);
     }
@@ -90,77 +90,77 @@ public class ReflectionTests
     [TestMethod]
     public void GetInheritedContainment()
     {
-        var child = new Documentation("c");
-        var parent = new Circle("id") { ShapeDocs = child };
-        Assert.AreSame(child, parent.Get(ShapesLanguage.Instance.Shape_shapeDocs));
+        var child = new LinkTestConcept("c");
+        var parent = new LinkTestConcept("id") { Containment_0_1 = child };
+        Assert.AreSame(child, parent.Get(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1));
     }
 
     [TestMethod]
     public void GetInheritedContainment_Unset()
     {
-        var parent = new Circle("id");
-        Assert.AreSame(null, parent.Get(ShapesLanguage.Instance.Shape_shapeDocs));
+        var parent = new LinkTestConcept("id");
+        Assert.AreSame(null, parent.Get(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1));
     }
 
     [TestMethod]
     public void SetInheritedContainment()
     {
-        var parent = new Circle("id");
-        var child = new Documentation("c");
-        parent.ShapeDocs = child;
-        Assert.AreSame(child, parent.ShapeDocs);
+        var parent = new LinkTestConcept("id");
+        var child = new LinkTestConcept("c");
+        parent.Containment_0_1 = child;
+        Assert.AreSame(child, parent.Containment_0_1);
     }
 
     [TestMethod]
     public void SetInheritedContainment_Setter()
     {
-        var parent = new Circle("id");
-        var child = new Documentation("c");
-        parent.SetShapeDocs(child);
-        Assert.AreSame(child, parent.ShapeDocs);
+        var parent = new LinkTestConcept("id");
+        var child = new LinkTestConcept("c");
+        parent.SetContainment_0_1(child);
+        Assert.AreSame(child, parent.Containment_0_1);
     }
 
     [TestMethod]
     public void SetInheritedContainment_Constructor()
     {
-        var child = new Documentation("c");
-        var parent = new Circle("id") { ShapeDocs = child };
-        Assert.AreSame(child, parent.ShapeDocs);
+        var child = new LinkTestConcept("c");
+        var parent = new LinkTestConcept("id") { Containment_0_1 = child };
+        Assert.AreSame(child, parent.Containment_0_1);
     }
 
     [TestMethod]
     public void SetInheritedContainment_Reflective()
     {
-        var parent = new Circle("id");
-        var child = new Documentation("c");
-        parent.Set(ShapesLanguage.Instance.Shape_shapeDocs, child);
-        Assert.AreSame(child, parent.ShapeDocs);
+        var parent = new LinkTestConcept("id");
+        var child = new LinkTestConcept("c");
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
+        Assert.AreSame(child, parent.Containment_0_1);
     }
 
     [TestMethod]
     public void InheritedContainment_DetachChild()
     {
-        var child = new Documentation("c");
-        var parent = new Circle("id") { ShapeDocs = child };
+        var child = new LinkTestConcept("c");
+        var parent = new LinkTestConcept("id") { Containment_0_1 = child };
         child.DetachFromParent();
         Assert.IsNull(child.GetParent());
-        Assert.IsNull(parent.ShapeDocs);
+        Assert.IsNull(parent.Containment_0_1);
     }
 
     [TestMethod]
     public void InheritedContainment_GetContainmentOf()
     {
-        var child = new Documentation("c");
-        var parent = new Circle("id") { ShapeDocs = child };
-        Assert.AreEqual(ShapesLanguage.Instance.Shape_shapeDocs, parent.GetContainmentOf(child));
+        var child = new LinkTestConcept("c");
+        var parent = new LinkTestConcept("id") { Containment_0_1 = child };
+        Assert.AreEqual(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, parent.GetContainmentOf(child));
     }
 
     [TestMethod]
     public void InheritedContainment_CollectAllSetFeatures()
     {
-        var child = new Documentation("c");
-        var parent = new Circle("id") { ShapeDocs = child };
-        CollectionAssert.AreEqual(new List<Feature> { ShapesLanguage.Instance.Shape_shapeDocs },
+        var child = new LinkTestConcept("c");
+        var parent = new LinkTestConcept("id") { Containment_0_1 = child };
+        CollectionAssert.AreEqual(new List<Feature> { TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1 },
             parent.CollectAllSetFeatures().ToList());
     }
 

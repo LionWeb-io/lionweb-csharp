@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.ParentHandling.Multiple.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SomeEntriesTests
@@ -27,46 +27,46 @@ public class SomeEntriesTests
     [TestMethod]
     public void Partial_Add()
     {
-        var childA = new Line("a");
-        var childB = new Line("b");
-        var source = new Geometry("src") { Shapes = [childA, childB] };
-        var target = new Geometry("tgt");
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var source = new TestPartition("src") { Links = [childA, childB] };
+        var target = new TestPartition("tgt");
 
-        target.AddShapes([childA]);
+        target.AddLinks([childA]);
 
         Assert.AreSame(target, childA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { childA }, target.Shapes.ToList());
-        CollectionAssert.AreEqual(new List<IShape> { childB }, source.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, target.Links.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, source.Links.ToList());
     }
 
     [TestMethod]
     public void Partial_Insert()
     {
-        var childA = new Line("a");
-        var childB = new Line("b");
-        var source = new Geometry("src") { Shapes = [childA, childB] };
-        var target = new Geometry("tgt");
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var source = new TestPartition("src") { Links = [childA, childB] };
+        var target = new TestPartition("tgt");
 
-        target.InsertShapes(0, [childA]);
+        target.InsertLinks(0, [childA]);
 
         Assert.AreSame(target, childA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { childA }, target.Shapes.ToList());
-        CollectionAssert.AreEqual(new List<IShape> { childB }, source.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, target.Links.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, source.Links.ToList());
     }
 
     [TestMethod]
     public void Partial_Reflective()
     {
-        var childA = new Line("a");
-        var childB = new Line("b");
-        var source = new Geometry("src") { Shapes = [childA, childB] };
-        var target = new Geometry("tgt");
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var source = new TestPartition("src") { Links = [childA, childB] };
+        var target = new TestPartition("tgt");
 
-        target.Set(ShapesLanguage.Instance.Geometry_shapes, new List<IShape> { childA });
+        target.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<LinkTestConcept> { childA });
 
         Assert.AreSame(target, childA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { childA }, target.Shapes.ToList());
-        CollectionAssert.AreEqual(new List<IShape> { childB }, source.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, target.Links.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, source.Links.ToList());
     }
 
     #endregion
@@ -76,46 +76,46 @@ public class SomeEntriesTests
     [TestMethod]
     public void Partial_Other_Add()
     {
-        var childA = new Line("a");
-        var childB = new Line("b");
-        var source = new Geometry("src") { Shapes = [childA, childB] };
-        var target = new CompositeShape("tgt");
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var source = new TestPartition("src") { Links = [childA, childB] };
+        var target = new LinkTestConcept("tgt");
 
-        target.AddParts([childA]);
+        target.AddContainment_1_n([childA]);
 
         Assert.AreSame(target, childA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { childA }, target.Parts.ToList());
-        CollectionAssert.AreEqual(new List<IShape> { childB }, source.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, target.Containment_1_n.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, source.Links.ToList());
     }
 
     [TestMethod]
     public void Partial_Other_Insert()
     {
-        var childA = new Line("a");
-        var childB = new Line("b");
-        var source = new Geometry("src") { Shapes = [childA, childB] };
-        var target = new CompositeShape("tgt");
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var source = new TestPartition("src") { Links = [childA, childB] };
+        var target = new LinkTestConcept("tgt");
 
-        target.InsertParts(0, [childA]);
+        target.InsertContainment_1_n(0, [childA]);
 
         Assert.AreSame(target, childA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { childA }, target.Parts.ToList());
-        CollectionAssert.AreEqual(new List<IShape> { childB }, source.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, target.Containment_1_n.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, source.Links.ToList());
     }
 
     [TestMethod]
     public void Partial_Other_Reflective()
     {
-        var childA = new Line("a");
-        var childB = new Line("b");
-        var source = new Geometry("src") { Shapes = [childA, childB] };
-        var target = new CompositeShape("tgt");
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var source = new TestPartition("src") { Links = [childA, childB] };
+        var target = new LinkTestConcept("tgt");
 
-        target.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<IShape> { childA });
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<LinkTestConcept> { childA });
 
         Assert.AreSame(target, childA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { childA }, target.Parts.ToList());
-        CollectionAssert.AreEqual(new List<IShape> { childB }, source.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, target.Containment_1_n.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, source.Links.ToList());
     }
 
     #endregion
@@ -125,43 +125,43 @@ public class SomeEntriesTests
     [TestMethod]
     public void Partial_OtherInSameInstance_Add()
     {
-        var childA = new MaterialGroup("a");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        parent.AddAltGroups([childA]);
+        parent.AddContainment_1_n([childA]);
 
         Assert.AreSame(parent, childA.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childA }, parent.AltGroups.ToList());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childB }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, parent.Containment_1_n.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
     public void Partial_OtherInSameInstance_Insert()
     {
-        var childA = new MaterialGroup("a");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        parent.InsertAltGroups(0, [childA]);
+        parent.InsertContainment_1_n(0, [childA]);
 
         Assert.AreSame(parent, childA.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childA }, parent.AltGroups.ToList());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childB }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, parent.Containment_1_n.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
     public void Partial_OtherInSameInstance_Reflective()
     {
-        var childA = new MaterialGroup("a");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        parent.Set(ShapesLanguage.Instance.BillOfMaterials_altGroups, new List<MaterialGroup> { childA });
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<LinkTestConcept> { childA });
 
         Assert.AreSame(parent, childA.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childA }, parent.AltGroups.ToList());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childB }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, parent.Containment_1_n.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB }, parent.Containment_0_n.ToList());
     }
 
     #endregion
@@ -171,68 +171,68 @@ public class SomeEntriesTests
     [TestMethod]
     public void Partial_SameInSameInstance_Add()
     {
-        var childA = new MaterialGroup("a");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        parent.AddGroups([childA]);
+        parent.AddContainment_0_n([childA]);
 
         Assert.AreSame(parent, childA.GetParent());
         // changed order
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childB, childA }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB, childA }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
     public void Partial_SameInSameInstance_Insert_Start()
     {
-        var childA = new MaterialGroup("a");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        parent.InsertGroups(0, [childA]);
+        parent.InsertContainment_0_n(0, [childA]);
 
         Assert.AreSame(parent, childA.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childA, childB }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA, childB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
     public void Partial_SameInSameInstance_Insert_Middle()
     {
-        var childA = new MaterialGroup("a");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        parent.InsertGroups(1, [childA]);
+        parent.InsertContainment_0_n(1, [childA]);
 
         Assert.AreSame(parent, childA.GetParent());
         // changed order
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childB, childA }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childB, childA }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
     public void Partial_SameInSameInstance_Insert_End()
     {
-        var childA = new MaterialGroup("a");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("a");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertGroups(2, [childA]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertContainment_0_n(2, [childA]));
 
         Assert.AreSame(parent, childA.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childA, childB }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA, childB }, parent.Containment_0_n.ToList());
     }
 
     [TestMethod]
     public void Partial_SameInSameInstance_Reflective()
     {
-        var childA = new MaterialGroup("myId");
-        var childB = new MaterialGroup("b");
-        var parent = new BillOfMaterials("src") { Groups = [childA, childB] };
+        var childA = new LinkTestConcept("myId");
+        var childB = new LinkTestConcept("b");
+        var parent = new LinkTestConcept("src") { Containment_0_n = [childA, childB] };
 
-        parent.Set(ShapesLanguage.Instance.BillOfMaterials_groups, new List<MaterialGroup> { childA });
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<LinkTestConcept> { childA });
 
         Assert.AreSame(parent, childA.GetParent());
-        CollectionAssert.AreEqual(new List<MaterialGroup> { childA }, parent.Groups.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { childA }, parent.Containment_0_n.ToList());
     }
 
     #endregion

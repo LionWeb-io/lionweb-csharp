@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Containment.Multiple.Required;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class NullTests
@@ -25,49 +25,49 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddParts(null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddContainment_1_n(null));
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(ShapesLanguage.Instance.CompositeShape_parts, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, null));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        Assert.ThrowsExactly<InvalidValueException>(() => new CompositeShape("cs") { Parts = null });
+        Assert.ThrowsExactly<InvalidValueException>(() => new LinkTestConcept("cs") { Containment_1_n = null });
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertParts(0, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertContainment_1_n(0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertParts(1, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertContainment_1_n(1, null));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
-        var parent = new CompositeShape("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveParts(null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveContainment_1_n(null));
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new CompositeShape("cs");
-        Assert.IsFalse(parent.TryGetParts(out var o));
+        var parent = new LinkTestConcept("cs");
+        Assert.IsFalse(parent.TryGetContainment_1_n(out var o));
         Assert.IsFalse(o.Any());
     }
 }

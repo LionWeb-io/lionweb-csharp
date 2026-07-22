@@ -16,7 +16,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
@@ -28,339 +27,339 @@ public class InsertTests
     [TestMethod]
     public void Empty()
     {
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var bom = new BillOfMaterials("myId");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(0, [bom]);
+        child.InsertAnnotations(0, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void One_Before()
     {
-        var doc = new Documentation("cId");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([doc]);
-        var bom = new BillOfMaterials("myId");
+        var existing = new TestAnnotation("cId");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existing]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(0, [bom]);
+        child.InsertAnnotations(0, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void One_Before_Reflective()
     {
-        var doc = new Documentation("cId");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([doc]);
-        var bom = new BillOfMaterials("myId");
+        var existing = new TestAnnotation("cId");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existing]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { bom, doc });
+        child.Set(null, new List<INode> { annotation, existing });
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void One_After()
     {
-        var doc = new Documentation("cId");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([doc]);
-        var bom = new BillOfMaterials("myId");
+        var existing = new TestAnnotation("cId");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existing]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(1, [bom]);
+        child.InsertAnnotations(1, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void One_After_Reflective()
     {
-        var doc = new Documentation("cId");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([doc]);
-        var bom = new BillOfMaterials("myId");
+        var existing = new TestAnnotation("cId");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existing]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { doc, bom });
+        child.Set(null, new List<INode> { existing, annotation });
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void Two_Before()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(0, [bom]);
+        child.InsertAnnotations(0, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void Two_Before_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { bom, docA, docB });
+        child.Set(null, new List<INode> { annotation, existingA, existingB });
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(0, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void Two_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(1, [bom]);
+        child.InsertAnnotations(1, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void Two_Between_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, bom, docB });
+        child.Set(null, new List<INode> { existingA, annotation, existingB });
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(1, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void Two_After()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(2, [bom]);
+        child.InsertAnnotations(2, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void Two_After_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new BillOfMaterials("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, docB, bom });
+        child.Set(null, new List<INode> { existingA, existingB, annotation });
 
         var notifications = observer.AssertOfType<AnnotationAddedNotification>(1);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].Index);
-        Assert.AreEqual(bom, notifications[0].NewAnnotation);
+        Assert.AreEqual(annotation, notifications[0].NewAnnotation);
     }
 
     [TestMethod]
     public void FromOtherParent()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
-        var line = new LinkTestConcept("g");
-        var parent = new LinkTestConcept("parent") { Containment_0_n = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new TestAnnotation("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new LinkTestConcept("parent") { Containment_0_n = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
         var oldParent = new LinkTestConcept("oldParent");
-        oldParent.AddAnnotations([new TestAnnotation("doc"), bom]);
+        oldParent.AddAnnotations([new TestAnnotation("doc"), annotation]);
 
         var partition = new TestPartition("partition") { Links = [parent, oldParent] };
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(2, [bom]);
+        child.InsertAnnotations(2, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationMovedFromOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreEqual(1, notifications[0].OldIndex);
-        Assert.AreSame(line, notifications[0].NewParent);
+        Assert.AreSame(child, notifications[0].NewParent);
         Assert.AreEqual(2, notifications[0].NewIndex);
-        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
+        Assert.AreEqual(annotation, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
     public void FromOtherParent_Reflective()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
-        var line = new LinkTestConcept("g");
-        var parent = new LinkTestConcept("parent") { Containment_0_n = [line] };
-        line.AddAnnotations([docA, docB]);
-        var bom = new TestAnnotation("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new LinkTestConcept("parent") { Containment_0_n = [child] };
+        child.AddAnnotations([existingA, existingB]);
+        var annotation = new TestAnnotation("myId");
         var oldParent = new LinkTestConcept("oldParent");
-        oldParent.AddAnnotations([new TestAnnotation("doc"), bom]);
+        oldParent.AddAnnotations([new TestAnnotation("doc"), annotation]);
 
         var partition = new TestPartition("partition") { Links = [parent, oldParent] };
 
         var observer = new NotificationObserver();
         partition.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, docB, bom });
+        child.Set(null, new List<INode> { existingA, existingB, annotation });
 
         var notifications = observer.AssertOfType<AnnotationMovedFromOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreEqual(1, notifications[0].OldIndex);
-        Assert.AreSame(line, notifications[0].NewParent);
+        Assert.AreSame(child, notifications[0].NewParent);
         Assert.AreEqual(2, notifications[0].NewIndex);
-        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
+        Assert.AreEqual(annotation, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
     public void FromSameParent()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var bom = new BillOfMaterials("myId");
-        line.AddAnnotations([docA, bom, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var annotation = new TestAnnotation("myId");
+        child.AddAnnotations([existingA, annotation, existingB]);
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(2, [bom]);
+        child.InsertAnnotations(2, [annotation]);
 
         var notifications = observer.AssertOfType<AnnotationMovedInSameParentNotification>(1);
         Assert.AreEqual(1, notifications[0].OldIndex);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].NewIndex);
-        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
+        Assert.AreEqual(annotation, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
     public void FromSameParent_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var bom = new BillOfMaterials("myId");
-        line.AddAnnotations([docA, bom, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var annotation = new TestAnnotation("myId");
+        child.AddAnnotations([existingA, annotation, existingB]);
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, docB, bom });
+        child.Set(null, new List<INode> { existingA, existingB, annotation });
 
         var notifications = observer.AssertOfType<AnnotationMovedInSameParentNotification>(1);
         Assert.AreEqual(1, notifications[0].OldIndex);
-        Assert.AreSame(line, notifications[0].Parent);
+        Assert.AreSame(child, notifications[0].Parent);
         Assert.AreEqual(2, notifications[0].NewIndex);
-        Assert.AreEqual(bom, notifications[0].MovedAnnotation);
+        Assert.AreEqual(annotation, notifications[0].MovedAnnotation);
     }
 
     [TestMethod]
     public void FromSameParent_NoOp()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var bom = new BillOfMaterials("myId");
-        line.AddAnnotations([docA, bom, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var annotation = new TestAnnotation("myId");
+        child.AddAnnotations([existingA, annotation, existingB]);
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.InsertAnnotations(1, [bom]);
+        child.InsertAnnotations(1, [annotation]);
 
         observer.AssertNone<AnnotationMovedInSameParentNotification>();
     }
@@ -368,17 +367,17 @@ public class InsertTests
     [TestMethod]
     public void FromSameParent_NoOp_Reflective()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var line = new Line("g");
-        var parent = new Geometry("parent") { Shapes = [line] };
-        var bom = new BillOfMaterials("myId");
-        line.AddAnnotations([docA, bom, docB]);
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var child = new LinkTestConcept("g");
+        var parent = new TestPartition("parent") { Links = [child] };
+        var annotation = new TestAnnotation("myId");
+        child.AddAnnotations([existingA, annotation, existingB]);
 
         var observer = new NotificationObserver();
         parent.GetNotificationSender()!.ConnectTo(observer);
 
-        line.Set(null, new List<INode> { docA, bom, docB });
+        child.Set(null, new List<INode> { existingA, annotation, existingB });
 
         observer.AssertNone<AnnotationMovedInSameParentNotification>();
     }

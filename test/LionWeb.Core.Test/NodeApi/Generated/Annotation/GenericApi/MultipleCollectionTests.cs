@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.GenericApi;
 
 using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class MultipleCollectionTests
@@ -25,9 +26,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void MultipleArray()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Add(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -42,9 +43,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_ListMatchingType()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new List<INode> { valueA, valueB };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -55,10 +56,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_ListSubtype()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var values = new List<BillOfMaterials> { valueA, valueB };
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var values = new List<TestAnnotation> { valueA, valueB };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
@@ -68,9 +69,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_Set()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new HashSet<INode> { valueA, valueB };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -81,9 +82,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_SingleEnumerable()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new SingleEnumerable<INode> { valueA, valueB };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -94,9 +95,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_Empty()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -107,11 +108,11 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_One_Before()
     {
-        var doc = new Documentation("cId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [doc]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, doc.GetParent());
@@ -123,11 +124,11 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_One_After()
     {
-        var ann = new BillOfMaterials("cId");
-        var parent = new Line("g");
+        var ann = new TestAnnotation("cId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [ann]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 1, values);
         Assert.AreSame(parent, ann.GetParent());
@@ -139,12 +140,12 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_Two_Before()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, docA.GetParent());
@@ -157,12 +158,12 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_Two_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 1, values);
         Assert.AreSame(parent, docA.GetParent());
@@ -175,12 +176,12 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_Two_After()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 2, values);
         Assert.AreSame(parent, docA.GetParent());
@@ -197,9 +198,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_ListMatchingType()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new List<INode>() { valueA, valueB };
         parent.Remove(null, values);
         Assert.IsNull(valueA.GetParent());
@@ -211,10 +212,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_ListSubtype()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var values = new List<BillOfMaterials>() { valueA, valueB };
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var values = new List<TestAnnotation>() { valueA, valueB };
         parent.Remove(null, values);
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
@@ -225,9 +226,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_Set()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new HashSet<INode>() { valueA, valueB };
         parent.Remove(null, values);
         Assert.IsNull(valueA.GetParent());
@@ -239,9 +240,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_SingleEnumerable()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new SingleEnumerable<INode>() { valueA, valueB };
         parent.Remove(null, values);
         Assert.IsNull(valueA.GetParent());
@@ -253,9 +254,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_Empty()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
         Assert.IsNull(valueA.GetParent());
@@ -267,12 +268,12 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_NonContained()
     {
-        var docA = new Documentation("cA");
-        var docB = new Documentation("cB");
-        var parent = new Line("cs");
+        var docA = new TestAnnotation("cA");
+        var docB = new TestAnnotation("cB");
+        var parent = new LinkTestConcept("cs");
         parent.Add(null, [docA, docB]);
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
         Assert.AreSame(parent, docA.GetParent());
@@ -285,11 +286,11 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_HalfContained()
     {
-        var docA = new Documentation("cA");
-        var docB = new Documentation("cB");
-        var parent = new Line("cs");
+        var docA = new TestAnnotation("cA");
+        var docB = new TestAnnotation("cB");
+        var parent = new LinkTestConcept("cs");
         parent.Add(null, [docA, docB]);
-        var valueA = new BillOfMaterials("sA");
+        var valueA = new TestAnnotation("sA");
         var values = new INode[] { valueA, docA };
         parent.Remove(null, values);
         Assert.AreSame(parent, docB.GetParent());
@@ -301,9 +302,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_Only()
     {
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var parent = new Line("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [valueA, valueB]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
@@ -315,10 +316,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_First()
     {
-        var doc = new Documentation("cId");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [valueA, valueB, doc]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
@@ -331,10 +332,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_Last()
     {
-        var doc = new Documentation("cId");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [doc, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
@@ -347,11 +348,11 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, valueA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
@@ -365,11 +366,11 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_Mixed()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [valueA, docA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
@@ -385,9 +386,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void MultipleListMatchingType()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new List<INode>() { valueA, valueB };
         parent.Add(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -400,10 +401,10 @@ public class MultipleCollectionTests
     [TestMethod]
     public void MultipleListSubtype()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
-        var values = new List<BillOfMaterials>() { valueA, valueB };
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
+        var values = new List<TestAnnotation>() { valueA, valueB };
         parent.Add(null, values);
         Assert.AreSame(parent, valueA.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(valueA));
@@ -415,9 +416,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void MultipleSet()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new HashSet<INode>() { valueA, valueB };
         parent.Add(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -430,9 +431,9 @@ public class MultipleCollectionTests
     [TestMethod]
     public void MultipleSingleEnumerable()
     {
-        var parent = new Line("g");
-        var valueA = new BillOfMaterials("sA");
-        var valueB = new BillOfMaterials("sB");
+        var parent = new LinkTestConcept("g");
+        var valueA = new TestAnnotation("sA");
+        var valueB = new TestAnnotation("sB");
         var values = new SingleEnumerable<INode> { valueA, valueB };
         parent.Add(null, values);
         Assert.AreSame(parent, valueA.GetParent());
@@ -444,7 +445,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating()
     {
-        var parent = new Geometry("g");
+        var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(null, values));
@@ -455,7 +456,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Insert()
     {
-        var parent = new Geometry("g");
+        var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(null, 0, values));
@@ -466,7 +467,7 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Remove()
     {
-        var parent = new Geometry("g");
+        var parent = new LinkTestConcept("g");
         var value = new Documentation("sA");
         var values = new List<INode>() { value };
         parent.Remove(null, values);

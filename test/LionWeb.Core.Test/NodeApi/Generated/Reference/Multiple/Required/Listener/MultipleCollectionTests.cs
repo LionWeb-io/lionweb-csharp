@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required.Listener;
@@ -27,25 +27,24 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.AddMaterials(values);
+        source.AddReference_1_n(values);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(materialGroup, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -53,25 +52,24 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Array_Reflective()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{valueA,valueB});
+        source.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, new List<LinkTestConcept>{valueA,valueB});
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(materialGroup, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -81,25 +79,24 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.InsertMaterials(0, values);
+        source.InsertReference_1_n(0, values);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(materialGroup, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -107,27 +104,26 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Insert_Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.InsertMaterials(1, values);
+        source.InsertReference_1_n(1, values);
 
         var notifications = observer.AssertOfType<ReferenceAddedNotification>(2);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].NewTarget);
-        Assert.AreSame(materialGroup, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[1].Reference);
         Assert.AreEqual(2, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].NewTarget);
     }
@@ -139,17 +135,16 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_ListMatchingType()
     {
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs");
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape> { valueA, valueB };
+        var source = new LinkTestConcept("mg");
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new List<LinkTestConcept> { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => source.RemoveReference_1_n(values));
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -158,17 +153,16 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Only()
     {
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [valueA, valueB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[] { valueA, valueB };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [valueA, valueB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        Assert.ThrowsExactly<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
+        Assert.ThrowsExactly<InvalidValueException>(() => source.RemoveReference_1_n(values));
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -176,19 +170,18 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_NonContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cA");
+        var circleB = new LinkTestConcept("cB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.RemoveMaterials(values);
+        source.RemoveReference_1_n(values);
 
         observer.AssertNone<ReferenceDeletedNotification>();
     }
@@ -196,22 +189,21 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_HalfContained()
     {
-        var circleA = new Circle("cA");
-        var circleB = new Circle("cB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var valueA = new Line("sA");
-        var values = new IShape[] { valueA, circleA };
+        var circleA = new LinkTestConcept("cA");
+        var circleB = new LinkTestConcept("cB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var valueA = new LinkTestConcept("sA");
+        var values = new LinkTestConcept[] { valueA, circleA };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.RemoveMaterials(values);
+        source.RemoveReference_1_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(1);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(circleA), notifications[0].DeletedTarget);
     }
@@ -219,26 +211,25 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Last()
     {
-        var circle = new Circle("cId");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circle, valueA, valueB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[] { valueA, valueB };
+        var circle = new LinkTestConcept("cId");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circle, valueA, valueB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.RemoveMaterials(values);
+        source.RemoveReference_1_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(materialGroup, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
@@ -246,27 +237,26 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [circleA, valueA, valueB, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [circleA, valueA, valueB, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.RemoveMaterials(values);
+        source.RemoveReference_1_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(1, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(materialGroup, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }
@@ -274,27 +264,26 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Remove_Mixed()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new Geometry("g");
-        var materialGroup = new MaterialGroup("cs") { Materials = [valueA, circleA, valueB, circleB] };
-        parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
-        var values = new IShape[] { valueA, valueB };
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var valueA = new LinkTestConcept("sA");
+        var valueB = new LinkTestConcept("sB");
+        var source = new LinkTestConcept("mg") { Reference_1_n = [valueA, circleA, valueB, circleB] };
+        var partition = new TestPartition("g") { Links = [source] };
+        var values = new LinkTestConcept[] { valueA, valueB };
 
         var observer = new NotificationObserver();
-        parent.GetNotificationSender()!.ConnectTo(observer);
+        partition.GetNotificationSender()!.ConnectTo(observer);
 
-        materialGroup.RemoveMaterials(values);
+        source.RemoveReference_1_n(values);
 
         var notifications = observer.AssertOfType<ReferenceDeletedNotification>(2);
-        Assert.AreSame(materialGroup, notifications[0].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[0].Reference);
+        Assert.AreSame(source, notifications[0].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[0].Reference);
         Assert.AreEqual(0, notifications[0].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueA), notifications[0].DeletedTarget);
-        Assert.AreSame(materialGroup, notifications[1].Parent);
-        Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, notifications[1].Reference);
+        Assert.AreSame(source, notifications[1].Parent);
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, notifications[1].Reference);
         Assert.AreEqual(1, notifications[1].Index);
         Assert.AreEqual(ReferenceTarget.FromNode(valueB), notifications[1].DeletedTarget);
     }

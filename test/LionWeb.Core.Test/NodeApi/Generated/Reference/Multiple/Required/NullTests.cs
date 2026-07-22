@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Required;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class NullTests
@@ -25,50 +25,50 @@ public class NullTests
     [TestMethod]
     public void Null()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddMaterials(null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.AddReference_1_n(null));
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new MaterialGroup("cs");
+        var parent = new LinkTestConcept("cs");
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, null));
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, null));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        Assert.ThrowsExactly<InvalidValueException>(() => new MaterialGroup("cs") { Materials = null });
+        Assert.ThrowsExactly<InvalidValueException>(() => new LinkTestConcept("cs") { Reference_1_n = null });
     }
 
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertMaterials(0, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertReference_1_n(0, null));
     }
 
     [TestMethod]
     public void Insert_Empty_OutOfBounds()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertMaterials(1, null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertReference_1_n(1, null));
     }
 
     [TestMethod]
     public void Remove_Empty()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveMaterials(null));
+        var parent = new LinkTestConcept("cs");
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.RemoveReference_1_n(null));
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var parent = new MaterialGroup("cs");
-        Assert.IsFalse(parent.TryGetMaterials(out var o));
+        var parent = new LinkTestConcept("cs");
+        Assert.IsFalse(parent.TryGetReference_1_n(out var o));
         Assert.IsFalse(o.Any());
     }
 }

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.GenericApi;
 
 using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class CollectionTests
@@ -27,7 +28,7 @@ public class CollectionTests
     [TestMethod]
     public void EmptyArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[0];
         parent.Add(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -37,7 +38,7 @@ public class CollectionTests
     [TestMethod]
     public void Insert_EmptyArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[0];
         parent.Insert(null, 0, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -46,7 +47,7 @@ public class CollectionTests
     [TestMethod]
     public void Remove_EmptyArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[0];
         parent.Remove(null, values);
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -59,7 +60,7 @@ public class CollectionTests
     [TestMethod]
     public void NullArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[] { null };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -69,7 +70,7 @@ public class CollectionTests
     [TestMethod]
     public void Insert_NullArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[] { null };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(null, 0, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -78,7 +79,7 @@ public class CollectionTests
     [TestMethod]
     public void Remove_NullArray()
     {
-        var parent = new Line("g");
+        var parent = new LinkTestConcept("g");
         var values = new INode[] { null };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Remove(null, values));
         Assert.IsTrue(parent.GetAnnotations().Count == 0);
@@ -91,8 +92,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new INode[] { value };
         parent.Add(null, values);
         Assert.AreSame(parent, value.GetParent());
@@ -102,8 +103,8 @@ public class CollectionTests
     [TestMethod]
     public void Insert_SingleArray()
     {
-        var parent = new Line("g");
-        var value = new BillOfMaterials("s");
+        var parent = new LinkTestConcept("g");
+        var value = new TestAnnotation("s");
         var values = new INode[] { value };
         parent.Insert(null, 0, values);
         Assert.AreSame(parent, value.GetParent());
@@ -115,8 +116,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Empty()
     {
-        var parent = new Line("g");
-        var bom = new BillOfMaterials("myId");
+        var parent = new LinkTestConcept("g");
+        var bom = new TestAnnotation("myId");
         var values = new INode[] { bom };
         parent.Remove(null, values);
         Assert.IsNull(bom.GetParent());
@@ -126,8 +127,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Only()
     {
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [bom]);
         var values = new INode[] { bom };
         parent.Remove(null, values);
@@ -138,9 +139,9 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_First()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [bom, doc]);
         var values = new INode[] { bom };
         parent.Remove(null, values);
@@ -152,9 +153,9 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Last()
     {
-        var doc = new Documentation("cId");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var doc = new TestAnnotation("cId");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [doc, bom]);
         var values = new INode[] { bom };
         parent.Remove(null, values);
@@ -166,10 +167,10 @@ public class CollectionTests
     [TestMethod]
     public void SingleArray_Remove_Between()
     {
-        var docA = new Documentation("cIdA");
-        var docB = new Documentation("cIdB");
-        var bom = new BillOfMaterials("myId");
-        var parent = new Line("g");
+        var docA = new TestAnnotation("cIdA");
+        var docB = new TestAnnotation("cIdB");
+        var bom = new TestAnnotation("myId");
+        var parent = new LinkTestConcept("g");
         parent.Add(null, [docA, bom, docB]);
         var values = new INode[] { bom };
         parent.Remove(null, values);
@@ -182,4 +183,37 @@ public class CollectionTests
     #endregion
 
     #endregion
+
+    [TestMethod]
+    public void SingleList_NotAnnotating()
+    {
+        var parent = new LinkTestConcept("g");
+        var value = new Documentation("sA");
+        var values = new List<INode>() { value };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(null, values));
+        Assert.IsNull(value.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
+    public void SingleList_NotAnnotating_Insert()
+    {
+        var parent = new LinkTestConcept("g");
+        var value = new Documentation("sA");
+        var values = new List<INode>() { value };
+        Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(null, 0, values));
+        Assert.IsNull(value.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
+    public void SingleList_NotAnnotating_Remove()
+    {
+        var parent = new LinkTestConcept("g");
+        var value = new Documentation("sA");
+        var values = new List<INode>() { value };
+        parent.Remove(null, values);
+        Assert.IsNull(value.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(value));
+    }
 }

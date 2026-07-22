@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Reference.Multiple.Optional;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleTests
@@ -25,39 +25,39 @@ public class SingleTests
     [TestMethod]
     public void Add()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
-        parent.AddShapes([line]);
+        var parent = new LinkTestConcept("g");
+        var line = new LinkTestConcept("myId");
+        parent.AddReference_0_n([line]);
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
     }
 
     [TestMethod]
     public void Reflective()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
+        var parent = new LinkTestConcept("g");
+        var line = new LinkTestConcept("myId");
         Assert.ThrowsExactly<InvalidValueException>(() =>
-            parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, line));
+            parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, line));
         Assert.IsNull(line.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(line));
+        Assert.IsFalse(parent.Reference_0_n.Contains(line));
     }
 
     [TestMethod]
     public void Constructor()
     {
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line] };
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [line] };
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
     }
 
     [TestMethod]
     public void TryGet()
     {
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line] };
-        Assert.IsTrue(parent.TryGetShapes(out var o));
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [line] };
+        Assert.IsTrue(parent.TryGetReference_0_n(out var o));
         Assert.AreSame(line, o.FirstOrDefault());
     }
 
@@ -66,102 +66,102 @@ public class SingleTests
     [TestMethod]
     public void Insert_Empty()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
-        parent.InsertShapes(0, [line]);
+        var parent = new LinkTestConcept("g");
+        var line = new LinkTestConcept("myId");
+        parent.InsertReference_0_n(0, [line]);
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
     }
 
     [TestMethod]
     public void Insert_Empty_UnderBounds()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertShapes(-1, [line]));
+        var parent = new LinkTestConcept("g");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertReference_0_n(-1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(line));
+        Assert.IsFalse(parent.Reference_0_n.Contains(line));
     }
 
     [TestMethod]
     public void Insert_Empty_OverBounds()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertShapes(1, [line]));
+        var parent = new LinkTestConcept("g");
+        var line = new LinkTestConcept("myId");
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.InsertReference_0_n(1, [line]));
         Assert.IsNull(line.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(line));
+        Assert.IsFalse(parent.Reference_0_n.Contains(line));
     }
 
     [TestMethod]
     public void Insert_One_Before()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var line = new Line("myId");
-        parent.InsertShapes(0, [line]);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertReference_0_n(0, [line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circle }, parent.Shapes.ToList());
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circle }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Insert_One_After()
     {
-        var circle = new Circle("cId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
-        var line = new Line("myId");
-        parent.InsertShapes(1, [line]);
+        var circle = new LinkTestConcept("cId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertReference_0_n(1, [line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circle, line }, parent.Shapes.ToList());
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle, line }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Before()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.InsertShapes(0, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertReference_0_n(0, [line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { line, circleA, circleB }, parent.Shapes.ToList());
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { line, circleA, circleB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.InsertShapes(1, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertReference_0_n(1, [line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, line, circleB }, parent.Shapes.ToList());
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, line, circleB }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Insert_Two_After()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
-        var line = new Line("myId");
-        parent.InsertShapes(2, [line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circleA, circleB] };
+        var line = new LinkTestConcept("myId");
+        parent.InsertReference_0_n(2, [line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(line));
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB, line }, parent.Shapes.ToList());
+        Assert.IsTrue(parent.Reference_0_n.Contains(line));
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB, line }, parent.Reference_0_n.ToList());
     }
 
     #endregion
@@ -171,71 +171,71 @@ public class SingleTests
     [TestMethod]
     public void Remove_Empty()
     {
-        var parent = new ReferenceGeometry("g");
-        var line = new Line("myId");
-        parent.RemoveShapes([line]);
+        var parent = new LinkTestConcept("g");
+        var line = new LinkTestConcept("myId");
+        parent.RemoveReference_0_n([line]);
         Assert.IsNull(line.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(line));
+        Assert.IsFalse(parent.Reference_0_n.Contains(line));
     }
 
     [TestMethod]
     public void Remove_NotContained()
     {
-        var circle = new Circle("myC");
-        var parent = new ReferenceGeometry("cs") { Shapes = [circle] };
-        var line = new Line("myId");
-        parent.RemoveShapes([line]);
+        var circle = new LinkTestConcept("myC");
+        var parent = new LinkTestConcept("cs") { Reference_0_n = [circle] };
+        var line = new LinkTestConcept("myId");
+        parent.RemoveReference_0_n([line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Only()
     {
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line] };
-        parent.RemoveShapes([line]);
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [line] };
+        parent.RemoveReference_0_n([line]);
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Remove_First()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
-        parent.RemoveShapes([line]);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [line, circle] };
+        parent.RemoveReference_0_n([line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Last()
     {
-        var circle = new Circle("cId");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
-        parent.RemoveShapes([line]);
+        var circle = new LinkTestConcept("cId");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circle, line] };
+        parent.RemoveReference_0_n([line]);
         Assert.IsNull(circle.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circle }, parent.Reference_0_n.ToList());
     }
 
     [TestMethod]
     public void Remove_Between()
     {
-        var circleA = new Circle("cIdA");
-        var circleB = new Circle("cIdB");
-        var line = new Line("myId");
-        var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
-        parent.RemoveShapes([line]);
+        var circleA = new LinkTestConcept("cIdA");
+        var circleB = new LinkTestConcept("cIdB");
+        var line = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("g") { Reference_0_n = [circleA, line, circleB] };
+        parent.RemoveReference_0_n([line]);
         Assert.IsNull(circleA.GetParent());
         Assert.IsNull(circleB.GetParent());
         Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Shapes.ToList());
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { circleA, circleB }, parent.Reference_0_n.ToList());
     }
 
     #endregion
