@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.ParentHandling;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleRequiredTests
@@ -27,60 +27,60 @@ public class SingleRequiredTests
     [TestMethod]
     public void SameInOtherInstance()
     {
-        var child = new Coord("myId");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new OffsetDuplicate("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Offset = child;
+        target.Containment_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Offset);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
     }
 
     [TestMethod]
     public void SameInOtherInstance_detach()
     {
-        var child = new Coord("myId");
-        var orphan = new Coord("o");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new OffsetDuplicate("tgt") { Offset = orphan };
+        var child = new LinkTestConcept("myId");
+        var orphan = new LinkTestConcept("o");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt") { Containment_1 = orphan };
 
-        target.Offset = child;
+        target.Containment_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Offset);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
         Assert.IsNull(orphan.GetParent());
     }
 
     [TestMethod]
     public void SameInOtherInstance_Reflective()
     {
-        var child = new Coord("myId");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new OffsetDuplicate("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Offset);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
     }
 
     [TestMethod]
     public void SameInOtherInstance_detach_Reflective()
     {
-        var child = new Coord("myId");
-        var orphan = new Coord("o");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new OffsetDuplicate("tgt") { Offset = orphan };
+        var child = new LinkTestConcept("myId");
+        var orphan = new LinkTestConcept("o");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt") { Containment_1 = orphan };
 
-        target.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Offset);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -91,60 +91,60 @@ public class SingleRequiredTests
     [TestMethod]
     public void Other()
     {
-        var child = new Coord("myId");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new Circle("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Center = child;
+        target.Containment_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Center);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
     }
 
     [TestMethod]
     public void Other_detach()
     {
-        var child = new Coord("myId");
-        var orphan = new Coord("o");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new Circle("tgt") { Center = orphan };
+        var child = new LinkTestConcept("myId");
+        var orphan = new LinkTestConcept("o");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt") { Containment_1 = orphan };
 
-        target.Center = child;
+        target.Containment_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Center);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
         Assert.IsNull(orphan.GetParent());
     }
 
     [TestMethod]
     public void Other_Reflective()
     {
-        var child = new Coord("myId");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new Circle("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Set(ShapesLanguage.Instance.Circle_center, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Center);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
     }
 
     [TestMethod]
     public void Other_detach_Reflective()
     {
-        var child = new Coord("myId");
-        var orphan = new Coord("o");
-        var source = new OffsetDuplicate("src") { Offset = child };
-        var target = new Circle("tgt") { Center = orphan };
+        var child = new LinkTestConcept("myId");
+        var orphan = new LinkTestConcept("o");
+        var source = new LinkTestConcept("src") { Containment_1 = child };
+        var target = new LinkTestConcept("tgt") { Containment_1 = orphan };
 
-        target.Set(ShapesLanguage.Instance.Circle_center, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Center);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Offset);
+        Assert.AreSame(child, target.Containment_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => source.Containment_1);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -155,25 +155,25 @@ public class SingleRequiredTests
     [TestMethod]
     public void SameInSameInstance()
     {
-        var child = new Coord("myId");
-        var parent = new Line("src") { Start = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_1 = child };
 
-        parent.Start = child;
+        parent.Containment_1 = child;
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.Start);
+        Assert.AreSame(child, parent.Containment_1);
     }
 
     [TestMethod]
     public void SameInSameInstance_Reflective()
     {
-        var child = new Coord("myId");
-        var parent = new Line("src") { Start = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_1 = child };
 
-        parent.Set(ShapesLanguage.Instance.Line_start, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, child);
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.Start);
+        Assert.AreSame(child, parent.Containment_1);
     }
 
     #endregion
@@ -183,56 +183,56 @@ public class SingleRequiredTests
     [TestMethod]
     public void OtherInSameInstance()
     {
-        var child = new Coord("myId");
-        var parent = new Line("src") { Start = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_1 = child };
 
-        parent.End = child;
+        parent.Containment_0_1 = child;
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.End);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
+        Assert.AreSame(child, parent.Containment_0_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
     }
 
     [TestMethod]
     public void OtherInSameInstance_detach()
     {
-        var child = new Coord("myId");
-        var orphan = new Coord("o");
-        var parent = new Line("src") { Start = child, End = orphan };
+        var child = new LinkTestConcept("myId");
+        var orphan = new LinkTestConcept("o");
+        var parent = new LinkTestConcept("src") { Containment_1 = child, Containment_0_1 = orphan };
 
-        parent.End = child;
+        parent.Containment_0_1 = child;
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.End);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
+        Assert.AreSame(child, parent.Containment_0_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(orphan.GetParent());
     }
 
     [TestMethod]
     public void OtherInSameInstance_Reflective()
     {
-        var child = new Coord("myId");
-        var parent = new Line("src") { Start = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_1 = child };
 
-        parent.Set(ShapesLanguage.Instance.Line_end, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.End);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
+        Assert.AreSame(child, parent.Containment_0_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
     }
 
     [TestMethod]
     public void OtherInSameInstance_detach_Reflective()
     {
-        var child = new Coord("myId");
-        var orphan = new Coord("o");
-        var parent = new Line("src") { Start = child, End = orphan };
+        var child = new LinkTestConcept("myId");
+        var orphan = new LinkTestConcept("o");
+        var parent = new LinkTestConcept("src") { Containment_1 = child, Containment_0_1 = orphan };
 
-        parent.Set(ShapesLanguage.Instance.Line_end, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.End);
-        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Start);
+        Assert.AreSame(child, parent.Containment_0_1);
+        Assert.ThrowsExactly<UnsetFeatureException>(() => parent.Containment_1);
         Assert.IsNull(orphan.GetParent());
     }
 

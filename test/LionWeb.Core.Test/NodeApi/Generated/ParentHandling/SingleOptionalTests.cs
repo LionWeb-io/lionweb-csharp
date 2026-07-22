@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated.ParentHandling;
 
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
 public class SingleOptionalTests
@@ -27,60 +28,60 @@ public class SingleOptionalTests
     [TestMethod]
     public void SameInOtherInstance()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var target = new Geometry("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Documentation = child;
+        target.Containment_0_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Documentation);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
     }
 
     [TestMethod]
     public void SameInOtherInstance_detach()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var orphan = new Documentation("o");
-        var target = new Geometry("tgt") { Documentation = orphan };
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var orphan = new LinkTestConcept("o");
+        var target = new LinkTestConcept("tgt") { Containment_0_1 = orphan };
 
-        target.Documentation = child;
+        target.Containment_0_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Documentation);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
         Assert.IsNull(orphan.GetParent());
     }
 
     [TestMethod]
     public void SameInOtherInstance_Reflective()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var target = new Geometry("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Set(ShapesLanguage.Instance.Geometry_documentation, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Documentation);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
     }
 
     [TestMethod]
     public void SameInOtherInstance_detach_Reflective()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var orphan = new Documentation("o");
-        var target = new Geometry("tgt") { Documentation = orphan };
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var orphan = new LinkTestConcept("o");
+        var target = new LinkTestConcept("tgt") { Containment_0_1 = orphan };
 
-        target.Set(ShapesLanguage.Instance.Geometry_documentation, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Documentation);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
         Assert.IsNull(orphan.GetParent());
     }
 
@@ -91,66 +92,69 @@ public class SingleOptionalTests
     [TestMethod]
     public void Other()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var target = new OffsetDuplicate("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Docs = child;
+        target.Containment_0_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Docs);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
     }
 
     [TestMethod]
     public void Other_detach()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var orphan = new Documentation("o");
-        var target = new OffsetDuplicate("tgt") { Docs = orphan };
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var orphan = new LinkTestConcept("o");
+        var target = new LinkTestConcept("tgt") { Containment_0_1 = orphan };
 
-        target.Docs = child;
+        target.Containment_0_1 = child;
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Docs);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
         Assert.IsNull(orphan.GetParent());
     }
 
     [TestMethod]
     public void Other_Reflective()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var target = new OffsetDuplicate("tgt");
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var target = new LinkTestConcept("tgt");
 
-        target.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Docs);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
     }
 
     [TestMethod]
     public void Other_detach_Reflective()
     {
-        var child = new Documentation("myId");
-        var source = new Geometry("src") { Documentation = child };
-        var orphan = new Documentation("o");
-        var target = new OffsetDuplicate("tgt") { Docs = orphan };
+        var child = new LinkTestConcept("myId");
+        var source = new LinkTestConcept("src") { Containment_0_1 = child };
+        var orphan = new LinkTestConcept("o");
+        var target = new LinkTestConcept("tgt") { Containment_0_1 = orphan };
 
-        target.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, child);
+        target.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(target, child.GetParent());
-        Assert.AreSame(child, target.Docs);
-        Assert.IsNull(source.Documentation);
+        Assert.AreSame(child, target.Containment_0_1);
+        Assert.IsNull(source.Containment_0_1);
         Assert.IsNull(orphan.GetParent());
     }
 
     #endregion
 
     #region otherInSameInstance
+    // Uses Shapes: OffsetDuplicate has two single-optional containments (Docs, SecretDocs).
+    // TestLanguage's LinkTestConcept only has one single-optional containment (Containment_0_1).
+    // No 1-to-1 mapping available.
 
     [TestMethod]
     public void OtherInSameInstance()
@@ -215,31 +219,33 @@ public class SingleOptionalTests
     [TestMethod]
     public void SameInSameInstance()
     {
-        var child = new Documentation("myId");
-        var parent = new OffsetDuplicate("src") { Docs = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_0_1 = child };
 
-        parent.SecretDocs = child;
+        parent.Containment_0_1 = child;
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.SecretDocs);
-        Assert.IsNull(parent.Docs);
+        Assert.AreSame(child, parent.Containment_0_1);
     }
 
     [TestMethod]
     public void SameInSameInstance_Reflective()
     {
-        var child = new Documentation("myId");
-        var parent = new OffsetDuplicate("src") { Docs = child };
+        var child = new LinkTestConcept("myId");
+        var parent = new LinkTestConcept("src") { Containment_0_1 = child };
 
-        parent.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
 
         Assert.AreSame(parent, child.GetParent());
-        Assert.AreSame(child, parent.Docs);
+        Assert.AreSame(child, parent.Containment_0_1);
     }
 
     #endregion
 
     #region annotation
+    // Uses Shapes: Documentation is both an annotation type AND a valid containment child.
+    // TestLanguage's TestAnnotation cannot be used as a Containment_0_1 child (wrong type).
+    // No 1-to-1 mapping available.
 
     [TestMethod]
     public void ToAnnotation()

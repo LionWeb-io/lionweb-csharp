@@ -17,116 +17,118 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
+using M2;
 using M3;
 
 [TestClass]
 public class InterfaceTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
+
     [TestMethod]
     public void GetClassifier()
     {
-        IShape node = new Circle("c");
-        Assert.AreSame(ShapesLanguage.Instance.Circle, node.GetClassifier());
+        INamedWritable node = new LinkTestConcept("c");
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept, node.GetClassifier());
     }
 
     [TestMethod]
     public void GetProperty_Reflective()
     {
-        IShape node = new Circle("c") { Uuid = "abc" };
-        Assert.AreEqual("abc", node.Get(ShapesLanguage.Instance.IShape_uuid));
+        INamedWritable node = new LinkTestConcept("c") { Name = "abc" };
+        Assert.AreEqual("abc", node.Get(_builtIns.INamed_name));
     }
 
     [TestMethod]
     public void GetContainment_Reflective()
     {
-        Coord child = new Coord("coord");
-        IShape node = new Circle("c") { Fixpoints = [child] };
-        CollectionAssert.AreEqual(new List<Coord> { child },
-            ((IReadOnlyList<Coord>)node.Get(ShapesLanguage.Instance.IShape_fixpoints)).ToList());
+        LinkTestConcept child = new LinkTestConcept("coord");
+        INamedWritable node = new LinkTestConcept("c") { Containment_0_n = [child] };
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child },
+            ((IReadOnlyList<LinkTestConcept>)node.Get(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n)).ToList());
     }
 
     [TestMethod]
     public void SetProperty()
     {
-        IShape node = new Circle("c");
-        node.Uuid = "abc";
-        Assert.AreEqual("abc", node.Uuid);
+        INamedWritable node = new LinkTestConcept("c");
+        node.SetName("abc");
+        Assert.AreEqual("abc", ((LinkTestConcept)node).Name);
     }
 
     [TestMethod]
     public void SetProperty_Reflective()
     {
-        IShape node = new Circle("c");
-        node.Set(ShapesLanguage.Instance.IShape_uuid, "abc");
-        Assert.AreEqual("abc", node.Uuid);
+        INamedWritable node = new LinkTestConcept("c");
+        node.Set(_builtIns.INamed_name, "abc");
+        Assert.AreEqual("abc", ((LinkTestConcept)node).Name);
     }
 
     [TestMethod]
     public void AddContainment()
     {
-        Coord child = new Coord("coord");
-        IShape prevParent = new Line("l") { Fixpoints = [child] };
-        IShape node = new Circle("c");
-        node.AddFixpoints([child]);
-        CollectionAssert.AreEqual(new List<Coord> { child }, node.Fixpoints.ToList());
-        Assert.IsFalse(prevParent.Fixpoints.Any());
+        LinkTestConcept child = new LinkTestConcept("coord");
+        LinkTestConcept prevParent = new LinkTestConcept("l") { Containment_0_n = [child] };
+        LinkTestConcept node = new LinkTestConcept("c");
+        node.AddContainment_0_n([child]);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, node.Containment_0_n.ToList());
+        Assert.IsFalse(prevParent.Containment_0_n.Any());
         Assert.AreSame(node, child.GetParent());
     }
 
     [TestMethod]
     public void InsertContainment()
     {
-        Coord child = new Coord("coord");
-        IShape prevParent = new Line("l") { Fixpoints = [child] };
-        IShape node = new Circle("c");
-        node.InsertFixpoints(0, [child]);
-        CollectionAssert.AreEqual(new List<Coord> { child }, node.Fixpoints.ToList());
-        Assert.IsFalse(prevParent.Fixpoints.Any());
+        LinkTestConcept child = new LinkTestConcept("coord");
+        LinkTestConcept prevParent = new LinkTestConcept("l") { Containment_0_n = [child] };
+        LinkTestConcept node = new LinkTestConcept("c");
+        node.InsertContainment_0_n(0, [child]);
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, node.Containment_0_n.ToList());
+        Assert.IsFalse(prevParent.Containment_0_n.Any());
         Assert.AreSame(node, child.GetParent());
     }
 
     [TestMethod]
     public void RemoveContainment()
     {
-        Coord child = new Coord("coord");
-        IShape node = new Circle("c") { Fixpoints = [child] };
-        node.RemoveFixpoints([child]);
-        Assert.IsFalse(node.Fixpoints.Any());
+        LinkTestConcept child = new LinkTestConcept("coord");
+        LinkTestConcept node = new LinkTestConcept("c") { Containment_0_n = [child] };
+        node.RemoveContainment_0_n([child]);
+        Assert.IsFalse(node.Containment_0_n.Any());
         Assert.IsNull(child.GetParent());
     }
 
     [TestMethod]
     public void SetContainment_Reflective()
     {
-        Coord child = new Coord("coord");
-        IShape prevParent = new Line("l") { Fixpoints = [child] };
-        IShape node = new Circle("c");
-        node.Set(ShapesLanguage.Instance.IShape_fixpoints, new List<Coord> { child });
-        CollectionAssert.AreEqual(new List<Coord> { child }, node.Fixpoints.ToList());
-        Assert.IsFalse(prevParent.Fixpoints.Any());
-        Assert.AreSame(node, child.GetParent());
+        LinkTestConcept child = new LinkTestConcept("coord");
+        LinkTestConcept prevParent = new LinkTestConcept("l") { Containment_0_n = [child] };
+        INamedWritable node = new LinkTestConcept("c");
+        node.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, new List<LinkTestConcept> { child });
+        CollectionAssert.AreEqual(new List<LinkTestConcept> { child }, ((LinkTestConcept)node).Containment_0_n.ToList());
+        Assert.IsFalse(prevParent.Containment_0_n.Any());
+        Assert.AreSame((INode)node, child.GetParent());
     }
 
     [TestMethod]
     public void CollectAllSetFeatures()
     {
-        Coord child = new Coord("coord");
-        IShape node = new Circle("c") { Fixpoints = [child], Uuid = "abc", R = 1 };
+        LinkTestConcept child = new LinkTestConcept("coord");
+        LinkTestConcept node = new LinkTestConcept("c") { Containment_0_n = [child], Name = "abc" };
         CollectionAssert.AreEquivalent(
             new List<Feature>
             {
-                ShapesLanguage.Instance.IShape_uuid,
-                ShapesLanguage.Instance.IShape_fixpoints,
-                ShapesLanguage.Instance.Circle_r
+                _builtIns.INamed_name,
+                TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n,
             }, node.CollectAllSetFeatures().ToList());
     }
 
     [TestMethod]
     public void GetContainmentOf()
     {
-        Coord child = new Coord("coord");
-        IShape node = new Circle("c") { Fixpoints = [child] };
-        Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, node.GetContainmentOf(child));
+        LinkTestConcept child = new LinkTestConcept("coord");
+        LinkTestConcept node = new LinkTestConcept("c") { Containment_0_n = [child] };
+        Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, node.GetContainmentOf(child));
     }
 }
