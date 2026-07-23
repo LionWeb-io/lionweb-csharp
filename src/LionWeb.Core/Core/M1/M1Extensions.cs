@@ -271,6 +271,52 @@ public static class M1Extensions
             Descendants<T>(self, [], includeSelf, includeAnnotations).GetEnumerator();
     }
 
+    /// <summary>
+    /// Enumerates all direct and indirect children of <paramref name="self"/> matching <paramref name="filter"/>.
+    /// Optionally includes <paramref name="self"/> and/or directly and indirectly contained annotations.
+    /// </summary>
+    /// <param name="self">Base node to find descendants of.</param>
+    /// <param name="filter">Filter whether to include a node and all its descendants. <i>Not</i> applied to <paramref name="self"/>.</param>
+    /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
+    /// <param name="includeAnnotations">If true, the result includes directly and indirectly contained annotations.</param>
+    /// <returns>All directly and indirectly contained nodes of <paramref name="self"/> that match <paramref name="filter"/>.</returns>
+    /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
+    public static IEnumerable<IReadableNode> Descendants(this IReadableNode self, Func<IReadableNode, bool> filter, bool includeSelf = false, bool includeAnnotations = false) =>
+        new ResettingFilteringEnumerable(self, filter, includeSelf, includeAnnotations);
+
+    internal static IEnumerable<IReadableNode> Descendants(IReadableNode self, HashSet<IReadableNode> visited, Func<IReadableNode, bool> filter, bool includeSelf, bool includeAnnotations)
+    {
+        if (!visited.Add(self))
+            throw new TreeShapeException(self,
+                $"{self.GetId()} contains itself as descendant: [{string.Join(",", visited.Select(a => a.GetId()))}]");
+
+        var result = Children(self, false, includeAnnotations)
+            .Where(filter)
+            .SelectMany(child =>
+                Descendants(child, visited, filter, includeSelf: true, includeAnnotations: includeAnnotations));
+
+        if (includeSelf)
+            result = result.Prepend(self);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Resets the <c>visited</c> HashSet on each enumeration. 
+    /// Without that, double enumeration leads to false positive <see cref="TreeShapeException"/>s. 
+    /// </summary>
+    /// <seealso cref="LionWeb.Core.Test.NodeApi.CircularContainmentTests.NonCircularMultipleEnumerationDescendants()">Test Case</seealso>
+    /// <inheritdoc cref="M1Extensions.Descendants(IReadableNode,Func{IReadableNode,bool},bool,bool)"/>
+    private class ResettingFilteringEnumerable(IReadableNode self, Func<IReadableNode, bool> filter, bool includeSelf, bool includeAnnotations)
+        : IEnumerable<IReadableNode>
+    {
+        IEnumerator IEnumerable.GetEnumerator() =>
+            GetEnumerator();
+
+        public IEnumerator<IReadableNode> GetEnumerator() =>
+            Descendants(self, [], filter, includeSelf, includeAnnotations).GetEnumerator();
+    }
+
     #endregion
 
     #region Children

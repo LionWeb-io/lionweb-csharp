@@ -106,7 +106,7 @@ public class Serializer : ISerializer
             _usedLanguages.Add(altLanguage);
     }
 
-    private SerializedNode? SerializeNode(IReadableNode node)
+    protected virtual SerializedNode? SerializeNode(IReadableNode node)
     {
         var id = node.GetId();
         if (!_duplicateIdChecker.IsIdDuplicate(id))
@@ -170,17 +170,15 @@ public class Serializer : ISerializer
 
     private Dictionary<Feature, object?> CollectFeatureValues(IReadableNode node, Classifier classifier)
     {
-        var features = new HashSet<Feature>(_featureComparer);
-        features.UnionWith(node.CollectAllSetFeatures());
-        features.UnionWith(AllFeatures(classifier));
+        HashSet<Feature> features = AllFeaturesIncludingUnset(node, classifier);
 
         Dictionary<Feature, object?> featureValues = [];
         foreach (Feature feature in features)
         {
             if (node.TryGetRaw(feature, out var value))
             {
-                if (SerializeEmptyFeatures ||  value is not null and not IList { Count: 0 })
-                    featureValues[feature] = value;
+                if (SerializeEmptyFeatures || value is not null and not IList { Count: 0 })
+                    featureValues[feature] = AdjustFeatureValue(value);
             } else if (SerializeEmptyFeatures)
             {
                 featureValues[feature] = null;
@@ -189,6 +187,17 @@ public class Serializer : ISerializer
 
         return featureValues;
     }
+
+    private HashSet<Feature> AllFeaturesIncludingUnset(IReadableNode node, Classifier classifier)
+    {
+        var features = new HashSet<Feature>(_featureComparer);
+        features.UnionWith(node.CollectAllSetFeatures());
+        features.UnionWith(AllFeatures(classifier));
+        return features;
+    }
+
+    protected virtual object? AdjustFeatureValue(object? value) =>
+        value;
 
     private IImmutableSet<Feature> AllFeatures(Classifier classifier)
     {
@@ -371,7 +380,7 @@ public class Serializer : ISerializer
 
     private NodeId[] SerializeAnnotations(IReadableNode node)
     {
-        var annotations = node.GetAnnotationsRaw();
+        var annotations = CollectAnnotations(node);
         NodeId[] annotationIds = new NodeId[annotations.Count];
         for (var i = 0; i < annotations.Count; i++)
         {
@@ -380,6 +389,9 @@ public class Serializer : ISerializer
 
         return annotationIds;
     }
+
+    protected virtual IReadOnlyList<IReadableNode> CollectAnnotations(IReadableNode node) =>
+        node.GetAnnotationsRaw();
 
     private static NodeId SerializeAnnotationTarget(IReadableNode annotation) =>
         annotation.GetId();
