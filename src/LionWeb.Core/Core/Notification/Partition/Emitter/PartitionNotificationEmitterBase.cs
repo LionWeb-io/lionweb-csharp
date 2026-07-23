@@ -60,7 +60,11 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _partitionProducer?.CreateNotificationId()!;
+    /// <param name="oldPartition"></param>
+    protected INotificationId GetNotificationId(IPartitionInstance? oldPartition = null) =>
+        _partitionProducer?.CreateNotificationId()
+        ?? oldPartition?.GetNotificationProducer()?.CreateNotificationId()
+        ?? throw new InvalidOperationException("No NotificationProducer available");
     
     protected void ProduceNotification(INotification notification) =>
         _partitionProducer?.ProduceNotification(notification);

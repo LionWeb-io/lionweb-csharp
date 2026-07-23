@@ -23,6 +23,7 @@ using Utilities.ListComparer;
 /// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
 public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBase
 {
+    private readonly List<IWritableNode> _existingValues = [];
     private readonly List<IListChange<IWritableNode>> _changes = [];
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
@@ -35,6 +36,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
         if (!IsActive() || setValues == null)
             return;
 
+        _existingValues = existingValues;
         var listComparer = IListComparer.CreateForNodes(existingValues, setValues);
         _changes = listComparer.Compare();
     }
@@ -47,6 +49,17 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
     {}
 
     /// <inheritdoc />
+    public override void CollectOldData()
+    {
+        base.CollectOldData();
+
+        foreach (var existingValue in _existingValues)
+        {
+            OldAnnotationInfos[existingValue] = Collect(existingValue);
+        }
+    }
+
+    /// <inheritdoc />
     public override void Notify()
     {
         if (!IsActive())
@@ -57,7 +70,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
             switch (change)
             {
                 case ListAdded<IWritableNode> added:
-                    switch (NewValues[added.Element])
+                    switch (OldAnnotationInfos[added.Element])
                     {
                         case null:
                             ProduceNotification(new AnnotationAddedNotification(DestinationParent, added.Element,
@@ -69,7 +82,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                             break;
                         
                         case { Partition: not null } old when DestinationPartition is null:
-                            ProduceOriginNotification(old, new AnnotationDeletedNotification(added.Element, old.Parent, old.Index, GetNotificationId()));
+                            ProduceOriginNotification(old, new AnnotationDeletedNotification(added.Element, old.Parent, old.Index, GetNotificationId(old.Partition)));
                             break;
 
                         case { } old when old.Parent != DestinationParent:
@@ -93,8 +106,10 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                     break;
 
                 case ListDeleted<IWritableNode> deleted:
-                    ProduceNotification(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
-                        GetNotificationId()));
+                    var oldDeleted = OldAnnotationInfos[deleted.Element];
+                    if (oldDeleted is not null || DestinationPartition is not null)
+                        ProduceNotification(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
+                            GetNotificationId(oldDeleted?.Partition)));
                     break;
             }
         }
