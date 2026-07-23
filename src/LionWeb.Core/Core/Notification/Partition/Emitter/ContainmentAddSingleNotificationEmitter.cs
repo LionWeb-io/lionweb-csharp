@@ -49,7 +49,7 @@ public class ContainmentAddSingleNotificationEmitter<T> : ContainmentMultipleNot
         if (!IsActive())
             return;
 
-        foreach ((T added, OldContainmentInfo? old) in NewValues)
+        foreach ((T added, OldContainmentInfo? old) in OldContainmentInfos)
         {
             switch (old)
             {
@@ -61,7 +61,7 @@ public class ContainmentAddSingleNotificationEmitter<T> : ContainmentMultipleNot
                 case not null when old.Parent != DestinationParent && DestinationPartition is null:
                     if (old.Partition?.GetNotificationProducer() is { } prod)
                     {
-                        var deletedNotification = new ChildDeletedNotification(added, old.Parent, old.Containment, old.Index, GetNotificationId());
+                        var deletedNotification = new ChildDeletedNotification(added, old.Parent, old.Containment, old.Index, GetNotificationId(old.Partition));
                         prod.ProduceNotification(deletedNotification);
                     }
                     break;

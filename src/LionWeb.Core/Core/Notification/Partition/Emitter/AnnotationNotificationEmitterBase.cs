@@ -24,20 +24,20 @@ using M3;
 public abstract class AnnotationNotificationEmitterBase : PartitionNotificationEmitterBase<IWritableNode>
 {
     /// Newly set values and their previous context.
-    protected readonly Dictionary<IWritableNode, OldAnnotationInfo?> NewValues;
+    protected readonly Dictionary<IWritableNode, OldAnnotationInfo?> OldAnnotationInfos;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="newValues">Newly set values.</param>
     protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<IWritableNode>? newValues) : base(destinationParent)
     {
-        NewValues = newValues?.ToDictionary<IWritableNode, IWritableNode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
+        OldAnnotationInfos = newValues?.ToDictionary<IWritableNode, IWritableNode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
     }
 
     /// <inheritdoc />
     protected override bool IsActive() =>
         base.IsActive() ||
-        NewValues.Values.Any(v => v?.Partition?.GetNotificationProducer()?.Handles() ?? false) ||
-        NewValues.Keys.Any(k => k.GetPartition()?.GetNotificationProducer()?.Handles() ?? false);
+        OldAnnotationInfos.Values.Any(v => v?.Partition?.GetNotificationProducer()?.Handles() ?? false) ||
+        OldAnnotationInfos.Keys.Any(k => k.GetPartition()?.GetNotificationProducer()?.Handles() ?? false);
 
     /// <inheritdoc />
     public override void CollectOldData()
@@ -45,18 +45,26 @@ public abstract class AnnotationNotificationEmitterBase : PartitionNotificationE
         if (!IsActive())
             return;
 
-        foreach (var newValue in NewValues.Keys.ToList())
+        foreach (var newValue in OldAnnotationInfos.Keys.ToList())
         {
-            var oldParent = newValue.GetParent();
-            if (oldParent == null)
-                continue;
-
-            var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(newValue);
-
-            var oldPartition = newValue.GetPartition();
-
-            NewValues[newValue] = new((IWritableNode)oldParent, oldIndex, oldPartition);
+            OldAnnotationInfos[newValue] = Collect(newValue);
         }
+    }
+
+    /// Collects <see cref="OldAnnotationInfo"/> from <paramref name="value"/>, to be used in <see cref="PartitionNotificationEmitterBase{T}.CollectOldData"/>
+    protected OldAnnotationInfo? Collect(IWritableNode value)
+    {
+        var oldParent = value.GetParent();
+        if (oldParent == null)
+            return null;
+
+        var oldPartition = value.GetPartition();
+        if (oldPartition == null)
+            return null;
+        
+        var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(value);
+
+        return new((IWritableNode)oldParent, oldIndex, oldPartition);
     }
 
     /// Context of an annotation instance before it has been removed from its previous <paramref name="Parent"/>.

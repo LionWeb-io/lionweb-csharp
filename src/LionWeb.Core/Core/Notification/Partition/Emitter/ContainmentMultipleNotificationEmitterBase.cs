@@ -25,7 +25,7 @@ using M3;
 public abstract class ContainmentMultipleNotificationEmitterBase<T> : ContainmentNotificationEmitterBase<T> where T : IWritableNode
 {
     /// Newly set values and their previous context.
-    protected readonly Dictionary<T, OldContainmentInfo?> NewValues;
+    protected readonly Dictionary<T, OldContainmentInfo?> OldContainmentInfos;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
@@ -35,7 +35,7 @@ public abstract class ContainmentMultipleNotificationEmitterBase<T> : Containmen
     {
         try
         {
-            NewValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
+            OldContainmentInfos = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
         } catch (ArgumentException e)
         {
             throw new ArgumentException(string.Join(",", newValues?.Select(n => n.GetId()) ?? []), e);
@@ -45,8 +45,8 @@ public abstract class ContainmentMultipleNotificationEmitterBase<T> : Containmen
     /// <inheritdoc />
     protected override bool IsActive() =>
         base.IsActive() ||
-        NewValues.Values.Any(v => v?.Partition?.GetNotificationProducer()?.Handles() ?? false) ||
-        NewValues.Keys.Any(k => k.GetPartition()?.GetNotificationProducer()?.Handles() ?? false);
+        OldContainmentInfos.Values.Any(v => v?.Partition?.GetNotificationProducer()?.Handles() ?? false) ||
+        OldContainmentInfos.Keys.Any(k => k.GetPartition()?.GetNotificationProducer()?.Handles() ?? false);
 
     /// <inheritdoc />
     public override void CollectOldData()
@@ -54,9 +54,9 @@ public abstract class ContainmentMultipleNotificationEmitterBase<T> : Containmen
         if (!IsActive())
             return;
 
-        foreach (T newValue in NewValues.Keys.ToList())
+        foreach (T newValue in OldContainmentInfos.Keys.ToList())
         {
-            NewValues[newValue] = Collect(newValue);
+            OldContainmentInfos[newValue] = Collect(newValue);
         }
     }
 }

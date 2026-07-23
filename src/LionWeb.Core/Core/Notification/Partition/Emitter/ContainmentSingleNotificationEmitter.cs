@@ -97,7 +97,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
             case (_, not null, _)
                 when _oldContainmentInfo.Partition is not null && DestinationPartition is null:
                 ProduceOriginNotification(_oldContainmentInfo,
-                    new ChildDeletedNotification(_newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, GetNotificationId()));
+                    new ChildDeletedNotification(_newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, GetNotificationId(_oldContainmentInfo.Partition)));
                 break;
 
             case (null, not null, not null)

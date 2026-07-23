@@ -24,6 +24,7 @@ using Utilities.ListComparer;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : IWritableNode
 {
+    private readonly List<T> _existingValues = [];
     private readonly List<IListChange<T>> _changes = [];
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
@@ -38,6 +39,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
         if (!IsActive() || setValues == null)
             return;
 
+        _existingValues = existingValues;
         var listComparer = IListComparer.CreateForNodes(existingValues, setValues);
         _changes = listComparer.Compare();
     }
@@ -51,6 +53,17 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
     }
 
     /// <inheritdoc />
+    public override void CollectOldData()
+    {
+        base.CollectOldData();
+
+        foreach (T existingValue in _existingValues)
+        {
+            OldContainmentInfos[existingValue] = Collect(existingValue);
+        }
+    }
+
+    /// <inheritdoc />
     public override void Notify()
     {
         if (!IsActive())
@@ -61,7 +74,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
             switch (change)
             {
                 case ListAdded<T> added:
-                    switch (NewValues[added.Element])
+                    switch (OldContainmentInfos[added.Element])
                     {
                         case null:
                             ProduceNotification(new ChildAddedNotification(DestinationParent, added.Element, Containment,
@@ -69,7 +82,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                             break;
 
                         case { Partition: not null } old when DestinationPartition is null:
-                            ProduceOriginNotification(old, new ChildDeletedNotification(added.Element, old.Parent, old.Containment, old.Index, GetNotificationId()));
+                            ProduceOriginNotification(old, new ChildDeletedNotification(added.Element, old.Parent, old.Containment, old.Index, GetNotificationId(old.Partition)));
                             break;
 
                         case { } old when old.Parent != DestinationParent:
@@ -97,8 +110,10 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                         DestinationParent, Containment, moved.LeftIndex, moved.RightIndex - moved.LeftIndex, GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
-                    ProduceNotification(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
-                        deleted.LeftIndex, GetNotificationId()));
+                    var oldDeleted = OldContainmentInfos[deleted.Element];
+                    if (oldDeleted is not null || DestinationPartition is not null)
+                        ProduceNotification(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
+                            deleted.LeftIndex, GetNotificationId(oldDeleted?.Partition)));
                     break;
             }
         }

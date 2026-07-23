@@ -45,7 +45,7 @@ public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmit
         if (!IsActive())
             return;
 
-        foreach ((IWritableNode added, OldAnnotationInfo? old) in NewValues)
+        foreach ((IWritableNode added, OldAnnotationInfo? old) in OldAnnotationInfos)
         {
             switch (old)
             {
@@ -57,7 +57,7 @@ public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmit
                 case not null when old.Parent != DestinationParent && DestinationPartition is null:
                     if (old.Partition?.GetNotificationProducer() is { } prod)
                     {
-                        var deletedNotification = new AnnotationDeletedNotification(added, old.Parent, old.Index, GetNotificationId());
+                        var deletedNotification = new AnnotationDeletedNotification(added, old.Parent, old.Index, GetNotificationId(old.Partition));
                         prod.ProduceNotification(deletedNotification);
                     }
 
