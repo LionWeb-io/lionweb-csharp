@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `IGlobalM2Cache`, defaults to unset. If available, used by `M2Extensions`.
 * Added `ReusableDeserializer` to avoid initialization effort during delta deserialization.
 * Added `IChildNotification` and `IAnnotationNotification` marker interfaces.
+* Added `M1Extension.Descendants()` with filter.
 ### Fixed
 * `InsertBefore()` and `InsertAfter()` works now with annotations.
 * Moving or replacing nodes between partitions and free-floating nodes produces the proper added/deleted notifications.

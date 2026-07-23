@@ -15,6 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable InconsistentNaming
+
 namespace LionWeb.Core.Test.NodeApi.TreeTraversal;
 
 using Languages.Generated.V2024_1.Shapes.M2;
@@ -344,6 +346,158 @@ public class DescendantsTests
             grandchildAnn,
             annAnn
         }, node.Descendants(true, true).ToList());
+    }
+
+    #endregion
+
+    #region manyLevelDescendants filtered
+
+    [TestMethod]
+    public void ManyLevelDescendants_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        CollectionAssert.AreEquivalent(new List<INode> { childA, grandchildAA, grandchildAB },
+            node.Descendants(n => n.GetId() != "cB", false, false).ToList());
+    }
+
+    [TestMethod]
+    public void ManyLevelDescendants_Self_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, grandchildAA, grandchildAB },
+            node.Descendants(n => n.GetId() != "cB" && n.GetId() != "n", true, false).ToList());
+    }
+
+    [TestMethod]
+    public void ManyLevelDescendants_Annotations_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        CollectionAssert.AreEquivalent(new List<INode> { childA, grandchildAA, grandchildAB },
+            node.Descendants(n => n.GetId() != "cB", false, true).ToList());
+    }
+
+    [TestMethod]
+    public void ManyLevelDescendants_Self_Annotations_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, grandchildAA, grandchildAB },
+            node.Descendants(n => n.GetId() != "cB" && n.GetId() != "n", true, true).ToList());
+    }
+
+    [TestMethod]
+    public void ManyLevelDescendants_Annotation_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAAAnn = new TestAnnotation("gAAa");
+        grandchildAA.AddAnnotations([grandchildAAAnn]);
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+
+        var grandchild = new LinkTestConcept("aG");
+        var grandchildAnn = new TestAnnotation("aGa");
+        grandchild.AddAnnotations([grandchildAnn]);
+        var ann = new TestAnnotation("a") { Containment = grandchild };
+        var annAnn = new TestAnnotation("aa");
+        ann.AddAnnotations([annAnn]);
+        node.AddAnnotations([ann]);
+        CollectionAssert.AreEquivalent(new List<INode> { childA, grandchildAA, grandchildAB },
+            node.Descendants(n => n.GetId() != "cB", false, false).ToList());
+    }
+
+    [TestMethod]
+    public void ManyLevelDescendants_Annotation_Self_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAAAnn = new TestAnnotation("gAAa");
+        grandchildAA.AddAnnotations([grandchildAAAnn]);
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+
+        var grandchild = new LinkTestConcept("aG");
+        var grandchildAnn = new TestAnnotation("aGa");
+        grandchild.AddAnnotations([grandchildAnn]);
+        var ann = new TestAnnotation("a") { Containment = grandchild };
+        var annAnn = new TestAnnotation("aa");
+        ann.AddAnnotations([annAnn]);
+        node.AddAnnotations([ann]);
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, grandchildAA, grandchildAB }, node.Descendants(n => n.GetId() != "cB" && n.GetId() != "n", true, false).ToList());
+    }
+
+    [TestMethod]
+    public void ManyLevelDescendants_Annotation_Annotations_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAAAnn = new TestAnnotation("gAAa");
+        grandchildAA.AddAnnotations([grandchildAAAnn]);
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+
+        var grandchild = new LinkTestConcept("aG");
+        var grandchildAnn = new TestAnnotation("aGa");
+        grandchild.AddAnnotations([grandchildAnn]);
+        var ann = new TestAnnotation("a") { Containment = grandchild };
+        var annAnn = new TestAnnotation("aa");
+        ann.AddAnnotations([annAnn]);
+        node.AddAnnotations([ann]);
+        CollectionAssert.AreEquivalent(new List<INode>
+        {
+            childA,
+            grandchildAB,
+            ann,
+            grandchild,
+            grandchildAnn,
+            annAnn
+        }, node.Descendants(n => n.GetId() != "cB" && n.GetId() != "gAA", false, true).ToList());
+    }
+
+    [TestMethod]
+    public void ManyLevelDescendants_Annotation_Self_Annotations_filtered()
+    {
+        var grandchildAA = new LinkTestConcept("gAA");
+        var grandchildAAAnn = new TestAnnotation("gAAa");
+        grandchildAA.AddAnnotations([grandchildAAAnn]);
+        var grandchildAB = new LinkTestConcept("gAB");
+        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
+        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+
+        var grandchild = new LinkTestConcept("aG");
+        var grandchildAnn = new TestAnnotation("aGa");
+        grandchild.AddAnnotations([grandchildAnn]);
+        var ann = new TestAnnotation("a") { Containment = grandchild };
+        var annAnn = new TestAnnotation("aa");
+        ann.AddAnnotations([annAnn]);
+        node.AddAnnotations([ann]);
+        CollectionAssert.AreEquivalent(new List<INode>
+        {
+            node,
+            childA,
+            grandchildAA,
+            grandchildAAAnn,
+            grandchildAB
+        }, node.Descendants(n => n.GetId() != "cB" && n.GetId() != "a", true, true).ToList());
     }
 
     #endregion
