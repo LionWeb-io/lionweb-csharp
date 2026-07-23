@@ -22,10 +22,11 @@ public class SerializerBuilder
 {
     private bool _serializeEmptyFeatures = true;
     private bool _persistLionCoreReferenceTargetIds = false;
-    
+    private Func<IReadableNode, bool>? _filter;
+
     /// <inheritdoc cref="WithLionWebVersion"/>
     public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
-    
+
     /// <inheritdoc cref="WithHandler"/>
     public ISerializerHandler? Handler { get; set; }
 
@@ -64,16 +65,34 @@ public class SerializerBuilder
         return this;
     }
 
+    /// <summary>
+    /// Omit any nodes (both the node itself an all links to it) from serialization that don't pass <paramref name="filter"/>.
+    /// </summary>
+    public SerializerBuilder WithFilter(Func<IReadableNode, bool>? filter)
+    {
+        _filter = filter;
+        return this;
+    }
+
     /// <summary>Builds the serializer.</summary>
     public ISerializer Build()
     {
-        Serializer result = new Serializer(LionWebVersion)
+        var handler = Handler ?? new SerializerExceptionHandler();
+        if (_filter is null)
         {
-            Handler = Handler ?? new SerializerExceptionHandler(),
+            return new Serializer(LionWebVersion)
+            {
+                Handler = handler,
+                SerializeEmptyFeatures = _serializeEmptyFeatures,
+                PersistLionCoreReferenceTargetIds = _persistLionCoreReferenceTargetIds
+            };
+        }
+
+        return new FilteringSerializer(LionWebVersion, _filter)
+        {
+            Handler = handler,
             SerializeEmptyFeatures = _serializeEmptyFeatures,
             PersistLionCoreReferenceTargetIds = _persistLionCoreReferenceTargetIds
         };
-
-        return result;
     }
 }
