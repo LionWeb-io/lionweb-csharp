@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.GenericApi;
 
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
@@ -117,67 +116,67 @@ public class CollectionTests
     public void SingleArray_Remove_Empty()
     {
         var parent = new LinkTestConcept("g");
-        var bom = new TestAnnotation("myId");
-        var values = new INode[] { bom };
+        var annotation = new TestAnnotation("myId");
+        var values = new INode[] { annotation };
         parent.Remove(null, values);
-        Assert.IsNull(bom.GetParent());
-        Assert.IsFalse(parent.GetAnnotations().Contains(bom));
+        Assert.IsNull(annotation.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(annotation));
     }
 
     [TestMethod]
     public void SingleArray_Remove_Only()
     {
-        var bom = new TestAnnotation("myId");
+        var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [bom]);
-        var values = new INode[] { bom };
+        parent.Add(null, [annotation]);
+        var values = new INode[] { annotation };
         parent.Remove(null, values);
-        Assert.IsNull(bom.GetParent());
+        Assert.IsNull(annotation.GetParent());
         CollectionAssert.AreEqual(new List<INode> { }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_First()
     {
-        var doc = new TestAnnotation("cId");
-        var bom = new TestAnnotation("myId");
+        var existing = new TestAnnotation("cId");
+        var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [bom, doc]);
-        var values = new INode[] { bom };
+        parent.Add(null, [annotation, existing]);
+        var values = new INode[] { annotation };
         parent.Remove(null, values);
-        Assert.AreSame(parent, doc.GetParent());
-        Assert.IsNull(bom.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+        Assert.AreSame(parent, existing.GetParent());
+        Assert.IsNull(annotation.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_Last()
     {
-        var doc = new TestAnnotation("cId");
-        var bom = new TestAnnotation("myId");
+        var existing = new TestAnnotation("cId");
+        var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [doc, bom]);
-        var values = new INode[] { bom };
+        parent.Add(null, [existing, annotation]);
+        var values = new INode[] { annotation };
         parent.Remove(null, values);
-        Assert.AreSame(parent, doc.GetParent());
-        Assert.IsNull(bom.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+        Assert.AreSame(parent, existing.GetParent());
+        Assert.IsNull(annotation.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void SingleArray_Remove_Between()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
-        var bom = new TestAnnotation("myId");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
+        var annotation = new TestAnnotation("myId");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [docA, bom, docB]);
-        var values = new INode[] { bom };
+        parent.Add(null, [existingA, annotation, existingB]);
+        var values = new INode[] { annotation };
         parent.Remove(null, values);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
-        Assert.IsNull(bom.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docA, docB }, parent.GetAnnotations().ToList());
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
+        Assert.IsNull(annotation.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existingA, existingB }, parent.GetAnnotations().ToList());
     }
 
     #endregion
@@ -187,8 +186,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(null, values));
         Assert.IsNull(value.GetParent());
@@ -198,8 +197,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Insert()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(null, 0, values));
         Assert.IsNull(value.GetParent());
@@ -209,8 +208,8 @@ public class CollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Remove()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         parent.Remove(null, values);
         Assert.IsNull(value.GetParent());

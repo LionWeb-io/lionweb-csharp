@@ -24,7 +24,7 @@ public class ClassifierToSyntaxCorrelationTests
         var compilationUnit = generator.Generate();
         var correlationManager = generator.Correlator;
 
-        Assert.HasCount(4, correlationManager.Correlations.OfType<ClassifierToMainCorrelation>());
+        Assert.HasCount(5, correlationManager.Correlations.OfType<ClassifierToMainCorrelation>());
 
         var linkTestCorrelation = correlationManager
             .FindAll<ClassifierToMainCorrelation>(testLanguage.LinkTestConcept)

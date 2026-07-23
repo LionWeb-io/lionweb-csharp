@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.RawApi;
 
-using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
@@ -338,8 +337,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<IWritableNode>() { value };
         Assert.IsFalse(parent.AddAnnotationsRaw(values[0]));
         Assert.IsNull(value.GetParent());
@@ -349,8 +348,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Insert()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<IWritableNode>() { value };
         Assert.IsFalse(parent.InsertAnnotationsRaw(0, values[0]));
         Assert.IsNull(value.GetParent());
@@ -360,8 +359,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Remove()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<IWritableNode>() { value };
         Assert.IsFalse(parent.RemoveAnnotationsRaw(values[0]));
         Assert.IsNull(value.GetParent());
