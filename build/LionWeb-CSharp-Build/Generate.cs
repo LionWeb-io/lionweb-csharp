@@ -26,6 +26,7 @@ using LionWeb.Core.Serialization;
 using LionWeb.Generator;
 using LionWeb.Generator.GeneratorExtensions;
 using LionWeb.Generator.Names;
+using System.Text.Json;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
@@ -194,10 +195,10 @@ return;
 
 void SerializeLanguagesLocally(LionWebVersions lionWebVersion, string name, params Language[] languages)
 {
-    JsonUtils.WriteNodesToStream(
-        new FileStream($"chunks/localDefs/{lionWebVersion.VersionString}/{name}.json", FileMode.Create),
-        new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build(),
-        languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, true, true)));
+    var serializer = new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build();
+    var chunk = serializer.SerializeToChunk(languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, true, true)));
+    var json = JsonSerializer.Serialize(chunk, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+    File.WriteAllText($"chunks/localDefs/{lionWebVersion.VersionString}/{name}.json", json);
 }
 
 DynamicLanguage[] DeserializeExternalLanguage(LionWebVersions lionWebVersion, string name,
