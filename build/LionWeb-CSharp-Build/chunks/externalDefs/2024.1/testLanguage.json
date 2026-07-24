@@ -57,6 +57,7 @@
             "DataTypeTestConcept",
             "LinkTestConcept",
             "TestAnnotation",
+            "RestrictedTestAnnotation",
             "TestPartition"
           ]
         }
@@ -893,7 +894,8 @@
             "LinkTestConcept-reference_0_1",
             "LinkTestConcept-reference_1",
             "LinkTestConcept-reference_0_n",
-            "LinkTestConcept-reference_1_n"
+            "LinkTestConcept-reference_1_n",
+            "LinkTestConcept-otherContainment_0_1"
           ]
         }
       ],
@@ -1404,6 +1406,66 @@
       "parent": "LinkTestConcept"
     },
     {
+      "id": "LinkTestConcept-otherContainment_0_1",
+      "classifier": {
+        "language": "LionCore-M3",
+        "version": "2024.1",
+        "key": "Containment"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "Link-multiple"
+          },
+          "value": "false"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "Feature-optional"
+          },
+          "value": "true"
+        },
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "IKeyed-key"
+          },
+          "value": "LinkTestConcept-otherContainment_0_1"
+        },
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2024.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": "otherContainment_0_1"
+        }
+      ],
+      "containments": [],
+      "references": [
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "Link-type"
+          },
+          "targets": [
+            {
+              "resolveInfo": "LinkTestConcept",
+              "reference": "LinkTestConcept"
+            }
+          ]
+        }
+      ],
+      "annotations": [],
+      "parent": "LinkTestConcept"
+    },
+    {
       "id": "TestAnnotation",
       "classifier": {
         "language": "LionCore-M3",
@@ -1599,6 +1661,80 @@
       ],
       "annotations": [],
       "parent": "TestAnnotation"
+    },
+    {
+      "id": "RestrictedTestAnnotation",
+      "classifier": {
+        "language": "LionCore-M3",
+        "version": "2024.1",
+        "key": "Annotation"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "IKeyed-key"
+          },
+          "value": "RestrictedTestAnnotation"
+        },
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2024.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": "RestrictedTestAnnotation"
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "Classifier-features"
+          },
+          "children": []
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "Annotation-annotates"
+          },
+          "targets": [
+            {
+              "resolveInfo": "LinkTestConcept",
+              "reference": "LinkTestConcept"
+            }
+          ]
+        },
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "Annotation-extends"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "LionCore-M3",
+            "version": "2024.1",
+            "key": "Annotation-implements"
+          },
+          "targets": [
+            {
+              "resolveInfo": "LionWeb.LionCore_builtins.INamed",
+              "reference": null
+            }
+          ]
+        }
+      ],
+      "annotations": [],
+      "parent": "TestLanguage"
     },
     {
       "id": "TestPartition",

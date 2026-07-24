@@ -32,15 +32,17 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 		_dataTypeTestConcept_integerValue_1 = new(() => new PropertyBase<NullableReferencesTestLanguageLanguage>("DataTypeTestConcept-integerValue_1", DataTypeTestConcept, this) { Key = "DataTypeTestConcept-integerValue_1", Name = "integerValue_1", Optional = false, Type = _builtIns.Integer });
 		_dataTypeTestConcept_stringValue_0_1 = new(() => new PropertyBase<NullableReferencesTestLanguageLanguage>("DataTypeTestConcept-stringValue_0_1", DataTypeTestConcept, this) { Key = "DataTypeTestConcept-stringValue_0_1", Name = "stringValue_0_1", Optional = true, Type = _builtIns.String });
 		_dataTypeTestConcept_stringValue_1 = new(() => new PropertyBase<NullableReferencesTestLanguageLanguage>("DataTypeTestConcept-stringValue_1", DataTypeTestConcept, this) { Key = "DataTypeTestConcept-stringValue_1", Name = "stringValue_1", Optional = false, Type = _builtIns.String });
-		_linkTestConcept = new(() => new ConceptBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept", this) { Key = "LinkTestConcept", Name = "LinkTestConcept", Abstract = false, Partition = false, ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [LinkTestConcept_containment_0_1, LinkTestConcept_containment_0_n, LinkTestConcept_containment_1, LinkTestConcept_containment_1_n, LinkTestConcept_reference_0_1, LinkTestConcept_reference_0_n, LinkTestConcept_reference_1, LinkTestConcept_reference_1_n]) });
+		_linkTestConcept = new(() => new ConceptBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept", this) { Key = "LinkTestConcept", Name = "LinkTestConcept", Abstract = false, Partition = false, ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [LinkTestConcept_containment_0_1, LinkTestConcept_containment_0_n, LinkTestConcept_containment_1, LinkTestConcept_containment_1_n, LinkTestConcept_otherContainment_0_1, LinkTestConcept_reference_0_1, LinkTestConcept_reference_0_n, LinkTestConcept_reference_1, LinkTestConcept_reference_1_n]) });
 		_linkTestConcept_containment_0_1 = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-containment_0_1", LinkTestConcept, this) { Key = "LinkTestConcept-containment_0_1", Name = "containment_0_1", Optional = true, Multiple = false, Type = LinkTestConcept });
 		_linkTestConcept_containment_0_n = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-containment_0_n", LinkTestConcept, this) { Key = "LinkTestConcept-containment_0_n", Name = "containment_0_n", Optional = true, Multiple = true, Type = LinkTestConcept });
 		_linkTestConcept_containment_1 = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-containment_1", LinkTestConcept, this) { Key = "LinkTestConcept-containment_1", Name = "containment_1", Optional = false, Multiple = false, Type = LinkTestConcept });
 		_linkTestConcept_containment_1_n = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-containment_1_n", LinkTestConcept, this) { Key = "LinkTestConcept-containment_1_n", Name = "containment_1_n", Optional = false, Multiple = true, Type = LinkTestConcept });
+		_linkTestConcept_otherContainment_0_1 = new(() => new ContainmentBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-otherContainment_0_1", LinkTestConcept, this) { Key = "LinkTestConcept-otherContainment_0_1", Name = "otherContainment_0_1", Optional = true, Multiple = false, Type = LinkTestConcept });
 		_linkTestConcept_reference_0_1 = new(() => new ReferenceBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-reference_0_1", LinkTestConcept, this) { Key = "LinkTestConcept-reference_0_1", Name = "reference_0_1", Optional = true, Multiple = false, Type = LinkTestConcept });
 		_linkTestConcept_reference_0_n = new(() => new ReferenceBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-reference_0_n", LinkTestConcept, this) { Key = "LinkTestConcept-reference_0_n", Name = "reference_0_n", Optional = true, Multiple = true, Type = LinkTestConcept });
 		_linkTestConcept_reference_1 = new(() => new ReferenceBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-reference_1", LinkTestConcept, this) { Key = "LinkTestConcept-reference_1", Name = "reference_1", Optional = false, Multiple = false, Type = LinkTestConcept });
 		_linkTestConcept_reference_1_n = new(() => new ReferenceBase<NullableReferencesTestLanguageLanguage>("LinkTestConcept-reference_1_n", LinkTestConcept, this) { Key = "LinkTestConcept-reference_1_n", Name = "reference_1_n", Optional = false, Multiple = true, Type = LinkTestConcept });
+		_restrictedTestAnnotation = new(() => new AnnotationBase<NullableReferencesTestLanguageLanguage>("RestrictedTestAnnotation", this) { Key = "RestrictedTestAnnotation", Name = "RestrictedTestAnnotation", AnnotatesLazy = new(() => LinkTestConcept), ImplementsLazy = new(() => [_builtIns.INamed]) });
 		_secondTestEnumeration = new(() => new EnumerationBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration", this) { Key = "SecondTestEnumeration", Name = "SecondTestEnumeration", LiteralsLazy = new(() => [SecondTestEnumeration_literal1, SecondTestEnumeration_literal2, SecondTestEnumeration_literal3]) });
 		_secondTestEnumeration_literal1 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal1", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal1", Name = "literal1" });
 		_secondTestEnumeration_literal2 = new(() => new EnumerationLiteralBase<NullableReferencesTestLanguageLanguage>("SecondTestEnumeration-literal2", SecondTestEnumeration, this) { Key = "SecondTestEnumeration-literal2", Name = "literal2" });
@@ -59,7 +61,7 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [DataTypeTestConcept, LinkTestConcept, SecondTestEnumeration, TestAnnotation, TestEnumeration, TestPartition];
+        public override IReadOnlyList<LanguageEntity> Entities => [DataTypeTestConcept, LinkTestConcept, RestrictedTestAnnotation, SecondTestEnumeration, TestAnnotation, TestEnumeration, TestPartition];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
@@ -117,6 +119,9 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 	private readonly Lazy<Containment> _linkTestConcept_containment_1_n;
 	public Containment LinkTestConcept_containment_1_n => _linkTestConcept_containment_1_n.Value;
 
+	private readonly Lazy<Containment> _linkTestConcept_otherContainment_0_1;
+	public Containment LinkTestConcept_otherContainment_0_1 => _linkTestConcept_otherContainment_0_1.Value;
+
 	private readonly Lazy<Reference> _linkTestConcept_reference_0_1;
 	public Reference LinkTestConcept_reference_0_1 => _linkTestConcept_reference_0_1.Value;
 
@@ -128,6 +133,9 @@ public partial class NullableReferencesTestLanguageLanguage : LanguageBase<INull
 
 	private readonly Lazy<Reference> _linkTestConcept_reference_1_n;
 	public Reference LinkTestConcept_reference_1_n => _linkTestConcept_reference_1_n.Value;
+
+	private readonly Lazy<Annotation> _restrictedTestAnnotation;
+	public Annotation RestrictedTestAnnotation => _restrictedTestAnnotation.Value;
 
 	private readonly Lazy<Enumeration> _secondTestEnumeration;
 	public Enumeration SecondTestEnumeration => _secondTestEnumeration.Value;
@@ -178,6 +186,8 @@ public partial interface INullableReferencesTestLanguageFactory : INodeFactory
 	public DataTypeTestConcept CreateDataTypeTestConcept();
 	public LinkTestConcept NewLinkTestConcept(string id);
 	public LinkTestConcept CreateLinkTestConcept();
+	public RestrictedTestAnnotation NewRestrictedTestAnnotation(string id);
+	public RestrictedTestAnnotation CreateRestrictedTestAnnotation();
 	public TestAnnotation NewTestAnnotation(string id);
 	public TestAnnotation CreateTestAnnotation();
 	public TestPartition NewTestPartition(string id);
@@ -199,6 +209,8 @@ public class NullableReferencesTestLanguageFactory : AbstractBaseNodeFactory, IN
 			return NewDataTypeTestConcept(id);
 		if (_language.LinkTestConcept.EqualsIdentity(classifier))
 			return NewLinkTestConcept(id);
+		if (_language.RestrictedTestAnnotation.EqualsIdentity(classifier))
+			return NewRestrictedTestAnnotation(id);
 		if (_language.TestAnnotation.EqualsIdentity(classifier))
 			return NewTestAnnotation(id);
 		if (_language.TestPartition.EqualsIdentity(classifier))
@@ -226,6 +238,8 @@ public class NullableReferencesTestLanguageFactory : AbstractBaseNodeFactory, IN
 	public virtual DataTypeTestConcept CreateDataTypeTestConcept() => NewDataTypeTestConcept(GetNewId());
 	public virtual LinkTestConcept NewLinkTestConcept(string id) => new(id);
 	public virtual LinkTestConcept CreateLinkTestConcept() => NewLinkTestConcept(GetNewId());
+	public virtual RestrictedTestAnnotation NewRestrictedTestAnnotation(string id) => new(id);
+	public virtual RestrictedTestAnnotation CreateRestrictedTestAnnotation() => NewRestrictedTestAnnotation(GetNewId());
 	public virtual TestAnnotation NewTestAnnotation(string id) => new(id);
 	public virtual TestAnnotation CreateTestAnnotation() => NewTestAnnotation(GetNewId());
 	public virtual TestPartition NewTestPartition(string id) => new(id);
@@ -909,6 +923,34 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		return this;
 	}
 
+	private LinkTestConcept? _otherContainment_0_1 = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-otherContainment_0_1")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
+	public LinkTestConcept? OtherContainment_0_1 { get => _otherContainment_0_1; set => SetOtherContainment_0_1(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetOtherContainment_0_1([NotNullWhenAttribute(true)] out LinkTestConcept? otherContainment_0_1)
+	{
+		otherContainment_0_1 = _otherContainment_0_1;
+		return otherContainment_0_1 != null;
+	}
+
+	private bool SetOtherContainment_0_1Raw(LinkTestConcept? value)
+	{
+		if (!ExchangeChildRaw(value, _otherContainment_0_1))
+			return false;
+		_otherContainment_0_1 = value;
+		return true;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
+        public LinkTestConcept SetOtherContainment_0_1(LinkTestConcept? value)
+	{
+		SetOptionalSingleContainment<LinkTestConcept>(value, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1, _otherContainment_0_1, SetOtherContainment_0_1Raw);
+		return this;
+	}
+
 	private ReferenceTarget? _reference_0_1 = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "LinkTestConcept-reference_0_1")]
@@ -1104,6 +1146,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return true;
 		}
 
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1.EqualsIdentity(feature))
+		{
+			result = OtherContainment_0_1;
+			return true;
+		}
+
 		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(feature))
 		{
 			result = Reference_0_1;
@@ -1157,6 +1205,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(feature))
 		{
 			result = _containment_1;
+			return true;
+		}
+
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1.EqualsIdentity(feature))
+		{
+			result = _otherContainment_0_1;
 			return true;
 		}
 
@@ -1270,6 +1324,17 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return true;
 		}
 
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1.EqualsIdentity(feature))
+		{
+			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept)
+			{
+				SetOtherContainment_0_1((LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept?)value);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept)
@@ -1336,6 +1401,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return SetContainment_0_1Raw((LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept?)value);
 		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept)
 			return SetContainment_1Raw((LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept?)value);
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1.EqualsIdentity(feature) && value is null or LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept)
+			return SetOtherContainment_0_1Raw((LionWeb.Core.Test.Languages.Generated.V2023_1.NullableReferencesTestLang.LinkTestConcept?)value);
 		return false;
 	}
 
@@ -1364,6 +1431,8 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			result.Add(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1);
 		if (TryGetContainment_1_n(out _))
 			result.Add(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
+		if (TryGetOtherContainment_0_1(out _))
+			result.Add(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1);
 		if (TryGetReference_0_1(out _))
 			result.Add(NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_reference_0_1);
 		if (TryGetReference_0_n(out _))
@@ -1571,6 +1640,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return true;
 		}
 
+		if (NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1.EqualsIdentity(c))
+		{
+			_otherContainment_0_1 = null;
+			if (notify)
+				NotifyRemoveFromParent<LinkTestConcept>(child, NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1);
+			return true;
+		}
+
 		return false;
 	}
 
@@ -1588,7 +1665,117 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable
 			return NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1;
 		if (child is LinkTestConcept child3 && (_containment_1_n?.Contains(child3) ?? false))
 			return NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_containment_1_n;
+		if (ReferenceEquals(_otherContainment_0_1, child))
+			return NullableReferencesTestLanguageLanguage.Instance.LinkTestConcept_otherContainment_0_1;
 		return null;
+	}
+}
+
+[LionCoreMetaPointer(Language = typeof(NullableReferencesTestLanguageLanguage), Key = "RestrictedTestAnnotation")]
+public partial class RestrictedTestAnnotation : AnnotationInstanceBase, INamedWritable
+{
+	private string? _name = null;
+	private bool SetNameRaw(string? value)
+	{
+		if (value == _name)
+			return false;
+		_name = value;
+		return true;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LionWeb.Core.VersionSpecific.V2023_1.BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
+	{
+		name = _name;
+		return name != null;
+	}
+/// <remarks>Required Property</remarks>
+/// <exception cref="InvalidValueException">If set to null</exception>
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public RestrictedTestAnnotation SetName(string value)
+	{
+		SetRequiredReferenceTypeProperty<string>(value, _builtIns.INamed_name, _name, SetNameRaw);
+		return this;
+	}
+
+	public RestrictedTestAnnotation(string id) : base(id)
+	{
+	}
+
+	/// <inheritdoc/>
+        public override Annotation GetAnnotation() => NullableReferencesTestLanguageLanguage.Instance.RestrictedTestAnnotation;
+	/// <inheritdoc/>
+        protected override bool GetInternal(Feature? feature, out object? result)
+	{
+		if (base.GetInternal(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = Name;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected override bool TryGetPropertyRaw(Property feature, out object? result)
+	{
+		if (base.TryGetPropertyRaw(feature, out result))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = _name;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, object? value)
+	{
+		if (base.SetInternal(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			if (value is string v)
+			{
+				SetName(v);
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
+		return false;
+	}
+
+	protected override bool SetPropertyRaw(Property feature, object? value)
+	{
+		if (base.SetPropertyRaw(feature, value))
+			return true;
+		if (_builtIns.INamed_name.EqualsIdentity(feature) && value is null or string)
+			return SetNameRaw((string?)value);
+		return false;
+	}
+
+	/// <inheritdoc/>
+        public override IEnumerable<Feature> CollectAllSetFeatures()
+	{
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
+		if (TryGetName(out _))
+			result.Add(_builtIns.INamed_name);
+		return result;
 	}
 }
 

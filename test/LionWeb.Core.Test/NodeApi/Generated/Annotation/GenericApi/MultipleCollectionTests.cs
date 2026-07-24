@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.GenericApi;
 
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
@@ -108,87 +107,87 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Insert_One_Before()
     {
-        var doc = new TestAnnotation("cId");
+        var existing = new TestAnnotation("cId");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [doc]);
+        parent.Add(null, [existing]);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 0, values);
-        Assert.AreSame(parent, doc.GetParent());
+        Assert.AreSame(parent, existing.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { valueA, valueB, doc }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { valueA, valueB, existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Insert_One_After()
     {
-        var ann = new TestAnnotation("cId");
+        var existing = new TestAnnotation("cId");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [ann]);
+        parent.Add(null, [existing]);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 1, values);
-        Assert.AreSame(parent, ann.GetParent());
+        Assert.AreSame(parent, existing.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { ann, valueA, valueB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existing, valueA, valueB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Insert_Two_Before()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add(null, [existingA, existingB]);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 0, values);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { valueA, valueB, docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { valueA, valueB, existingA, existingB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Insert_Two_Between()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add(null, [existingA, existingB]);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 1, values);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docA, valueA, valueB, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existingA, valueA, valueB, existingB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Insert_Two_After()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add(null, [existingA, existingB]);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Insert(null, 2, values);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
         Assert.AreSame(parent, valueA.GetParent());
         Assert.AreSame(parent, valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docA, docB, valueA, valueB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existingA, existingB, valueA, valueB }, parent.GetAnnotations().ToList());
     }
 
     #endregion
@@ -268,35 +267,35 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_NonContained()
     {
-        var docA = new TestAnnotation("cA");
-        var docB = new TestAnnotation("cB");
+        var existingA = new TestAnnotation("cA");
+        var existingB = new TestAnnotation("cB");
         var parent = new LinkTestConcept("cs");
-        parent.Add(null, [docA, docB]);
+        parent.Add(null, [existingA, existingB]);
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existingA, existingB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Remove_HalfContained()
     {
-        var docA = new TestAnnotation("cA");
-        var docB = new TestAnnotation("cB");
+        var existingA = new TestAnnotation("cA");
+        var existingB = new TestAnnotation("cB");
         var parent = new LinkTestConcept("cs");
-        parent.Add(null, [docA, docB]);
+        parent.Add(null, [existingA, existingB]);
         var valueA = new TestAnnotation("sA");
-        var values = new INode[] { valueA, docA };
+        var values = new INode[] { valueA, existingA };
         parent.Remove(null, values);
-        Assert.AreSame(parent, docB.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
         Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(docA.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docB }, parent.GetAnnotations().ToList());
+        Assert.IsNull(existingA.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { existingB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
@@ -316,69 +315,69 @@ public class MultipleCollectionTests
     [TestMethod]
     public void Multiple_Remove_First()
     {
-        var doc = new TestAnnotation("cId");
+        var existing = new TestAnnotation("cId");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [valueA, valueB, doc]);
+        parent.Add(null, [valueA, valueB, existing]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
-        Assert.AreSame(parent, doc.GetParent());
+        Assert.AreSame(parent, existing.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Remove_Last()
     {
-        var doc = new TestAnnotation("cId");
+        var existing = new TestAnnotation("cId");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [doc, valueA, valueB]);
+        parent.Add(null, [existing, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
-        Assert.AreSame(parent, doc.GetParent());
+        Assert.AreSame(parent, existing.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existing }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Remove_Between()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [docA, valueA, valueB, docB]);
+        parent.Add(null, [existingA, valueA, valueB, existingB]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existingA, existingB }, parent.GetAnnotations().ToList());
     }
 
     [TestMethod]
     public void Multiple_Remove_Mixed()
     {
-        var docA = new TestAnnotation("cIdA");
-        var docB = new TestAnnotation("cIdB");
+        var existingA = new TestAnnotation("cIdA");
+        var existingB = new TestAnnotation("cIdB");
         var valueA = new TestAnnotation("sA");
         var valueB = new TestAnnotation("sB");
         var parent = new LinkTestConcept("g");
-        parent.Add(null, [valueA, docA, valueB, docB]);
+        parent.Add(null, [valueA, existingA, valueB, existingB]);
         var values = new INode[] { valueA, valueB };
         parent.Remove(null, values);
-        Assert.AreSame(parent, docA.GetParent());
-        Assert.AreSame(parent, docB.GetParent());
+        Assert.AreSame(parent, existingA.GetParent());
+        Assert.AreSame(parent, existingB.GetParent());
         Assert.IsNull(valueA.GetParent());
         Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<INode> { docA, docB }, parent.GetAnnotations().ToList());
+        CollectionAssert.AreEqual(new List<INode> { existingA, existingB }, parent.GetAnnotations().ToList());
     }
 
     #endregion
@@ -445,8 +444,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Add(null, values));
         Assert.IsNull(value.GetParent());
@@ -456,8 +455,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Insert()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Insert(null, 0, values));
         Assert.IsNull(value.GetParent());
@@ -467,8 +466,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Remove()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         parent.Remove(null, values);
         Assert.IsNull(value.GetParent());

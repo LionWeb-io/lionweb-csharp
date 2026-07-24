@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated.Annotation.MultipleConnection;
 
-using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2024_1.TestLanguage;
 using System.Collections;
 
@@ -231,8 +230,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.AddAnnotations(values));
         Assert.IsNull(value.GetParent());
@@ -242,8 +241,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Reflective()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.Set(null, values));
         Assert.IsNull(value.GetParent());
@@ -253,8 +252,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Insert()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         Assert.ThrowsExactly<InvalidValueException>(() => parent.InsertAnnotations(0, values));
         Assert.IsNull(value.GetParent());
@@ -264,8 +263,8 @@ public class MultipleCollectionTests
     [TestMethod]
     public void SingleList_NotAnnotating_Remove()
     {
-        var parent = new LinkTestConcept("g");
-        var value = new Documentation("sA");
+        var parent = new TestPartition("g");
+        var value = new RestrictedTestAnnotation("sA");
         var values = new List<INode>() { value };
         parent.RemoveAnnotations(values);
         Assert.IsNull(value.GetParent());
