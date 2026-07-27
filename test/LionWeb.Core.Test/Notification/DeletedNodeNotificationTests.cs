@@ -20,7 +20,6 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
-using Languages.Generated.V2023_1.Shapes.M2;
 using Languages.Generated.V2023_1.TestLanguage;
 
 [TestClass]
@@ -31,21 +30,23 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var parent = new LinkTestConcept("parent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var ann = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var ann = new TestAnnotation("ann") { Containment = new LinkTestConcept("container") { Containment_0_n = [link0, link1] }, Ref = refTarget };
+        ((LinkTestConcept)ann.Containment).Containment_0_1 = link2;
         var notification = new AnnotationDeletedNotification(ann, parent, 0, new NumericNotificationId("a", 0));
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             ann,
-            mg0,
-            mg1,
-            mg2,
-            line
+            (LinkTestConcept)ann.Containment,
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -54,23 +55,25 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var parent = new LinkTestConcept("parent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var ann = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
-        var replacement = new TestAnnotation("replacement");
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var ann = new TestAnnotation("ann") { Containment = new LinkTestConcept("container") { Containment_0_n = [link0, link1] }, Ref = refTarget };
+        ((LinkTestConcept)ann.Containment).Containment_0_1 = link2;
+        var replacement = new TestAnnotation("replacement") { Ref = refTarget };
         var notification =
             new AnnotationReplacedNotification(replacement, ann, parent, 0, new NumericNotificationId("a", 0));
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             ann,
-            mg0,
-            mg1,
-            mg2,
-            line
+            (LinkTestConcept)ann.Containment,
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -80,14 +83,15 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         var oldParent = new LinkTestConcept("oldParent");
         var newParent = new LinkTestConcept("newParent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var ann = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
-        var replacement = new TestAnnotation("replacement");
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var ann = new TestAnnotation("ann") { Containment = new LinkTestConcept("container") { Containment_0_n = [link0, link1] }, Ref = refTarget };
+        ((LinkTestConcept)ann.Containment).Containment_0_1 = link2;
+        var replacement = new TestAnnotation("replacement") { Ref = refTarget };
         var notification = new AnnotationMovedAndReplacedFromOtherParentNotification(
             newParent,
             1,
@@ -99,10 +103,11 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             ann,
-            mg0,
-            mg1,
-            mg2,
-            line
+            (LinkTestConcept)ann.Containment,
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -111,14 +116,15 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var parent = new LinkTestConcept("parent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var ann = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
-        var replacement = new TestAnnotation("replacement");
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var ann = new TestAnnotation("ann") { Containment = new LinkTestConcept("container") { Containment_0_n = [link0, link1] }, Ref = refTarget };
+        ((LinkTestConcept)ann.Containment).Containment_0_1 = link2;
+        var replacement = new TestAnnotation("replacement") { Ref = refTarget };
         var notification = new AnnotationMovedAndReplacedInSameParentNotification(
             1,
             replacement,
@@ -130,10 +136,11 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             ann,
-            mg0,
-            mg1,
-            mg2,
-            line
+            (LinkTestConcept)ann.Containment,
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -142,13 +149,13 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var parent = new LinkTestConcept("parent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var child = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var child = new LinkTestConcept("child") { Containment_0_n = [link0, link1], Containment_0_1 = link2, Reference_0_1 = refTarget };
         var notification = new ChildDeletedNotification(
             child,
             parent,
@@ -158,10 +165,10 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             child,
-            mg0,
-            mg1,
-            mg2,
-            line
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -170,13 +177,13 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var parent = new LinkTestConcept("parent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var child = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var child = new LinkTestConcept("child") { Containment_0_n = [link0, link1], Containment_0_1 = link2, Reference_0_1 = refTarget };
         var replacement = new LinkTestConcept("replacement");
         var notification = new ChildReplacedNotification(
             replacement,
@@ -188,10 +195,10 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             child,
-            mg0,
-            mg1,
-            mg2,
-            line
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -200,13 +207,13 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var parent = new LinkTestConcept("parent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var child = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var child = new LinkTestConcept("child") { Containment_0_n = [link0, link1], Containment_0_1 = link2, Reference_0_1 = refTarget };
         var replacement = new LinkTestConcept("replacement");
         var notification = new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
             TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n,
@@ -220,10 +227,10 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             child,
-            mg0,
-            mg1,
-            mg2,
-            line
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -233,13 +240,13 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         var oldParent = new LinkTestConcept("oldParent");
         var newParent = new LinkTestConcept("newParent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var child = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var child = new LinkTestConcept("child") { Containment_0_n = [link0, link1], Containment_0_1 = link2, Reference_0_1 = refTarget };
         var replacement = new LinkTestConcept("replacement");
         var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(
             newParent,
@@ -254,10 +261,10 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             child,
-            mg0,
-            mg1,
-            mg2,
-            line
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -266,13 +273,13 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var parent = new LinkTestConcept("parent");
 
-        var circle = new Circle("circle");
+        var refTarget = new LinkTestConcept("refTarget");
 
-        var mg0 = new MaterialGroup("mg0");
-        var line = new Line("line");
-        var mg1 = new MaterialGroup("mg1") { DefaultShape = line };
-        var mg2 = new MaterialGroup("mg2");
-        var child = new BillOfMaterials("ann") { AltGroups = [mg0, mg1], DefaultGroup = mg2, Materials = [circle] };
+        var link0 = new LinkTestConcept("link0");
+        var link3 = new LinkTestConcept("link3");
+        var link1 = new LinkTestConcept("link1") { Containment_0_1 = link3 };
+        var link2 = new LinkTestConcept("link2");
+        var child = new LinkTestConcept("child") { Containment_0_n = [link0, link1], Containment_0_1 = link2, Reference_0_1 = refTarget };
         var replacement = new LinkTestConcept("replacement");
         var notification = new ChildMovedAndReplacedInSameContainmentNotification(
             1,
@@ -286,10 +293,10 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         CollectionAssert.AreEquivalent(new List<IReadableNode>
         {
             child,
-            mg0,
-            mg1,
-            mg2,
-            line
+            link0,
+            link1,
+            link2,
+            link3
         }, notification.DeletedNodes.ToList());
     }
 
@@ -298,7 +305,7 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     {
         var data = new DataTypeTestConcept("data");
         var linkB = new LinkTestConcept("linkB");
-        var linkA = new LinkTestConcept("linkA") { Containment_1 = linkB };
+        var linkA = new LinkTestConcept("linkA") { Containment_0_1 = linkB };
         var part = new TestPartition("part") { Data = data, Links = [linkA] };
         var notification = new PartitionDeletedNotification(part, new NumericNotificationId("a", 0));
         CollectionAssert.AreEquivalent(new List<IReadableNode> { part, data, linkA, linkB },

@@ -18,7 +18,7 @@
 using System.Reflection;
 using LionWeb.Core.Notification;
 using LionWeb.Core.Notification.Pipe;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification.Replicator;
 
 namespace LionWeb.Core.Test.Notification;
@@ -29,11 +29,11 @@ public class TwowayInfrastructureTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void OtherListeners()
     {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
+        var child = new LinkTestConcept("c");
+        var node = new TestPartition("a") { Links = [child] };
 
-        var cloneCircle = new Circle("c");
-        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+        var cloneChild = new LinkTestConcept("c");
+        var clone = new TestPartition("a") { Links = [cloneChild] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
@@ -43,8 +43,8 @@ public class TwowayInfrastructureTests : TwowayReplicatorTestsBase
         var cloneObserver = new NotificationObserver();
         clone.GetNotificationSender()!.ConnectTo(cloneObserver);
 
-        circle.Name = "Hello";
-        cloneCircle.Name = "World";
+        child.Name = "Hello";
+        cloneChild.Name = "World";
 
         AssertEquals([node], [clone]);
         Assert.AreEqual(2, nodeObserver.Count);
@@ -54,16 +54,16 @@ public class TwowayInfrastructureTests : TwowayReplicatorTestsBase
     [TestMethod]
     public void NoLingeringNotificiationIds()
     {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
+        var child = new LinkTestConcept("c");
+        var node = new TestPartition("a") { Links = [child] };
 
-        var cloneCircle = new Circle("c");
-        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+        var cloneChild = new LinkTestConcept("c");
+        var clone = new TestPartition("a") { Links = [cloneChild] };
 
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
-        circle.Name = "Hello";
-        cloneCircle.Name = "World";
+        child.Name = "Hello";
+        cloneChild.Name = "World";
 
         AssertEquals([node], [clone]);
 

@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
 using Core.Notification.Pipe;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -28,7 +28,7 @@ public class CompositorTests: NotificationTestsBase
     [TestMethod]
     public void ComposePartition_none()
     {
-        var partition = new Geometry("partition");
+        var partition = new TestPartition("partition");
 
         var compositor = new NotificationCompositor("compositor");
         partition.GetNotificationSender()!.ConnectTo(compositor);
@@ -36,9 +36,9 @@ public class CompositorTests: NotificationTestsBase
         var counter = new NotificationObserver();
         compositor.ConnectTo(counter);
         
-        partition.Documentation = new Documentation("documentation");
-        partition.Documentation.Text = "hello";
-        partition.AddShapes([new Circle("c")]);
+        partition.Data = new DataTypeTestConcept("documentation");
+        partition.Data.StringValue_0_1 = "hello";
+        partition.AddLinks([new LinkTestConcept("c")]);
         
         Assert.AreEqual(3, counter.Count);
     }
@@ -46,7 +46,7 @@ public class CompositorTests: NotificationTestsBase
     [TestMethod]
     public void ComposePartition_one_send()
     {
-        var partition = new Geometry("partition");
+        var partition = new TestPartition("partition");
 
         var compositor = new NotificationCompositor("compositor");
         partition.GetNotificationSender()!.ConnectTo(compositor);
@@ -56,9 +56,9 @@ public class CompositorTests: NotificationTestsBase
 
         var composite = compositor.Push();
         
-        partition.Documentation = new Documentation("documentation");
-        partition.Documentation.Text = "hello";
-        partition.AddShapes([new Circle("c")]);
+        partition.Data = new DataTypeTestConcept("documentation");
+        partition.Data.StringValue_0_1 = "hello";
+        partition.AddLinks([new LinkTestConcept("c")]);
         
         Assert.AreEqual(3, composite.Parts.Count);
         Assert.AreEqual(0, counter.Count);
@@ -70,7 +70,7 @@ public class CompositorTests: NotificationTestsBase
     [TestMethod]
     public void ComposePartition_one_suppress()
     {
-        var partition = new Geometry("partition");
+        var partition = new TestPartition("partition");
 
         var compositor = new NotificationCompositor("compositor");
         partition.GetNotificationSender()!.ConnectTo(compositor);
@@ -80,9 +80,9 @@ public class CompositorTests: NotificationTestsBase
 
         var composite = compositor.Push();
         
-        partition.Documentation = new Documentation("documentation");
-        partition.Documentation.Text = "hello";
-        partition.AddShapes([new Circle("c")]);
+        partition.Data = new DataTypeTestConcept("documentation");
+        partition.Data.StringValue_0_1 = "hello";
+        partition.AddLinks([new LinkTestConcept("c")]);
         
         Assert.AreEqual(3, composite.Parts.Count);
         Assert.AreEqual(0, counter.Count);
@@ -94,7 +94,7 @@ public class CompositorTests: NotificationTestsBase
     [TestMethod]
     public void ComposePartition_two()
     {
-        var partition = new Geometry("partition");
+        var partition = new TestPartition("partition");
 
         var compositor = new NotificationCompositor("compositor");
         partition.GetNotificationSender()!.ConnectTo(compositor);
@@ -104,14 +104,14 @@ public class CompositorTests: NotificationTestsBase
 
         var compositeA = compositor.Push();
         
-        partition.Documentation = new Documentation("documentation");
-        partition.Documentation.Text = "hello";
+        partition.Data = new DataTypeTestConcept("documentation");
+        partition.Data.StringValue_0_1 = "hello";
 
         var compositeB = new CompositeNotification(new NumericNotificationId("manual", 0));
         var compositeBPushed = compositor.Push(compositeB);
         Assert.AreSame(compositeB, compositeBPushed);
         
-        partition.AddShapes([new Circle("c")]);
+        partition.AddLinks([new LinkTestConcept("c")]);
         
         Assert.AreEqual(3, compositeA.Parts.Count);
         Assert.AreEqual(1, compositeB.Parts.Count);
@@ -126,7 +126,7 @@ public class CompositorTests: NotificationTestsBase
     public void ComposeForest_onePartition_oneComposite()
     {
         var forest = new Forest();
-        var partition = new Geometry("partition");
+        var partition = new TestPartition("partition");
 
         var compositor = new NotificationCompositor("compositor");
         forest.GetNotificationSender()!.ConnectTo(compositor);
@@ -138,9 +138,9 @@ public class CompositorTests: NotificationTestsBase
 
         var composite = compositor.Push();
         
-        partition.Documentation = new Documentation("documentation");
-        partition.Documentation.Text = "hello";
-        partition.AddShapes([new Circle("c")]);
+        partition.Data = new DataTypeTestConcept("documentation");
+        partition.Data.StringValue_0_1 = "hello";
+        partition.AddLinks([new LinkTestConcept("c")]);
         
         Assert.AreEqual(3, composite.Parts.Count);
         Assert.AreEqual(0, counter.Count);
@@ -153,7 +153,7 @@ public class CompositorTests: NotificationTestsBase
     public void ComposeForest_deletePartition_oneComposite()
     {
         var forest = new Forest();
-        var partition = new Geometry("partition");
+        var partition = new TestPartition("partition");
 
         var compositor = new NotificationCompositor("compositor");
         forest.GetNotificationSender()!.ConnectTo(compositor);
@@ -165,13 +165,13 @@ public class CompositorTests: NotificationTestsBase
 
         var composite = compositor.Push();
         
-        partition.Documentation = new Documentation("documentation");
-        partition.Documentation.Text = "hello";
-        partition.AddShapes([new Circle("c")]);
+        partition.Data = new DataTypeTestConcept("documentation");
+        partition.Data.StringValue_0_1 = "hello";
+        partition.AddLinks([new LinkTestConcept("c")]);
         
         forest.RemovePartitions([partition]);
         
-        partition.Documentation.Text = "goodbye";
+        partition.Data.StringValue_0_1 = "goodbye";
         
         Assert.AreEqual(4, composite.Parts.Count);
         Assert.AreEqual(0, counter.Count);
@@ -188,22 +188,22 @@ public class CompositorTests: NotificationTestsBase
         var compositor = new NotificationCompositor("compositor");
         forest.GetNotificationSender()!.ConnectTo(compositor);
         
-        var partitionA = new Geometry("partitionA");
+        var partitionA = new TestPartition("partitionA");
         // outside counter
         forest.AddPartitions([partitionA]);
 
         var counter = new NotificationObserver();
         compositor.ConnectTo(counter);
         
-        var partitionB = new Geometry("partitionB");
+        var partitionB = new TestPartition("partitionB");
         // inside counter, outside composite
         forest.AddPartitions([partitionB]);
 
         var composite = compositor.Push();
         
-        partitionA.Documentation = new Documentation("documentation");
-        partitionA.Documentation.Text = "hello";
-        partitionB.AddShapes([new Circle("c")]);
+        partitionA.Data = new DataTypeTestConcept("documentation");
+        partitionA.Data.StringValue_0_1 = "hello";
+        partitionB.AddLinks([new LinkTestConcept("c")]);
         
         Assert.AreEqual(3, composite.Parts.Count);
         Assert.AreEqual(1, counter.Count);
@@ -225,16 +225,16 @@ public class CompositorTests: NotificationTestsBase
         
         var compositeA = compositor.Push();
         
-        var partitionA = new Geometry("partitionA");
+        var partitionA = new TestPartition("partitionA");
         // compositeA[0]
         forest.AddPartitions([partitionA]);
 
-        var partitionB = new Geometry("partitionB");
+        var partitionB = new TestPartition("partitionB");
         // compositeA[1]
         forest.AddPartitions([partitionB]);
 
         // compositeA[2]
-        partitionA.Documentation = new Documentation("documentation");
+        partitionA.Data = new DataTypeTestConcept("documentation");
         
         var compositeB = new CompositeNotification(new NumericNotificationId("manual", 0));
         // compositeA[3]
@@ -245,16 +245,16 @@ public class CompositorTests: NotificationTestsBase
         forest.RemovePartitions([partitionA]);
         
         // NOT in forest anymore 
-        partitionA.Documentation.Text = "hello";
+        partitionA.Data.StringValue_0_1 = "hello";
         
         // compositeB[1]
-        partitionB.AddShapes([new Circle("cA")]);
+        partitionB.AddLinks([new LinkTestConcept("cA")]);
         
         var compositeBPopped = compositor.Pop(true);
         Assert.AreSame(compositeB, compositeBPopped);
        
         // compositeA[4]
-        partitionB.AddShapes([new Circle("cB")]);
+        partitionB.AddLinks([new LinkTestConcept("cB")]);
         
         Assert.AreEqual(5, compositeA.Parts.Count);
         Assert.AreEqual(1, counter.Count);

@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.NoOperationsTests;
 
-using Languages.Generated.V2026_1.Shapes.M2;
+using Languages.Generated.V2026_1.TestLanguage;
 
 [TestClass]
 public class NoOpsTests_Reference : NotificationTestsBase
@@ -25,15 +25,14 @@ public class NoOpsTests_Reference : NotificationTestsBase
     [TestMethod]
     public void ReferenceChanged_to_the_same_target()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
+        var refTarget = new LinkTestConcept("refTarget");
+        var child = new LinkTestConcept("child") { Reference_0_1 = refTarget };
+        var originalPartition = new TestPartition("a") { Links = [child, refTarget] };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        od.AltSource = circle;
+        child.Reference_0_1 = refTarget;
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
@@ -41,13 +40,13 @@ public class NoOpsTests_Reference : NotificationTestsBase
     [TestMethod]
     public void ReferenceChanged_non_existing_reference_to_null_target()
     {
-        var od = new OffsetDuplicate("od");
-        var originalPartition = new Geometry("a") { Shapes = [od] };
+        var child = new LinkTestConcept("child");
+        var originalPartition = new TestPartition("a") { Links = [child] };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        od.AltSource = null;
+        child.Reference_0_1 = null;
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
