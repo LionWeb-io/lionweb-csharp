@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.NoOperationsTests;
 
-using Languages.Generated.V2026_1.Shapes.M2;
+using Languages.Generated.V2026_1.TestLanguage;
 
 [TestClass]
 public class NoOpsTests_Containment: NotificationTestsBase
@@ -25,16 +25,16 @@ public class NoOpsTests_Containment: NotificationTestsBase
     [TestMethod]
     public void ChildReplaced_Single_sets_the_same_node()
     {
-        var documentation = new Documentation("doc") { Text = "a" };
-        var originalPartition = new Geometry("a")
+        var data = new DataTypeTestConcept("doc") { StringValue_0_1 = "a" };
+        var originalPartition = new TestPartition("a")
         {
-            Documentation = documentation
+            Data = data
         };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.Documentation = documentation;
+        originalPartition.Data = data;
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
@@ -42,19 +42,19 @@ public class NoOpsTests_Containment: NotificationTestsBase
     [TestMethod]
     public void ChildAdded_Multiple_adds_the_same_list_of_children()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo")
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo")
         {
-            Shapes = [a, b, c, d]
+            Links = [a, b, c, d]
         };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddShapes([a, b, c, d]);
+        originalPartition.AddLinks([a, b, c, d]);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }  
@@ -62,19 +62,19 @@ public class NoOpsTests_Containment: NotificationTestsBase
     [TestMethod]
     public void ChildAdded_Multiple_adds_empty_list()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo")
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo")
         {
-            Shapes = [a, b, c, d]
+            Links = [a, b, c, d]
         };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddShapes([]);
+        originalPartition.AddLinks([]);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }
@@ -82,16 +82,16 @@ public class NoOpsTests_Containment: NotificationTestsBase
     [TestMethod]
     public void ChildMovedInSameContainment_adds_last_of_the_existing_children()
     {
-        var a = new Circle("a");
-        var b = new Circle("b");
-        var c = new Circle("c");
-        var d = new Circle("d");
-        var originalPartition = new Geometry("geo") { Shapes = [a, b, c, d] };
+        var a = new LinkTestConcept("a");
+        var b = new LinkTestConcept("b");
+        var c = new LinkTestConcept("c");
+        var d = new LinkTestConcept("d");
+        var originalPartition = new TestPartition("geo") { Links = [a, b, c, d] };
         
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        originalPartition.AddShapes([d]);
+        originalPartition.AddLinks([d]);
 
         Assert.AreEqual(0, notificationObserver.Count);
     }

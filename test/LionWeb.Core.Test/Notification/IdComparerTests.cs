@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.Notification;
 
 using Core.Utilities;
-using Languages.Generated.V2026_1.Shapes.M2;
+using Languages.Generated.V2026_1.TestLanguage;
 
 [TestClass]
 public class IdComparerTests : NotificationTestsBase
@@ -26,20 +26,20 @@ public class IdComparerTests : NotificationTestsBase
     [TestMethod]
     public void TestNodeIdComparer_Fails()
     {
-        var circle1 = new Circle("c");
-        var circle2 = new Circle("d");
+        var child1 = new LinkTestConcept("c");
+        var child2 = new LinkTestConcept("d");
 
-        List<IDifference> differences = new IdComparer(new List<INode?> { circle1 }, new List<INode?> { circle2 }).Compare().ToList();
+        List<IDifference> differences = new IdComparer(new List<INode?> { child1 }, new List<INode?> { child2 }).Compare().ToList();
         Assert.HasCount(1, differences, differences.DescribeAll(new()));
     }
 
     [TestMethod]
     public void TestNodeIdComparer_Succeeds()
     {
-        var circle1 = new Circle("a");
-        var circle2 = new Circle("a");
+        var child1 = new LinkTestConcept("a");
+        var child2 = new LinkTestConcept("a");
 
-        List<IDifference> differences = new IdComparer(new List<INode?> { circle1 }, new List<INode?> { circle2 }).Compare().ToList();
+        List<IDifference> differences = new IdComparer(new List<INode?> { child1 }, new List<INode?> { child2 }).Compare().ToList();
         Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
 }

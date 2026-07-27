@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification.NoOperationsTests;
 
-using Languages.Generated.V2026_1.Shapes.M2;
+using Languages.Generated.V2026_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -26,7 +26,7 @@ public class NoOpsTests_Forest : NotificationTestsBase
     [TestMethod]
     public void PartitionAdded_adds_the_same_partition()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
         var originalForest = new Forest();
 
         originalForest.AddPartitions([node]);

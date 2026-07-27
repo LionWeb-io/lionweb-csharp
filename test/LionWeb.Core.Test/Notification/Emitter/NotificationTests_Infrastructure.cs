@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using LionWeb.Core.Notification.Partition;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 namespace LionWeb.Core.Test.Notification;
 
@@ -26,7 +26,7 @@ public class NotificationTests_Infrastructure
     [TestMethod]
     public void NotificationProducer()
     {
-        var node = new Geometry("a");
+        var node = new TestPartition("a");
         
         Assert.IsNotNull(node.GetNotificationSender());
         Assert.AreSame(node.GetNotificationSender(), ((IPartitionInstance)node).GetNotificationProducer());
@@ -36,31 +36,31 @@ public class NotificationTests_Infrastructure
     [TestMethod]
     public void MultiListeners_NoRead()
     {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
+        var child = new LinkTestConcept("c");
+        var node = new TestPartition("a") { Links = [child] };
 
         var observer = new NotificationObserver();
         node.GetNotificationSender()!.ConnectTo(observer);
 
-        circle.Name = "Hello";
-        circle.Name = "World";
+        child.Name = "Hello";
+        child.Name = "World";
 
-        Assert.AreEqual("World", circle.Name);
+        Assert.AreEqual("World", child.Name);
     }
 
     [TestMethod]
     public void MultiListeners_SomeRead()
     {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
+        var child = new LinkTestConcept("c");
+        var node = new TestPartition("a") { Links = [child] };
 
         var observer = new NotificationObserver();
         node.GetNotificationSender()!.ConnectTo(observer);
 
-        circle.Name = "Hello";
-        circle.Name = "World";
+        child.Name = "Hello";
+        child.Name = "World";
         
-        Assert.AreEqual("World", circle.Name);
+        Assert.AreEqual("World", child.Name);
         Assert.AreEqual(2, observer.Count);
         observer.AssertOfTypeAmong<PropertyAddedNotification>(1);
     }
@@ -68,16 +68,16 @@ public class NotificationTests_Infrastructure
     [TestMethod]
     public void MultiListeners_AllRead()
     {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
+        var child = new LinkTestConcept("c");
+        var node = new TestPartition("a") { Links = [child] };
 
         var observer = new NotificationObserver();
         node.GetNotificationSender()!.ConnectTo(observer);
 
-        circle.Name = "Hello";
-        circle.Name = "World";
+        child.Name = "Hello";
+        child.Name = "World";
         
-        Assert.AreEqual("World", circle.Name);
+        Assert.AreEqual("World", child.Name);
         Assert.AreEqual(2, observer.Count);
         observer.AssertOfTypeAmong<PropertyAddedNotification>(1);
         observer.AssertOfTypeAmong<PropertyChangedNotification>(1);
