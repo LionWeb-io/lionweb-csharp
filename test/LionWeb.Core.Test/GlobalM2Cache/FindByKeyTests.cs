@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.GlobalM2Cache;
 
 using Languages.Generated.V2024_1.CustomPrimitiveTypeLang;
 using Languages.Generated.V2024_1.SDTLang;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M2;
 using M3;
 
@@ -30,7 +30,7 @@ public class FindByKeyTests
     public void Language()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FindByKey<Language>(language, language.Key);
         Assert.AreSame(language, actual);
@@ -40,40 +40,40 @@ public class FindByKeyTests
     public void Classifier()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FindByKey<Classifier>(language, language.Circle.Key);
-        Assert.AreSame(language.Circle, actual);
+        var actual = cache.FindByKey<Classifier>(language, language.LinkTestConcept.Key);
+        Assert.AreSame(language.LinkTestConcept, actual);
     }
 
     [TestMethod]
     public void Feature()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FindByKey<Feature>(language, language.Circle_center.Key);
-        Assert.AreSame(language.Circle_center, actual);
+        var actual = cache.FindByKey<Feature>(language, language.LinkTestConcept_containment_0_1.Key);
+        Assert.AreSame(language.LinkTestConcept_containment_0_1, actual);
     }
 
     [TestMethod]
     public void Enumeration()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = language.FindByKey<Enumeration>(language.MatterState.Key);
-        Assert.AreSame(language.MatterState, actual);
+        var actual = language.FindByKey<Enumeration>(language.TestEnumeration.Key);
+        Assert.AreSame(language.TestEnumeration, actual);
     }
 
     [TestMethod]
     public void EnumerationLiteral()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FindByKey<EnumerationLiteral>(language, language.MatterState_liquid.Key);
-        Assert.AreSame(language.MatterState_liquid, actual);
+        var actual = cache.FindByKey<EnumerationLiteral>(language, language.TestEnumeration_literal1.Key);
+        Assert.AreSame(language.TestEnumeration_literal1, actual);
     }
 
     [TestMethod]
@@ -139,7 +139,7 @@ public class FindByKeyTests
     public void UnknownKey()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         Assert.IsNull(cache.FindByKey<IKeyed>(language, "asdf"));
     }

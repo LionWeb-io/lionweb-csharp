@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.GlobalM2Cache;
 
 using Languages;
+using TestLang = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage;
 using M2;
 using M3;
 
@@ -274,17 +275,15 @@ public class AllGeneralizationsTests
     public void CrossLanguage()
     {
         var cache = new M2Cache();
-        Language lang = ShapesDynamic.Language;
-        cache.Register([lang]);
+        var language = TestLang.Instance;
+        cache.Register([_builtIns, language]);
 
-        var actual = cache.AllGeneralizations(cache.FindByKey<Classifier>(lang, "key-Circle")!)!;
+        var actual = cache.AllGeneralizations(language.LinkTestConcept)!;
 
         CollectionAssert.AreEquivalent(
             new List<Classifier>
             {
                 _builtIns.INamed,
-                cache.FindByKey<Classifier>(lang, "key-Shape")!,
-                cache.FindByKey<Classifier>(lang, "key-IShape")!
             },
             actual.ToList());
     }

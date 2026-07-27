@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.GlobalM2Cache;
 
 using Languages.Generated.V2024_1.SDTLang;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M2;
 using System.Collections;
 using System.Reflection;
@@ -40,7 +40,7 @@ public class ClearTests
             Assert.IsEmpty(enumerable);
         }
         
-        cache.Register([ShapesLanguage.Instance, SDTLangLanguage.Instance]);
+        cache.Register([TestLanguageLanguage.Instance, SDTLangLanguage.Instance]);
         
         foreach (var field in fields)
         {

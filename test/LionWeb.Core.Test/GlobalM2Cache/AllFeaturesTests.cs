@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.GlobalM2Cache;
 
 using Languages;
+using TestLang = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage;
 using M2;
 using M3;
 
@@ -72,20 +73,17 @@ public class AllFeaturesTests
     public void Concept()
     {
         var cache = new M2Cache();
-        Language lang = ShapesDynamic.Language;
-        cache.Register([_builtIns, lang]);
+        var language = TestLang.Instance;
+        cache.Register([_builtIns, language]);
 
-        var actual = cache.AllFeatures(cache.FindByKey<Classifier>(lang, "key-Line")!)!;
+        var actual = cache.AllFeatures(language.TestPartition)!;
 
         CollectionAssert.AreEquivalent(
             new List<Feature>
             {
                 _builtIns.INamed_name!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Shape")!, "key-shape-docs")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Line")!, "key-start")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Line")!, "key-end")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-IShape")!, "key-uuid")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-IShape")!, "key-fixpoints")!,
+                language.TestPartition_data,
+                language.TestPartition_links,
             }, actual.ToList());
     }
 
@@ -123,16 +121,17 @@ public class AllFeaturesTests
     public void Annotation()
     {
         var cache = new M2Cache();
-        Language lang = ShapesDynamic.Language;
-        cache.Register([lang]);
+        var language = TestLang.Instance;
+        cache.Register([_builtIns, language]);
 
-        var actual = cache.AllFeatures(cache.FindByKey<Classifier>(lang, "key-Documentation")!)!;
+        var actual = cache.AllFeatures(language.TestAnnotation)!;
 
         CollectionAssert.AreEquivalent(
             new List<Feature>
             {
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Documentation")!, "key-text")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Documentation")!, "key-technical")!
+                _builtIns.INamed_name,
+                language.TestAnnotation_containment,
+                language.TestAnnotation_ref,
             }, actual.ToList());
     }
 
@@ -170,20 +169,24 @@ public class AllFeaturesTests
     public void CrossLanguage()
     {
         var cache = new M2Cache();
-        Language lang = ShapesDynamic.Language;
-        cache.Register([_builtIns, lang]);
+        var language = TestLang.Instance;
+        cache.Register([_builtIns, language]);
 
-        var actual = cache.AllFeatures(cache.FindByKey<Classifier>(lang, "key-Circle")!)!;
+        var actual = cache.AllFeatures(language.LinkTestConcept)!;
 
         CollectionAssert.AreEquivalent(
             new List<Feature>
             {
                 _builtIns.INamed_name,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Shape")!, "key-shape-docs")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Circle")!, "key-r")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-Circle")!, "key-center")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-IShape")!, "key-uuid")!,
-                cache.FeatureByKey(cache.FindByKey<Classifier>(lang, "key-IShape")!, "key-fixpoints")!,
+                language.LinkTestConcept_containment_0_1,
+                language.LinkTestConcept_containment_0_n,
+                language.LinkTestConcept_containment_1,
+                language.LinkTestConcept_containment_1_n,
+                language.LinkTestConcept_otherContainment_0_1,
+                language.LinkTestConcept_reference_0_1,
+                language.LinkTestConcept_reference_0_n,
+                language.LinkTestConcept_reference_1,
+                language.LinkTestConcept_reference_1_n,
             },
             actual.ToList());
     }
