@@ -21,7 +21,7 @@ using Core.Serialization;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Circular.B;
 using Languages.Generated.V2024_1.Library.M2;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using Languages.Generated.V2024_1.WithEnum.M2;
 using M1;
 using M2;
@@ -38,15 +38,15 @@ public class SerializationLenientTests
     [TestMethod]
     public void InvalidValues()
     {
-        var rootNode = new LenientNode("a", ShapesLanguage.Instance.Line);
+        var rootNode = new LenientNode("a", TestLanguageLanguage.Instance.LinkTestConcept);
 
         var childA = new Book("bookA");
         var childB = new BConcept("bConceptB");
         rootNode.Set(_builtIns.INamed_name, new List<INode> { childA, childB });
-        rootNode.Set(ShapesLanguage.Instance.IShape_uuid, new List<IReadableNode> { childA, childB });
-        rootNode.Set(ShapesLanguage.Instance.Shape_shapeDocs, "hello");
-        rootNode.Set(ShapesLanguage.Instance.Line_start, new List<INode> { childA, childB });
-        rootNode.Set(ShapesLanguage.Instance.Line_end, MyEnum.literal1);
+        rootNode.Set(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, new List<IReadableNode> { childA, childB });
+        rootNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, "hello");
+        rootNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, new List<INode> { childA, childB });
+        rootNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, MyEnum.literal1);
 
         IEnumerable<IReadableNode> nodes = new List<INode> { rootNode, childA, childB };
         var serializationChunk =
@@ -55,8 +55,8 @@ public class SerializationLenientTests
 
         var readableNodes = new DeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
-            .WithLanguage(ShapesLanguage.Instance)
-            .WithCustomFactory(ShapesLanguage.Instance, new LenientFactory(ShapesLanguage.Instance))
+            .WithLanguage(TestLanguageLanguage.Instance)
+            .WithCustomFactory(TestLanguageLanguage.Instance, new LenientFactory(TestLanguageLanguage.Instance))
             .WithLanguage(LibraryLanguage.Instance)
             .WithLanguage(BLangLanguage.Instance)
             .WithLanguage(WithEnumLanguage.Instance)
@@ -81,11 +81,11 @@ public class SerializationLenientTests
     [TestMethod]
     public void ReferenceToChild()
     {
-        var parent = new LenientNode("parent", ShapesLanguage.Instance.MaterialGroup);
-        var child = new LenientNode("child", ShapesLanguage.Instance.Line);
+        var parent = new LenientNode("parent", TestLanguageLanguage.Instance.LinkTestConcept);
+        var child = new LenientNode("child", TestLanguageLanguage.Instance.LinkTestConcept);
         
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_defaultShape, child);
-        parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, child);
+        parent.Set(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, child);
         
         IEnumerable<IReadableNode> nodes = new List<INode> { parent, child };
         var serializationChunk =
@@ -93,8 +93,8 @@ public class SerializationLenientTests
         
         var readableNodes = new DeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
-            .WithLanguage(ShapesLanguage.Instance)
-            .WithCustomFactory(ShapesLanguage.Instance, new LenientFactory(ShapesLanguage.Instance))
+            .WithLanguage(TestLanguageLanguage.Instance)
+            .WithCustomFactory(TestLanguageLanguage.Instance, new LenientFactory(TestLanguageLanguage.Instance))
             .Build()
             .Deserialize(serializationChunk);
         
@@ -129,7 +129,7 @@ public class SerializationLenientTests
             var replacementFeature = new List<Language>
                 {
                     _builtIns,
-                    ShapesLanguage.Instance,
+                    TestLanguageLanguage.Instance,
                     LibraryLanguage.Instance,
                     BLangLanguage.Instance,
                     WithEnumLanguage.Instance

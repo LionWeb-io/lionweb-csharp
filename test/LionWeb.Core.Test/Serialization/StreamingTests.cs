@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.Serialization;
 
 using Core.Serialization;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M3;
 using System.Diagnostics;
@@ -31,7 +31,7 @@ public class StreamingTests
 
     public StreamingTests()
     {
-        _language = ShapesLanguage.Instance;
+        _language = TestLanguageLanguage.Instance;
     }
 
     // private const long _maxSize = 1_500_000L;
@@ -46,9 +46,9 @@ public class StreamingTests
 
         IEnumerable<INode> CreateNodes(long count)
         {
-            Line? lastLine = null;
-            Circle? lastCircle = null;
-            Coord? lastCoord = null;
+            LinkTestConcept? lastA = null;
+            LinkTestConcept? lastB = null;
+            LinkTestConcept? lastChild = null;
             for (long l = 0; l < count; l++)
             {
                 var id = $"id{l}_{StringRandomizer.RandomLength()}";
@@ -56,29 +56,29 @@ public class StreamingTests
                 if (l % 10_000 == 0)
                 {
                     TestContext.WriteLine(
-                        $"Creating Line #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
+                        $"Creating LinkTestConcept #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
                 }
 
                 INode result;
-                if (lastCoord == null || l % 2 == 0)
+                if (lastChild == null || l % 2 == 0)
                 {
-                    lastCoord = new Coord(id);
-                    result = lastCoord;
+                    lastChild = new LinkTestConcept(id);
+                    result = lastChild;
                 } else if (l % 3 == 0)
                 {
-                    lastLine = new Line(id) { Start = lastCoord };
-                    result = lastLine;
+                    lastA = new LinkTestConcept(id) { Containment_1 = lastChild };
+                    result = lastA;
                 } else if (l % 17 == 0)
                 {
-                    lastCircle = new Circle(id) { Center = lastCoord };
-                    result = lastCircle;
+                    lastB = new LinkTestConcept(id) { Containment_0_1 = lastChild };
+                    result = lastB;
                 } else if (l % 37 == 0)
                 {
-                    result = new Geometry(id) { Shapes = [lastLine!, lastCircle!] };
+                    result = new TestPartition(id) { Links = [lastA!, lastB!] };
                 } else
                 {
-                    lastCoord = new Coord(id);
-                    result = lastCoord;
+                    lastChild = new LinkTestConcept(id);
+                    result = lastChild;
                 }
 
                 yield return result;

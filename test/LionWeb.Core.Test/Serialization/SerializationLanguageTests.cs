@@ -22,6 +22,7 @@ using Core.Utilities;
 using Io.Lionweb.Mps.Specific;
 using Io.Lionweb.Mps.Specific.V2024_1;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M2;
 using M3;
@@ -195,14 +196,14 @@ public class LanguageSerializationTests
     }
 
     [TestMethod]
-    public void shapes_language()
+    public void test_language()
     {
         var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
-            .SerializeToChunk([ShapesLanguage.Instance]);
+            .SerializeToChunk([TestLanguageLanguage.Instance]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         var redeserialized = ILanguageDeserializerExtensions.Deserialize(serializationChunk);
-        var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
+        var comparer = new Comparer([TestLanguageLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
