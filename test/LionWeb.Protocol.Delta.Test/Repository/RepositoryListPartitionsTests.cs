@@ -17,7 +17,6 @@
 
 namespace LionWeb.Protocol.Delta.Test.Repository;
 
-using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
@@ -39,7 +38,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
     {
         await _aClient.SignOn(RepoId);
         
-        var part0 = new Geometry("partition");
+        var part0 = new TestPartition("partition");
         _aForest.AddPartitions([part0]);
         _aClient.WaitForReceived(1);
         var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
@@ -55,12 +54,12 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        var part0 = new Geometry("part0");
+        var part0 = new TestPartition("part0");
         _aForest.AddPartitions([part0]);
         await _bClient.SubscribeToPartitionContents(part0.GetId());
         WaitForReceived(1);
 
-        var part1 = new Geometry("part1");
+        var part1 = new TestPartition("part1");
         _bForest.AddPartitions([part1]);
         await _aClient.SubscribeToPartitionContents(part1.GetId());
         WaitForReceived(1);
