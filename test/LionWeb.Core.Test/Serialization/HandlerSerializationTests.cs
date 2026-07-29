@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Serialization;
 
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 using M3;
 using System.Collections.Concurrent;
@@ -41,7 +41,7 @@ public class HandlerSerializationTests
     [TestMethod]
     public void DuplicateId_CustomHandler()
     {
-        var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
+        var parent = new LinkTestConcept("duplicate") { Containment_1 = new LinkTestConcept("duplicate") };
 
         int count = 0;
 
@@ -52,7 +52,7 @@ public class HandlerSerializationTests
 
         try
         {
-            ISerializerExtensions.Serialize(serializer, materialGroup.Descendants(true, true));
+            ISerializerExtensions.Serialize(serializer, parent.Descendants(true, true));
         } catch (InvalidOperationException _)
         {
         }
@@ -75,16 +75,16 @@ public class HandlerSerializationTests
     {
         var lang = new DynamicLanguage("abc", _lionWebVersion)
         {
-            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+            Key = TestLanguageLanguage.Instance.Key, Version = TestLanguageLanguage.Instance.Version
         };
-        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-            ShapesLanguage.Instance.MaterialGroup.Name);
-        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+        var linkTestConcept = lang.Concept("efg", TestLanguageLanguage.Instance.LinkTestConcept.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept.Name);
+        var containment_1 = linkTestConcept.Containment("ijk", TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Name);
 
-        var a = lang.GetFactory().CreateNode("a", materialGroup);
-        var b = new Circle("b");
-        a.Set(defaultShape, b);
+        var a = lang.GetFactory().CreateNode("a", linkTestConcept);
+        var b = new LinkTestConcept("b");
+        a.Set(containment_1, b);
 
         var dictionary = new ConcurrentDictionary<Language, byte>();
 
@@ -114,16 +114,16 @@ public class HandlerSerializationTests
     {
         var lang = new DynamicLanguage("abc", _lionWebVersion)
         {
-            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+            Key = TestLanguageLanguage.Instance.Key, Version = TestLanguageLanguage.Instance.Version
         };
-        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-            ShapesLanguage.Instance.MaterialGroup.Name);
-        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+        var linkTestConcept = lang.Concept("efg", TestLanguageLanguage.Instance.LinkTestConcept.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept.Name);
+        var containment_1 = linkTestConcept.Containment("ijk", TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Key,
+            TestLanguageLanguage.Instance.LinkTestConcept_containment_1.Name);
 
-        var a = lang.GetFactory().CreateNode("a", materialGroup);
-        var b = new Circle("b");
-        a.Set(defaultShape, b);
+        var a = lang.GetFactory().CreateNode("a", linkTestConcept);
+        var b = new LinkTestConcept("b");
+        a.Set(containment_1, b);
 
         var dictionary = new ConcurrentDictionary<Language, byte>();
 
@@ -133,7 +133,7 @@ public class HandlerSerializationTests
             {
                 dictionary[a] = 1;
                 dictionary[b] = 1;
-                return ShapesLanguage.Instance;
+                return TestLanguageLanguage.Instance;
             }))
             .Build();
 
