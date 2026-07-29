@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -194,11 +194,17 @@ public class DirectSpecializationsTests
     public void CrossLanguage()
     {
         var cache = new M2Cache();
-        Language lang = ShapesDynamic.Language;
-        cache.Register([lang, InvalidLanguage.Language]);
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        cache.Register([_builtIns, language, InvalidLanguage.Language]);
 
-        var actual = _builtIns.INamed.DirectSpecializations([lang, InvalidLanguage.Language]);
+        var actual = _builtIns.INamed.DirectSpecializations([language, InvalidLanguage.Language]);
 
-        CollectionAssert.AreEquivalent(new List<Classifier> { cache.FindByKey<Classifier>(lang, "key-Shape")!, cache.FindByKey<Classifier>(lang, "key-Line")!, }, actual.ToList());
+        CollectionAssert.AreEquivalent(new List<Classifier>
+        {
+            language.LinkTestConcept,
+            language.TestPartition,
+            language.RestrictedTestAnnotation,
+            language.TestAnnotation,
+        }, actual.ToList());
     }
 }

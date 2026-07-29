@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 namespace LionWeb.Core.Test.GlobalM2Cache;
+using Languages.Generated.V2024_1.TestLanguage;
 
-using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2024_1.WithEnum.M2;
 using M2;
 
@@ -28,19 +28,19 @@ public class LiteralByKeyTests
     public void KnownLiteral()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.LiteralByKey(language.MatterState, language.MatterState_gas.Key);
-        Assert.AreSame(language.MatterState_gas, actual);
+        var actual = cache.LiteralByKey(language.TestEnumeration, language.TestEnumeration_literal1.Key);
+        Assert.AreSame(language.TestEnumeration_literal1, actual);
     }
 
     [TestMethod]
     public void WrongEnum()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.LiteralByKey(language.MatterState, language.MaterialGroup_defaultShape.Key);
+        var actual = cache.LiteralByKey(language.TestEnumeration, language.SecondTestEnumeration_literal1.Key);
         Assert.IsNull(actual);
     }
 
@@ -48,9 +48,9 @@ public class LiteralByKeyTests
     public void UnknownKey()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.LiteralByKey(language.MatterState, "asdf");
+        var actual = cache.LiteralByKey(language.TestEnumeration, "asdf");
         Assert.IsNull(actual);
     }
 
@@ -58,7 +58,7 @@ public class LiteralByKeyTests
     public void UnknownClassifier()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.LiteralByKey(WithEnumLanguage.Instance.MyEnum, "asdf");
         Assert.IsNull(actual);

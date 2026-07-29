@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 namespace LionWeb.Core.Test.GlobalM2Cache;
+using Languages.Generated.V2024_1.TestLanguage;
 
 using Languages.Generated.V2024_1.SDTLang;
-using Languages.Generated.V2024_1.Shapes.M2;
 using M2;
 
 [TestClass]
@@ -30,39 +30,39 @@ public class FeatureByKeyTests
     public void DirectProperty()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FeatureByKey(language.Circle, language.Circle_r.Key);
-        Assert.AreSame(language.Circle_r, actual);
+        var actual = cache.FeatureByKey(language.DataTypeTestConcept, language.DataTypeTestConcept_stringValue_0_1.Key);
+        Assert.AreSame(language.DataTypeTestConcept_stringValue_0_1, actual);
     }
 
     [TestMethod]
     public void DirectContainment()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FeatureByKey(language.Circle, language.Circle_center.Key);
-        Assert.AreSame(language.Circle_center, actual);
+        var actual = cache.FeatureByKey(language.LinkTestConcept, language.LinkTestConcept_containment_0_1.Key);
+        Assert.AreSame(language.LinkTestConcept_containment_0_1, actual);
     }
 
     [TestMethod]
     public void DirectReference()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FeatureByKey(language.BillOfMaterials, language.BillOfMaterials_materials.Key);
-        Assert.AreSame(language.BillOfMaterials_materials, actual);
+        var actual = cache.FeatureByKey(language.LinkTestConcept, language.LinkTestConcept_reference_0_1.Key);
+        Assert.AreSame(language.LinkTestConcept_reference_0_1, actual);
     }
 
     [TestMethod]
     public void InheritedProperty()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FeatureByKey(language.Circle, _builtIns.INamed_name.Key);
+        var actual = cache.FeatureByKey(language.LinkTestConcept, _builtIns.INamed_name.Key);
         Assert.AreSame(_builtIns.INamed_name, actual);
     }
 
@@ -70,7 +70,7 @@ public class FeatureByKeyTests
     public void InheritedContainment()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(language.Circle, language.Shape_shapeDocs.Key);
         Assert.AreSame(language.Shape_shapeDocs, actual);
@@ -80,9 +80,9 @@ public class FeatureByKeyTests
     public void WrongClassifier()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FeatureByKey(language.Circle, language.Line_start.Key);
+        var actual = cache.FeatureByKey(language.DataTypeTestConcept, language.LinkTestConcept_containment_0_1.Key);
         Assert.IsNull(actual);
     }
 
@@ -90,9 +90,9 @@ public class FeatureByKeyTests
     public void UnknownKey()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FeatureByKey(language.Circle, "asdf");
+        var actual = cache.FeatureByKey(language.LinkTestConcept, "asdf");
         Assert.IsNull(actual);
     }
 
@@ -100,7 +100,7 @@ public class FeatureByKeyTests
     public void UnknownClassifier()
     {
         var cache = new M2Cache();
-        var language = ShapesLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(SDTLangLanguage.Instance.SDTConcept, "asdf");
         Assert.IsNull(actual);
