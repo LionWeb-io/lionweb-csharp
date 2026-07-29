@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 namespace LionWeb.Core.Test.GlobalM2Cache;
+using Languages.Generated.V2024_1.TestLanguage;
 
 using Languages.Generated.V2024_1.SDTLang;
 using M2;
@@ -29,7 +30,7 @@ public class FeatureByKeyTests
     public void DirectProperty()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(language.DataTypeTestConcept, language.DataTypeTestConcept_stringValue_0_1.Key);
         Assert.AreSame(language.DataTypeTestConcept_stringValue_0_1, actual);
@@ -39,7 +40,7 @@ public class FeatureByKeyTests
     public void DirectContainment()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(language.LinkTestConcept, language.LinkTestConcept_containment_0_1.Key);
         Assert.AreSame(language.LinkTestConcept_containment_0_1, actual);
@@ -49,7 +50,7 @@ public class FeatureByKeyTests
     public void DirectReference()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(language.LinkTestConcept, language.LinkTestConcept_reference_0_1.Key);
         Assert.AreSame(language.LinkTestConcept_reference_0_1, actual);
@@ -59,7 +60,7 @@ public class FeatureByKeyTests
     public void InheritedProperty()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(language.LinkTestConcept, _builtIns.INamed_name.Key);
         Assert.AreSame(_builtIns.INamed_name, actual);
@@ -79,7 +80,7 @@ public class FeatureByKeyTests
     public void WrongClassifier()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(language.DataTypeTestConcept, language.LinkTestConcept_containment_0_1.Key);
         Assert.IsNull(actual);
@@ -89,7 +90,7 @@ public class FeatureByKeyTests
     public void UnknownKey()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(language.LinkTestConcept, "asdf");
         Assert.IsNull(actual);
@@ -99,7 +100,7 @@ public class FeatureByKeyTests
     public void UnknownClassifier()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FeatureByKey(SDTLangLanguage.Instance.SDTConcept, "asdf");
         Assert.IsNull(actual);

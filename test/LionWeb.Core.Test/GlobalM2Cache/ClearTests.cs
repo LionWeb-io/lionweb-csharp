@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 namespace LionWeb.Core.Test.GlobalM2Cache;
+using Languages.Generated.V2024_1.TestLanguage;
 
 using Languages.Generated.V2024_1.SDTLang;
 using M2;
@@ -39,7 +40,7 @@ public class ClearTests
             Assert.IsEmpty(enumerable);
         }
         
-        cache.Register([Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance, SDTLangLanguage.Instance]);
+        cache.Register([TestLanguageLanguage.Instance, SDTLangLanguage.Instance]);
         
         foreach (var field in fields)
         {
