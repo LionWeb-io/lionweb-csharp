@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Test.GlobalM2Cache;
 
 using Languages;
-using TestLang = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage;
 using M2;
 using M3;
 
@@ -275,7 +274,7 @@ public class AllGeneralizationsTests
     public void CrossLanguage()
     {
         var cache = new M2Cache();
-        var language = TestLang.Instance;
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([_builtIns, language]);
 
         var actual = cache.AllGeneralizations(language.LinkTestConcept)!;

@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ namespace LionWeb.Core.Test.GlobalM2Cache;
 
 using Languages.Generated.V2024_1.CustomPrimitiveTypeLang;
 using Languages.Generated.V2024_1.SDTLang;
-using Languages.Generated.V2024_1.TestLanguage;
 using M2;
 using M3;
 
@@ -30,7 +29,7 @@ public class FindByKeyTests
     public void Language()
     {
         var cache = new M2Cache();
-        var language = TestLanguageLanguage.Instance;
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FindByKey<Language>(language, language.Key);
         Assert.AreSame(language, actual);
@@ -40,7 +39,7 @@ public class FindByKeyTests
     public void Classifier()
     {
         var cache = new M2Cache();
-        var language = TestLanguageLanguage.Instance;
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FindByKey<Classifier>(language, language.LinkTestConcept.Key);
         Assert.AreSame(language.LinkTestConcept, actual);
@@ -50,7 +49,7 @@ public class FindByKeyTests
     public void Feature()
     {
         var cache = new M2Cache();
-        var language = TestLanguageLanguage.Instance;
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FindByKey<Feature>(language, language.LinkTestConcept_containment_0_1.Key);
         Assert.AreSame(language.LinkTestConcept_containment_0_1, actual);
@@ -60,7 +59,7 @@ public class FindByKeyTests
     public void Enumeration()
     {
         var cache = new M2Cache();
-        var language = TestLanguageLanguage.Instance;
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = language.FindByKey<Enumeration>(language.TestEnumeration.Key);
         Assert.AreSame(language.TestEnumeration, actual);
@@ -70,7 +69,7 @@ public class FindByKeyTests
     public void EnumerationLiteral()
     {
         var cache = new M2Cache();
-        var language = TestLanguageLanguage.Instance;
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([language]);
         var actual = cache.FindByKey<EnumerationLiteral>(language, language.TestEnumeration_literal1.Key);
         Assert.AreSame(language.TestEnumeration_literal1, actual);
@@ -139,7 +138,7 @@ public class FindByKeyTests
     public void UnknownKey()
     {
         var cache = new M2Cache();
-        var language = TestLanguageLanguage.Instance;
+        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([language]);
         Assert.IsNull(cache.FindByKey<IKeyed>(language, "asdf"));
     }
