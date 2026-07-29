@@ -75,14 +75,21 @@ public class AllFeaturesTests
         var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
         cache.Register([_builtIns, language]);
 
-        var actual = cache.AllFeatures(language.TestPartition)!;
+        var actual = cache.AllFeatures(language.LinkTestConcept)!;
 
         CollectionAssert.AreEquivalent(
             new List<Feature>
             {
                 _builtIns.INamed_name!,
-                language.TestPartition_data,
-                language.TestPartition_links,
+                language.LinkTestConcept_containment_0_1,
+                language.LinkTestConcept_containment_0_n,
+                language.LinkTestConcept_containment_1,
+                language.LinkTestConcept_containment_1_n,
+                language.LinkTestConcept_otherContainment_0_1,
+                language.LinkTestConcept_reference_0_1,
+                language.LinkTestConcept_reference_0_n,
+                language.LinkTestConcept_reference_1,
+                language.LinkTestConcept_reference_1_n,
             }, actual.ToList());
     }
 
