@@ -17,7 +17,6 @@
 
 namespace LionWeb.Protocol.Delta.Test.Repository;
 
-using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
@@ -30,7 +29,7 @@ public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        _aForest.AddPartitions([new Geometry("partition")]);
+        _aForest.AddPartitions([new TestPartition("partition")]);
         await _bClient.SubscribeToPartitionContents("partition");
         WaitForReceived(1);
 
@@ -44,7 +43,7 @@ public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        _aForest.AddPartitions([new Geometry("partitionA"), new TestPartition("partitionB")]);
+        _aForest.AddPartitions([new TestPartition("partitionA"), new TestPartition("partitionB")]);
         await _bClient.SubscribeToPartitionContents("partitionA");
         await _bClient.SubscribeToPartitionContents("partitionB");
         WaitForReceived(2);
@@ -61,7 +60,7 @@ public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
         
         await _bClient.SubscribeToChangingPartitions(true, true);
         
-        _aForest.AddPartitions([new Geometry("geo")]);
+        _aForest.AddPartitions([new TestPartition("geo")]);
         WaitForReceived(1);
         
         var bLink = new TestPartition("link");
@@ -90,15 +89,15 @@ public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        _aForest.AddPartitions([new Geometry("partition")]);
+        _aForest.AddPartitions([new TestPartition("partition")]);
         _aClient.WaitForReceived(1);
         await _bClient.SubscribeToPartitionContents("partition");
         _bClient.WaitForReceived(1);
 
-        var bPartition = (Geometry)_bForest.Partitions.First();
+        var bPartition = (TestPartition)_bForest.Partitions.First();
         Assert.IsNotNull(bPartition);
 
-        bPartition.AddAnnotations([new BillOfMaterials("bom")]);
+        bPartition.AddAnnotations([new TestAnnotation("bom")]);
         WaitForReceived(1);
 
         AssertEquals(_aForest.Partitions, _bForest.Partitions);

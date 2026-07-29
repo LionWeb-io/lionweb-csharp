@@ -22,7 +22,6 @@ using LionWeb.Core.Notification;
 using LionWeb.Core.Notification.Forest;
 using LionWeb.Core.Notification.Partition;
 using LionWeb.Core.Notification.Pipe;
-using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using LionWeb.Core.Test.Notification;
 using LionWeb.Protocol.Delta.Client;
@@ -70,7 +69,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
     private void CreateDeltaReplicator(IForest cloneForest, INotificationSender originalSender)
     {
         var lionWebVersion = LionWebVersions.v2024_1;
-        List<Language> languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
+        List<Language> languages = [TestLanguageLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
@@ -126,7 +125,7 @@ public abstract class DeltaTestsBase: NotificationTestsBase
         var clone = ClonePartition(node);
 
         var lionWebVersion = LionWebVersions.v2024_1;
-        List<Language> languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
+        List<Language> languages = [TestLanguageLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
