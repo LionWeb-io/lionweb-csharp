@@ -69,10 +69,10 @@ public class FeatureByKeyTests
     public void InheritedContainment()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
+        var language = Languages.Generated.V2024_1.Shapes.M2.ShapesLanguage.Instance;
         cache.Register([language]);
-        var actual = cache.FeatureByKey(language.TestPartition, language.TestPartition_links.Key);
-        Assert.AreSame(language.TestPartition_links, actual);
+        var actual = cache.FeatureByKey(language.Circle, language.Shape_shapeDocs.Key);
+        Assert.AreSame(language.Shape_shapeDocs, actual);
     }
 
     [TestMethod]

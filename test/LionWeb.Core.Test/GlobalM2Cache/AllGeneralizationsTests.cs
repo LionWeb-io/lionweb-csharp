@@ -274,15 +274,17 @@ public class AllGeneralizationsTests
     public void CrossLanguage()
     {
         var cache = new M2Cache();
-        var language = Languages.Generated.V2024_1.TestLanguage.TestLanguageLanguage.Instance;
-        cache.Register([_builtIns, language]);
+        Language lang = ShapesDynamic.Language;
+        cache.Register([lang]);
 
-        var actual = cache.AllGeneralizations(language.LinkTestConcept)!;
+        var actual = cache.AllGeneralizations(cache.FindByKey<Classifier>(lang, "key-Circle")!)!;
 
         CollectionAssert.AreEquivalent(
             new List<Classifier>
             {
                 _builtIns.INamed,
+                cache.FindByKey<Classifier>(lang, "key-Shape")!,
+                cache.FindByKey<Classifier>(lang, "key-IShape")!
             },
             actual.ToList());
     }
