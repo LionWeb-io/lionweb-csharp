@@ -94,7 +94,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     if (!messageContext.ClientInfo.SignedOn)
                     {
                         await Send(messageContext.ClientInfo,
-                            DeltaErrorCode.NotSignedOn.AsError(
+                            DeltaErrorCode.NotSignedOn.AsErrorEvent(
                                 [new CommandSource(messageContext.ClientInfo.ParticipationId, command.CommandId)],
                                 null));
                         return;

@@ -537,7 +537,7 @@ public class DeltaEventToNotificationMapper
         if (TryToNode(nodeId, out var w))
             return w;
 
-        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsErrorEvent(null, null, nodeId));
     }
 
     private protected virtual IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
@@ -582,7 +582,7 @@ internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap shared
                 return wr;
         }
 
-        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsErrorEvent(null, null, nodeId));
     }
 
     private protected override IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
