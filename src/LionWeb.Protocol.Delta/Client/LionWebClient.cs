@@ -182,6 +182,11 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         await Query<SubscribeToChangingPartitionsResponse, SubscribeToChangingPartitionsRequest>(
             new SubscribeToChangingPartitionsRequest(creation, deletion, QueryId(), null));
 
+    /// <inheritdoc />
+    public override async Task<InformAboutChangingPartitionsResponse> InformAboutChangingPartitions(bool creation,
+        bool deletion, DepthLimit depthLimit) =>
+        await Query<InformAboutChangingPartitionsResponse, InformAboutChangingPartitionsRequest>(
+            new InformAboutChangingPartitionsRequest(creation, deletion, depthLimit, QueryId(), null));
 
     /// <inheritdoc />
     public override async Task<IPartitionInstance> SubscribeToPartitionContents(TargetNode partition)

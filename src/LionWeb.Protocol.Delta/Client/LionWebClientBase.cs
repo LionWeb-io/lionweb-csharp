@@ -118,6 +118,10 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToChangingPartitionsResponse"/></returns>
     public abstract Task SubscribeToChangingPartitions(bool creation, bool deletion);
 
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.InformAboutChangingPartitionsRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.InformAboutChangingPartitionsResponse"/></returns>
+    public abstract Task InformAboutChangingPartitions(bool creation, bool deletion, DepthLimit depthLimit);
+
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsResponse"/></returns>
     public abstract Task<IPartitionInstance> SubscribeToPartitionContents(TargetNode partition);

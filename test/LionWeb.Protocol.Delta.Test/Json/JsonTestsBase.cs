@@ -59,6 +59,12 @@ public abstract class JsonTestsBase
     protected static SubscribeToChangingPartitionsResponse CreateSubscribeToChangingPartitionsResponse() =>
         new(QueryId(), AdditionalInfos());
 
+    protected static InformAboutChangingPartitionsRequest CreateInformAboutChangingPartitionsRequest() =>
+        new(true, false, _defaultDepthLimit, QueryId(), AdditionalInfos());
+
+    protected static InformAboutChangingPartitionsResponse CreateInformAboutChangingPartitionsResponse() =>
+        new(QueryId(), AdditionalInfos());
+
     protected static SubscribeToPartitionContentsRequest CreateSubscribeToPartitionContentsRequest() =>
         new(TargetNode(), QueryId(), AdditionalInfos());
 
@@ -108,6 +114,8 @@ public abstract class JsonTestsBase
     [
         [CreateSubscribeToChangingPartitionsRequest(), typeof(SubscribeToChangingPartitionsRequest)],
         [CreateSubscribeToChangingPartitionsResponse(), typeof(SubscribeToChangingPartitionsResponse)],
+        [CreateInformAboutChangingPartitionsRequest(), typeof(InformAboutChangingPartitionsRequest)],
+        [CreateInformAboutChangingPartitionsResponse(), typeof(InformAboutChangingPartitionsResponse)],
         [CreateSubscribeToPartitionContentsRequest(), typeof(SubscribeToPartitionContentsRequest)],
         [CreateSubscribeToPartitionContentsResponse(), typeof(SubscribeToPartitionContentsResponse)],
         [CreateUnsubscribeFromPartitionContentsRequest(), typeof(UnsubscribeFromPartitionContentsRequest)],

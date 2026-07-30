@@ -109,6 +109,23 @@ public record SubscribeToChangingPartitionsResponse(
 
 #endregion
 
+#region InformAboutChangingPartitions
+
+public record InformAboutChangingPartitionsRequest(
+    bool Creation,
+    bool Deletion,
+    DepthLimit DepthLimit,
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;
+
+public record InformAboutChangingPartitionsResponse(
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
+
+#endregion
+
 #region SubscribeToPartitionContents
 
 public record SubscribeToPartitionContentsRequest(

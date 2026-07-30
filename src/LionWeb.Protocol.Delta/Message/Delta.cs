@@ -316,6 +316,8 @@ public interface IDeltaError
 
 [JsonDerivedType(typeof(SubscribeToChangingPartitionsRequest), nameof(SubscribeToChangingPartitionsRequest))]
 [JsonDerivedType(typeof(SubscribeToChangingPartitionsResponse), nameof(SubscribeToChangingPartitionsResponse))]
+[JsonDerivedType(typeof(InformAboutChangingPartitionsRequest), nameof(InformAboutChangingPartitionsRequest))]
+[JsonDerivedType(typeof(InformAboutChangingPartitionsResponse), nameof(InformAboutChangingPartitionsResponse))]
 [JsonDerivedType(typeof(SubscribeToPartitionContentsRequest), nameof(SubscribeToPartitionContentsRequest))]
 [JsonDerivedType(typeof(SubscribeToPartitionContentsResponse), nameof(SubscribeToPartitionContentsResponse))]
 [JsonDerivedType(typeof(UnsubscribeFromPartitionContentsRequest), nameof(UnsubscribeFromPartitionContentsRequest))]
