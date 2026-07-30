@@ -177,7 +177,12 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 
     private IDeltaQueryResponse ListPartitions(ListPartitionsRequest listPartitionsRequest)
     {
-        DeltaSerializationChunk chunk = Serialize(_forest.Partitions);
+        DeltaSerializationChunk chunk = Serialize(_forest
+            .Partitions
+            .SelectMany(p =>
+                p.Descendants(n => M1Extensions.Ancestors(n).Count() <= listPartitionsRequest.DepthLimit, true, true)
+            )
+        );
         return new ListPartitionsResponse(chunk, false, listPartitionsRequest.QueryId, null);
     }
 

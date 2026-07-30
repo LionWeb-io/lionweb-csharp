@@ -42,14 +42,14 @@ public class RepositoryListAndSubscribePartitionsTests : RepositoryTestNoExcepti
         _aForest.AddPartitions([part0]);
         _aClient.WaitForReceived(1);
         var partitions = await _aClient.ListAndSubscribePartitions();
+        
         Assert.HasCount(1, partitions);
-
         AssertEquals(part0, partitions[0]);
     }
 
     [TestMethod]
     [Timeout(6000)]
-    public async Task Two()
+    public async Task ListExisting()
     {
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
@@ -67,13 +67,34 @@ public class RepositoryListAndSubscribePartitionsTests : RepositoryTestNoExcepti
         var partitions = await _aClient.ListAndSubscribePartitions();
         Assert.HasCount(2, partitions);
 
-        AssertEquals(part0, partitions[0]);
+        Assert.AreSame(part0, partitions[0]);
         AssertEquals(part1, partitions[1]);
+        Assert.AreNotSame(part1, partitions[1]);
     }
 
     [TestMethod]
     [Timeout(6000)]
-    public async Task NoFeatures()
+    public async Task AddedToForest()
+    {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
+        var part0 = new TestPartition("part0");
+        _aForest.AddPartitions([part0]);
+        WaitForReceived(1);
+
+        var partitions = await _bClient.ListAndSubscribePartitions();
+        Assert.HasCount(1, partitions);
+        AssertEquals(part0, partitions[0]);
+        Assert.AreNotSame(part0, partitions[0]);
+        
+        Assert.HasCount(1, _bForest.Partitions);
+        Assert.AreSame(partitions[0], _bForest.Partitions.First());
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task IncludesFeatures()
     {
         await _aClient.SignOn(RepoId);
         
@@ -94,7 +115,7 @@ public class RepositoryListAndSubscribePartitionsTests : RepositoryTestNoExcepti
         Assert.AreEqual(part0.GetId(), actual.GetId());
         Assert.AreEqual(part0.GetConcept(), actual.GetConcept());
         Assert.AreEqual(part0.Name, actual.Name);
-        Assert.IsEmpty(actual.Links);
+        Assert.IsNotEmpty(actual.Links);
     }
     
     [TestMethod]

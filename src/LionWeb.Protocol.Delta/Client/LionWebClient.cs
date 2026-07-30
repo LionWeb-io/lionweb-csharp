@@ -282,13 +282,21 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             .WithLanguageReferences()
             .WithHandler(new NoFeaturesDeserializationHandler())
             .Build();
-        var result = deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();
+        var deserialized = deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();
+        var result = new List<IPartitionInstance>(deserialized.Count);
         lock (_eventReceiver)
         {
-            foreach (var partition in result)
+            foreach (var partition in deserialized)
             {
+                if(_forest.TryGetPartition(partition.GetId(), out var existing))
+                {
+                    result.Add(existing);
+                    continue;
+                }
+
                 var notification = new PartitionAddedNotification(partition, new ParticipationNotificationId(ParticipationId, _commandIdProvider.Create()));
                 _eventReceiver.ProduceNotification(notification);
+                result.Add(partition);
             }
         }
         return result;
