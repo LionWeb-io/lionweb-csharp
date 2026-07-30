@@ -21,7 +21,7 @@ using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Core.Utilities;
 
 [TestClass]
-public class RepositoryGetAvailableIdsTests : RepositoryTestNoExceptionsBase
+public class GetAvailableIdsTests : RepositoryTestNoExceptionsBase
 {
     [TestMethod]
     [Timeout(6000)]

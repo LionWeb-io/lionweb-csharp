@@ -20,7 +20,7 @@ namespace LionWeb.Protocol.Delta.Test.Repository;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
-public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
+public class PartitionTests : RepositoryTestNoExceptionsBase
 {
     [TestMethod]
     [Timeout(6000)]

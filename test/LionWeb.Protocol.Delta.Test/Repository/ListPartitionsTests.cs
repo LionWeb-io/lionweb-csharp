@@ -22,7 +22,7 @@ using Core.M1;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
-public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
+public class ListPartitionsTests : RepositoryTestNoExceptionsBase
 {
     private readonly TestPartition _partition;
     private readonly LinkTestConcept _linkLevel1B;
@@ -39,7 +39,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
     private readonly TestAnnotation _annLevel4Aaaa;
     private readonly DataTypeTestConcept _dataLevel5Aaaaa;
 
-    public RepositoryListPartitionsTests()
+    public ListPartitionsTests()
     {
         _dataLevel5Aaaaa = new DataTypeTestConcept("dataLevel5_A_A_A_A_A");
         _annLevel4Aaaa = new TestAnnotation("annLevel4_A_A_A_A") { Containment = _dataLevel5Aaaaa };

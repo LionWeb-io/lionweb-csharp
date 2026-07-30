@@ -21,7 +21,7 @@ using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 using Delta.Client;
 
 [TestClass]
-public class RepositorySignOnTests : RepositoryTestsBase
+public class SignOnTests : RepositoryTestsBase
 {
     [TestMethod]
     [Timeout(6000)]
