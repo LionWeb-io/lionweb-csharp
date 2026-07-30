@@ -144,14 +144,17 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             case ListPartitionsRequest listPartitionsRequest:
                 return ListPartitions(listPartitionsRequest);
 
+            case ListAndSubscribePartitionsRequest listAndSubscribePartitionsRequest:
+                return ListAndSubscribePartitions(listAndSubscribePartitionsRequest, clientInfo);
+
             case SignOnRequest signOnRequest:
-                return SignOn(clientInfo, signOnRequest);
+                return SignOn(signOnRequest, clientInfo);
 
             case SignOffRequest signOffRequest:
-                return SignOff(clientInfo, signOffRequest);
+                return SignOff(signOffRequest, clientInfo);
 
             case ReconnectRequest reconnectRequest:
-                return Reconnect(clientInfo, reconnectRequest);
+                return Reconnect(reconnectRequest, clientInfo);
 
             case SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest:
                 return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest, clientInfo);
@@ -178,7 +181,16 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         return new ListPartitionsResponse(chunk, false, listPartitionsRequest.QueryId, null);
     }
 
-    private IDeltaQueryResponse SignOn(IClientInfo clientInfo, SignOnRequest signOnRequest)
+    private IDeltaQueryResponse ListAndSubscribePartitions(ListAndSubscribePartitionsRequest listAndSubscribePartitionsRequest, IClientInfo clientInfo)
+    {
+        DeltaSerializationChunk chunk = Serialize(_forest.Partitions);
+        clientInfo.NotifyAboutParitionCreation = true;
+        clientInfo.NotifyAboutParitionDeletion = true;
+        clientInfo.SubscribedPartitions.UnionWith(_forest.Partitions.Select(p => p.GetId()));
+        return new ListAndSubscribePartitionsResponse(chunk, false, listAndSubscribePartitionsRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse SignOn(SignOnRequest signOnRequest, IClientInfo clientInfo)
     {
         if (clientInfo.SignedOn)
             return DeltaErrorCode.AlreadySignedOn.AsErrorResponse(signOnRequest.QueryId, null);
@@ -189,7 +201,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         return new SignOnResponse(clientInfo.ParticipationId, signOnRequest.QueryId, null);
     }
 
-    private IDeltaQueryResponse SignOff(IClientInfo clientInfo, SignOffRequest signOffRequest)
+    private IDeltaQueryResponse SignOff(SignOffRequest signOffRequest, IClientInfo clientInfo)
     {
         if (!clientInfo.SignedOn)
             return DeltaErrorCode.NotSignedOn.AsErrorResponse(signOffRequest.QueryId, null);
@@ -198,7 +210,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         return new SignOffResponse(signOffRequest.QueryId, null);
     }
 
-    private IDeltaQueryResponse Reconnect(IClientInfo clientInfo, ReconnectRequest reconnectRequest)
+    private IDeltaQueryResponse Reconnect(ReconnectRequest reconnectRequest, IClientInfo clientInfo)
     {
         if (clientInfo.SignedOn)
             return DeltaErrorCode.AlreadySignedOn.AsErrorResponse(reconnectRequest.QueryId, null);

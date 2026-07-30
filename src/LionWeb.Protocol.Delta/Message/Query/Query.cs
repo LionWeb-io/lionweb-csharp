@@ -298,6 +298,22 @@ public record ListPartitionsResponse(
 
 #endregion
 
+#region ListAndSubscribePartitions
+
+public record ListAndSubscribePartitionsRequest(
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
+
+public record ListAndSubscribePartitionsResponse(
+    DeltaSerializationChunk Partitions,
+    SplitFlag Split,
+    QueryId QueryId,
+    AdditionalInfo[]? AdditionalInfos
+) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse, IDeltaSplittable;
+
+#endregion
+
 #region Custom
 
 public interface ICustomDeltaQuery : ICustomDeltaContent, IDeltaQuery

@@ -21,6 +21,7 @@ using Core;
 using Core.M1;
 using Core.M3;
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Utilities;
 using Message;
 using Message.Command;
@@ -33,6 +34,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
     private readonly DeltaProtocolEventReceiver _eventReceiver;
     private readonly DeserializerBuilder _deserializerBuilder;
+    private readonly ICommandIdProvider _commandIdProvider;
 
     private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
@@ -54,6 +56,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         IClientConnector<IDeltaContent> connector
     ) : base(lionWebVersion, languages, name, forest, connector)
     {
+        _commandIdProvider = new CommandIdProvider();
+        
         var unresolvedReferencesManager = new UnresolvedReferencesManager();
 
         _deserializerBuilder = new DeserializerBuilder()
@@ -264,6 +268,30 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             .WithHandler(new NoFeaturesDeserializationHandler())
             .Build();
         return deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();
+    }
+
+    /// <inheritdoc />
+    public override async Task<List<IPartitionInstance>> ListAndSubscribePartitions()
+    {
+        var response =
+            await Query<ListAndSubscribePartitionsResponse, ListAndSubscribePartitionsRequest>(new ListAndSubscribePartitionsRequest(QueryId(), null));
+        Log($"ListAndSubscribePartitions response: {response}");
+        var deserializer = new DeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithLanguages(_languages)
+            .WithLanguageReferences()
+            .WithHandler(new NoFeaturesDeserializationHandler())
+            .Build();
+        var result = deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();
+        lock (_eventReceiver)
+        {
+            foreach (var partition in result)
+            {
+                var notification = new PartitionAddedNotification(partition, new ParticipationNotificationId(ParticipationId, _commandIdProvider.Create()));
+                _eventReceiver.ProduceNotification(notification);
+            }
+        }
+        return result;
     }
 
     #endregion

@@ -81,6 +81,11 @@ public abstract class JsonTestsBase
     protected static ListPartitionsResponse CreateListPartitionsResponse() =>
         new(Chunk(), false, QueryId(), AdditionalInfos());
 
+    protected static ListAndSubscribePartitionsRequest CreateListAndSubscribePartitionsRequest() => new(QueryId(), AdditionalInfos());
+
+    protected static ListAndSubscribePartitionsResponse CreateListAndSubscribePartitionsResponse() =>
+        new(Chunk(), false, QueryId(), AdditionalInfos());
+
     protected static SignOnRequest CreateSignOnRequest() =>
         new(LionWebVersions.v2026_1.VersionString, ClientId(), QueryId(), RepositoryId(), AdditionalInfos());
 
@@ -111,6 +116,8 @@ public abstract class JsonTestsBase
         [CreateGetAvailableIdsResponse(), typeof(GetAvailableIdsResponse)],
         [CreateListPartitionsRequest(), typeof(ListPartitionsRequest)],
         [CreateListPartitionsResponse(), typeof(ListPartitionsResponse)],
+        [CreateListAndSubscribePartitionsRequest(), typeof(ListAndSubscribePartitionsRequest)],
+        [CreateListAndSubscribePartitionsResponse(), typeof(ListAndSubscribePartitionsResponse)],
         [CreateSignOnRequest(), typeof(SignOnRequest)],
         [CreateSignOnResponse(), typeof(SignOnResponse)],
         [CreateSignOffRequest(), typeof(SignOffRequest)],

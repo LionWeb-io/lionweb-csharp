@@ -154,6 +154,10 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     /// <returns>List{<see cref="IPartitionInstance"/>}</returns>
     public abstract Task ListPartitions(DepthLimit depthLimit);
 
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.ListAndSubscribePartitionsRequest"/>
+    /// <returns>List{<see cref="IPartitionInstance"/>}</returns>
+    public abstract Task ListAndSubscribePartitions();
+
     #endregion
     
     protected abstract Task Send(T deltaContent);

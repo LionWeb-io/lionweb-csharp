@@ -20,7 +20,7 @@ namespace LionWeb.Protocol.Delta.Test.Repository;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
-public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
+public class RepositoryListAndSubscribePartitionsTests : RepositoryTestNoExceptionsBase
 {
     [TestMethod]
     [Timeout(6000)]
@@ -28,7 +28,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
     {
         await _aClient.SignOn(RepoId);
         
-        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
+        var partitions = await _aClient.ListAndSubscribePartitions();
         Assert.AreEqual(0, partitions.Count);
     }
 
@@ -41,7 +41,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         var part0 = new TestPartition("partition");
         _aForest.AddPartitions([part0]);
         _aClient.WaitForReceived(1);
-        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
+        var partitions = await _aClient.ListAndSubscribePartitions();
         Assert.HasCount(1, partitions);
 
         AssertEquals(part0, partitions[0]);
@@ -64,7 +64,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SubscribeToPartitionContents(part1.GetId());
         WaitForReceived(1);
 
-        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
+        var partitions = await _aClient.ListAndSubscribePartitions();
         Assert.HasCount(2, partitions);
 
         AssertEquals(part0, partitions[0]);
@@ -87,7 +87,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         _aForest.AddPartitions([part0]);
         _aClient.WaitForReceived(1);
 
-        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
+        var partitions = await _aClient.ListAndSubscribePartitions();
         Assert.HasCount(1, partitions);
         var actual = (TestPartition)partitions[0];
 
@@ -99,7 +99,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
     
     [TestMethod]
     [Timeout(6000)]
-    public async Task NotSubscribed()
+    public async Task Subscribed()
     {
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
@@ -108,7 +108,7 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         _aForest.AddPartitions([part0]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(DefaultDepthLimit);
+        var partitions = await _bClient.ListAndSubscribePartitions();
         Assert.HasCount(1, partitions);
 
         Assert.AreEqual(part0.GetId(), partitions[0].GetId());
@@ -116,6 +116,6 @@ public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
         part0.Name = "ChangedName";
         WaitForReceived(1);
         
-        Assert.IsFalse(((TestPartition)partitions[0]).TryGetName(out _));
+        Assert.AreEqual("ChangedName", ((TestPartition)partitions[0]).Name);
     }
 }

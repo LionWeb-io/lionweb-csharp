@@ -12,6 +12,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `IChildNotification` and `IAnnotationNotification` marker interfaces.
 * Added `M1Extension.Descendants()` with filter.
 * Introduced `FilteringSerializer` to omit nodes from serialization by filter.
+* Support `ListAndSubscribePartitions` query.
 ### Fixed
 * `InsertBefore()` and `InsertAfter()` works now with annotations.
 * Moving or replacing nodes between partitions and free-floating nodes produces the proper added/deleted notifications.

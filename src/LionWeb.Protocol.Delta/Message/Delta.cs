@@ -295,6 +295,8 @@ public interface IDeltaError
 [JsonDerivedType(typeof(GetAvailableIdsResponse), nameof(GetAvailableIdsResponse))]
 [JsonDerivedType(typeof(ListPartitionsRequest), nameof(ListPartitionsRequest))]
 [JsonDerivedType(typeof(ListPartitionsResponse), nameof(ListPartitionsResponse))]
+[JsonDerivedType(typeof(ListAndSubscribePartitionsRequest), nameof(ListAndSubscribePartitionsRequest))]
+[JsonDerivedType(typeof(ListAndSubscribePartitionsResponse), nameof(ListAndSubscribePartitionsResponse))]
 [JsonDerivedType(typeof(ContinuedQueryResponse), nameof(ContinuedQueryResponse))]
 
 #endregion
