@@ -29,7 +29,8 @@ public enum DeltaErrorCode
     AlreadySignedOn,
     NotCurrentSequenceNumber,
     UnknownPartition,
-    NotSubscribed
+    NotSubscribed,
+    MixedSubscribeInformPartitionChanges
 }
 
 public static class DeltaErrorCodeExtensions
@@ -43,6 +44,7 @@ public static class DeltaErrorCodeExtensions
         DeltaErrorCode.NotCurrentSequenceNumber => "Last sent sequence number is {0} vs. last received {1}",
         DeltaErrorCode.UnknownPartition => "Unknown partition '{0}'",
         DeltaErrorCode.NotSubscribed => "Not subscribed to partition '{0}'",
+        DeltaErrorCode.MixedSubscribeInformPartitionChanges => "Already subscribed to {0}, but requesting {1}",
     }, args);
 
     public static ErrorEvent AsErrorEvent(this DeltaErrorCode errorCode, CommandSource[]? originCommands,

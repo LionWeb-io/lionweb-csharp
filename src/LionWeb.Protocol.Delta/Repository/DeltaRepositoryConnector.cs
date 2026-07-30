@@ -63,21 +63,37 @@ public class DeltaRepositoryConnector : IDeltaRepositoryConnector
         {
             if (!clientInfo.SignedOn)
                 continue;
+            
+            bool shouldSend;
+            switch (clientInfo, content)
+            {
+                case ({ PartitionChanges: PartitionChanges.SubscribeToChangingPartitions, NotifyAboutPartitionCreation: true }, PartitionAdded added):
+                    clientInfo.SubscribedPartitions.Add(added.AffectedNode);
+                    shouldSend = true;
+                    break;
+                
+                case ({ParticipationId: var pId}, {InternalParticipationId: var iPId}) when pId == iPId:
+                    shouldSend = true;
+                    break;
+                
+                case ({ PartitionChanges: not PartitionChanges.None }, PartitionAdded):
+                    shouldSend = clientInfo.NotifyAboutPartitionCreation;
+                    break;
+                
+                case ({ PartitionChanges: not PartitionChanges.None }, PartitionDeleted):
+                    shouldSend = clientInfo.NotifyAboutPartitionDeletion;
+                    break;
+                
+                case ({SubscribedPartitions: var partitions}, _): 
+                    shouldSend = partitions.Overlaps(affectedPartitions);
+                    break;
+                
+                default:
+                    shouldSend = false;
+                    break;
+            }
 
-            var shouldSend = false;
-
-            if ((clientInfo.NotifyAboutParitionDeletion ||
-                 content.InternalParticipationId == clientInfo.ParticipationId) && content is PartitionDeleted)
-                shouldSend = true;
-            else if (clientInfo.NotifyAboutParitionCreation && content is PartitionAdded)
-                shouldSend = true;
-
-            if (clientInfo.SubscribedPartitions.Overlaps(affectedPartitions))
-                shouldSend = true;
-
-            if (clientInfo.SubscribeCreatedParitions && content is PartitionAdded a)
-                clientInfo.SubscribedPartitions.Add(a.AffectedNode);
-
+            // always remove deleted partitions from clientInfo
             if (content is PartitionDeleted d)
                 clientInfo.SubscribedPartitions.Remove(d.DeletedPartition);
 

@@ -28,9 +28,11 @@ public interface IClientInfo
 
     HashSet<NodeId> SubscribedPartitions { get; }
 
-    bool NotifyAboutParitionCreation { get; set; }
-    bool NotifyAboutParitionDeletion { get; set; }
-    bool SubscribeCreatedParitions { get; set; }
+    PartitionChanges PartitionChanges { get; set; }
+
+    bool NotifyAboutPartitionCreation { get; set; }
+    
+    bool NotifyAboutPartitionDeletion { get; set; }
 
     EventSequenceNumber IncrementAndGetSequenceNumber();
     EventSequenceNumber SequenceNumber { get; }
@@ -47,6 +49,13 @@ public interface IClientInfo
 
     public static IEqualityComparer<IClientInfo> IdentityComparer { get; } =
         new IdentityEqualityComparer();
+}
+
+public enum PartitionChanges
+{
+    None,
+    SubscribeToChangingPartitions,
+    InformAboutChangingPartitions
 }
 
 public record ClientInfo : IClientInfo
@@ -74,11 +83,11 @@ public record ClientInfo : IClientInfo
     public HashSet<NodeId> SubscribedPartitions { get; } = [];
 
     /// <inheritdoc />
-    public bool NotifyAboutParitionCreation { get; set; }
+    public PartitionChanges PartitionChanges { get; set; } = PartitionChanges.None;
 
     /// <inheritdoc />
-    public bool NotifyAboutParitionDeletion { get; set; }
+    public bool NotifyAboutPartitionCreation { get; set; } = false;
 
     /// <inheritdoc />
-    public bool SubscribeCreatedParitions { get; set; }
+    public bool NotifyAboutPartitionDeletion { get; set; } = false;
 }

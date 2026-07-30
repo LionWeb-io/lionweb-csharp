@@ -159,6 +159,9 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             case SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest:
                 return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest, clientInfo);
 
+            case InformAboutChangingPartitionsRequest informAboutChangingPartitionsRequest:
+                return InformAboutChangingPartitions(informAboutChangingPartitionsRequest, clientInfo);
+
             case SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest:
                 return SubscribeToPartitionContents(subscribeToPartitionContentsRequest, clientInfo);
 
@@ -189,8 +192,6 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     private IDeltaQueryResponse ListAndSubscribePartitions(ListAndSubscribePartitionsRequest listAndSubscribePartitionsRequest, IClientInfo clientInfo)
     {
         DeltaSerializationChunk chunk = Serialize(_forest.Partitions);
-        clientInfo.NotifyAboutParitionCreation = true;
-        clientInfo.NotifyAboutParitionDeletion = true;
         clientInfo.SubscribedPartitions.UnionWith(_forest.Partitions.Select(p => p.GetId()));
         return new ListAndSubscribePartitionsResponse(chunk, false, listAndSubscribePartitionsRequest.QueryId, null);
     }
@@ -232,11 +233,37 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     private IDeltaQueryResponse SubscribeToChangingPartitions(
         SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest, IClientInfo clientInfo)
     {
-        clientInfo.NotifyAboutParitionCreation = subscribeToChangingPartitionsRequest.Creation;
-        clientInfo.NotifyAboutParitionDeletion = subscribeToChangingPartitionsRequest.Deletion;
-        clientInfo.SubscribeCreatedParitions = subscribeToChangingPartitionsRequest.Creation;
+        if (clientInfo.PartitionChanges == PartitionChanges.InformAboutChangingPartitions)
+            return DeltaErrorCode.MixedSubscribeInformPartitionChanges.AsErrorResponse(subscribeToChangingPartitionsRequest.QueryId, null, clientInfo.PartitionChanges,
+                PartitionChanges.SubscribeToChangingPartitions); 
+        
+        var creation = subscribeToChangingPartitionsRequest.Creation;
+        var deletion = subscribeToChangingPartitionsRequest.Deletion;
+        
+        clientInfo.PartitionChanges = creation || deletion ? PartitionChanges.SubscribeToChangingPartitions : PartitionChanges.None;
+
+        clientInfo.NotifyAboutPartitionCreation = creation;
+        clientInfo.NotifyAboutPartitionDeletion = deletion;
 
         return new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse InformAboutChangingPartitions(
+        InformAboutChangingPartitionsRequest informAboutChangingPartitionsRequest, IClientInfo clientInfo)
+    {
+        if (clientInfo.PartitionChanges == PartitionChanges.SubscribeToChangingPartitions)
+            return DeltaErrorCode.MixedSubscribeInformPartitionChanges.AsErrorResponse(informAboutChangingPartitionsRequest.QueryId, null, clientInfo.PartitionChanges,
+                PartitionChanges.InformAboutChangingPartitions); 
+        
+        var creation = informAboutChangingPartitionsRequest.Creation;
+        var deletion = informAboutChangingPartitionsRequest.Deletion;
+        
+        clientInfo.PartitionChanges = creation || deletion ? PartitionChanges.InformAboutChangingPartitions : PartitionChanges.None;
+
+        clientInfo.NotifyAboutPartitionCreation = creation;
+        clientInfo.NotifyAboutPartitionDeletion = deletion;
+
+        return new InformAboutChangingPartitionsResponse(informAboutChangingPartitionsRequest.QueryId, null);
     }
 
     private IDeltaQueryResponse SubscribeToPartitionContents(
