@@ -315,6 +315,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         try
         {
             HashSet<NodeId> affectedPartitions = [];
+            Dictionary<NodeId, DepthLimit>? depths = deltaContent is PartitionAdded ? [] : null;
 
             switch (deltaContent)
             {
@@ -326,7 +327,10 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     foreach (var affectedNode in deltaEvent.AffectedNodes)
                     {
                         if (SharedNodeMap.TryGetPartition(affectedNode, out var partition))
+                        {
                             affectedPartitions.Add(partition.GetId());
+                            AddDepths(partition, depths);
+                        }
                     }
 
                     if (deltaEvent is PartitionDeleted d)
@@ -348,6 +352,12 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             Log(e.ToString());
             OnCommunicationError(e);
         }
+    }
+
+    private void AddDepths(IReadableNode node, DepthLimit currentDepth, Dictionary<NodeId, DepthLimit>? depths)
+    {
+        
+        throw new NotImplementedException();
     }
 
     #endregion

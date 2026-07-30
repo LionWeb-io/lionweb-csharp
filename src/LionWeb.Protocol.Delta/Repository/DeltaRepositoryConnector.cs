@@ -67,6 +67,11 @@ public class DeltaRepositoryConnector : IDeltaRepositoryConnector
             bool shouldSend;
             switch (clientInfo, content)
             {
+                case ({ PartitionChanges: PartitionChanges.InformAboutChangingPartitions, NotifyAboutPartitionCreation: true }, PartitionAdded added):
+                    clientInfo.SubscribedPartitions.Add(added.AffectedNode);
+                    shouldSend = true;
+                    break;
+                
                 case ({ PartitionChanges: PartitionChanges.SubscribeToChangingPartitions, NotifyAboutPartitionCreation: true }, PartitionAdded added):
                     clientInfo.SubscribedPartitions.Add(added.AffectedNode);
                     shouldSend = true;

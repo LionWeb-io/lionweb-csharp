@@ -20,105 +20,169 @@ namespace LionWeb.Protocol.Delta.Test.Repository;
 using Core.Test.Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
-public class ListPartitionsTests : RepositoryTestNoExceptionsBase
+public class InformAboutChangingPartitionsTests : RepositoryTestsBase
 {
     [TestMethod]
     [Timeout(6000)]
-    public async Task Empty()
-    {
-        await _aClient.SignOn(RepoId);
-        
-        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
-        Assert.AreEqual(0, partitions.Count);
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task One()
-    {
-        await _aClient.SignOn(RepoId);
-        
-        var part0 = new TestPartition("partition");
-        _aForest.AddPartitions([part0]);
-        _aClient.WaitForReceived(1);
-        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
-        Assert.HasCount(1, partitions);
-
-        AssertEquals(part0, partitions[0]);
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task Two()
+    public async Task Create()
     {
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        var part0 = new TestPartition("part0");
-        _aForest.AddPartitions([part0]);
-        await _bClient.SubscribeToPartitionContents(part0.GetId());
-        WaitForReceived(1);
+        await _bClient.InformAboutChangingPartitions(true, false, DefaultDepthLimit);
 
-        var part1 = new TestPartition("part1");
-        _bForest.AddPartitions([part1]);
-        await _aClient.SubscribeToPartitionContents(part1.GetId());
-        WaitForReceived(1);
-
-        var partitions = await _aClient.ListPartitions(DefaultDepthLimit);
-        Assert.HasCount(2, partitions);
-
-        AssertEquals(part0, partitions[0]);
-        AssertEquals(part1, partitions[1]);
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task NoFeatures()
-    {
-        await _aClient.SignOn(RepoId);
-        
-        var containment01 = new LinkTestConcept("cont");
-        var part0 = new TestPartition("partition")
+        var aPart = new TestPartition("part")
         {
-            Name = "my partition", 
-            Links = [containment01]
+            Links = [new LinkTestConcept("cont")]
         };
-        part0.AddAnnotations([new TestAnnotation("ann")]);
-        _aForest.AddPartitions([part0]);
+        _aForest.AddPartitions([aPart]);
+        WaitForReceived(1);
+
+        var bPart = (TestPartition)_bForest.Partitions.First();
+        Assert.IsNotNull(bPart);
+        Assert.IsNotEmpty(bPart.Links);
+
+        aPart.Name = "changed";
         _aClient.WaitForReceived(1);
-
-        var partitions = await _aClient.ListPartitions(0);
-        Assert.HasCount(1, partitions);
-        var actual = (TestPartition)partitions[0];
-
-        Assert.AreEqual(part0.GetId(), actual.GetId());
-        Assert.AreEqual(part0.GetConcept(), actual.GetConcept());
-        Assert.AreEqual(part0.Name, actual.Name);
-        Assert.IsEmpty(actual.Links);
+        Assert.IsFalse(bPart.TryGetName(out _));
+        
+        _aForest.RemovePartitions([aPart]);
+        _aClient.WaitForReceived(1);
+        
+        Assert.HasCount(1, _bForest.Partitions);
+        AssertNoExceptions();
     }
     
     [TestMethod]
     [Timeout(6000)]
-    public async Task NotSubscribed()
+    public async Task DeleteUnknown()
     {
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
         
-        var part0 = new TestPartition("part0");
-        _aForest.AddPartitions([part0]);
+        await _bClient.InformAboutChangingPartitions(false, true, DefaultDepthLimit);
+
+        var aPart = new TestPartition("part")
+        {
+            Links = [new LinkTestConcept("cont")]
+        };
+        _aForest.AddPartitions([aPart]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(DefaultDepthLimit);
-        Assert.HasCount(1, partitions);
+        Assert.HasCount(0, _bForest.Partitions);
 
-        Assert.AreEqual(part0.GetId(), partitions[0].GetId());
-
-        part0.Name = "ChangedName";
-        WaitForReceived(1);
+        _aForest.RemovePartitions([aPart]);
+        _aClient.WaitForReceived(1);
         
-        Assert.IsFalse(((TestPartition)partitions[0]).TryGetName(out _));
+        Assert.HasCount(0, _bForest.Partitions);
+        AssertNoExceptions(_repository.Exceptions);
+        AssertNoExceptions(_aClient.Exceptions);
+        Assert.HasCount(1, _bClient.Exceptions);
+        Assert.IsInstanceOfType<DeltaException>(_bClient.Exceptions[0]);
+        var bClientException = (DeltaException)_bClient.Exceptions[0];
+        Assert.AreEqual("Unknown node id part", bClientException.Message);
     }
 
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task DeleteKnown()
+    {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+
+        await _bClient.InformAboutChangingPartitions(true, true, DefaultDepthLimit);
+
+        var aPart = new TestPartition("partA") { Links = [new LinkTestConcept("cont")] };
+        _aForest.AddPartitions([aPart]);
+        WaitForReceived(1);
+
+        Assert.HasCount(1, _bForest.Partitions);
+
+        await _bClient.InformAboutChangingPartitions(false, true, DefaultDepthLimit);
+
+        _aForest.RemovePartitions([aPart]);
+        WaitForReceived(1);
+
+        Assert.HasCount(0, _bForest.Partitions);
+
+        _aForest.AddPartitions([new TestPartition("partB")]);
+
+        Assert.HasCount(1, _aForest.Partitions);
+        Assert.HasCount(0, _bForest.Partitions);
+
+        AssertNoExceptions();
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task Unsubscribe()
+    {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+
+        await _bClient.InformAboutChangingPartitions(true, true, DefaultDepthLimit);
+
+        var aPartX = new TestPartition("partX");
+        _aForest.AddPartitions([aPartX]);
+        WaitForReceived(1);
+
+        Assert.HasCount(1, _aForest.Partitions);
+        Assert.HasCount(1, _bForest.Partitions);
+
+        await _bClient.InformAboutChangingPartitions(false, false, DefaultDepthLimit);
+
+        var aPartY = new TestPartition("partY");
+        _aForest.AddPartitions([aPartY]);
+        _aClient.WaitForReceived(1);
+
+        Assert.HasCount(2, _aForest.Partitions);
+        Assert.HasCount(1, _bForest.Partitions);
+
+        // b does NOT get this event because it's NOT subscribed to partX
+        _aForest.RemovePartitions([aPartX]);
+        _aClient.WaitForReceived(1);
+
+        Assert.HasCount(1, _aForest.Partitions);
+        Assert.HasCount(1, _bForest.Partitions);
+
+        _aForest.RemovePartitions([aPartY]);
+        _aClient.WaitForReceived(1);
+
+        Assert.HasCount(0, _aForest.Partitions);
+        Assert.HasCount(1, _bForest.Partitions);
+
+        AssertNoExceptions();
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task InfoAfterSubscribe()
+    {
+        await _aClient.SignOn(RepoId);
+
+        await _aClient.SubscribeToChangingPartitions(true, true);
+        var ex = await Assert.ThrowsExactlyAsync<DeltaException>(async () => await _aClient.InformAboutChangingPartitions(true, false, DefaultDepthLimit));
+
+        Assert.AreEqual("Already subscribed to SubscribeToChangingPartitions, but requesting InformAboutChangingPartitions", ex.Message);
+
+        AssertNoExceptions(_repository.Exceptions);
+        AssertNoExceptions(_aClient.Exceptions);
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task InfoAfterSubscribeCleared()
+    {
+        await _aClient.SignOn(RepoId);
+
+        await _aClient.SubscribeToChangingPartitions(true, true);
+        await _aClient.SubscribeToChangingPartitions(false, false);
+        await _aClient.InformAboutChangingPartitions(true, false, DefaultDepthLimit);
+
+        AssertNoExceptions(_repository.Exceptions);
+        AssertNoExceptions(_aClient.Exceptions);
+    }
+    
     [TestMethod]
     [Timeout(6000)]
     public async Task Depth0()
@@ -126,10 +190,12 @@ public class ListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
 
+        await _bClient.InformAboutChangingPartitions(true, true, 0);
+
         _aForest.AddPartitions([_partition]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(0);
+        var partitions = _bForest.Partitions.ToList();
         Assert.HasCount(1, partitions);
 
         AssertNodesPresent([_partition], partitions);
@@ -142,10 +208,12 @@ public class ListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
 
+        await _bClient.InformAboutChangingPartitions(true, true, 1);
+
         _aForest.AddPartitions([_partition]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(1);
+        var partitions = _bForest.Partitions.ToList();
         Assert.HasCount(1, partitions);
 
         AssertNodesPresent([_partition, _linkLevel1A, _linkLevel1B], partitions);
@@ -158,10 +226,12 @@ public class ListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
 
+        await _bClient.InformAboutChangingPartitions(true, true, 2);
+
         _aForest.AddPartitions([_partition]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(2);
+        var partitions = _bForest.Partitions.ToList();
         Assert.HasCount(1, partitions);
 
         AssertNodesPresent(
@@ -185,10 +255,12 @@ public class ListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
 
+        await _bClient.InformAboutChangingPartitions(true, true, 3);
+
         _aForest.AddPartitions([_partition]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(3);
+        var partitions = _bForest.Partitions.ToList();
         Assert.HasCount(1, partitions);
 
         AssertNodesPresent(
@@ -216,10 +288,12 @@ public class ListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
 
+        await _bClient.InformAboutChangingPartitions(true, true, 4);
+
         _aForest.AddPartitions([_partition]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(4);
+        var partitions = _bForest.Partitions.ToList();
         Assert.HasCount(1, partitions);
 
         AssertNodesPresent(
@@ -249,10 +323,12 @@ public class ListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
 
+        await _bClient.InformAboutChangingPartitions(true, true, 5);
+
         _aForest.AddPartitions([_partition]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(5);
+        var partitions = _bForest.Partitions.ToList();
         Assert.HasCount(1, partitions);
 
         AssertNodesPresent(
@@ -283,10 +359,12 @@ public class ListPartitionsTests : RepositoryTestNoExceptionsBase
         await _aClient.SignOn(RepoId);
         await _bClient.SignOn(RepoId);
 
+        await _bClient.InformAboutChangingPartitions(true, true, 6);
+
         _aForest.AddPartitions([_partition]);
         WaitForReceived(1);
 
-        var partitions = await _bClient.ListPartitions(6);
+        var partitions = _bForest.Partitions.ToList();
         Assert.HasCount(1, partitions);
 
         AssertNodesPresent(
