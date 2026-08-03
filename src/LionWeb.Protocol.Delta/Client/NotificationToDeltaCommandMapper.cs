@@ -99,7 +99,7 @@ public class NotificationToDeltaCommandMapper
             ToDelta(propertyAddedNotification.Node, propertyAddedNotification.Property,
                 propertyAddedNotification.NewValue)!,
             ToCommandId(propertyAddedNotification),
-            []
+            [new AdditionalInfo("a", "b", [], false)]
         );
 
     private DeleteProperty OnPropertyDeleted(PropertyDeletedNotification propertyDeletedNotification) =>

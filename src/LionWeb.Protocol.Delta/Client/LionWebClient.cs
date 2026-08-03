@@ -176,14 +176,14 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public override async Task<SubscribeToChangingPartitionsResponse> SubscribeToChangingPartitions(bool creation,
         bool deletion) =>
         await Query<SubscribeToChangingPartitionsResponse, SubscribeToChangingPartitionsRequest>(
-            new SubscribeToChangingPartitionsRequest(creation, deletion, QueryId(), null));
+            new SubscribeToChangingPartitionsRequest(creation, deletion, QueryId(), []));
 
 
     /// <inheritdoc />
     public override async Task<IPartitionInstance> SubscribeToPartitionContents(TargetNode partition)
     {
         var response = await Query<SubscribeToPartitionContentsResponse, SubscribeToPartitionContentsRequest>(
-            new SubscribeToPartitionContentsRequest(partition, QueryId(), null));
+            new SubscribeToPartitionContentsRequest(partition, QueryId(), []));
 
         var deserializer = _deserializerBuilder.Build();
         deserializer.RegisterDependentNodes(_forest.Descendants(true));
@@ -206,7 +206,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public override async Task<UnsubscribeFromPartitionContentsResponse> UnsubscribeFromPartitionContents(
         TargetNode partition) =>
         await Query<UnsubscribeFromPartitionContentsResponse, UnsubscribeFromPartitionContentsRequest>(
-            new UnsubscribeFromPartitionContentsRequest(partition, QueryId(), null));
+            new UnsubscribeFromPartitionContentsRequest(partition, QueryId(), []));
 
     #endregion
 
@@ -217,7 +217,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     {
         var signOnResponse =
             await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId,
-                IdUtils.NewId(), repositoryId, null));
+                repositoryId, IdUtils.NewId(), []));
         _repositoryId = repositoryId;
         ParticipationId = signOnResponse.ParticipationId;
         return signOnResponse;
@@ -226,7 +226,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     /// <inheritdoc />
     public override async Task<SignOffResponse> SignOff()
     {
-        var response = await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(QueryId(), null));
+        var response = await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(QueryId(), []));
         _participationId = null;
         return response;
     }
@@ -235,9 +235,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public override async Task<ReconnectResponse> Reconnect(ParticipationId participationId)
     {
         if(SignedIn)
-            throw new DeltaException(DeltaErrorCode.AlreadySignedOn.AsErrorResponse(null, null));
+            throw new DeltaException(DeltaErrorCode.AlreadySignedOn.AsErrorResponse(null, []));
 
-        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(_lionWebVersion.VersionString, ClientId, _repositoryId, participationId, EventSequenceNumber, QueryId(), null));
+        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(_lionWebVersion.VersionString, ClientId, _repositoryId, participationId, EventSequenceNumber, QueryId(), []));
         ParticipationId = participationId;
         return response;
     }
@@ -272,7 +272,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest
     {
         if (request.RequiresParticipationId && !SignedIn)
-            throw new DeltaException(DeltaErrorCode.NotSignedOn.AsErrorResponse(request.QueryId, null));
+            throw new DeltaException(DeltaErrorCode.NotSignedOn.AsErrorResponse(request.QueryId, []));
         
         var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
         _queryResponses[request.QueryId] = tcs;
