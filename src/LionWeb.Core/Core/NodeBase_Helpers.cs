@@ -60,7 +60,7 @@ public abstract partial class NodeBase
 
         var notificationProducer = GetPartitionNotificationProducer();
         if (notificationProducer is not null)
-            notificationProducer.ProduceNotification(new AnnotationDeletedNotification(child, this, index, notificationProducer.CreateNotificationId()));
+            notificationProducer.ProduceNotification(new AnnotationDeletedNotification((IWritableAnnotationInstance)child, this, index, notificationProducer.CreateNotificationId()));
         return true;
     }
 
@@ -459,6 +459,6 @@ public abstract partial class NodeBase
     /// Raises <see cref="AnnotationDeletedNotification"/>.
     private void AnnotationRemover(IPartitionNotificationProducer producer, Index index, INode node,
         INotificationId? notificationId = null) =>
-        producer.ProduceNotification(new AnnotationDeletedNotification(node, this, index,
+        producer.ProduceNotification(new AnnotationDeletedNotification((IWritableAnnotationInstance)node, this, index,
             notificationId ?? producer.CreateNotificationId()));
 }

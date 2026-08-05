@@ -30,12 +30,16 @@ public interface IAnnotationInstance : IReadableNode
 }
 
 /// <inheritdoc cref="IAnnotationInstance" />
-public interface IAnnotationInstance<out T> : IReadableNode<T>, IAnnotationInstance where T : IReadableNode
-{
-}
+public interface IAnnotationInstance<out T> : IReadableNode<T>, IAnnotationInstance where T : IReadableNode;
+
+/// Instance of an <see cref="Annotation"/> that provides <em>write</em> access.
+public interface IWritableAnnotationInstance : IAnnotationInstance, IWritableNode;
+
+/// <inheritdoc cref="IWritableAnnotationInstance" />
+public interface IWritableAnnotationInstance<T> : IWritableAnnotationInstance, IAnnotationInstance<T>, IWritableNode<T> where T : class, IWritableNode;
 
 /// Base implementation of <see cref="IAnnotationInstance{T}"/>.
-public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INode>
+public abstract class AnnotationInstanceBase : NodeBase, IWritableAnnotationInstance<INode>
 {
     /// <inheritdoc />
     protected AnnotationInstanceBase(NodeId id) : base(id) { }

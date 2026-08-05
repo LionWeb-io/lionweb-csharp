@@ -30,7 +30,7 @@ public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmit
     /// <param name="startIndex">Optional index where we add <paramref name="addedValue"/> to <see cref="Annotation"/>s.</param>
     public AnnotationAddSingleNotificationEmitter(
         INotifiableNode destinationParent,
-        IWritableNode addedValue,
+        IWritableAnnotationInstance addedValue,
         List<INode> existingValues,
         Index? startIndex = null
     ) : base(destinationParent, [addedValue])
@@ -45,7 +45,7 @@ public class AnnotationAddSingleNotificationEmitter : AnnotationNotificationEmit
         if (!IsActive())
             return;
 
-        foreach ((IWritableNode added, OldAnnotationInfo? old) in OldAnnotationInfos)
+        foreach ((IWritableAnnotationInstance added, OldAnnotationInfo? old) in OldAnnotationInfos)
         {
             switch (old)
             {

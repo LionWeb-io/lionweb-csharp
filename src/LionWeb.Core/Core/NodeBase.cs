@@ -134,7 +134,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         int index = writableAnnotations.Count;
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AnnotationAddSingleNotificationEmitter emitter = new(this, safeAnnotation, writableAnnotations, index++);
+            AnnotationAddSingleNotificationEmitter emitter = new(this, (IWritableAnnotationInstance)safeAnnotation, writableAnnotations, index++);
             emitter.CollectOldData();
             if (AddAnnotationsRaw(safeAnnotation))
                 emitter.Notify();
@@ -165,7 +165,7 @@ public abstract partial class NodeBase : ReadableNodeBase<INode>, INode
         var safeAnnotations = AssureAnnotations(M2Extensions.AsAnnotations<IAnnotationInstance>(annotations).ToList());
         foreach (var safeAnnotation in safeAnnotations)
         {
-            AnnotationAddSingleNotificationEmitter notification = new(this, safeAnnotation, writableAnnotations, startIndex: index);
+            AnnotationAddSingleNotificationEmitter notification = new(this, (IWritableAnnotationInstance)safeAnnotation, writableAnnotations, startIndex: index);
             notification.CollectOldData();
             if (InsertAnnotationsRaw(index++, safeAnnotation))
                 notification.Notify();

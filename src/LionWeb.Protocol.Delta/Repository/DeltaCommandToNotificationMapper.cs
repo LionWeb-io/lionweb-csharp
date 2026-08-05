@@ -359,7 +359,7 @@ public class DeltaCommandToNotificationMapper
         var parent = ToNode(addAnnotationCommand.Parent);
         return new AnnotationAddedNotification(
             parent,
-            Deserialize(addAnnotationCommand.NewAnnotation),
+            DeserializeAnnotation(addAnnotationCommand.NewAnnotation),
             addAnnotationCommand.Index,
             ToNotificationId(addAnnotationCommand)
         );
@@ -368,7 +368,7 @@ public class DeltaCommandToNotificationMapper
     private AnnotationDeletedNotification OnDeleteAnnotation(DeleteAnnotation deleteAnnotationCommand)
     {
         var parent = ToNode(deleteAnnotationCommand.Parent);
-        var deletedAnnotation = ToNode(deleteAnnotationCommand.DeletedAnnotation);
+        var deletedAnnotation = ToAnnotation(deleteAnnotationCommand.DeletedAnnotation);
         return new AnnotationDeletedNotification(
             deletedAnnotation,
             parent,
@@ -381,8 +381,8 @@ public class DeltaCommandToNotificationMapper
     {
         var parent = ToNode(command.Parent);
         return new AnnotationReplacedNotification(
-            Deserialize(command.NewAnnotation),
-            ToNode(command.ReplacedAnnotation),
+            DeserializeAnnotation(command.NewAnnotation),
+            ToAnnotation(command.ReplacedAnnotation),
             parent,
             command.Index,
             ToNotificationId(command)
@@ -392,7 +392,7 @@ public class DeltaCommandToNotificationMapper
     private AnnotationMovedFromOtherParentNotification OnMoveAnnotationFromOtherParent(
         MoveAnnotationFromOtherParent moveAnnotationCommand)
     {
-        var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(moveAnnotationCommand.MovedAnnotation);
         var oldParent = GetParent(movedAnnotation, nameof(moveAnnotationCommand.MovedAnnotation));
         var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
@@ -410,7 +410,7 @@ public class DeltaCommandToNotificationMapper
     private AnnotationMovedInSameParentNotification OnMoveAnnotationInSameParent(
         MoveAnnotationInSameParent moveAnnotationCommand)
     {
-        var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(moveAnnotationCommand.MovedAnnotation);
         var parent = GetParent(movedAnnotation, nameof(moveAnnotationCommand.MovedAnnotation));
         var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
@@ -427,7 +427,7 @@ public class DeltaCommandToNotificationMapper
     private AnnotationMovedAndReplacedFromOtherParentNotification OnMoveAndReplaceAnnotationFromOtherParent(
         MoveAndReplaceAnnotationFromOtherParent moveAnnotationCommand)
     {
-        var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(moveAnnotationCommand.MovedAnnotation);
         var oldParent = GetParent(movedAnnotation, nameof(moveAnnotationCommand.MovedAnnotation));
         var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
@@ -438,7 +438,7 @@ public class DeltaCommandToNotificationMapper
             movedAnnotation,
             oldParent,
             oldIndex,
-            ToNode(moveAnnotationCommand.ReplacedAnnotation),
+            ToAnnotation(moveAnnotationCommand.ReplacedAnnotation),
             ToNotificationId(moveAnnotationCommand)
         );
     }
@@ -446,7 +446,7 @@ public class DeltaCommandToNotificationMapper
     private AnnotationMovedAndReplacedInSameParentNotification OnMoveAndReplaceAnnotationInSameParent(
         MoveAndReplaceAnnotationInSameParent moveAnnotationCommand)
     {
-        var movedAnnotation = ToNode(moveAnnotationCommand.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(moveAnnotationCommand.MovedAnnotation);
         var parent = GetParent(movedAnnotation, nameof(moveAnnotationCommand.MovedAnnotation));
         var oldIndex = parent.GetAnnotations().ToList().IndexOf(movedAnnotation);
 
@@ -456,7 +456,7 @@ public class DeltaCommandToNotificationMapper
             parent,
             oldIndex,
             moveAnnotationCommand.IndexOffset,
-            ToNode(moveAnnotationCommand.ReplacedAnnotation),
+            ToAnnotation(moveAnnotationCommand.ReplacedAnnotation),
             ToNotificationId(moveAnnotationCommand)
         );
     }
@@ -562,6 +562,9 @@ public class DeltaCommandToNotificationMapper
         throw new InvalidOperationException($"Unknown node with id: {nodeId}");
     }
 
+    private protected IWritableAnnotationInstance ToAnnotation(TargetNode nodeId) =>
+    (IWritableAnnotationInstance)ToNode(nodeId);
+
     private protected virtual IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         List<IWritableNode> nodes;
@@ -581,6 +584,9 @@ public class DeltaCommandToNotificationMapper
         var node = nodes.FirstOrDefault();
         return node ?? throw new UnsupportedNodeTypeException(node, nameof(node));
     }
+    
+    private protected IWritableAnnotationInstance DeserializeAnnotation(DeltaSerializationChunk deltaChunk) =>
+        (IWritableAnnotationInstance)Deserialize(deltaChunk);
 }
 
 /// <inheritdoc/>

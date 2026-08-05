@@ -427,7 +427,7 @@ public interface IAnnotationNotification : IPartitionNotification;
 /// <param name="Index"></param>
 public record AnnotationAddedNotification(
     IWritableNode Parent,
-    IWritableNode NewAnnotation,
+    IWritableAnnotationInstance NewAnnotation,
     Index Index,
     INotificationId NotificationId
 ) : APartitionNotification(NotificationId), INewNodeNotification, IAnnotationNotification
@@ -441,18 +441,18 @@ public record AnnotationAddedNotification(
     /// <inheritdoc />
     public IReadableNode NewNode => NewAnnotation;
 
-    public IWritableNode? FrozenNewAnnotation { get; private set; }
+    public IWritableAnnotationInstance? FrozenNewAnnotation { get; private set; }
 
     /// <inheritdoc />
     public override void Freeze() =>
-        FrozenNewAnnotation ??= SameIdCloner.Clone((INode)NewAnnotation);
+        FrozenNewAnnotation ??= (IWritableAnnotationInstance)SameIdCloner.Clone((INode)NewAnnotation);
 }
 
 /// <param name="DeletedAnnotation"></param>
 /// <param name="Parent"></param>
 /// <param name="Index"></param>
 public record AnnotationDeletedNotification(
-    IWritableNode DeletedAnnotation,
+    IWritableAnnotationInstance DeletedAnnotation,
     IWritableNode Parent,
     Index Index,
     INotificationId NotificationId
@@ -479,8 +479,8 @@ public record AnnotationDeletedNotification(
 /// <param name="Parent"></param>
 /// <param name="Index"></param>
 public record AnnotationReplacedNotification(
-    IWritableNode NewAnnotation,
-    IWritableNode ReplacedAnnotation,
+    IWritableAnnotationInstance NewAnnotation,
+    IWritableAnnotationInstance ReplacedAnnotation,
     IWritableNode Parent,
     Index Index,
     INotificationId NotificationId
@@ -501,13 +501,13 @@ public record AnnotationReplacedNotification(
     private IReadOnlyList<IReadableNode>? _deletedNodes;
     private IReadOnlyList<IReadableNode> CollectDeleted() => IDeletedNodeNotification.CollectDeleted(ReplacedAnnotation);
 
-    public IWritableNode? FrozenNewAnnotation { get; private set; }
+    public IWritableAnnotationInstance? FrozenNewAnnotation { get; private set; }
 
     /// <inheritdoc />
     public override void Freeze()
     {
         _deletedNodes ??= CollectDeleted();
-        FrozenNewAnnotation ??= SameIdCloner.Clone((INode)NewAnnotation);
+        FrozenNewAnnotation ??= (IWritableAnnotationInstance)SameIdCloner.Clone((INode)NewAnnotation);
     }
 }
 
@@ -519,7 +519,7 @@ public record AnnotationReplacedNotification(
 public record AnnotationMovedFromOtherParentNotification(
     IWritableNode NewParent,
     Index NewIndex,
-    IWritableNode MovedAnnotation,
+    IWritableAnnotationInstance MovedAnnotation,
     IWritableNode OldParent,
     Index OldIndex,
     INotificationId NotificationId
@@ -538,7 +538,7 @@ public record AnnotationMovedFromOtherParentNotification(
 /// <param name="OldIndex"></param>
 public record AnnotationMovedInSameParentNotification(
     Index NewIndex,
-    IWritableNode MovedAnnotation,
+    IWritableAnnotationInstance MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
     IndexOffset IndexOffset,
@@ -560,10 +560,10 @@ public record AnnotationMovedInSameParentNotification(
 public record AnnotationMovedAndReplacedFromOtherParentNotification(
     IWritableNode NewParent,
     Index NewIndex,
-    IWritableNode MovedAnnotation,
+    IWritableAnnotationInstance MovedAnnotation,
     IWritableNode OldParent,
     Index OldIndex,
-    IWritableNode ReplacedAnnotation,
+    IWritableAnnotationInstance ReplacedAnnotation,
     INotificationId NotificationId
 ) : APartitionNotification(NotificationId), IDeletedNodeNotification, IAnnotationNotification
 {
@@ -589,11 +589,11 @@ public record AnnotationMovedAndReplacedFromOtherParentNotification(
 /// <param name="OldIndex"></param>
 public record AnnotationMovedAndReplacedInSameParentNotification(
     Index NewIndex,
-    IWritableNode MovedAnnotation,
+    IWritableAnnotationInstance MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
     IndexOffset IndexOffset,
-    IWritableNode ReplacedAnnotation,
+    IWritableAnnotationInstance ReplacedAnnotation,
     INotificationId NotificationId
 ) : APartitionNotification(NotificationId), IDeletedNodeNotification, IAnnotationNotification
 {
