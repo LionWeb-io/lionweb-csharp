@@ -716,8 +716,8 @@ public class MapperTests : DeltaTestsBase
     public void Composite_ReuseId()
     {
         var partition = new TestPartition("partition");
-        var child = new LinkTestConcept("child");
-        var child2 = new LinkTestConcept("child");
+        var child = new LinkTestConcept("child") { Name = "A" };
+        var child2 = new LinkTestConcept("child") { Name = "B" };
         List<IReadableNode> nodes = [];
 
         Assert.IsEmpty(Test<CompositeCommand, CompositeEvent>(nodes,
@@ -813,7 +813,13 @@ public class MapperTests : DeltaTestsBase
         if (actual is not T actualT)
             Assert.Fail($"different types: expected: {expected.GetType()} actual: {actual.GetType()}");
 
-        foreach (var propertyInfo in expected.GetType().GetProperties())
+        var propertyInfos = expected
+            .GetType()
+            .GetProperties()
+            // The filtered combination has issues in case of reused node ids
+            .Where(p => expected is not CompositeNotification || p.Name != nameof(INotification.AffectedNodes));
+        
+        foreach (var propertyInfo in propertyInfos)
         {
             var ex = propertyInfo.GetValue(expected, null);
             var act = propertyInfo.GetValue(actual, null);

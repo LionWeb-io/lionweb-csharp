@@ -23,6 +23,10 @@ public interface INotification
     /// Globally unique id of this notification.
     INotificationId NotificationId { get; set; }
     
+    /// <summary>
+    /// Any and all nodes affected by this notification.
+    /// In general, all nodes mentioned directly in a notification.
+    /// </summary>
     HashSet<IReadableNode> AffectedNodes { get; }
 
     /// <summary>
