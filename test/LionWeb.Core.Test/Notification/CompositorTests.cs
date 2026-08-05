@@ -44,6 +44,26 @@ public class CompositorTests: NotificationTestsBase
     }
     
     [TestMethod]
+    public void ComposePartition_noop_send()
+    {
+        var partition = new TestPartition("partition");
+
+        var compositor = new NotificationCompositor("compositor");
+        partition.GetNotificationSender()!.ConnectTo(compositor);
+
+        var counter = new NotificationObserver();
+        compositor.ConnectTo(counter);
+
+        var composite = compositor.Push();
+        
+        Assert.AreEqual(0, composite.Parts.Count);
+        Assert.AreEqual(0, counter.Count);
+
+        compositor.Pop(true);
+        Assert.AreEqual(0, counter.Count);
+    }
+    
+    [TestMethod]
     public void ComposePartition_one_send()
     {
         var partition = new TestPartition("partition");

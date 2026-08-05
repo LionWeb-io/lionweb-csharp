@@ -54,7 +54,7 @@ public class NotificationCompositor : NotificationPipeBase, INotificationHandler
     public CompositeNotification Pop(bool send = false)
     {
         var result = _composites.Pop();
-        if (send)
+        if (send && result.Parts.Count != 0)
             Send(result);
         return result;
     }
