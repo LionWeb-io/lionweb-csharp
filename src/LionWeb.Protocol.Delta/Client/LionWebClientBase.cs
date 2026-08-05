@@ -39,6 +39,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected ParticipationId? _participationId;
     protected RepositoryId? _repositoryId;
     private readonly ClientId? _clientId;
+    public NotificationCompositor Compositor { get; }
 
     protected internal ParticipationId ParticipationId
     {
@@ -71,7 +72,11 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         SharedNodeMap = new();
         _replicator = ForestReplicator.Create(forest, SharedNodeMap, _name);
 
-        _replicator.ConnectTo( new LocalNotificationReceiver(name, this));
+        Compositor = new NotificationCompositor($"{name}_compositor");
+        _replicator.ConnectTo(Compositor);
+
+        var localNotificationReceiver = new LocalNotificationReceiver(name, this);
+        Compositor.ConnectTo(localNotificationReceiver);
 
         _connector.ReceivedFromRepository += OnReceivedFromRepository;
     }
@@ -81,6 +86,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     {
         GC.SuppressFinalize(this);
         _connector.ReceivedFromRepository -= OnReceivedFromRepository;
+        Compositor.Dispose();
         _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
@@ -113,7 +119,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     #region Send
 
     #region Subscription
-    
+
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToChangingPartitionsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToChangingPartitionsResponse"/></returns>
     public abstract Task SubscribeToChangingPartitions(bool creation, bool deletion);
@@ -127,7 +133,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     public abstract Task UnsubscribeFromPartitionContents(TargetNode partition);
 
     #endregion
-    
+
     #region Participation
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
@@ -143,9 +149,9 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     public abstract Task Reconnect(ParticipationId participationId);
 
     #endregion
-    
+
     #region Miscellaneous
-    
+
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
     public abstract Task GetAvailableIds(int count);
@@ -155,7 +161,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     public abstract Task ListPartitions(DepthLimit depthLimit);
 
     #endregion
-    
+
     protected abstract Task Send(T deltaContent);
 
     private void SendNotificationToRepository(object? sender, INotification? notification)

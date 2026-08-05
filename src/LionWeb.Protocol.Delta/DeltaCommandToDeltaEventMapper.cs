@@ -32,6 +32,7 @@ public class DeltaCommandToDeltaEventMapper
 {
     private readonly SharedNodeMap _sharedNodeMap;
     private readonly ParticipationId _participationId;
+    private EventSequenceNumber _nextEventSequenceNumber = 0;
 
     public DeltaCommandToDeltaEventMapper(ParticipationId participationId, SharedNodeMap sharedNodeMap)
     {
@@ -39,8 +40,9 @@ public class DeltaCommandToDeltaEventMapper
         _participationId = participationId;
     }
 
-    public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
-        deltaCommand switch
+    public IDeltaEvent Map(IDeltaCommand deltaCommand)
+    {
+        IDeltaEvent result = deltaCommand switch
         {
             AddProperty a => new PropertyAdded(a.Node, a.Property, a.NewValue, OriginCommands(a), []),
             DeleteProperty a => new PropertyDeleted(a.Node, a.Property, null, OriginCommands(a), []),
@@ -50,14 +52,14 @@ public class DeltaCommandToDeltaEventMapper
             ReplaceChild a => new ChildReplaced(a.NewChild, a.ReplacedChild, [], a.Parent, a.Containment, a.Index , OriginCommands(a), []),
             MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
             MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
-            // MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
+            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.MovedChild, a.Parent, a.Containment, a.OldIndex, a.IndexOffset, OriginCommands(a), []),
             MoveAndReplaceChildFromOtherContainment a => new ChildMovedAndReplacedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), a.ReplacedChild, [], OriginCommands(a), []),
             MoveAndReplaceChildFromOtherContainmentInSameParent a => new ChildMovedAndReplacedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), a.ReplacedChild, [], OriginCommands(a), []),
             AddAnnotation a => new AnnotationAdded(a.Parent, a.NewAnnotation, a.Index, OriginCommands(a), []),
             DeleteAnnotation a => new AnnotationDeleted(a.DeletedAnnotation, [], a.Parent, a.Index, OriginCommands(a), []),
             ReplaceAnnotation a => new AnnotationReplaced(a.NewAnnotation,a.ReplacedAnnotation, [], a.Parent, a.Index, OriginCommands(a), []),
             MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), []),
-            // MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), []),
+            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.MovedAnnotation, a.Parent, a.OldIndex, a.IndexOffset, OriginCommands(a), []),
             AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewReference, a.NewResolveInfo, OriginCommands(a), []),
             DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, a.DeletedReference, a.DeletedResolveInfo, OriginCommands(a), []),
             ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewReference, a.NewResolveInfo, a.OldReference, a.OldResolveInfo, OriginCommands(a), []),
@@ -66,6 +68,11 @@ public class DeltaCommandToDeltaEventMapper
             _ => throw new ArgumentException($"{nameof(DeltaCommandToDeltaEventMapper)} does not support {deltaCommand.GetType().Name}!")
         };
 
+        result.SequenceNumber = ++_nextEventSequenceNumber;
+        
+        return result;
+    }
+            
     private NodeId GetParent(NodeId childId)
     {
         var child = (IWritableNode)_sharedNodeMap[childId];

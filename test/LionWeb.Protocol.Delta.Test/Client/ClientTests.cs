@@ -87,9 +87,9 @@ public class ClientTests
     [Timeout(6000)]
     public void InOrderEvents()
     {
-        _repositoryConnector.SendToAllClients(ChildAdded(0), []);
-        _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
-        _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
+        _repositoryConnector.SendToAllClients(ChildAdded(1), []);
+        _repositoryConnector.SendToAllClients(PropertyAdded(2), []);
+        _repositoryConnector.SendToAllClients(PropertyChanged(3), []);
 
         AssertEquals(new TestPartition("partition") { Data = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
             _clientPartition);
@@ -99,9 +99,9 @@ public class ClientTests
     [Timeout(6000)]
     public void OutOfOrderEvents()
     {
-        _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
-        _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
-        _repositoryConnector.SendToAllClients(ChildAdded(0), []);
+        _repositoryConnector.SendToAllClients(PropertyAdded(2), []);
+        _repositoryConnector.SendToAllClients(PropertyChanged(3), []);
+        _repositoryConnector.SendToAllClients(ChildAdded(1), []);
 
         AssertEquals(new TestPartition("partition") { Data = new DataTypeTestConcept("doc") { StringValue_0_1 = "changed text" } },
             _clientPartition);

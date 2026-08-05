@@ -23,7 +23,7 @@ public interface IClientInfo
 {
     ParticipationId? ParticipationId { get; set; }
     ClientId? ClientId { get; set; }
-    
+
     bool SignedOn { get; set; }
 
     HashSet<NodeId> SubscribedPartitions { get; }
@@ -51,7 +51,7 @@ public interface IClientInfo
 
 public record ClientInfo : IClientInfo
 {
-    private EventSequenceNumber _nextSequenceNumber = 0;
+    private EventSequenceNumber _nextSequenceNumber = 1;
 
     /// <inheritdoc />
     public ClientId? ClientId { get; set; }
@@ -63,11 +63,11 @@ public record ClientInfo : IClientInfo
     public bool SignedOn { get; set; }
 
     /// <inheritdoc />
-    public EventSequenceNumber IncrementAndGetSequenceNumber() => 
+    public EventSequenceNumber IncrementAndGetSequenceNumber() =>
         Interlocked.Increment(ref _nextSequenceNumber) - 1;
 
     /// <inheritdoc />
-    public EventSequenceNumber SequenceNumber => 
+    public EventSequenceNumber SequenceNumber =>
         Interlocked.Read(ref _nextSequenceNumber);
 
     /// <inheritdoc />

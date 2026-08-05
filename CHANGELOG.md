@@ -25,6 +25,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * Introduced `ICustomDeltaContent` types (no functionality yet)
   * Introduced `IndexOffset` to all move/moveAndReplace in same list
 * Don't send notification if `NotificationComposer` didn't receive any notifications.
+* Ensure unique 
+* Ensure unique event sequence numbers.
 ### Removed
 ### Deprecated
 ### Security

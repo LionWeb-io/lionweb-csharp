@@ -713,6 +713,40 @@ public class MapperTests : DeltaTestsBase
     }
 
     [TestMethod]
+    public void Composite_EventSequenceNumberPrecedesParts()
+    {
+        var partition = new TestPartition("partition");
+        List<IReadableNode> nodes = [];
+
+        var notification = new CompositeNotification([
+            new PartitionAddedNotification(partition, _notificationIdProvider.Create()),
+            new PropertyAddedNotification(partition, Language.LionWebVersion.BuiltIns.INamed_name, "newName", _notificationIdProvider.Create())
+        ], _notificationIdProvider.Create());
+
+        var deltaEvent = (CompositeEvent)CreateNotificationToDeltaEventMapper().Map(notification);
+        
+        Assert.AreEqual(1, deltaEvent.SequenceNumber);
+        
+        Assert.DoesNotContain(e => e.SequenceNumber <= 1, deltaEvent.Parts);
+    }
+
+    [TestMethod]
+    public void Composite_Parts_UniqueEventSequenceNumber()
+    {
+        var partition = new TestPartition("partition");
+        List<IReadableNode> nodes = [];
+
+        var notification = new CompositeNotification([
+            new PartitionAddedNotification(partition, _notificationIdProvider.Create()),
+            new PropertyAddedNotification(partition, Language.LionWebVersion.BuiltIns.INamed_name, "newName", _notificationIdProvider.Create())
+        ], _notificationIdProvider.Create());
+
+        var deltaEvent = (CompositeEvent)CreateNotificationToDeltaEventMapper().Map(notification);
+        
+        Assert.AreEqual(deltaEvent.Parts.Length, deltaEvent.Parts.Select(p => p.SequenceNumber).Count());
+    }
+
+    [TestMethod]
     public void Composite_ReuseId()
     {
         var partition = new TestPartition("partition");
@@ -775,6 +809,7 @@ public class MapperTests : DeltaTestsBase
         {
             var @event = CreateNotificationToDeltaEventMapper().Map(notification);
             Assert.IsInstanceOfType<TEvent>(@event);
+            Assert.AreNotEqual(-1, @event.SequenceNumber);
             try
             {
                 var eventNotification = CreateDeltaEventToNotificationMapper(nodes).Map(@event);
@@ -881,7 +916,7 @@ public class MapperTests : DeltaTestsBase
         );
 
     private static NotificationToDeltaEventMapper CreateNotificationToDeltaEventMapper() =>
-        new(new ParticipationIdProvider(), LionWebVersion);
+        new(new ParticipationIdProvider(), LionWebVersion, new EventSequenceNumberProvider());
 
     private static DeltaEventToNotificationMapper CreateDeltaEventToNotificationMapper(List<IReadableNode> nodes) =>
         new(

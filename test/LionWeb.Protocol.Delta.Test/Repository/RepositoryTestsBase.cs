@@ -31,7 +31,7 @@ public abstract class RepositoryTestsBase
 {
     protected const RepositoryId RepoId = "myRepo";
     protected const int DefaultDepthLimit = 7;
-    
+
     private readonly IForest _repositoryForest;
     protected readonly LionWebTestRepository _repository;
     private readonly DeltaRepositoryConnector _deltaRepositoryConnector;
@@ -41,8 +41,8 @@ public abstract class RepositoryTestsBase
 
     protected readonly IForest _bForest;
     protected readonly LionWebTestClient _bClient;
-    private TestDeltaClientConnector _aConnector;
-    private TestDeltaClientConnector _bConnector;
+    private protected TestDeltaClientConnector _aConnector;
+    private protected TestDeltaClientConnector _bConnector;
     private readonly List<Language> _languages;
     private readonly IVersion2024_1 _lionWebVersion;
 
@@ -109,6 +109,6 @@ public abstract class RepositoryTestsBase
 public abstract class RepositoryTestNoExceptionsBase : RepositoryTestsBase
 {
     [TestCleanup]
-    public new void AssertNoExceptions() => 
+    public new void AssertNoExceptions() =>
         base.AssertNoExceptions();
 }

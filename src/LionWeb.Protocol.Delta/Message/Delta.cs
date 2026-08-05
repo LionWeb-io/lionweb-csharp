@@ -358,6 +358,11 @@ public partial interface ICustomDeltaContent : IDeltaContent
     private static partial Regex ValidMessageKindRegex();
 }
 
+public interface IDeltaComposite : IDeltaContent
+{
+    IEnumerable<IDeltaContent> CompositeParts { get; }
+}
+
 public abstract record DeltaContentBase(AdditionalInfo[]? AdditionalInfos) : IDeltaContent
 {
     [JsonIgnore]
