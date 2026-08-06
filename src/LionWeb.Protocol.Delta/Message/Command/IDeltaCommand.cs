@@ -26,6 +26,7 @@ using System.Text.Json.Serialization;
 /// <remarks>
 /// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> and <see cref="INonContinuedCommand"/> in lockstep.
 /// </remarks> 
+
 #region Command
 
 [JsonDerivedType(typeof(CompositeCommand), nameof(CompositeCommand))]
@@ -95,7 +96,9 @@ using System.Text.Json.Serialization;
 #endregion
 
 #endregion
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false,
+    UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface IDeltaCommand : IDeltaContent
 {
     CommandId CommandId { get; }
@@ -104,6 +107,7 @@ public interface IDeltaCommand : IDeltaContent
 /// <remarks>
 /// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> and <see cref="IDeltaCommand"/> in lockstep.
 /// </remarks> 
+
 #region Command
 
 [JsonDerivedType(typeof(CompositeCommand), nameof(CompositeCommand))]
@@ -172,7 +176,9 @@ public interface IDeltaCommand : IDeltaContent
 #endregion
 
 #endregion
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false,
+    UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface INonContinuedCommand : IDeltaCommand;
 
 public abstract record DeltaCommandBase(
@@ -232,13 +238,16 @@ public record ContinuedCommand(
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IDeltaContinued;
 
-
 public record CompositeCommand(
     INonContinuedCommand[] Parts,
     CommandId CommandId,
     AdditionalInfo[]? AdditionalInfos
-) : DeltaCommandBase(CommandId, AdditionalInfos), INonContinuedCommand
+) : DeltaCommandBase(CommandId, AdditionalInfos), INonContinuedCommand, IDeltaComposite
 {
+    /// <inheritdoc />
+    [JsonIgnore]
+    public IEnumerable<IDeltaContent> CompositeParts => Parts;
+
     /// <inheritdoc />
     public virtual bool Equals(CompositeCommand? other)
     {

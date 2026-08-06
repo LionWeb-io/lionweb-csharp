@@ -59,6 +59,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             deserializerBuilder);
 
         _commandReceiver.ConnectTo(_replicator);
+        _commandReceiver.ConnectTo(_localNotificationReceiver);
 
         _serializerBuilder = new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion);

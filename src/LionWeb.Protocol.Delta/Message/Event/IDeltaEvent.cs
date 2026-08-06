@@ -39,6 +39,7 @@ public record CommandSource(
 /// <remarks>
 /// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> and <see cref="INonContinuedDeltaEvent"/> in lockstep.
 /// </remarks> 
+
 #region Event
 
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
@@ -110,7 +111,9 @@ public record CommandSource(
 #endregion
 
 #endregion
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false,
+    UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface IDeltaEvent : IDeltaContent
 {
     const EventSequenceNumber DefaultEventSequenceNumber = -1;
@@ -125,6 +128,7 @@ public interface IDeltaEvent : IDeltaContent
 /// <remarks>
 /// IMPORTANT: Make sure to update attributes on <see cref="IDeltaContent"/> and <see cref="IDeltaEvent"/> in lockstep.
 /// </remarks> 
+
 #region Event
 
 [JsonDerivedType(typeof(CompositeEvent), nameof(CompositeEvent))]
@@ -196,7 +200,8 @@ public interface IDeltaEvent : IDeltaContent
 
 #endregion
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false,
+    UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface INonContinuedDeltaEvent : IDeltaEvent;
 
 public abstract record DeltaEventBase(
@@ -278,7 +283,7 @@ public record ContinuedEvent(
 
 #region Miscellaneous
 
-public record CompositeEvent : DeltaEventBase, INonContinuedDeltaEvent
+public record CompositeEvent : DeltaEventBase, INonContinuedDeltaEvent, IDeltaComposite
 {
     public CompositeEvent(INonContinuedDeltaEvent[] Parts,
         CommandSource[] OriginCommands,
@@ -297,6 +302,10 @@ public record CompositeEvent : DeltaEventBase, INonContinuedDeltaEvent
     public override HashSet<TargetNode> AffectedNodes => Parts.SelectMany(p => p.AffectedNodes).ToHashSet();
 
     public INonContinuedDeltaEvent[] Parts { get; init; }
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public IEnumerable<IDeltaContent> CompositeParts => Parts;
 
     /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)

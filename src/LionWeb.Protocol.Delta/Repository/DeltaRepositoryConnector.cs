@@ -32,7 +32,7 @@ public class DeltaRepositoryConnector : IDeltaRepositoryConnector
 
     public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
-        _mapper = new(new ExceptionParticipationIdProvider(), lionWebVersion);
+        _mapper = new(new ExceptionParticipationIdProvider(), lionWebVersion, new NoOpEventSequenceNumberProvider());
     }
 
     /// <inheritdoc />
@@ -59,6 +59,10 @@ public class DeltaRepositoryConnector : IDeltaRepositoryConnector
     /// <inheritdoc />
     public async Task SendToAllClients(IDeltaContent content, HashSet<NodeId> affectedPartitions)
     {
+        var (partitionAdded, partitionDeleted) = CollectPartitionEvents(content);
+
+        var contents = content.CollectNested();
+
         foreach (var (clientInfo, clientConnector) in _clients)
         {
             if (!clientInfo.SignedOn)
@@ -67,19 +71,25 @@ public class DeltaRepositoryConnector : IDeltaRepositoryConnector
             var shouldSend = false;
 
             if ((clientInfo.NotifyAboutParitionDeletion ||
-                 content.InternalParticipationId == clientInfo.ParticipationId) && content is PartitionDeleted)
+                 content.InternalParticipationId == clientInfo.ParticipationId) && partitionDeleted)
                 shouldSend = true;
-            else if (clientInfo.NotifyAboutParitionCreation && content is PartitionAdded)
+            else if (clientInfo.NotifyAboutParitionCreation && partitionAdded)
                 shouldSend = true;
 
             if (clientInfo.SubscribedPartitions.Overlaps(affectedPartitions))
                 shouldSend = true;
 
-            if (clientInfo.SubscribeCreatedParitions && content is PartitionAdded a)
-                clientInfo.SubscribedPartitions.Add(a.AffectedNode);
+            foreach (var c in contents)
+            {
+                if (clientInfo.SubscribeCreatedParitions && c is PartitionAdded a)
+                    clientInfo.SubscribedPartitions.Add(a.AffectedNode);
 
-            if (content is PartitionDeleted d)
-                clientInfo.SubscribedPartitions.Remove(d.DeletedPartition);
+                if (c is PartitionDeleted d)
+                    clientInfo.SubscribedPartitions.Remove(d.DeletedPartition);
+            }
+
+            if (content is CompositeEvent)
+                shouldSend = true;
 
             if (shouldSend)
             {
@@ -88,11 +98,29 @@ public class DeltaRepositoryConnector : IDeltaRepositoryConnector
         }
     }
 
+    private (bool partitionAdded, bool partitionDeleted) CollectPartitionEvents(IDeltaContent content)
+    {
+        bool partitionAdded = false;
+        bool partitionDeleted = false;
+        
+        foreach (var nested in content.CollectNested())
+        {
+            switch (nested)
+            {
+                case PartitionAdded: partitionAdded = true; break;
+                case PartitionDeleted: partitionDeleted = true; break;
+            }
+        }
+
+        return (partitionAdded, partitionDeleted);
+    }
+
     private static IDeltaContent UpdateSequenceNumber(IDeltaContent content, IClientInfo clientInfo)
     {
-        if (content is IDeltaEvent deltaEvent)
+        foreach (var nested in content.CollectNested())
         {
-            deltaEvent.SequenceNumber = clientInfo.IncrementAndGetSequenceNumber();
+            if (nested is IDeltaEvent deltaEvent)
+                deltaEvent.SequenceNumber = clientInfo.IncrementAndGetSequenceNumber();
         }
 
         return content;

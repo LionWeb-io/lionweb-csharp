@@ -299,8 +299,9 @@ public class DeltaEventToNotificationMapper
         var parent = ToNode(childMovedEvent.Parent);
         var movedChild = ToNode(childMovedEvent.MovedChild);
         var containment = ToContainment(childMovedEvent.Containment, parent);
+        var newIndex = NewIndex(childMovedEvent.OldIndex, childMovedEvent.IndexOffset);
         return new ChildMovedInSameContainmentNotification(
-            NewIndex(childMovedEvent.OldIndex, childMovedEvent.IndexOffset),
+            newIndex,
             movedChild,
             parent,
             containment,
@@ -337,7 +338,7 @@ public class DeltaEventToNotificationMapper
         var parent = ToNode(annotationAddedEvent.Parent);
         return new AnnotationAddedNotification(
             parent,
-            Deserialize(annotationAddedEvent.NewAnnotation),
+            DeserializeAnnotation(annotationAddedEvent.NewAnnotation),
             annotationAddedEvent.Index,
             ToNotificationId(annotationAddedEvent)
         );
@@ -346,7 +347,7 @@ public class DeltaEventToNotificationMapper
     private AnnotationDeletedNotification OnAnnotationDeleted(AnnotationDeleted annotationDeletedEvent)
     {
         var parent = ToNode(annotationDeletedEvent.Parent);
-        var deletedAnnotation = ToNode(annotationDeletedEvent.DeletedAnnotation);
+        var deletedAnnotation = ToAnnotation(annotationDeletedEvent.DeletedAnnotation);
         return new AnnotationDeletedNotification(
             deletedAnnotation,
             parent,
@@ -358,9 +359,9 @@ public class DeltaEventToNotificationMapper
     private AnnotationReplacedNotification OnAnnotationReplaced(AnnotationReplaced annotationReplacedEvent)
     {
         var parent = ToNode(annotationReplacedEvent.Parent);
-        var replacedAnnotation = ToNode(annotationReplacedEvent.ReplacedAnnotation);
+        var replacedAnnotation = ToAnnotation(annotationReplacedEvent.ReplacedAnnotation);
         return new AnnotationReplacedNotification(
-            Deserialize(annotationReplacedEvent.NewAnnotation),
+            DeserializeAnnotation(annotationReplacedEvent.NewAnnotation),
             replacedAnnotation,
             parent,
             annotationReplacedEvent.Index,
@@ -373,7 +374,7 @@ public class DeltaEventToNotificationMapper
     {
         var oldParent = ToNode(annotationMovedEvent.OldParent);
         var newParent = ToNode(annotationMovedEvent.NewParent);
-        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
             annotationMovedEvent.NewIndex,
@@ -388,7 +389,7 @@ public class DeltaEventToNotificationMapper
         AnnotationMovedInSameParent annotationMovedEvent)
     {
         var parent = ToNode(annotationMovedEvent.Parent);
-        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedInSameParentNotification(
             NewIndex(annotationMovedEvent.OldIndex, annotationMovedEvent.IndexOffset),
             movedAnnotation,
@@ -404,14 +405,14 @@ public class DeltaEventToNotificationMapper
     {
         var oldParent = ToNode(annotationMovedEvent.OldParent);
         var newParent = ToNode(annotationMovedEvent.NewParent);
-        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedAndReplacedFromOtherParentNotification(
             newParent,
             annotationMovedEvent.NewIndex,
             movedAnnotation,
             oldParent,
             annotationMovedEvent.OldIndex,
-            ToNode(annotationMovedEvent.ReplacedAnnotation),
+            ToAnnotation(annotationMovedEvent.ReplacedAnnotation),
             ToNotificationId(annotationMovedEvent)
         );
     }
@@ -420,14 +421,14 @@ public class DeltaEventToNotificationMapper
         AnnotationMovedAndReplacedInSameParent annotationMovedEvent)
     {
         var parent = ToNode(annotationMovedEvent.Parent);
-        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
+        var movedAnnotation = ToAnnotation(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedAndReplacedInSameParentNotification(
             NewIndex(annotationMovedEvent.OldIndex, annotationMovedEvent.IndexOffset),
             movedAnnotation,
             parent,
             annotationMovedEvent.OldIndex,
             annotationMovedEvent.IndexOffset,
-            ToNode(annotationMovedEvent.ReplacedAnnotation),
+            ToAnnotation(annotationMovedEvent.ReplacedAnnotation),
             ToNotificationId(annotationMovedEvent)
         );
     }
@@ -505,12 +506,7 @@ public class DeltaEventToNotificationMapper
         new ParticipationNotificationId(deltaEvent.InternalParticipationId, deltaEvent.Id);
 
     private Index NewIndex(Index oldIndex, IndexOffset indexOffset) =>
-        indexOffset switch
-        {
-            0 => throw new LionWebMappingException("IndexOffset", "0"),
-            > 0 => oldIndex + indexOffset - 1,
-            _ => oldIndex + indexOffset
-        };
+        indexOffset != 0 ? oldIndex + indexOffset : throw new LionWebMappingException("IndexOffset", "0");
 
     private protected bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
     {
@@ -540,6 +536,9 @@ public class DeltaEventToNotificationMapper
         throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
     }
 
+    private protected IWritableAnnotationInstance ToAnnotation(TargetNode nodeId) =>
+        (IWritableAnnotationInstance)ToNode(nodeId);
+
     private protected virtual IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
     {
         List<IWritableNode> nodes;
@@ -559,6 +558,9 @@ public class DeltaEventToNotificationMapper
         var node = nodes.FirstOrDefault();
         return node ?? throw new UnsupportedNodeTypeException(node, nameof(node));
     }
+    
+    private protected IWritableAnnotationInstance DeserializeAnnotation(DeltaSerializationChunk deltaChunk) =>
+        (IWritableAnnotationInstance)Deserialize(deltaChunk);
 }
 
 /// <inheritdoc/>

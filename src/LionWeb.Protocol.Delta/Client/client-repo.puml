@@ -1,0 +1,145 @@
+@startuml
+hide stereotype
+
+<style>
+    componentDiagram {
+        component {
+            .inactive {
+                LineColor: lightGray
+                FontColor: darkGray
+                BackGroundColor: #fafafa
+            }
+        }
+        
+        port {
+            .inactive {
+                LineColor: lightGray
+                FontColor: darkGray
+                BackGroundColor: #fafafa
+            }
+        }
+        
+        arrow {
+            .inactive {
+                LineColor: lightGray
+            }
+        }
+    }
+</style>
+
+component "Client" as client {
+    folder "communication" as clientCommunication {
+        [DeltaProtocolEventReceiver] as eventReceiver
+        component "ClientConnector" as connector {
+            portin Received as received
+            portout Send as send
+        }
+        [LocalNotificationReceiver] as localReceiver
+        
+        received .> eventReceiver : ReceivedFromRepository
+        '    note on link
+        '        via client.
+        '        * OnReceivedFromRepository()
+        '        * Receive()
+        '        * ReceiveEvent()
+        '        * ProcessEvent()
+        '    end note
+            
+        localReceiver ..> send
+        '    note on link
+        '        via
+        '        * client.SendNotificationToRepository()
+        '        * client.Send()
+        '        * connector.SendToRepository()
+        '    end note
+    }
+    
+    folder "model" as clientModel {
+        component "ForestReplicator" as replicator {
+            portin in
+            portout out
+            
+            interface " " as dummy
+            hide dummy
+        
+            [RemoteReplicator] as remote
+            [IdFilteringFilter] as filter
+            [LocalReplicator] as local
+            
+            in --> remote
+            dummy --> remote
+            remote --> filter
+            local --> filter
+            filter --> out
+        }
+        [Forest] as forest
+        [UnresolvedReferencesManager] as unresolved
+        [Compositor] as compositor
+
+        forest --> unresolved 
+        forest --> local
+        remote ..> forest
+        out --> compositor
+    }
+    
+    eventReceiver --> in
+    compositor --> localReceiver
+}
+
+component "Repository" as repo {
+    folder "communication" as repoCommunication {
+        component "RepositoryConnector" as repoConnector {
+            portin Received as repoReceived
+            portout Send as repoSend
+        }
+        [LocalNotificationReceiver] as repoLocalReceiver
+        [DeltaProtocolCommandReceiver] as commandReceiver
+
+        commandReceiver --> repoLocalReceiver
+        
+        repoReceived .> commandReceiver : ReceivedFromClient
+        '    note on link
+        '      via repository.
+        '      * OnReceiveFromClient()
+        '      * Receive()
+        '    end note
+    
+        repoLocalReceiver ..> repoSend
+        '    note on link
+        '        via
+        '        * repository.SendNotificationToAllClients()
+        '        * repository.SendAll()
+        '        * connector.SendToAllClients()
+        '    end note
+    }
+    
+    folder "model" as repoModel {
+        [Forest] as repoForest
+        [LoggingUnresolvedReferencesManager] as repoUnresolved
+        component "ForestReplicator" as repoReplicator {
+            portin "in" as repoIn
+            portout "out" as repoOut <<inactive>>
+            
+            [RemoteReplicator] as repoRemote
+            [LocalReplicator] as repoLocal <<inactive>>
+            [IdFilteringFilter] as repoFilter <<inactive>>
+            
+            repoIn --> repoRemote
+            repoRemote --> repoFilter <<inactive>>
+            repoFilter --> repoOut <<inactive>>
+            repoLocal --> repoFilter <<inactive>>
+        }
+        
+        repoForest --> repoUnresolved 
+        repoForest --> repoLocal <<inactive>>
+        repoRemote ..> repoForest
+    }
+    
+    commandReceiver -> repoIn
+}
+
+connector -[hidden]> repoConnector
+
+send ..> repoReceived
+repoSend ..> received
+@enduml

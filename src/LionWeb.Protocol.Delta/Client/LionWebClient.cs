@@ -40,7 +40,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     #region EventSequenceNumber
 
-    protected EventSequenceNumber _nextEventSequenceNumber = 0;
+    protected EventSequenceNumber _nextEventSequenceNumber = 1;
     private void IncrementEventSequenceNumber() => Interlocked.Increment(ref _nextEventSequenceNumber);
     private EventSequenceNumber EventSequenceNumber => Interlocked.Read(ref _nextEventSequenceNumber);
 
@@ -63,7 +63,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             .WithHandler(new DeltaDeserializerHandler(unresolvedReferencesManager));
 
         forest.GetNotificationSender()?.ConnectTo(unresolvedReferencesManager);
-        
+
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         _eventReceiver = new DeltaProtocolEventReceiver(
@@ -126,7 +126,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
         var commandSource = deltaEvent.OriginCommands.First();
 
-        deltaEvent.InternalParticipationId = commandSource.ParticipationId;
+        UpdateInternalParticipationId(deltaEvent, commandSource.ParticipationId);
 
         if (EventSequenceNumber == deltaEvent.SequenceNumber)
         {
@@ -142,9 +142,17 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         }
     }
 
+    private void UpdateInternalParticipationId(IDeltaContent deltaContent, ParticipationId participationId)
+    {
+        foreach (var content in deltaContent.CollectNested())
+        {
+            content.InternalParticipationId = participationId;
+        }
+    }
+
     private void ProcessEvent(IDeltaEvent deltaEvent)
     {
-        IncrementEventSequenceNumber();
+        IncrementEventSequenceNumber(deltaEvent);
 
         if (deltaEvent is ErrorEvent e)
             throw new DeltaException(e);
@@ -163,6 +171,14 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         lock (_eventReceiver)
         {
             _eventReceiver.Receive(deltaEvent);
+        }
+    }
+
+    private void IncrementEventSequenceNumber(IDeltaEvent deltaEvent)
+    {
+        foreach (var _ in deltaEvent.CollectNested())
+        {
+            IncrementEventSequenceNumber();
         }
     }
 
@@ -234,10 +250,12 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     /// <inheritdoc />
     public override async Task<ReconnectResponse> Reconnect(ParticipationId participationId)
     {
-        if(SignedIn)
+        if (SignedIn)
             throw new DeltaException(DeltaErrorCode.AlreadySignedOn.AsErrorResponse(null, null));
 
-        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(_lionWebVersion.VersionString, ClientId, _repositoryId, participationId, EventSequenceNumber, QueryId(), null));
+        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(
+            _lionWebVersion.VersionString, ClientId, _repositoryId, participationId, EventSequenceNumber, QueryId(),
+            null));
         ParticipationId = participationId;
         return response;
     }
@@ -255,7 +273,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public override async Task<List<IPartitionInstance>> ListPartitions(DepthLimit depthLimit)
     {
         var response =
-            await Query<ListPartitionsResponse, ListPartitionsRequest>(new ListPartitionsRequest(depthLimit, QueryId(), null));
+            await Query<ListPartitionsResponse, ListPartitionsRequest>(
+                new ListPartitionsRequest(depthLimit, QueryId(), null));
         Log($"ListPartitions response: {response}");
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
@@ -273,7 +292,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     {
         if (request.RequiresParticipationId && !SignedIn)
             throw new DeltaException(DeltaErrorCode.NotSignedOn.AsErrorResponse(request.QueryId, null));
-        
+
         var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
         _queryResponses[request.QueryId] = tcs;
         await Send(request);
@@ -289,8 +308,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     {
         try
         {
-            if (deltaContent.RequiresParticipationId)
-                deltaContent.InternalParticipationId = ParticipationId;
+            UpdateInternalParticipationId(deltaContent);
 
             if (deltaContent is IDeltaCommand { CommandId: { } commandId })
                 _ownCommands.TryAdd(commandId, true);
@@ -301,6 +319,15 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         {
             Log(e.ToString());
             OnCommunicationError(e);
+        }
+    }
+
+    private void UpdateInternalParticipationId(IDeltaContent deltaContent)
+    {
+        foreach (var content in deltaContent.CollectNested())
+        {
+            if (content.RequiresParticipationId)
+                content.InternalParticipationId = ParticipationId;
         }
     }
 

@@ -17,10 +17,8 @@
 
 namespace LionWeb.Protocol.Delta.Test.Pipe.TimeDependent;
 
-using Core;
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Partition;
 using Core.Test.Notification.Replicator;
 
 [TestClass]

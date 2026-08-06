@@ -21,16 +21,16 @@ using M1;
 using M3;
 
 /// Encapsulates notification-related logic and data for <i>multiple</i> <see cref="Annotation"/>s.
-public abstract class AnnotationNotificationEmitterBase : PartitionNotificationEmitterBase<IWritableNode>
+public abstract class AnnotationNotificationEmitterBase : PartitionNotificationEmitterBase<IWritableAnnotationInstance>
 {
     /// Newly set values and their previous context.
-    protected readonly Dictionary<IWritableNode, OldAnnotationInfo?> OldAnnotationInfos;
+    protected readonly Dictionary<IWritableAnnotationInstance, OldAnnotationInfo?> OldAnnotationInfos;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="newValues">Newly set values.</param>
-    protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<IWritableNode>? newValues) : base(destinationParent)
+    protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<IWritableAnnotationInstance>? newValues) : base(destinationParent)
     {
-        OldAnnotationInfos = newValues?.ToDictionary<IWritableNode, IWritableNode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
+        OldAnnotationInfos = newValues?.ToDictionary<IWritableAnnotationInstance, IWritableAnnotationInstance, OldAnnotationInfo?>(k => k, _ => null) ?? [];
     }
 
     /// <inheritdoc />

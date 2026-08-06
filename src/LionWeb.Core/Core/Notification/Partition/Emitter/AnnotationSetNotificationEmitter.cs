@@ -23,15 +23,15 @@ using Utilities.ListComparer;
 /// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
 public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBase
 {
-    private readonly List<IWritableNode> _existingValues = [];
-    private readonly List<IListChange<IWritableNode>> _changes = [];
+    private readonly List<IWritableAnnotationInstance> _existingValues = [];
+    private readonly List<IListChange<IWritableAnnotationInstance>> _changes = [];
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     public AnnotationSetNotificationEmitter(INotifiableNode destinationParent,
-        List<IWritableNode>? setValues,
-        List<IWritableNode> existingValues) : base(destinationParent, setValues)
+        List<IWritableAnnotationInstance>? setValues,
+        List<IWritableAnnotationInstance> existingValues) : base(destinationParent, setValues)
     {
         if (!IsActive() || setValues == null)
             return;
@@ -45,7 +45,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
     public AnnotationSetNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? setValues,
         List<INode> existingValues,
-        INotificationId? notificationId = null) : this(destinationParent, setValues?.Cast<IWritableNode>().ToList(), existingValues.Cast<IWritableNode>().ToList())
+        INotificationId? notificationId = null) : this(destinationParent, setValues?.Cast<IWritableAnnotationInstance>().ToList(), existingValues.Cast<IWritableAnnotationInstance>().ToList())
     {}
 
     /// <inheritdoc />
@@ -69,7 +69,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
         {
             switch (change)
             {
-                case ListAdded<IWritableNode> added:
+                case ListAdded<IWritableAnnotationInstance> added:
                     switch (OldAnnotationInfos[added.Element])
                     {
                         case null:
@@ -100,12 +100,12 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
 
                     break;
 
-                case ListMoved<IWritableNode> moved:
+                case ListMoved<IWritableAnnotationInstance> moved:
                     ProduceNotification(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, moved.LeftIndex, moved.RightIndex - moved.LeftIndex, GetNotificationId()));
                     break;
 
-                case ListDeleted<IWritableNode> deleted:
+                case ListDeleted<IWritableAnnotationInstance> deleted:
                     var oldDeleted = OldAnnotationInfos[deleted.Element];
                     if (oldDeleted is not null || DestinationPartition is not null)
                         ProduceNotification(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,

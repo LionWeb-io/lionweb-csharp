@@ -98,13 +98,13 @@ public class JsonSerializationTests : JsonTestsBase
             """{"messageKind":"AddProperty","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","commandId":"1","additionalInfos":[]}""",
             serializedCommand);
 
-        var deltaEvent = new NotificationToDeltaEventMapper(new ParticipationIdProvider(), lionWebVersion).Map(notification);
+        var deltaEvent = new NotificationToDeltaEventMapper(new ParticipationIdProvider(), lionWebVersion, new EventSequenceNumberProvider()).Map(notification);
         Assert.IsTrue(IdUtils.IsValid(deltaEvent.Id));
         Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].CommandId));
         Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].ParticipationId));
         var serializedEvent = deltaSerializer.Serialize(deltaEvent);
         Assert.AreEqual(
-            """{"messageKind":"PropertyAdded","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","sequenceNumber":-1,"originCommands":[{"participationId":"participationId1","commandId":"myBase__23"}],"additionalInfos":[]}""",
+            """{"messageKind":"PropertyAdded","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","sequenceNumber":1,"originCommands":[{"participationId":"participationId1","commandId":"myBase__23"}],"additionalInfos":[]}""",
             serializedEvent);
     }
 
@@ -124,13 +124,13 @@ public class JsonSerializationTests : JsonTestsBase
         Assert.AreEqual(
             """{"messageKind":"AddProperty","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","commandId":"myCommand","additionalInfos":[]}""",
             serializedCommand);
-        var deltaEvent = new NotificationToDeltaEventMapper(new ParticipationIdProvider(), lionWebVersion).Map(notification);
+        var deltaEvent = new NotificationToDeltaEventMapper(new ParticipationIdProvider(), lionWebVersion, new EventSequenceNumberProvider()).Map(notification);
         Assert.IsTrue(IdUtils.IsValid(deltaEvent.Id));
         Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].CommandId));
         Assert.IsTrue(IdUtils.IsValid(deltaEvent.OriginCommands![0].ParticipationId));
         var serializedEvent = deltaSerializer.Serialize(deltaEvent);
         Assert.AreEqual(
-            """{"messageKind":"PropertyAdded","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","sequenceNumber":-1,"originCommands":[{"participationId":"myParticipation","commandId":"myCommand"}],"additionalInfos":[]}""",
+            """{"messageKind":"PropertyAdded","node":"nodeId","property":{"language":"TestLanguage","version":"0","key":"DataTypeTestConcept-booleanValue_0_1"},"newValue":"true","sequenceNumber":1,"originCommands":[{"participationId":"myParticipation","commandId":"myCommand"}],"additionalInfos":[]}""",
             serializedEvent);
     }
 }

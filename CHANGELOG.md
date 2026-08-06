@@ -5,16 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.0] - 2026-07-14
+## [0.6.0] - tbd
 ### Added
 * Added `IGlobalM2Cache`, defaults to unset. If available, used by `M2Extensions`.
 * Added `ReusableDeserializer` to avoid initialization effort during delta deserialization.
 * Added `IChildNotification` and `IAnnotationNotification` marker interfaces.
 * Added `M1Extension.Descendants()` with filter.
 * Introduced `FilteringSerializer` to omit nodes from serialization by filter.
+* Introduced `IWritableAnnotationInstance` as combination of `IAnnotationInstance` and `IWritableNode`.
+* Clarified semantics of `INotification.AffectedNodes`.
 ### Fixed
 * `InsertBefore()` and `InsertAfter()` works now with annotations.
 * Moving or replacing nodes between partitions and free-floating nodes produces the proper added/deleted notifications.
+* Fixed `newIndex` calculation when moving/replacing nodes in the same containment.
 ### Changed
 * Adjusted to latest spec changes:
   * `AdditionalInfo`: `Distribute` flag, Dictionary instead of array of `AdditionalInfoData`
@@ -22,6 +25,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * Introduced `IDeltaSplittable` and `IDeltaContinued` types (no functionality yet)
   * Introduced `ICustomDeltaContent` types (no functionality yet)
   * Introduced `IndexOffset` to all move/moveAndReplace in same list
+* Don't send notification if `NotificationComposer` didn't receive any notifications.
+* Ensure unique event sequence numbers.
+* Simplified notification processing in `LionWebRepository`.
 ### Removed
 ### Deprecated
 ### Security

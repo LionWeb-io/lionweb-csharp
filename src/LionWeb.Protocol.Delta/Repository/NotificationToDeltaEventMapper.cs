@@ -31,12 +31,17 @@ public class NotificationToDeltaEventMapper
 {
     private readonly IParticipationIdProvider _participationIdProvider;
     private readonly LionWebVersions _lionWebVersion;
+    private readonly IEventSequenceNumberProvider _eventSequenceNumberProvider;
     private readonly ISerializerVersionSpecifics _propertySerializer;
 
-    public NotificationToDeltaEventMapper(IParticipationIdProvider participationIdProvider,
-        LionWebVersions lionWebVersion)
+    public NotificationToDeltaEventMapper(
+        IParticipationIdProvider participationIdProvider,
+        LionWebVersions lionWebVersion,
+        IEventSequenceNumberProvider eventSequenceNumberProvider
+    )
     {
         _lionWebVersion = lionWebVersion;
+        _eventSequenceNumberProvider = eventSequenceNumberProvider;
         _participationIdProvider = participationIdProvider;
         _propertySerializer = ISerializerVersionSpecifics.Create(lionWebVersion);
     }
@@ -80,7 +85,7 @@ public class NotificationToDeltaEventMapper
             partitionAddedNotification.NewPartition.GetId(),
             ToCommandSources(partitionAddedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private PartitionDeleted OnPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification) =>
         new(
@@ -88,7 +93,7 @@ public class NotificationToDeltaEventMapper
             ToDescendants(partitionDeletedNotification.DeletedPartition),
             ToCommandSources(partitionDeletedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     #endregion
 
@@ -102,7 +107,7 @@ public class NotificationToDeltaEventMapper
                 propertyAddedNotification.NewValue)!,
             ToCommandSources(propertyAddedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private PropertyDeleted OnPropertyDeleted(PropertyDeletedNotification propertyDeletedNotification) =>
         new(
@@ -112,7 +117,7 @@ public class NotificationToDeltaEventMapper
                 propertyDeletedNotification.OldValue)!,
             ToCommandSources(propertyDeletedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private PropertyChanged OnPropertyChanged(PropertyChangedNotification propertyChangedNotification) =>
         new(
@@ -124,7 +129,7 @@ public class NotificationToDeltaEventMapper
                 propertyChangedNotification.OldValue)!,
             ToCommandSources(propertyChangedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private PropertyValue? ToDelta(IReadableNode parent, Property property, Object newValue) =>
         _propertySerializer.SerializeProperty(parent, property, newValue).Value;
@@ -141,7 +146,7 @@ public class NotificationToDeltaEventMapper
             childAddedNotification.Index,
             ToCommandSources(childAddedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildDeleted OnChildDeleted(ChildDeletedNotification childDeletedNotification) =>
         new(
@@ -152,7 +157,7 @@ public class NotificationToDeltaEventMapper
             childDeletedNotification.Index,
             ToCommandSources(childDeletedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildReplaced OnChildReplaced(ChildReplacedNotification childReplacedNotification) =>
         new(
@@ -164,7 +169,7 @@ public class NotificationToDeltaEventMapper
             childReplacedNotification.Index,
             ToCommandSources(childReplacedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildMovedFromOtherContainment
         OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedNotification) =>
@@ -178,7 +183,7 @@ public class NotificationToDeltaEventMapper
             childMovedNotification.OldIndex,
             ToCommandSources(childMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildMovedAndReplacedFromOtherContainment
         OnChildMovedAndReplacedFromOtherContainment(
@@ -195,7 +200,7 @@ public class NotificationToDeltaEventMapper
             ToDescendants(childMovedAndReplacedNotification.ReplacedChild),
             ToCommandSources(childMovedAndReplacedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildMovedAndReplacedFromOtherContainmentInSameParent
         OnChildMovedAndReplacedFromOtherContainmentInSameParent(
@@ -211,7 +216,7 @@ public class NotificationToDeltaEventMapper
             ToDescendants(childMovedAndReplacedNotification.ReplacedChild),
             ToCommandSources(childMovedAndReplacedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildMovedFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentNotification childMovedNotification) =>
@@ -224,7 +229,7 @@ public class NotificationToDeltaEventMapper
             childMovedNotification.OldIndex,
             ToCommandSources(childMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildMovedAndReplacedInSameContainment OnChildMovedAndReplacedInSameContainment(
         ChildMovedAndReplacedInSameContainmentNotification childMovedNotification) =>
@@ -238,7 +243,7 @@ public class NotificationToDeltaEventMapper
             ToDescendants(childMovedNotification.ReplacedChild),
             ToCommandSources(childMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ChildMovedInSameContainment OnChildMovedInSameContainment(
         ChildMovedInSameContainmentNotification childMovedNotification) =>
@@ -250,7 +255,7 @@ public class NotificationToDeltaEventMapper
             childMovedNotification.IndexOffset,
             ToCommandSources(childMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     #endregion
 
@@ -263,7 +268,7 @@ public class NotificationToDeltaEventMapper
             annotationAddedNotification.Index,
             ToCommandSources(annotationAddedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private AnnotationDeleted OnAnnotationDeleted(AnnotationDeletedNotification annotationDeletedNotification) =>
         new(
@@ -273,7 +278,7 @@ public class NotificationToDeltaEventMapper
             annotationDeletedNotification.Index,
             ToCommandSources(annotationDeletedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private AnnotationReplaced OnAnnotationReplaced(AnnotationReplacedNotification annotationReplacedNotification) =>
         new(
@@ -284,7 +289,7 @@ public class NotificationToDeltaEventMapper
             annotationReplacedNotification.Index,
             ToCommandSources(annotationReplacedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private AnnotationMovedFromOtherParent
         OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification annotationMovedNotification) =>
@@ -296,7 +301,7 @@ public class NotificationToDeltaEventMapper
             annotationMovedNotification.OldIndex,
             ToCommandSources(annotationMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private AnnotationMovedInSameParent OnAnnotationMovedInSameParent(
         AnnotationMovedInSameParentNotification annotationMovedNotification) =>
@@ -307,7 +312,7 @@ public class NotificationToDeltaEventMapper
             annotationMovedNotification.IndexOffset,
             ToCommandSources(annotationMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private AnnotationMovedAndReplacedFromOtherParent
         OnAnnotationMovedAndReplacedFromOtherParent(AnnotationMovedAndReplacedFromOtherParentNotification annotationMovedNotification) =>
@@ -321,7 +326,7 @@ public class NotificationToDeltaEventMapper
             ToDescendants(annotationMovedNotification.ReplacedAnnotation),
             ToCommandSources(annotationMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private AnnotationMovedAndReplacedInSameParent OnAnnotationMovedAndReplacedInSameParent(
         AnnotationMovedAndReplacedInSameParentNotification annotationMovedNotification) =>
@@ -334,7 +339,7 @@ public class NotificationToDeltaEventMapper
             ToDescendants(annotationMovedNotification.ReplacedAnnotation),
             ToCommandSources(annotationMovedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     #endregion
 
@@ -349,7 +354,7 @@ public class NotificationToDeltaEventMapper
             referenceAddedNotification.NewTarget.ResolveInfo,
             ToCommandSources(referenceAddedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ReferenceDeleted OnReferenceDeleted(ReferenceDeletedNotification referenceDeletedNotification) =>
         new(
@@ -360,7 +365,7 @@ public class NotificationToDeltaEventMapper
             referenceDeletedNotification.DeletedTarget.ResolveInfo,
             ToCommandSources(referenceDeletedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     private ReferenceChanged OnReferenceChanged(ReferenceChangedNotification referenceChangedNotification) =>
         new(
@@ -373,16 +378,19 @@ public class NotificationToDeltaEventMapper
             referenceChangedNotification.OldTarget.ResolveInfo,
             ToCommandSources(referenceChangedNotification),
             []
-        );
+        ) { SequenceNumber = NextEventSequenceNumber() };
 
     #endregion
 
-    private CompositeEvent OnComposite(CompositeNotification compositeNotification) =>
-        new(
+    private CompositeEvent OnComposite(CompositeNotification compositeNotification)
+    {
+        var eventSequenceNumber = NextEventSequenceNumber();
+        return new CompositeEvent(
             [.. compositeNotification.Parts.Select(notification => (INonContinuedDeltaEvent)Map(notification))],
             ToCommandSources(compositeNotification),
             []
-        );
+        ) { SequenceNumber = eventSequenceNumber };
+    }
 
     private DeltaSerializationChunk ToDeltaChunk(IReadableNode node)
     {
@@ -395,4 +403,7 @@ public class NotificationToDeltaEventMapper
 
     private CommandSource[] ToCommandSources(INotification notification) => 
         [new(notification.NotificationId.ParticipationId ?? _participationIdProvider.Create(), notification.NotificationId.CommandId)];
+
+    private EventSequenceNumber NextEventSequenceNumber() =>
+        _eventSequenceNumberProvider.Next();
 }

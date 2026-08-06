@@ -502,7 +502,7 @@ public class DynamicNode : NodeBase
 
 /// A generic implementation of <see cref="IAnnotationInstance"/>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
-public class DynamicAnnotationInstance : DynamicNode, IAnnotationInstance<INode>
+public class DynamicAnnotationInstance : DynamicNode, IWritableAnnotationInstance<INode>
 {
     /// <inheritdoc />
     public DynamicAnnotationInstance(NodeId id, Annotation annotation) : base(id, annotation) { }

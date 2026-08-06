@@ -29,7 +29,7 @@ using Message.Event;
 
 public class NotificationDeltaEventMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, LionWebVersions lionWebVersion, IEnumerable<Language> languages) : NotificationPipeBase, INotificationHandler
 {
-    private readonly NotificationToDeltaEventMapper _toDeltaMapper = new(new ParticipationIdProvider(), lionWebVersion);
+    private readonly NotificationToDeltaEventMapper _toDeltaMapper = new(new ParticipationIdProvider(), lionWebVersion, new EventSequenceNumberProvider());
     private readonly DeltaEventToNotificationMapper _toNotificationMapper = new(sharedNodeMap, sharedKeyedMap, new DeserializerBuilder().WithLionWebVersion(lionWebVersion).WithLanguages(languages));
 
     public void Receive(INotificationSender correspondingSender, INotification notification)
@@ -55,7 +55,7 @@ public class NotificationDeltaCommandMapper(SharedNodeMap sharedNodeMap, SharedK
 
 public class NotificationDeltaEventSerializationMapper(SharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, LionWebVersions lionWebVersion, IEnumerable<Language> languages) : NotificationPipeBase, INotificationHandler
 {
-    private readonly NotificationToDeltaEventMapper _toDeltaMapper = new(new ParticipationIdProvider(), lionWebVersion);
+    private readonly NotificationToDeltaEventMapper _toDeltaMapper = new(new ParticipationIdProvider(), lionWebVersion, new EventSequenceNumberProvider());
     private readonly DeltaEventToNotificationMapper _toNotificationMapper = new(sharedNodeMap, sharedKeyedMap, new DeserializerBuilder().WithLionWebVersion(lionWebVersion).WithLanguages(languages));
     private readonly DeltaSerializer _deltaSerializer = new ();
 

@@ -113,18 +113,20 @@ internal class NotifyingNodeReplacer<T>(INode self, T replacement) : NodeReplace
 
     private INotification CreateAnnotationNotification()
     {
+        var selfAnnotation = (IWritableAnnotationInstance)self;
+        var replacementAnnotation = (IWritableAnnotationInstance)replacement;
         switch (_oldParent)
         {
             case null:
             case not null when _oldParent.GetPartition() is null:
-                return new AnnotationReplacedNotification(replacement, self, _parent, _replacedIndex, _notificationId);
+                return new AnnotationReplacedNotification(replacementAnnotation, selfAnnotation, _parent, _replacedIndex, _notificationId);
             case not null when _parent.GetPartition() is null:
-                return new AnnotationDeletedNotification(replacement, _oldParent, _replacementIndex, _notificationId);
+                return new AnnotationDeletedNotification(replacementAnnotation, _oldParent, _replacementIndex, _notificationId);
             case not null when _oldParent == _parent:
                 var (newIndex, indexOffset) = MoveAndReplaceInSameList();
-                return new AnnotationMovedAndReplacedInSameParentNotification(newIndex, replacement, _parent, _replacementIndex, indexOffset, self, _notificationId);
+                return new AnnotationMovedAndReplacedInSameParentNotification(newIndex, replacementAnnotation, _parent, _replacementIndex, indexOffset, selfAnnotation, _notificationId);
             case not null when _oldParent != _parent:
-                return new AnnotationMovedAndReplacedFromOtherParentNotification(_parent, _replacedIndex, replacement, _oldParent, _replacementIndex, self, _notificationId);
+                return new AnnotationMovedAndReplacedFromOtherParentNotification(_parent, _replacedIndex, replacementAnnotation, _oldParent, _replacementIndex, selfAnnotation, _notificationId);
             default:
                 throw new ArgumentException();
         }
