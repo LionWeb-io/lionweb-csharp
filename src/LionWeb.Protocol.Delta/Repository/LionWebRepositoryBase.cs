@@ -21,6 +21,7 @@ using Core;
 using Core.M1;
 using Core.M3;
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Pipe;
 
 public abstract class LionWebRepositoryBase<T> : IDisposable
@@ -33,6 +34,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     protected readonly PartitionSharedNodeMap SharedNodeMap;
 
     protected readonly INotificationHandler _replicator;
+    protected readonly INotificationReceiver _localNotificationReceiver;
 
     private long _nextFreeNodeId = 0;
 
@@ -51,9 +53,9 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        _replicator = RewriteForestReplicator.Create(forest, SharedNodeMap);
+        _replicator = ForestReplicator.Create(forest, SharedNodeMap);
 
-        _replicator.ConnectTo(new LocalNotificationReceiver(name, this));
+        _localNotificationReceiver = new LocalNotificationReceiver(name, this);
 
         _connector.ReceivedFromClient += OnReceiveFromClient;
     }
