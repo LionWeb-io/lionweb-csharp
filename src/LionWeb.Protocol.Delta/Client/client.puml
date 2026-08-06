@@ -1,0 +1,113 @@
+@startuml
+'left to right direction
+hide stereotype
+
+component "Client" as client {
+    component "ForestReplicator" as replicator {
+        portin in
+        portout out
+        
+        interface " " as dummy
+        hide dummy
+    
+        [RemoteReplicator] as remote
+        [IdFilteringFilter] as filter
+        [LocalReplicator] as local
+    }
+    
+    [Forest] as forest
+    [UnresolvedReferencesManager] as unresolved
+    [DeltaProtocolEventReceiver] as eventReceiver
+    component "ClientConnector" as connector {
+        portin Received as received
+        portout Send as send
+    }
+    [Compositor] as compositor
+    [LocalNotificationReceiver] as localReceiver
+    
+    unresolved <- forest
+    eventReceiver --> in
+
+    forest --> local
+    remote ..> forest
+
+    in --> remote
+    dummy --> remote
+    remote --> filter
+    local --> filter
+    filter --> out
+    
+    out --> compositor
+    compositor --> localReceiver
+    
+    eventReceiver <. connector: ReceivedFromRepository
+    note on link
+        via client.
+        * OnReceivedFromRepository()
+        * Receive()
+        * ReceiveEvent()
+        * ProcessEvent()
+    end note
+    
+    localReceiver .> connector
+    note on link
+        via
+        * client.SendNotificationToRepository()
+        * client.Send()
+        * connector.SendToRepository()
+    end note
+}
+
+component "Repository" as repo {
+    component ""RepositoryConnector" as repoConnector {
+        portin Received as repoReceived
+        portout Send as repoSend
+    }
+    [Forest] as repoForest
+    [LoggingUnresolvedReferencesManager] as repoUnresolved
+    component ""RewriteForestReplicator" as repoReplicator {
+        portin "in" as repoIn
+        portout "out" as repoOut
+        
+        [IdReplacingFilter] as repoReplacingFilter
+        [RewriteRemoteReplicator] as repoRemote
+        [LocalReplicator] as repoLocal
+        [IdFilteringFilter] as repoFilter
+    }
+    [LocalNotificationReceiver] as repoLocalReceiver
+    [DeltaProtocolCommandReceiver] as commandReceiver
+    
+    commandReceiver --> repoIn
+    
+    repoIn --> repoReplacingFilter
+    repoReplacingFilter --> repoRemote
+    repoRemote --> repoFilter
+    repoFilter --> repoOut
+    repoLocal --> repoFilter
+
+    repoUnresolved <- repoForest
+
+    repoForest --> repoLocal
+    repoRemote ..> repoForest
+    
+    repoOut --> repoLocalReceiver
+    
+    commandReceiver <. repoConnector: ReceivedFromClient
+    note on link
+      via repository.
+      * OnReceiveFromClient()
+      * Receive()
+    end note
+
+    repoLocalReceiver .> repoConnector
+    note on link
+        via
+        * repository.SendNotificationToAllClients()
+        * repository.SendAll()
+        * connector.SendToAllClients()
+    end note
+}
+
+send ..> repoReceived
+repoSend ..> received
+@enduml
