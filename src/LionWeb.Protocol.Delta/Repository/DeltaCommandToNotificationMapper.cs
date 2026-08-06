@@ -301,9 +301,9 @@ public class DeltaCommandToNotificationMapper
         var movedChild = ToNode(command.MovedChild);
         var containment = GetContainmentAndParent(movedChild, nameof(command.MovedChild), out var parent);
         var oldIndex = GetChildIndex(parent, containment, movedChild);
-
+        var newIndex = NewIndex(command.OldIndex, command.IndexOffset);
         return new ChildMovedInSameContainmentNotification(
-            NewIndex(command.OldIndex, command.IndexOffset),
+            newIndex,
             movedChild,
             parent,
             containment,
@@ -534,12 +534,7 @@ public class DeltaCommandToNotificationMapper
         new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
 
     private Index NewIndex(Index oldIndex, IndexOffset indexOffset) =>
-        indexOffset switch
-        {
-            0 => throw new LionWebMappingException("IndexOffset", "0"),
-            > 0 => oldIndex + indexOffset - 1,
-            _ => oldIndex + indexOffset
-        };
+        indexOffset != 0 ? oldIndex + indexOffset : throw new LionWebMappingException("IndexOffset", "0");
 
     private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
     {

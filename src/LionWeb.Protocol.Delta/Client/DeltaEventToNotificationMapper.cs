@@ -299,8 +299,9 @@ public class DeltaEventToNotificationMapper
         var parent = ToNode(childMovedEvent.Parent);
         var movedChild = ToNode(childMovedEvent.MovedChild);
         var containment = ToContainment(childMovedEvent.Containment, parent);
+        var newIndex = NewIndex(childMovedEvent.OldIndex, childMovedEvent.IndexOffset);
         return new ChildMovedInSameContainmentNotification(
-            NewIndex(childMovedEvent.OldIndex, childMovedEvent.IndexOffset),
+            newIndex,
             movedChild,
             parent,
             containment,
@@ -505,12 +506,7 @@ public class DeltaEventToNotificationMapper
         new ParticipationNotificationId(deltaEvent.InternalParticipationId, deltaEvent.Id);
 
     private Index NewIndex(Index oldIndex, IndexOffset indexOffset) =>
-        indexOffset switch
-        {
-            0 => throw new LionWebMappingException("IndexOffset", "0"),
-            > 0 => oldIndex + indexOffset - 1,
-            _ => oldIndex + indexOffset
-        };
+        indexOffset != 0 ? oldIndex + indexOffset : throw new LionWebMappingException("IndexOffset", "0");
 
     private protected bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
     {
