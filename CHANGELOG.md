@@ -18,6 +18,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `InsertBefore()` and `InsertAfter()` works now with annotations.
 * Moving or replacing nodes between partitions and free-floating nodes produces the proper added/deleted notifications.
 * Fixed `newIndex` calculation when moving/replacing nodes in the same containment.
+* Fixed resolving nodes or references to target nodes created within the same `CompositeCommand` / `CompositeEvent`.
 ### Changed
 * Adjusted to latest spec changes:
   * `AdditionalInfo`: `Distribute` flag, Dictionary instead of array of `AdditionalInfoData`

@@ -480,12 +480,11 @@ public class DeltaEventToNotificationMapper
     private Reference ToReference(MetaPointer deltaReference, IReadableNode node) =>
         ToFeature<Reference>(deltaReference, node);
 
-    private IReferenceTarget ToTarget(TargetNode? targetNode, ResolveInfo? resolveInfo)
+    private protected virtual IReferenceTarget ToTarget(TargetNode? targetNode, ResolveInfo? resolveInfo)
     {
         IReadableNode? target = null;
-        if (targetNode != null &&
-            _sharedNodeMap.TryGetValue(targetNode, out var node))
-            target = node;
+        if (targetNode != null)
+            TryToNode(targetNode, out target);
 
         return new ReferenceTarget(resolveInfo, targetNode, target);
     }
@@ -508,13 +507,10 @@ public class DeltaEventToNotificationMapper
     private Index NewIndex(Index oldIndex, IndexOffset indexOffset) =>
         indexOffset != 0 ? oldIndex + indexOffset : throw new LionWebMappingException("IndexOffset", "0");
 
-    private protected bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
+    private protected bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IReadableNode? node)
     {
-        if (_sharedNodeMap.TryGetValue(nodeId, out var n) && n is IWritableNode w)
-        {
-            node = w;
+        if (_sharedNodeMap.TryGetValue(nodeId, out node))
             return true;
-        }
 
         node = null;
         return false;
@@ -530,7 +526,7 @@ public class DeltaEventToNotificationMapper
 
     private protected virtual IWritableNode ToNode(TargetNode nodeId)
     {
-        if (TryToNode(nodeId, out var w))
+        if (TryToNode(nodeId, out var r) && r is IWritableNode w)
             return w;
 
         throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
@@ -558,7 +554,7 @@ public class DeltaEventToNotificationMapper
         var node = nodes.FirstOrDefault();
         return node ?? throw new UnsupportedNodeTypeException(node, nameof(node));
     }
-    
+
     private protected IWritableAnnotationInstance DeserializeAnnotation(DeltaSerializationChunk deltaChunk) =>
         (IWritableAnnotationInstance)Deserialize(deltaChunk);
 }
@@ -575,16 +571,25 @@ internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap shared
 
     private protected override IWritableNode ToNode(TargetNode nodeId)
     {
-        if (TryToNode(nodeId, out var w))
-            return w;
+        if (!TryToNode(nodeId, out IReadableNode? readableNode))
+            TryToInterdependentNode(nodeId, out readableNode);
 
-        if (_interdependentNodeMap.TryGetValue(nodeId, out var node))
-        {
-            if (node is IWritableNode wr)
-                return wr;
-        }
+        if (readableNode is IWritableNode wr)
+            return wr;
 
         throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+    }
+
+    private protected override IReferenceTarget ToTarget(TargetNode? targetNode, ResolveInfo? resolveInfo)
+    {
+        IReadableNode? target = null;
+        if (targetNode != null)
+        {
+            if (!TryToNode(targetNode, out target))
+                TryToInterdependentNode(targetNode, out target);
+        }
+
+        return new ReferenceTarget(resolveInfo, targetNode, target);
     }
 
     private protected override IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
@@ -596,5 +601,14 @@ internal class InterdependentDeltaEventToNotificationMapper(SharedNodeMap shared
         }
 
         return result;
+    }
+
+    private bool TryToInterdependentNode(TargetNode nodeId, [NotNullWhen(true)] out IReadableNode? node)
+    {
+        if (_interdependentNodeMap.TryGetValue(nodeId, out node))
+            return true;
+
+        node = null;
+        return false;
     }
 }

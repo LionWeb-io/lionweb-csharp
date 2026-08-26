@@ -749,7 +749,11 @@ public class MapperTests : DeltaTestsBase
     [TestMethod]
     public void Composite_ReuseId()
     {
-        var partition = new TestPartition("partition");
+        var target = new LinkTestConcept("target");
+        var partition = new TestPartition("partition")
+        {
+            Links = [target]
+        };
         var child = new LinkTestConcept("child") { Name = "A" };
         var child2 = new LinkTestConcept("child") { Name = "B" };
         List<IReadableNode> nodes = [];
@@ -757,12 +761,13 @@ public class MapperTests : DeltaTestsBase
         Assert.IsEmpty(Test<CompositeCommand, CompositeEvent>(nodes,
             new CompositeNotification([
                 new PartitionAddedNotification(partition, _notificationIdProvider.Create()),
-                new ChildAddedNotification(partition, child, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
-                new ChildDeletedNotification(child, partition, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
-                new ChildAddedNotification(partition, child, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
-                new ChildDeletedNotification(child, partition, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
-                new ChildAddedNotification(partition, child2, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
-                new ChildDeletedNotification(child2, partition, TestLanguageLanguage.Instance.TestPartition_links, 0, _notificationIdProvider.Create()),
+                new ChildAddedNotification(partition, child, TestLanguageLanguage.Instance.TestPartition_links, 1, _notificationIdProvider.Create()),
+                new ChildDeletedNotification(child, partition, TestLanguageLanguage.Instance.TestPartition_links, 1, _notificationIdProvider.Create()),
+                new ChildAddedNotification(partition, child, TestLanguageLanguage.Instance.TestPartition_links, 1, _notificationIdProvider.Create()),
+                new ChildDeletedNotification(child, partition, TestLanguageLanguage.Instance.TestPartition_links, 1, _notificationIdProvider.Create()),
+                new ChildAddedNotification(partition, child2, TestLanguageLanguage.Instance.TestPartition_links, 1, _notificationIdProvider.Create()),
+                new ReferenceAddedNotification(child, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, 0, new ReferenceTarget(null, target.GetId(), target), _notificationIdProvider.Create()),
+                new ChildDeletedNotification(child2, partition, TestLanguageLanguage.Instance.TestPartition_links, 1, _notificationIdProvider.Create()),
             ], _notificationIdProvider.Create())
         ));
     }
@@ -863,6 +868,14 @@ public class MapperTests : DeltaTestsBase
             {
                 case (IReadableNode e, IReadableNode a):
                     AssertSurfaceEquals(e, a);
+                    break;
+                case (IReferenceTarget et, IReferenceTarget at):
+                    Assert.AreEqual(et.ResolveInfo,  at.ResolveInfo);
+                    Assert.AreEqual(et.TargetId, at.TargetId);
+                    if (et.Target is {} etTarget && at.Target is {} atTarget)
+                        AssertSurfaceEquals(etTarget, atTarget);
+                    else
+                        Assert.AreEqual(et.Target, at.Target);
                     break;
                 case (string, string):
                     Assert.AreEqual(ex, act);
