@@ -320,7 +320,7 @@ public class Serializer : ISerializer
         serializedReferences = [];
         foreach (var pair in featureValues)
         {
-            if (pair.Value is IReadOnlyList<ReferenceTarget> targets)
+            if (pair.Value is IList<ReferenceTarget> targets)
             {
                 result.Add(pair.Key);
                 serializedReferences.Add(SerializeMultipleReference(targets, pair.Key));

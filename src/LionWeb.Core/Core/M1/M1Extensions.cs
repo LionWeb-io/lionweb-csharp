@@ -401,7 +401,7 @@ public static class M1Extensions
     /// </summary>
     /// <param name="self">Base node to find ancestors of.</param>
     /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
-    /// <returns>All direct and indirect parents of <paramref name="self"/>.</returns>
+    /// <returns>All direct and indirect parents of <paramref name="self"/> in bottom-to-top order.</returns>
     /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
     public static IEnumerable<INode> Ancestors(this INode self, bool includeSelf = false) =>
         Ancestors<INode>(self, includeSelf);

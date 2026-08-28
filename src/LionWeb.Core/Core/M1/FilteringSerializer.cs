@@ -44,34 +44,54 @@ public class FilteringSerializer(LionWebVersions lionWebVersion, Func<IReadableN
                 return value;
 
             case IReadableNode n:
-                return filter(n) ? n : null;
+                return filter(n) ? n : Enumerable.Empty<IReadableNode>();
+            
+            case ReferenceTarget t:
+                return t.Target is null || filter(t.Target) ? t: Enumerable.Empty<ReferenceTarget>();
 
             case IEnumerable enumerable:
                 List<IReadableNode>? nodeList = null;
+                List<ReferenceTarget> referenceList = null;
                 List<object>? otherList = null;
                 foreach (var element in enumerable)
                 {
-                    if (element is IReadableNode rn)
+                    switch (element)
                     {
-                        if (otherList is not null)
-                            throw new SerializerException($"both node and other values in one feature: {element}; {otherList}");
+                        case IReadableNode when otherList is not null || referenceList is not null:
+                            throw new SerializerException($"both node and other values in one feature: {element}; {otherList}; {referenceList}");
+                        case IReadableNode rn:
+                            {
+                                nodeList ??= [];
 
-                        nodeList ??= [];
+                                if (filter(rn))
+                                    nodeList.Add(rn);
+                                break;
+                            }
+                        
+                        case ReferenceTarget when otherList is not null || nodeList is not null:
+                            throw new SerializerException($"both reference and other values in one feature: {element}; {otherList}; {nodeList}");
+                        case ReferenceTarget rt:
+                            {
+                                referenceList ??= [];
 
-                        if (filter(rn))
-                            nodeList.Add(rn);
-                    } else
-                    {
-                        if (nodeList is not null)
-                            throw new SerializerException($"both other value and nodes in one feature: {element}; {nodeList}");
+                                if (rt.Target is null || filter(rt.Target))
+                                    referenceList.Add(rt);
+                                break;
+                            }
+                        
+                        case not null when nodeList is not null || referenceList is not null:
+                            throw new SerializerException($"both other value and nodes in one feature: {element}; {nodeList}; {referenceList}");
+                        case not null:
+                            {
+                                otherList ??= [];
 
-                        otherList ??= [];
-
-                        otherList.Add(element);
+                                otherList.Add(element);
+                                break;
+                            }
                     }
                 }
 
-                return nodeList ?? otherList ?? enumerable;
+                return nodeList ?? referenceList ?? otherList ?? enumerable;
 
             default:
                 return value;

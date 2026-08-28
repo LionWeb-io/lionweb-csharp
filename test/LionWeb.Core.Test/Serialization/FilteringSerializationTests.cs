@@ -19,6 +19,7 @@
 
 namespace LionWeb.Core.Test.Serialization;
 
+using Core.Serialization;
 using Core.Utilities;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
@@ -27,9 +28,9 @@ using M1;
 public class FilteringSerializationTests : SerializationTestsBase
 {
     [TestMethod]
-    public void String()
+    public void NoOp()
     {
-        var node = new LinkTestConcept("n") { Name = "hello" };
+        var node = new LinkTestConcept("node") { Name = "hello" };
 
         var serializationChunk = new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
@@ -37,162 +38,196 @@ public class FilteringSerializationTests : SerializationTestsBase
             .Build()
             .SerializeToChunk([node]);
 
-        var deserialized = new DeserializerBuilder()
-            .WithLanguage(TestLanguageLanguage.Instance)
-            .Build()
-            .Deserialize(serializationChunk);
-
+        List<IReadableNode> deserialized = Deserialize(serializationChunk);
         AssertEquals([node], deserialized);
     }
 
     [TestMethod]
     public void ManyLevelDescendants()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childB = new LinkTestConcept("childB") { Containment_0_1 = grandchildB };
+        grandchildB.Reference_0_1 = childB;
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Containment_0_1 = childB, Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB, childB] };
 
-        AssertSerializeDeserialize([childA, grandchildAA, grandchildAB, node], node, n => n.GetId() != "cB");
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childB";
+        List<INode> expected = [childA, grandchildAA, grandchildAB, node];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB], node, filter);
     }
 
     [TestMethod]
     public void ManyLevelDescendants_Self()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childB = new LinkTestConcept("childB") { Containment_0_1 = grandchildB };
+        grandchildB.Reference_0_1 = childB;
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Containment_0_1 = childB, Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB, childB] };
 
-        AssertSerializeDeserialize([node, childA, grandchildAA, grandchildAB], node, n => n.GetId() != "cB");
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childB";
+        List<INode> expected = [node, childA, grandchildAA, grandchildAB];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB], node, filter);
     }
 
     [TestMethod]
     public void ManyLevelDescendants_Annotations()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childAnn = new TestAnnotation("childAnn") { Containment = grandchildB };
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB] }
+            .WithAnnotation(childAnn);
 
-        AssertSerializeDeserialize([childA, grandchildAA, grandchildAB, node], node, n => n.GetId() != "cB");
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childAnn";
+        List<INode> expected = [childA, grandchildAA, grandchildAB, node];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB], node, filter);
     }
 
     [TestMethod]
     public void ManyLevelDescendants_Self_Annotations()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childAnn = new TestAnnotation("childAnn") { Containment = grandchildB };
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB] }
+            .WithAnnotation(childAnn);
 
-        AssertSerializeDeserialize([node, childA, grandchildAA, grandchildAB], node, n => n.GetId() != "cB");
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childAnn";
+        List<INode> expected = [node, childA, grandchildAA, grandchildAB];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB], node, filter);
     }
 
     [TestMethod]
     public void ManyLevelDescendants_Annotation()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAAAnn = new TestAnnotation("gAAa");
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAAAnn = new TestAnnotation("grandchildAAAnn");
         grandchildAA.AddAnnotations([grandchildAAAnn]);
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childB = new LinkTestConcept("childB") { Containment_0_1 = grandchildB };
+        grandchildB.Reference_0_1 = childB;
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Containment_0_1 = childB, Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB, childB] };
 
-        var grandchild = new LinkTestConcept("aG");
-        var grandchildAnn = new TestAnnotation("aGa");
+        var grandchild = new LinkTestConcept("grandchild");
+        var grandchildAnn = new TestAnnotation("grandchildAnn");
         grandchild.AddAnnotations([grandchildAnn]);
-        var ann = new TestAnnotation("a") { Containment = grandchild };
-        var annAnn = new TestAnnotation("aa");
+        var ann = new TestAnnotation("ann") { Containment = grandchild, Ref = grandchildAnn };
+        var annAnn = new TestAnnotation("annAnn");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
 
-        AssertSerializeDeserialize([childA, grandchildAA, grandchildAB, node], node, n => n.GetId() != "cB" && n is not IAnnotationInstance);
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childB" && n is not IAnnotationInstance;
+        List<INode> expected = [childA, grandchildAA, grandchildAB, node];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB, grandchild], node, filter);
     }
 
     [TestMethod]
     public void ManyLevelDescendants_Annotation_Self()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAAAnn = new TestAnnotation("gAAa");
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAAAnn = new TestAnnotation("grandchildAAAnn");
         grandchildAA.AddAnnotations([grandchildAAAnn]);
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childB = new LinkTestConcept("childB") { Containment_0_1 = grandchildB };
+        grandchildB.Reference_0_1 = childB;
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Containment_0_1 = childB, Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB, childB] };
 
-        var grandchild = new LinkTestConcept("aG");
-        var grandchildAnn = new TestAnnotation("aGa");
+        var grandchild = new LinkTestConcept("grandchild");
+        var grandchildAnn = new TestAnnotation("grandchildAnn");
         grandchild.AddAnnotations([grandchildAnn]);
-        var ann = new TestAnnotation("a") { Containment = grandchild };
-        var annAnn = new TestAnnotation("aa");
+        var ann = new TestAnnotation("ann") { Containment = grandchild, Ref = grandchildAnn };
+        var annAnn = new TestAnnotation("annAnn");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
 
-        AssertSerializeDeserialize([node, childA, grandchildAA, grandchildAB], node, n => n.GetId() != "cB" && n is not IAnnotationInstance);
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childB" && n is not IAnnotationInstance;
+        List<INode> expected = [node, childA, grandchildAA, grandchildAB];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB, grandchild], node, filter);
     }
 
     [TestMethod]
     public void ManyLevelDescendants_Annotation_Annotations()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAAAnn = new TestAnnotation("gAAa");
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAAAnn = new TestAnnotation("grandchildAAAnn");
         grandchildAA.AddAnnotations([grandchildAAAnn]);
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childB = new LinkTestConcept("childB") { Containment_0_1 = grandchildB };
+        grandchildB.Reference_0_1 = childB;
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Containment_0_1 = childB, Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB, childB] };
 
-        var grandchild = new LinkTestConcept("aG");
-        var grandchildAnn = new TestAnnotation("aGa");
+        var grandchild = new LinkTestConcept("grandchild");
+        var grandchildAnn = new TestAnnotation("grandchildAnn");
         grandchild.AddAnnotations([grandchildAnn]);
-        var ann = new TestAnnotation("a") { Containment = grandchild };
-        var annAnn = new TestAnnotation("aa");
+        var ann = new TestAnnotation("ann") { Containment = grandchild, Ref = grandchildAnn };
+        var annAnn = new TestAnnotation("annAnn");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
 
-        AssertSerializeDeserialize([
-            childA,
-            grandchildAB,
-            ann,
-            grandchild,
-            grandchildAnn,
-            annAnn,
-            node
-        ], node, n => n.GetId() != "cB" && n.GetId() != "gAA");
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childB" && n.GetId() != "grandchildAA";
+        List<INode> expected = [childA, grandchildAB, ann, grandchild, grandchildAnn, annAnn, node];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB, grandchildAAAnn], node, filter);
     }
 
     [TestMethod]
     public void ManyLevelDescendants_Annotation_Self_Annotations()
     {
-        var grandchildAA = new LinkTestConcept("gAA");
-        var grandchildAAAnn = new TestAnnotation("gAAa");
+        var grandchildAA = new LinkTestConcept("grandchildAA");
+        var grandchildAAAnn = new TestAnnotation("grandchildAAAnn");
         grandchildAA.AddAnnotations([grandchildAAAnn]);
-        var grandchildAB = new LinkTestConcept("gAB");
-        var childA = new LinkTestConcept("cA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
-        var childB = new LinkTestConcept("cB") { Containment_0_1 = new LinkTestConcept("gB") };
-        var node = new LinkTestConcept("n") { Containment_0_n = [childA], Containment_0_1 = childB };
+        var grandchildAB = new LinkTestConcept("grandchildAB");
+        var childA = new LinkTestConcept("childA") { Containment_0_1 = grandchildAA, Containment_1 = grandchildAB };
+        var grandchildB = new LinkTestConcept("grandchildB");
+        var childB = new LinkTestConcept("childB") { Containment_0_1 = grandchildB };
+        grandchildB.Reference_0_1 = childB;
+        var node = new LinkTestConcept("node") { Containment_0_n = [childA], Containment_0_1 = childB, Reference_0_n = [grandchildAA, grandchildAB, childA, grandchildB, childB] };
 
-        var grandchild = new LinkTestConcept("aG");
-        var grandchildAnn = new TestAnnotation("aGa");
+        var grandchild = new LinkTestConcept("grandchild");
+        var grandchildAnn = new TestAnnotation("grandchildAnn");
         grandchild.AddAnnotations([grandchildAnn]);
-        var ann = new TestAnnotation("a") { Containment = grandchild };
-        var annAnn = new TestAnnotation("aa");
+        var ann = new TestAnnotation("ann") { Containment = grandchild, Ref = grandchildAnn };
+        var annAnn = new TestAnnotation("annAnn");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
 
-        AssertSerializeDeserialize([
-            node,
-            childA,
-            grandchildAA,
-            grandchildAAAnn,
-            grandchildAB
-        ], node, n => n.GetId() != "cB" && n.GetId() != "a");
+        Func<IReadableNode, bool> filter = n => n.GetId() != "childB" && n.GetId() != "ann";
+        List<INode> expected = [node, childA, grandchildAA, grandchildAAAnn, grandchildAB];
+        AssertSerializeDeserializeIncludingAncestors(expected, node, filter);
+        AssertSerializeDeserialize([.. expected, grandchildB, grandchild, grandchildAnn, annAnn], node, filter);
+    }
+
+    private void AssertSerializeDeserializeIncludingAncestors(List<INode> expected, LinkTestConcept node, Func<IReadableNode, bool> filter)
+    {
+        var serializationChunk = new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithFilterIncludingAncestors(filter)
+            .Build()
+            .SerializeToChunk([node]);
+
+        List<IReadableNode> deserialized = Deserialize(serializationChunk);
+        AssertEquivalent(expected, deserialized);
     }
 
     private void AssertSerializeDeserialize(List<INode> expected, LinkTestConcept node, Func<IReadableNode, bool> filter)
@@ -202,15 +237,23 @@ public class FilteringSerializationTests : SerializationTestsBase
             .WithFilter(filter)
             .Build()
             .SerializeToChunk([node]);
-        var deserialized = new DeserializerBuilder()
+
+        List<IReadableNode> deserialized = Deserialize(serializationChunk);
+        AssertEquivalent(expected, deserialized);
+    }
+
+    private static List<IReadableNode> Deserialize(SerializationChunk serializationChunk) =>
+        new DeserializerBuilder()
             .WithLanguage(TestLanguageLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);
 
+    private static void AssertEquivalent(List<INode> expected, List<IReadableNode> deserialized) =>
         CollectionAssert.AreEquivalent(
             expected,
-            M1Extensions.Descendants(deserialized.First(), true, true).ToList(),
+            deserialized
+                .SelectMany(n => M1Extensions.Descendants(n, true, true))
+                .ToList(),
             new NodeIdComparer<IReadableNode>()
         );
-    }
 }

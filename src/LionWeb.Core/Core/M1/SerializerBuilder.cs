@@ -74,6 +74,22 @@ public class SerializerBuilder
         return this;
     }
 
+    /// <summary>
+    /// If a node or any of its ancestors don't pass <paramref name="filter"/>,
+    /// they are omitted from serialization (both the node itself an all links to it).
+    /// </summary>
+    public SerializerBuilder WithFilterIncludingAncestors(Func<IReadableNode, bool>? filter)
+    {
+        if (filter is not null)
+            _filter = n =>
+                M1Extensions.Ancestors(n, true)
+                    .Reverse()
+                    .All(filter);
+        else
+            _filter = null;
+        return this;
+    }
+
     /// <summary>Builds the serializer.</summary>
     public ISerializer Build()
     {
