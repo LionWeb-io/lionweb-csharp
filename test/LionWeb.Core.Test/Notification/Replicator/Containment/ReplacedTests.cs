@@ -331,7 +331,7 @@ public class ReplacedTests : ReplicatorTestsBase
 
     /// <summary>
     /// Replaced and replacement nodes are part of a (same) partition.
-    /// Therefore <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/> is emitted.
+    /// Therefore <see cref="ChildMovedAndReplacedFromContainmentInOtherParentNotification"/> is emitted.
     /// </summary>
     [TestMethod]
     public void Nodes_are_in_same_partition()
@@ -362,13 +362,13 @@ public class ReplacedTests : ReplicatorTestsBase
 
         AssertUniqueNodeIds(originalPartition);
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
     /// <summary>
     /// Partitions do not know about their forests. That's why test below emits
-    /// <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/>
+    /// <see cref="ChildMovedAndReplacedFromContainmentInOtherParentNotification"/>
     /// The correct notification would be <see cref="ChildReplacedNotification"/>.
     /// </summary>
     [TestMethod]
@@ -404,12 +404,12 @@ public class ReplacedTests : ReplicatorTestsBase
 
         AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
     }
 
     /// <summary>
     /// Partitions do not know about their forests. That's why test below emits
-    /// <see cref="ChildMovedAndReplacedFromOtherContainmentNotification"/>
+    /// <see cref="ChildMovedAndReplacedFromContainmentInOtherParentNotification"/>
     /// The correct notification would be <see cref="ChildReplacedNotification"/>.
     /// </summary>
     [TestMethod]
@@ -448,6 +448,6 @@ public class ReplacedTests : ReplicatorTestsBase
 
         AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
     }
 }

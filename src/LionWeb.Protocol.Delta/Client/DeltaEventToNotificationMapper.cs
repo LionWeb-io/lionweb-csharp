@@ -67,7 +67,7 @@ public class DeltaEventToNotificationMapper
             ChildMovedFromContainmentInOtherParent a => OnChildMovedFromContainmentInOtherParent(a),
             ChildMovedFromOtherContainmentInSameParent a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainment a => OnChildMovedInSameContainment(a),
-            ChildMovedAndReplacedFromOtherContainment a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedAndReplacedFromContainmentInOtherParent a => OnChildMovedAndReplacedFromContainmentInOtherParent(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             ChildMovedAndReplacedInSameContainment a => OnChildMovedAndReplacedInSameContainment(a),
             AnnotationAdded a => OnAnnotationAdded(a),
@@ -210,8 +210,8 @@ public class DeltaEventToNotificationMapper
         );
     }
 
-    private ChildMovedAndReplacedFromOtherContainmentNotification OnChildMovedAndReplacedFromOtherContainment(
-        ChildMovedAndReplacedFromOtherContainment childMovedAndReplacedEvent)
+    private ChildMovedAndReplacedFromContainmentInOtherParentNotification OnChildMovedAndReplacedFromContainmentInOtherParent(
+        ChildMovedAndReplacedFromContainmentInOtherParent childMovedAndReplacedEvent)
     {
         var movedChild = ToNode(childMovedAndReplacedEvent.MovedChild);
         var oldParent = ToNode(childMovedAndReplacedEvent.OldParent);
@@ -222,7 +222,7 @@ public class DeltaEventToNotificationMapper
 
         var replacedChild = ToNode(childMovedAndReplacedEvent.ReplacedChild);
 
-        return new ChildMovedAndReplacedFromOtherContainmentNotification(
+        return new ChildMovedAndReplacedFromContainmentInOtherParentNotification(
             newParent,
             newContainment,
             childMovedAndReplacedEvent.NewIndex,

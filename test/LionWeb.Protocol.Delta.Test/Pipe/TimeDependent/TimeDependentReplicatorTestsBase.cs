@@ -291,7 +291,7 @@ public abstract class TimeDependentReplicatorTestsBase  : ReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedAndReplacedFromOtherContainment()
+    public void ChildMovedAndReplacedFromContainmentInOtherParent()
     {
         var grandChild = new LinkTestConcept("grandChild");
         var child = new LinkTestConcept("child") { Containment_0_1 = grandChild };
@@ -305,9 +305,9 @@ public abstract class TimeDependentReplicatorTestsBase  : ReplicatorTestsBase
         child.Containment_0_1 = null;
         var composite = _compositor.Pop(true);
         
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(composite.Parts[^1]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(composite.Parts[^1]);
 
-        var deleted = (ChildMovedAndReplacedFromOtherContainmentNotification)composite.Parts[^1];
+        var deleted = (ChildMovedAndReplacedFromContainmentInOtherParentNotification)composite.Parts[^1];
         CollectionAssert.AreEqual(new List<IReadableNode>{child, grandChild}, deleted.DeletedNodes.ToList());
 
         AssertPartitionsEqual();

@@ -55,7 +55,7 @@ public class NotificationToDeltaCommandMapper
             ChildMovedFromOtherContainmentInSameParentNotification a =>
                 OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedAndReplacedFromContainmentInOtherParentNotification a => OnChildMovedAndReplacedFromContainmentInOtherParent(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             ChildMovedAndReplacedInSameContainmentNotification a => OnChildMovedAndReplacedInSameContainment(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
@@ -173,8 +173,8 @@ public class NotificationToDeltaCommandMapper
         );
 
     private MoveAndReplaceChildFromContainmentInOtherParent
-        OnChildMovedAndReplacedFromOtherContainment(
-            ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) =>
+        OnChildMovedAndReplacedFromContainmentInOtherParent(
+            ChildMovedAndReplacedFromContainmentInOtherParentNotification childMovedAndReplacedNotification) =>
         new(
             childMovedAndReplacedNotification.NewParent.GetId(),
             childMovedAndReplacedNotification.NewContainment.ToMetaPointer(),
