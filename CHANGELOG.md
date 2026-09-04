@@ -16,6 +16,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Renamed delta event `ChildMovedInSameContainment` -> `ChildMovedInSameContainmentInSameParent`
   and notification `ChildMovedInSameContainmentNotification` -> `ChildMovedInSameContainmentInSameParentNotification`.
 * Renamed delta command `MoveAndReplaceChildInSameContainment` -> `MoveAndReplaceChildInSameContainmentInSameParent`.
+* Renamed delta event `ChildMovedAndReplacedInSameContainment` -> `ChildMovedAndReplacedInSameContainmentInSameParent`
+  and notification `ChildMovedAndReplacedInSameContainmentNotification` -> `ChildMovedAndReplacedInSameContainmentInSameParentNotification`.
 
 ## [0.6.0] - tbd
 ### Added

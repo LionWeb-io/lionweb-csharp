@@ -388,7 +388,7 @@ public class MapperTests : DeltaTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedAndReplacedInSameParent()
+    public void ChildMovedAndReplacedInSameContainmentInSameParent()
     {
         var other = new LinkTestConcept("other");
         var replaced = new LinkTestConcept("replaced");
@@ -396,13 +396,13 @@ public class MapperTests : DeltaTestsBase
         var parent = new LinkTestConcept("parent") { Containment_0_n = [moved, other, replaced] };
         List<IReadableNode> nodes = [parent];
 
-        Assert.IsEmpty(Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainment>(nodes,
-            new ChildMovedAndReplacedInSameContainmentNotification(2, moved, parent, Containment, replaced, 0, +2, _notificationIdProvider.Create())
+        Assert.IsEmpty(Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainmentInSameParent>(nodes,
+            new ChildMovedAndReplacedInSameContainmentInSameParentNotification(2, moved, parent, Containment, replaced, 0, +2, _notificationIdProvider.Create())
         ));
         }
 
     [TestMethod]
-    public void ChildMovedAndReplacedInSameParent_Unset_Replaced()
+    public void ChildMovedAndReplacedInSameContainmentInSameParent_Unset_Replaced()
     {
         var other = new LinkTestConcept("other");
         var replaced = new LinkTestConcept("replaced");
@@ -412,13 +412,13 @@ public class MapperTests : DeltaTestsBase
 
         Assert.ContainsSingle(
             e => e.Message.StartsWith("Invalid notification: Replaced node node with id replaced does not match with actual node with id other at index 1 in containment containment_0_n"),
-            Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainment>(nodes,
-                new ChildMovedAndReplacedInSameContainmentNotification(1, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
+            Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainmentInSameParent>(nodes,
+                new ChildMovedAndReplacedInSameContainmentInSameParentNotification(1, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
             ));
     }
 
     [TestMethod]
-    public void ChildMovedAndReplacedInSameParent_Unset_Moved()
+    public void ChildMovedAndReplacedInSameContainmentInSameParent_Unset_Moved()
     {
         var other = new LinkTestConcept("other");
         var replaced = new LinkTestConcept("replaced");
@@ -426,8 +426,8 @@ public class MapperTests : DeltaTestsBase
         var parent = new LinkTestConcept("parent") { Containment_0_n = [other, replaced] };
         List<IReadableNode> nodes = [parent, moved];
 
-        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainment>(nodes,
-            new ChildMovedAndReplacedInSameContainmentNotification(1, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
+        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainmentInSameParent>(nodes,
+            new ChildMovedAndReplacedInSameContainmentInSameParentNotification(1, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
         ));
     }
 
