@@ -166,7 +166,7 @@ public abstract class JsonTestsBase
         new(Chunk(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
-    protected static MoveChildFromOtherContainment CreateMoveChildFromOtherContainment() =>
+    protected static MoveChildFromContainmentInOtherParent CreateMoveChildFromContainmentInOtherParent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
@@ -256,7 +256,7 @@ public abstract class JsonTestsBase
         [CreateAddChild(), typeof(AddChild)],
         [CreateDeleteChild(), typeof(DeleteChild)],
         [CreateReplaceChild(), typeof(ReplaceChild)],
-        [CreateMoveChildFromOtherContainment(), typeof(MoveChildFromOtherContainment)],
+        [CreateMoveChildFromContainmentInOtherParent(), typeof(MoveChildFromContainmentInOtherParent)],
         [CreateMoveChildFromOtherContainmentInSameParent(), typeof(MoveChildFromOtherContainmentInSameParent)],
         [CreateMoveChildInSameContainment(), typeof(MoveChildInSameContainment)],
         [CreateMoveAndReplaceChildFromOtherContainment(), typeof(MoveAndReplaceChildFromOtherContainment)],

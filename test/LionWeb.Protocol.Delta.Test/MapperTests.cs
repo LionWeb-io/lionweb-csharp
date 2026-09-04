@@ -440,7 +440,7 @@ public class MapperTests : DeltaTestsBase
         var newParent = new LinkTestConcept("newParent");
         List<IReadableNode> nodes = [oldParent, newParent];
 
-        Assert.IsEmpty(Test<MoveChildFromOtherContainment, ChildMovedFromOtherContainment>(nodes,
+        Assert.IsEmpty(Test<MoveChildFromContainmentInOtherParent, ChildMovedFromOtherContainment>(nodes,
             new ChildMovedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, _notificationIdProvider.Create())
         ));
     }
@@ -454,7 +454,7 @@ public class MapperTests : DeltaTestsBase
         var newParent = new LinkTestConcept("newParent");
         List<IReadableNode> nodes = [oldParent, newParent, moved];
 
-        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveChildFromOtherContainment, ChildMovedFromOtherContainment>(nodes,
+        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveChildFromContainmentInOtherParent, ChildMovedFromOtherContainment>(nodes,
             new ChildMovedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, _notificationIdProvider.Create())
         ));
     }

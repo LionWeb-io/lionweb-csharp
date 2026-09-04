@@ -158,7 +158,7 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
-    private MoveChildFromOtherContainment
+    private MoveChildFromContainmentInOtherParent
         OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedNotification) =>
         new(
             childMovedNotification.NewParent.GetId(),
