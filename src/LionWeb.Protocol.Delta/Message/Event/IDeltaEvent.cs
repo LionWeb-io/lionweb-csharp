@@ -79,7 +79,7 @@ public record CommandSource(
 [JsonDerivedType(typeof(ChildMovedAndReplacedInSameContainment), nameof(ChildMovedAndReplacedInSameContainment))]
 [JsonDerivedType(typeof(ChildMovedFromContainmentInOtherParent), nameof(ChildMovedFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(ChildMovedFromOtherContainmentInSameParent), nameof(ChildMovedFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(ChildMovedInSameContainment), nameof(ChildMovedInSameContainment))]
+[JsonDerivedType(typeof(ChildMovedInSameContainmentInSameParent), nameof(ChildMovedInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ChildReplaced), nameof(ChildReplaced))]
 
 #endregion
@@ -167,7 +167,7 @@ public interface IDeltaEvent : IDeltaContent
 [JsonDerivedType(typeof(ChildMovedAndReplacedInSameContainment), nameof(ChildMovedAndReplacedInSameContainment))]
 [JsonDerivedType(typeof(ChildMovedFromContainmentInOtherParent), nameof(ChildMovedFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(ChildMovedFromOtherContainmentInSameParent), nameof(ChildMovedFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(ChildMovedInSameContainment), nameof(ChildMovedInSameContainment))]
+[JsonDerivedType(typeof(ChildMovedInSameContainmentInSameParent), nameof(ChildMovedInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ChildReplaced), nameof(ChildReplaced))]
 
 #endregion

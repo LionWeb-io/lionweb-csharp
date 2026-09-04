@@ -397,7 +397,7 @@ public class InsertTests
         var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(args =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentInSameParentNotification>(args =>
         {
             notifications++;
             Assert.AreEqual(1, args.OldIndex);
@@ -423,7 +423,7 @@ public class InsertTests
         var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(args =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentInSameParentNotification>(args =>
         {
             notifications++;
             Assert.AreEqual(1, args.OldIndex);
@@ -449,7 +449,7 @@ public class InsertTests
         var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(_ => notifications++));
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentInSameParentNotification>(_ => notifications++));
         
         compositeShape.InsertContainment_0_n(1, [lineA, lineB]);
 
@@ -467,7 +467,7 @@ public class InsertTests
         var parent = new TestPartition("g") { Links = [compositeShape] };
 
         int notifications = 0;
-        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentNotification>(_ => notifications++));
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedInSameContainmentInSameParentNotification>(_ => notifications++));
 
         compositeShape.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n,
             new List<INode> { circleA, lineA, lineB, circleB });

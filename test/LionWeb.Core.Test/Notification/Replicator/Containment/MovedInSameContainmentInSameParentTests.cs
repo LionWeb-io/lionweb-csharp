@@ -21,7 +21,7 @@ using Core.Notification.Partition;
 using Languages.Generated.V2024_1.TestLanguage;
 
 [TestClass]
-public class MovedInSameContainmentTests : ReplicatorTestsBase
+public class MovedInSameContainmentInSameParentTests : ReplicatorTestsBase
 {
     [TestMethod]
     public void Forward()
@@ -72,9 +72,9 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
         Assert.AreEqual(1, notificationObserver.Count);
         
         var notification = notificationObserver.Notifications[0];
-        Assert.IsInstanceOfType<ChildMovedInSameContainmentNotification>(notification);
+        Assert.IsInstanceOfType<ChildMovedInSameContainmentInSameParentNotification>(notification);
         
-        var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentNotification;
+        var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentInSameParentNotification;
         Assert.AreEqual(0, childMovedInSameContainmentNotification!.OldIndex);
         Assert.AreEqual(3, childMovedInSameContainmentNotification.NewIndex);
         
@@ -103,8 +103,8 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
 
         foreach (var notification in notificationObserver.Notifications)
         {
-            Assert.IsInstanceOfType<ChildMovedInSameContainmentNotification>(notification);
-            var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentNotification;
+            Assert.IsInstanceOfType<ChildMovedInSameContainmentInSameParentNotification>(notification);
+            var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentInSameParentNotification;
             Assert.AreEqual(0, childMovedInSameContainmentNotification?.OldIndex);
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }
@@ -165,8 +165,8 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
 
         foreach (var notification in notificationObserver.Notifications)
         {
-            Assert.IsInstanceOfType<ChildMovedInSameContainmentNotification>(notification);
-            var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentNotification;
+            Assert.IsInstanceOfType<ChildMovedInSameContainmentInSameParentNotification>(notification);
+            var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentInSameParentNotification;
             Assert.AreEqual(0, childMovedInSameContainmentNotification?.OldIndex);
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }
@@ -196,18 +196,18 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
 
         foreach (var notification in notificationObserver.Notifications)
         {
-            Assert.IsInstanceOfType<ChildMovedInSameContainmentNotification>(notification);
+            Assert.IsInstanceOfType<ChildMovedInSameContainmentInSameParentNotification>(notification);
         }
         
-        var firstNotification = notificationObserver.Notifications[0] as ChildMovedInSameContainmentNotification;
+        var firstNotification = notificationObserver.Notifications[0] as ChildMovedInSameContainmentInSameParentNotification;
         Assert.AreEqual(2, firstNotification?.OldIndex);
         Assert.AreEqual(3, firstNotification?.NewIndex);
         
-        var secondNotification = notificationObserver.Notifications[1] as ChildMovedInSameContainmentNotification;
+        var secondNotification = notificationObserver.Notifications[1] as ChildMovedInSameContainmentInSameParentNotification;
         Assert.AreEqual(0, secondNotification?.OldIndex);
         Assert.AreEqual(3, secondNotification?.NewIndex);
         
-        var lastNotification = notificationObserver.Notifications[^1] as ChildMovedInSameContainmentNotification;
+        var lastNotification = notificationObserver.Notifications[^1] as ChildMovedInSameContainmentInSameParentNotification;
         Assert.AreEqual(0, lastNotification?.OldIndex);
         Assert.AreEqual(3, lastNotification?.NewIndex);
         
@@ -237,8 +237,8 @@ public class MovedInSameContainmentTests : ReplicatorTestsBase
 
         foreach (var notification in notificationObserver.Notifications[..4])
         {
-            Assert.IsInstanceOfType<ChildMovedInSameContainmentNotification>(notification);
-            var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentNotification;
+            Assert.IsInstanceOfType<ChildMovedInSameContainmentInSameParentNotification>(notification);
+            var childMovedInSameContainmentNotification = notification as ChildMovedInSameContainmentInSameParentNotification;
             Assert.AreEqual(0, childMovedInSameContainmentNotification?.OldIndex);
             Assert.AreEqual(3, childMovedInSameContainmentNotification?.NewIndex);
         }

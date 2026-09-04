@@ -80,7 +80,7 @@ public class NoOpsTests_Containment: NotificationTestsBase
     }
     
     [TestMethod]
-    public void ChildMovedInSameContainment_adds_last_of_the_existing_children()
+    public void ChildMovedInSameContainmentInSameParent_adds_last_of_the_existing_children()
     {
         var a = new LinkTestConcept("a");
         var b = new LinkTestConcept("b");

@@ -343,7 +343,7 @@ public record ChildMovedFromOtherContainmentInSameParent(
     MetaPointer IContainmentEvent.Containment => NewContainment;
 }
 
-public record ChildMovedInSameContainment(
+public record ChildMovedInSameContainmentInSameParent(
     TargetNode MovedChild,
     TargetNode Parent,
     MetaPointer Containment,

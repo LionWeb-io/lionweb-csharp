@@ -52,7 +52,7 @@ public class DeltaCommandToDeltaEventMapper
             ReplaceChild a => new ChildReplaced(a.NewChild, a.ReplacedChild, [], a.Parent, a.Containment, a.Index , OriginCommands(a), []),
             MoveChildFromContainmentInOtherParent a => new ChildMovedFromContainmentInOtherParent(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
             MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
-            MoveChildInSameContainmentInSameParent a => new ChildMovedInSameContainment(a.MovedChild, a.Parent, a.Containment, a.OldIndex, a.IndexOffset, OriginCommands(a), []),
+            MoveChildInSameContainmentInSameParent a => new ChildMovedInSameContainmentInSameParent(a.MovedChild, a.Parent, a.Containment, a.OldIndex, a.IndexOffset, OriginCommands(a), []),
             MoveAndReplaceChildFromContainmentInOtherParent a => new ChildMovedAndReplacedFromContainmentInOtherParent(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), a.ReplacedChild, [], OriginCommands(a), []),
             MoveAndReplaceChildFromOtherContainmentInSameParent a => new ChildMovedAndReplacedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), a.ReplacedChild, [], OriginCommands(a), []),
             AddAnnotation a => new AnnotationAdded(a.Parent, a.NewAnnotation, a.Index, OriginCommands(a), []),

@@ -486,28 +486,28 @@ public class MapperTests : DeltaTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedInSameParent()
+    public void ChildMovedInSameContainmentInSameParent()
     {
         var other = new LinkTestConcept("other");
         var moved = new LinkTestConcept("moved");
         var parent = new LinkTestConcept("parent") { Containment_0_n = [moved, other] };
         List<IReadableNode> nodes = [parent];
 
-        Assert.IsEmpty(Test<MoveChildInSameContainmentInSameParent, ChildMovedInSameContainment>(nodes,
-            new ChildMovedInSameContainmentNotification(1, moved, parent, Containment, 0, +1, _notificationIdProvider.Create())
+        Assert.IsEmpty(Test<MoveChildInSameContainmentInSameParent, ChildMovedInSameContainmentInSameParent>(nodes,
+            new ChildMovedInSameContainmentInSameParentNotification(1, moved, parent, Containment, 0, +1, _notificationIdProvider.Create())
         ));
     }
 
     [TestMethod]
-    public void ChildMovedInSameParent_Unset()
+    public void ChildMovedInSameContainmentInSameParent_Unset()
     {
         var other = new LinkTestConcept("other");
         var moved = new LinkTestConcept("moved");
         var parent = new LinkTestConcept("parent") { Containment_0_n = [other] };
         List<IReadableNode> nodes = [parent, moved];
 
-        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveChildInSameContainmentInSameParent, ChildMovedInSameContainment>(nodes,
-            new ChildMovedInSameContainmentNotification(1, moved, parent, Containment, 0, +1, _notificationIdProvider.Create())
+        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveChildInSameContainmentInSameParent, ChildMovedInSameContainmentInSameParent>(nodes,
+            new ChildMovedInSameContainmentInSameParentNotification(1, moved, parent, Containment, 0, +1, _notificationIdProvider.Create())
         ));
     }
 

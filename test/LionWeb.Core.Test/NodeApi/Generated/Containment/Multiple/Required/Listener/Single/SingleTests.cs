@@ -160,7 +160,7 @@ public class SingleTests
 
         partition.AddLinks([child]);
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(1);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(partition, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
@@ -180,7 +180,7 @@ public class SingleTests
 
         partition.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { otherChild, child });
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(1);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(partition, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
@@ -200,7 +200,7 @@ public class SingleTests
 
         partition.AddLinks([child]);
 
-        observer.AssertNone<ChildMovedInSameContainmentNotification>();
+        observer.AssertNone<ChildMovedInSameContainmentInSameParentNotification>();
     }
 
     [TestMethod]
@@ -215,6 +215,6 @@ public class SingleTests
 
         partition.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { otherChild, child });
 
-        observer.AssertNone<ChildMovedInSameContainmentNotification>();
+        observer.AssertNone<ChildMovedInSameContainmentInSameParentNotification>();
     }
 }

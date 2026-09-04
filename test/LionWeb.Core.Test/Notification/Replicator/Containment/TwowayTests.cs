@@ -334,10 +334,10 @@ public class TwowayTests : TwowayReplicatorTestsBase
 
     #endregion
 
-    #region ChildMovedInSameContainment
+    #region ChildMovedInSameContainmentInSameParent
 
     [TestMethod]
-    public void ChildMovedInSameContainment_Forward()
+    public void ChildMovedInSameContainmentInSameParent_Forward()
     {
         var moved = new LinkTestConcept("moved");
         var node = new TestPartition("a") { Links =  [moved, new LinkTestConcept("l")] };
@@ -353,7 +353,7 @@ public class TwowayTests : TwowayReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedInSameContainment_Backward()
+    public void ChildMovedInSameContainmentInSameParent_Backward()
     {
         var moved = new LinkTestConcept("moved");
         var node = new TestPartition("a") { Links =  [new LinkTestConcept("l"), moved] };

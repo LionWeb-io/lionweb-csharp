@@ -106,7 +106,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                     break;
 
                 case ListMoved<T> moved:
-                    ProduceNotification(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
+                    ProduceNotification(new ChildMovedInSameContainmentInSameParentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, Containment, moved.LeftIndex, moved.RightIndex - moved.LeftIndex, GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
