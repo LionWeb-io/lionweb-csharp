@@ -432,7 +432,7 @@ public class MapperTests : DeltaTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherParent()
+    public void ChildMovedFromContainmentInOtherParent()
     {
         var other = new LinkTestConcept("other");
         var moved = new LinkTestConcept("moved");
@@ -440,13 +440,13 @@ public class MapperTests : DeltaTestsBase
         var newParent = new LinkTestConcept("newParent");
         List<IReadableNode> nodes = [oldParent, newParent];
 
-        Assert.IsEmpty(Test<MoveChildFromContainmentInOtherParent, ChildMovedFromOtherContainment>(nodes,
-            new ChildMovedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, _notificationIdProvider.Create())
+        Assert.IsEmpty(Test<MoveChildFromContainmentInOtherParent, ChildMovedFromContainmentInOtherParent>(nodes,
+            new ChildMovedFromContainmentInOtherParentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, _notificationIdProvider.Create())
         ));
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherParent_Unset()
+    public void ChildMovedFromContainmentInOtherParent_Unset()
     {
         var other = new LinkTestConcept("other");
         var moved = new LinkTestConcept("moved");
@@ -454,8 +454,8 @@ public class MapperTests : DeltaTestsBase
         var newParent = new LinkTestConcept("newParent");
         List<IReadableNode> nodes = [oldParent, newParent, moved];
 
-        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveChildFromContainmentInOtherParent, ChildMovedFromOtherContainment>(nodes,
-            new ChildMovedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, _notificationIdProvider.Create())
+        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveChildFromContainmentInOtherParent, ChildMovedFromContainmentInOtherParent>(nodes,
+            new ChildMovedFromContainmentInOtherParentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, _notificationIdProvider.Create())
         ));
     }
 

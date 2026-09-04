@@ -300,7 +300,7 @@ public record ChildReplaced(
     }
 }
 
-public record ChildMovedFromOtherContainment(
+public record ChildMovedFromContainmentInOtherParent(
     TargetNode NewParent,
     MetaPointer NewContainment,
     Index NewIndex,

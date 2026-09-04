@@ -252,7 +252,7 @@ public class InsertTests
 
         parent.InsertLinks(2, [child]);
 
-        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromContainmentInOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
@@ -276,7 +276,7 @@ public class InsertTests
 
         parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { childA, childB, child });
 
-        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromContainmentInOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
