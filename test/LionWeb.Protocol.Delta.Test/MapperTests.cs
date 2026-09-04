@@ -307,7 +307,7 @@ public class MapperTests : DeltaTestsBase
         var newParent = new LinkTestConcept("newParent") { Containment_1_n = [replaced] };
         List<IReadableNode> nodes = [oldParent, newParent];
 
-        Assert.IsEmpty(Test<MoveAndReplaceChildFromOtherContainment, ChildMovedAndReplacedFromOtherContainment>(nodes,
+        Assert.IsEmpty(Test<MoveAndReplaceChildFromContainmentInOtherParent, ChildMovedAndReplacedFromOtherContainment>(nodes,
             new ChildMovedAndReplacedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, replaced, _notificationIdProvider.Create())
         ));
     }
@@ -323,7 +323,7 @@ public class MapperTests : DeltaTestsBase
         List<IReadableNode> nodes = [oldParent, newParent, replaced];
 
         Assert.ContainsSingle(e => e.Message.StartsWith("Invalid notification: Replaced node index 0 out of range (size: 0)"),
-            Test<MoveAndReplaceChildFromOtherContainment, ChildMovedAndReplacedFromOtherContainment>(nodes,
+            Test<MoveAndReplaceChildFromContainmentInOtherParent, ChildMovedAndReplacedFromOtherContainment>(nodes,
                 new ChildMovedAndReplacedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, replaced, _notificationIdProvider.Create())
             ));
     }
@@ -338,7 +338,7 @@ public class MapperTests : DeltaTestsBase
         var newParent = new LinkTestConcept("newParent") { Containment_1_n = [replaced] };
         List<IReadableNode> nodes = [oldParent, newParent, moved];
 
-        Assert.IsEmpty(Test<MoveAndReplaceChildFromOtherContainment, ChildMovedAndReplacedFromOtherContainment>(nodes,
+        Assert.IsEmpty(Test<MoveAndReplaceChildFromContainmentInOtherParent, ChildMovedAndReplacedFromOtherContainment>(nodes,
             new ChildMovedAndReplacedFromOtherContainmentNotification(newParent, NewContainment, 0, moved, oldParent, OldContainment, 1, replaced, _notificationIdProvider.Create())
         ));
     }
