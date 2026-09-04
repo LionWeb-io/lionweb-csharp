@@ -102,7 +102,7 @@ public record ReplaceChild(
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
-public record MoveChildFromOtherContainment(
+public record MoveChildFromContainmentInOtherParent(
     TargetNode NewParent,
     MetaPointer NewContainment,
     Index NewIndex,
