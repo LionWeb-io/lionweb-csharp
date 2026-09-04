@@ -241,7 +241,7 @@ public record ChildReplacedNotification(
 /// <param name="OldParent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedFromOtherContainmentNotification(
+public record ChildMovedFromContainmentInOtherParentNotification(
     IWritableNode NewParent,
     Containment NewContainment,
     Index NewIndex,

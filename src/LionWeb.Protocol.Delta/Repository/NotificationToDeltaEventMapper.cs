@@ -57,7 +57,7 @@ public class NotificationToDeltaEventMapper
             ChildAddedNotification a => OnChildAdded(a),
             ChildDeletedNotification a => OnChildDeleted(a),
             ChildReplacedNotification a => OnChildReplaced(a),
-            ChildMovedFromOtherContainmentNotification a => OnChildMovedFromOtherContainment(a),
+            ChildMovedFromContainmentInOtherParentNotification a => OnChildMovedFromContainmentInOtherParent(a),
             ChildMovedFromOtherContainmentInSameParentNotification a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
@@ -171,8 +171,8 @@ public class NotificationToDeltaEventMapper
             []
         ) { SequenceNumber = NextEventSequenceNumber() };
 
-    private ChildMovedFromOtherContainment
-        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedNotification) =>
+    private ChildMovedFromContainmentInOtherParent
+        OnChildMovedFromContainmentInOtherParent(ChildMovedFromContainmentInOtherParentNotification childMovedNotification) =>
         new(
             childMovedNotification.NewParent.GetId(),
             childMovedNotification.NewContainment.ToMetaPointer(),

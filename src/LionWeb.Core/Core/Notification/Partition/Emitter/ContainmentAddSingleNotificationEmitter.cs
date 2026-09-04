@@ -67,7 +67,7 @@ public class ContainmentAddSingleNotificationEmitter<T> : ContainmentMultipleNot
                     break;
                 
                 case not null when old.Parent != DestinationParent:
-                    var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, _newIndex, added,
+                    var notification = new ChildMovedFromContainmentInOtherParentNotification(DestinationParent, Containment, _newIndex, added,
                         old.Parent, old.Containment, old.Index, GetNotificationId());
                     ProduceOriginNotification(old, notification);
                     ProduceNotification(notification);

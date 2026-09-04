@@ -335,7 +335,7 @@ public abstract class JsonTestsBase
             SequenceNumber = Sequence()
         };
 
-    protected static ChildMovedFromOtherContainment CreateChildMovedFromOtherContainment() =>
+    protected static ChildMovedFromContainmentInOtherParent CreateChildMovedFromContainmentInOtherParent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(),
             AdditionalInfos()) { SequenceNumber = Sequence() };
 
@@ -454,7 +454,7 @@ public abstract class JsonTestsBase
         [CreateChildAdded(), typeof(ChildAdded)],
         [CreateChildDeleted(), typeof(ChildDeleted)],
         [CreateChildReplaced(), typeof(ChildReplaced)],
-        [CreateChildMovedFromOtherContainment(), typeof(ChildMovedFromOtherContainment)],
+        [CreateChildMovedFromContainmentInOtherParent(), typeof(ChildMovedFromContainmentInOtherParent)],
         [CreateChildMovedFromOtherContainmentInSameParent(), typeof(ChildMovedFromOtherContainmentInSameParent)],
         [CreateChildMovedInSameContainment(), typeof(ChildMovedInSameContainment)],
         [CreateChildMovedAndReplacedFromOtherContainment(), typeof(ChildMovedAndReplacedFromOtherContainment)],

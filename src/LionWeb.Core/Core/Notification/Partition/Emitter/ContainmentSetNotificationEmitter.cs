@@ -86,7 +86,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                             break;
 
                         case { } old when old.Parent != DestinationParent:
-                            var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
+                            var notification = new ChildMovedFromContainmentInOtherParentNotification(DestinationParent, Containment,
                                 added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, GetNotificationId());
                             ProduceOriginNotification(old, notification);
                             ProduceNotification(notification);

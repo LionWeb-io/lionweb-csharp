@@ -50,7 +50,7 @@ public class DeltaCommandToDeltaEventMapper
             AddChild a => new ChildAdded(a.Parent, a.NewChild, a.Containment, a.Index, OriginCommands(a), []),
             DeleteChild a => new ChildDeleted(a.DeletedChild, [], a.Parent, a.Containment, a.Index, OriginCommands(a), []),
             ReplaceChild a => new ChildReplaced(a.NewChild, a.ReplacedChild, [], a.Parent, a.Containment, a.Index , OriginCommands(a), []),
-            MoveChildFromContainmentInOtherParent a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
+            MoveChildFromContainmentInOtherParent a => new ChildMovedFromContainmentInOtherParent(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
             MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),
             MoveChildInSameContainment a => new ChildMovedInSameContainment(a.MovedChild, a.Parent, a.Containment, a.OldIndex, a.IndexOffset, OriginCommands(a), []),
             MoveAndReplaceChildFromOtherContainment a => new ChildMovedAndReplacedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), a.ReplacedChild, [], OriginCommands(a), []),

@@ -44,7 +44,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ChildAddedNotification a => OnChildAdded(a),
             ChildDeletedNotification a => OnChildDeleted(a),
             ChildReplacedNotification a => OnChildReplaced(a),
-            ChildMovedFromOtherContainmentNotification a => OnChildMovedFromOtherContainment(a),
+            ChildMovedFromContainmentInOtherParentNotification a => OnChildMovedFromContainmentInOtherParent(a),
             ChildMovedFromOtherContainmentInSameParentNotification a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
@@ -167,14 +167,14 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
-    private ChildMovedFromOtherContainmentNotification OnChildMovedFromOtherContainment(
-        ChildMovedFromOtherContainmentNotification notification)
+    private ChildMovedFromContainmentInOtherParentNotification OnChildMovedFromContainmentInOtherParent(
+        ChildMovedFromContainmentInOtherParentNotification notification)
     {
         var movedChild = LookUpNode(notification.MovedChild);
         var newParent = LookUpNode(notification.NewParent);
         var oldParent = LookUpNode(notification.OldParent);
 
-        return new ChildMovedFromOtherContainmentNotification(
+        return new ChildMovedFromContainmentInOtherParentNotification(
             newParent,
             notification.NewContainment,
             notification.NewIndex,

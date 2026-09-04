@@ -74,7 +74,7 @@ public class SingleTests
 
         node.AddContainment_1_n([child]);
 
-        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromContainmentInOtherParentNotification>(1);
         Assert.AreSame(partition, notifications[0].OldParent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].OldContainment);
         Assert.AreEqual(1, notifications[0].OldIndex);
@@ -96,7 +96,7 @@ public class SingleTests
 
         node.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { child });
 
-        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromContainmentInOtherParentNotification>(1);
         Assert.AreSame(partition, notifications[0].OldParent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].OldContainment);
         Assert.AreEqual(1, notifications[0].OldIndex);

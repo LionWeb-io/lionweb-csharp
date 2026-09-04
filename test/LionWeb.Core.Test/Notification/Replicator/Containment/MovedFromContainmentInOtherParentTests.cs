@@ -22,7 +22,7 @@ using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
-public class MovedFromOtherContainmentTests : ReplicatorTestsBase
+public class MovedFromContainmentInOtherParentTests : ReplicatorTestsBase
 {
     [TestMethod]
     public void Multiple()

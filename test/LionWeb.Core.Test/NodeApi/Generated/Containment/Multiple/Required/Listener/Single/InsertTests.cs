@@ -291,7 +291,7 @@ public class InsertTests
         var parent = new TestPartition("g") { Links = [compositeShape, line] };
 
         int notifications = 0;
-        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromOtherContainmentNotification>(args =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromContainmentInOtherParentNotification>(args =>
         {
             notifications++;
             Assert.AreSame(parent, args.OldParent);
@@ -318,7 +318,7 @@ public class InsertTests
         var parent = new TestPartition("g") { Links = [compositeShape, line] };
 
         int notifications = 0;
-        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromOtherContainmentNotification>(args =>
+        parent.GetNotificationSender()!.ConnectTo(new NotificationChecker<ChildMovedFromContainmentInOtherParentNotification>(args =>
         {
             notifications++;
             Assert.AreSame(parent, args.OldParent);
