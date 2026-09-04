@@ -172,7 +172,7 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
-    private MoveAndReplaceChildFromOtherContainment
+    private MoveAndReplaceChildFromContainmentInOtherParent
         OnChildMovedAndReplacedFromOtherContainment(
             ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) =>
         new(
