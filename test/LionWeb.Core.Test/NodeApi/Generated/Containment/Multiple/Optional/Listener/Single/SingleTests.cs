@@ -146,7 +146,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.AddLinks([child]);
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(1);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);
@@ -166,7 +166,7 @@ public class SingleTests: NotificationTestsBase
 
         parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { childB, child });
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(1);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parent, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].Containment);

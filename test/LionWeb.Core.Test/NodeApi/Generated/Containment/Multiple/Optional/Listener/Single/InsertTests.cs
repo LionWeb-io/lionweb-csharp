@@ -348,7 +348,7 @@ public class InsertTests
 
         parentNode.InsertContainment_1_n(2, values);
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(2);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(2);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parentNode, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
@@ -377,7 +377,7 @@ public class InsertTests
 
         parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { childA, valueA, childB, valueB });
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(2);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(2);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parentNode, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);

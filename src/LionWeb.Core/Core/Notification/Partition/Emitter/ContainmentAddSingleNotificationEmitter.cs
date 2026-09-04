@@ -83,7 +83,7 @@ public class ContainmentAddSingleNotificationEmitter<T> : ContainmentMultipleNot
                     if (old.Index == _newIndex)
                         break;
                     
-                    ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added,
+                    ProduceNotification(new ChildMovedInSameContainmentInSameParentNotification(_newIndex, added,
                         DestinationParent, old.Containment, old.Index, _newIndex - old.Index, GetNotificationId()));
 
                     break;
