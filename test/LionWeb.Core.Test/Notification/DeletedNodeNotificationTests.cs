@@ -269,7 +269,7 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedAndReplacedInSameContainment()
+    public void ChildMovedAndReplacedInSameContainmentInSameParent()
     {
         var parent = new LinkTestConcept("parent");
 
@@ -281,7 +281,7 @@ public class DeletedNodeNotificationTests : NotificationTestsBase
         var link2 = new LinkTestConcept("link2");
         var child = new LinkTestConcept("child") { Containment_0_n = [link0, link1], Containment_0_1 = link2, Reference_0_1 = refTarget };
         var replacement = new LinkTestConcept("replacement");
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(
+        var notification = new ChildMovedAndReplacedInSameContainmentInSameParentNotification(
             1,
             replacement,
             parent,

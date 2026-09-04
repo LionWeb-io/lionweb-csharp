@@ -126,7 +126,7 @@ public class AllNotificationTestsBase : NotificationTestsBase
         [CreateChildDeletedNotification()],
         [CreateChildMovedAndReplacedFromOtherContainmentInSameParentNotification()],
         [CreateChildMovedAndReplacedFromContainmentInOtherParentNotification()],
-        [CreateChildMovedAndReplacedInSameContainmentNotification()],
+        [CreateChildMovedAndReplacedInSameContainmentInSameParentNotification()],
         [CreateChildMovedFromOtherContainmentInSameParentNotification()],
         [CreateChildMovedFromContainmentInOtherParentNotification()],
         [CreateChildMovedInSameContainmentInSameParentNotification()],
@@ -147,8 +147,8 @@ public class AllNotificationTestsBase : NotificationTestsBase
         CreateChildMovedAndReplacedFromContainmentInOtherParentNotification() =>
         new(LinkNode(), Containment(), 1, LinkNode(), LinkNode(), OtherContainment(), 0, LinkNode(), NotificationId());
 
-    protected static ChildMovedAndReplacedInSameContainmentNotification
-        CreateChildMovedAndReplacedInSameContainmentNotification() =>
+    protected static ChildMovedAndReplacedInSameContainmentInSameParentNotification
+        CreateChildMovedAndReplacedInSameContainmentInSameParentNotification() =>
         new(1, LinkNode(), LinkNode(), Containment(), LinkNode(), 0, 1, NotificationId());
 
     protected static ChildMovedFromOtherContainmentInSameParentNotification

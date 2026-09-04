@@ -585,7 +585,7 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     }
 }
 
-public record ChildMovedAndReplacedInSameContainment(
+public record ChildMovedAndReplacedInSameContainmentInSameParent(
     TargetNode MovedChild,
     TargetNode Parent,
     MetaPointer Containment,
@@ -601,7 +601,7 @@ public record ChildMovedAndReplacedInSameContainment(
     public override HashSet<NodeId> AffectedNodes => [Parent];
 
     /// <inheritdoc />
-    public virtual bool Equals(ChildMovedAndReplacedInSameContainment? other)
+    public virtual bool Equals(ChildMovedAndReplacedInSameContainmentInSameParent? other)
     {
         if (other is null)
         {

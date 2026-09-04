@@ -389,7 +389,7 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
 /// <param name="Parent"></param>
 /// <param name="Containment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedAndReplacedInSameContainmentNotification(
+public record ChildMovedAndReplacedInSameContainmentInSameParentNotification(
     Index NewIndex,
     IWritableNode MovedChild,
     IWritableNode Parent,

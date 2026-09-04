@@ -69,7 +69,7 @@ public class DeltaEventToNotificationMapper
             ChildMovedInSameContainmentInSameParent a => OnChildMovedInSameContainmentInSameParent(a),
             ChildMovedAndReplacedFromContainmentInOtherParent a => OnChildMovedAndReplacedFromContainmentInOtherParent(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
-            ChildMovedAndReplacedInSameContainment a => OnChildMovedAndReplacedInSameContainment(a),
+            ChildMovedAndReplacedInSameContainmentInSameParent a => OnChildMovedAndReplacedInSameContainmentInSameParent(a),
             AnnotationAdded a => OnAnnotationAdded(a),
             AnnotationDeleted a => OnAnnotationDeleted(a),
             AnnotationReplaced a => OnAnnotationReplaced(a),
@@ -275,13 +275,13 @@ public class DeltaEventToNotificationMapper
         );
     }
 
-    private ChildMovedAndReplacedInSameContainmentNotification OnChildMovedAndReplacedInSameContainment(
-        ChildMovedAndReplacedInSameContainment childMovedEvent)
+    private ChildMovedAndReplacedInSameContainmentInSameParentNotification OnChildMovedAndReplacedInSameContainmentInSameParent(
+        ChildMovedAndReplacedInSameContainmentInSameParent childMovedEvent)
     {
         var parent = ToNode(childMovedEvent.Parent);
         var movedChild = ToNode(childMovedEvent.MovedChild);
         var containment = ToContainment(childMovedEvent.Containment, parent);
-        return new ChildMovedAndReplacedInSameContainmentNotification(
+        return new ChildMovedAndReplacedInSameContainmentInSameParentNotification(
             NewIndex(childMovedEvent.OldIndex, childMovedEvent.IndexOffset),
             movedChild,
             parent,

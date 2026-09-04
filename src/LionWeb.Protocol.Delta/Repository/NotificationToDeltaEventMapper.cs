@@ -62,7 +62,7 @@ public class NotificationToDeltaEventMapper
             ChildMovedInSameContainmentInSameParentNotification a => OnChildMovedInSameContainmentInSameParent(a),
             ChildMovedAndReplacedFromContainmentInOtherParentNotification a => OnChildMovedAndReplacedFromContainmentInOtherParent(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
-            ChildMovedAndReplacedInSameContainmentNotification a => OnChildMovedAndReplacedInSameContainment(a),
+            ChildMovedAndReplacedInSameContainmentInSameParentNotification a => OnChildMovedAndReplacedInSameContainmentInSameParent(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
             AnnotationReplacedNotification a => OnAnnotationReplaced(a),
@@ -231,8 +231,8 @@ public class NotificationToDeltaEventMapper
             []
         ) { SequenceNumber = NextEventSequenceNumber() };
 
-    private ChildMovedAndReplacedInSameContainment OnChildMovedAndReplacedInSameContainment(
-        ChildMovedAndReplacedInSameContainmentNotification childMovedNotification) =>
+    private ChildMovedAndReplacedInSameContainmentInSameParent OnChildMovedAndReplacedInSameContainmentInSameParent(
+        ChildMovedAndReplacedInSameContainmentInSameParentNotification childMovedNotification) =>
         new(
             childMovedNotification.MovedChild.GetId(),
             childMovedNotification.Parent.GetId(),
