@@ -181,8 +181,7 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(),
             TargetNode(), CommandId(), AdditionalInfos());
 
-    protected static MoveAndReplaceChildFromOtherContainmentInSameParent
-        CreateMoveAndReplaceChildFromOtherContainmentInSameParent() =>
+    protected static MoveAndReplaceChildFromOtherContainmentInSameParent CreateMoveAndReplaceChildFromOtherContainmentInSameParent() =>
         new(TargetNode(), MetaPointer(), Index(), MetaPointer(), Index(),TargetNode(), TargetNode(), CommandId(), AdditionalInfos());
 
     protected static MoveAndReplaceChildInSameContainmentInSameParent CreateMoveAndReplaceChildInSameContainmentInSameParent() =>
@@ -355,8 +354,7 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(),
             Descendants(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
-    protected static ChildMovedAndReplacedFromOtherContainmentInSameParent
-        CreateChildMovedAndReplacedFromOtherContainmentInSameParent() =>
+    protected static ChildMovedAndReplacedFromOtherContainmentInSameParent CreateChildMovedAndReplacedFromOtherContainmentInSameParent() =>
         new(MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(),
             Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
