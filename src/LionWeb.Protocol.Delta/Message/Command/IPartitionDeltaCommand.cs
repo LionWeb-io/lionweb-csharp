@@ -125,7 +125,7 @@ public record MoveChildFromOtherContainmentInSameParent(
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
-public record MoveChildInSameContainment(
+public record MoveChildInSameContainmentInSameParent(
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,

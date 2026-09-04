@@ -64,7 +64,7 @@ using System.Text.Json.Serialization;
 [JsonDerivedType(typeof(MoveAndReplaceChildInSameContainment), nameof(MoveAndReplaceChildInSameContainment))]
 [JsonDerivedType(typeof(MoveChildFromContainmentInOtherParent), nameof(MoveChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveChildFromOtherContainmentInSameParent), nameof(MoveChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveChildInSameContainment), nameof(MoveChildInSameContainment))]
+[JsonDerivedType(typeof(MoveChildInSameContainmentInSameParent), nameof(MoveChildInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ReplaceChild), nameof(ReplaceChild))]
 
 #endregion
@@ -144,7 +144,7 @@ public interface IDeltaCommand : IDeltaContent
 [JsonDerivedType(typeof(MoveAndReplaceChildInSameContainment), nameof(MoveAndReplaceChildInSameContainment))]
 [JsonDerivedType(typeof(MoveChildFromContainmentInOtherParent), nameof(MoveChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveChildFromOtherContainmentInSameParent), nameof(MoveChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveChildInSameContainment), nameof(MoveChildInSameContainment))]
+[JsonDerivedType(typeof(MoveChildInSameContainmentInSameParent), nameof(MoveChildInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ReplaceChild), nameof(ReplaceChild))]
 
 #endregion
