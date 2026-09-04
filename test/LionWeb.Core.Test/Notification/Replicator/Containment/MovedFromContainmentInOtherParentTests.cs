@@ -22,7 +22,7 @@ using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
-public class MovedFromOtherContainmentTests : ReplicatorTestsBase
+public class MovedFromContainmentInOtherParentTests : ReplicatorTestsBase
 {
     [TestMethod]
     public void Multiple()
@@ -94,7 +94,7 @@ public class MovedFromOtherContainmentTests : ReplicatorTestsBase
 
         AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
         AssertEquals(originalForest.Partitions, clonedForest.Partitions);
     }
 }

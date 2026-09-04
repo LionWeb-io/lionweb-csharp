@@ -84,23 +84,23 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case ChildReplacedNotification e:
                 OnRemoteChildReplaced(e);
                 break;
-            case ChildMovedFromOtherContainmentNotification e:
-                OnRemoteChildMovedFromOtherContainment(e);
+            case ChildMovedFromContainmentInOtherParentNotification e:
+                OnRemoteChildMovedFromContainmentInOtherParent(e);
                 break;
             case ChildMovedFromOtherContainmentInSameParentNotification e:
                 OnRemoteChildMovedFromOtherContainmentInSameParent(e);
                 break;
-            case ChildMovedInSameContainmentNotification e:
-                OnRemoteChildMovedInSameContainment(e);
+            case ChildMovedInSameContainmentInSameParentNotification e:
+                OnRemoteChildMovedInSameContainmentInSameParent(e);
                 break;
-            case ChildMovedAndReplacedFromOtherContainmentNotification e:
-                OnRemoteChildMovedAndReplacedFromOtherContainment(e);
+            case ChildMovedAndReplacedFromContainmentInOtherParentNotification e:
+                OnRemoteChildMovedAndReplacedFromContainmentInOtherParent(e);
                 break;
             case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e:
                 OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(e);
                 break;
-            case ChildMovedAndReplacedInSameContainmentNotification e:
-                OnRemoteChildMovedAndReplacedInSameContainment(e);
+            case ChildMovedAndReplacedInSameContainmentInSameParentNotification e:
+                OnRemoteChildMovedAndReplacedInSameContainmentInSameParent(e);
                 break;
             case AnnotationAddedNotification e:
                 OnRemoteAnnotationAdded(e);
@@ -241,15 +241,15 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         });
     }
 
-    private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification n) =>
+    private void OnRemoteChildMovedFromContainmentInOtherParent(ChildMovedFromContainmentInOtherParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
             var success = MoveChild(n.NewParent, n.NewContainment, n.NewIndex, n.MovedChild);
             ProduceMoveNotification(n, success, n.NewParent, n.OldParent);
         });
 
-    private void OnRemoteChildMovedAndReplacedFromOtherContainment(
-        ChildMovedAndReplacedFromOtherContainmentNotification n) => SuppressNotificationForwarding(
+    private void OnRemoteChildMovedAndReplacedFromContainmentInOtherParent(
+        ChildMovedAndReplacedFromContainmentInOtherParentNotification n) => SuppressNotificationForwarding(
         n, () =>
         {
             CheckMatchingNodeId("Replaced node", n, n.NewParent, n.ReplacedChild, n.NewContainment, n.NewIndex);
@@ -274,15 +274,15 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             ProduceNotification(n, success);
         });
 
-    private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification n) =>
+    private void OnRemoteChildMovedInSameContainmentInSameParent(ChildMovedInSameContainmentInSameParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
             var success = MoveChild(n.Parent, n.Containment, n.NewIndex, n.MovedChild);
             ProduceNotification(n, success);
         });
 
-    private void OnRemoteChildMovedAndReplacedInSameContainment(
-        ChildMovedAndReplacedInSameContainmentNotification n) =>
+    private void OnRemoteChildMovedAndReplacedInSameContainmentInSameParent(
+        ChildMovedAndReplacedInSameContainmentInSameParentNotification n) =>
         SuppressNotificationForwarding(n, () =>
         {
             CheckMatchingNodeId("Replaced node", n, n.Parent, n.ReplacedChild, n.Containment, n.OldIndex + n.IndexOffset);

@@ -80,10 +80,10 @@ public class ForestTests : ReplicatorTestsBase
 
     #region Children
 
-    #region ChildMovedFromOtherContainment
+    #region ChildMovedFromContainmentInOtherParent
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_AddAfterSubscribe_Works()
+    public void ChildMovedFromContainmentInOtherParent_AddAfterSubscribe_Works()
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
@@ -101,7 +101,7 @@ public class ForestTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Fails()
+    public void ChildMovedFromContainmentInOtherParent_AddAfterSubscribe_Destination_Fails()
     {
         // Original and cloned forests are out of sync: their initial states differ.
         // One approach to tackle this: cloned forest can check available partitions in original forest, and can clone them.
@@ -124,7 +124,7 @@ public class ForestTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_AddBeforeSubscribe_CloneExists_Replicated()
+    public void ChildMovedFromContainmentInOtherParent_AddBeforeSubscribe_CloneExists_Replicated()
     {
         var moved = new LinkTestConcept("moved");
         var node = new TestPartition("a") { Links = [new LinkTestConcept("l") { Containment_0_1 = moved }] };
@@ -150,7 +150,7 @@ public class ForestTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_AddAfterSubscribe_DifferentPartitions_Works()
+    public void ChildMovedFromContainmentInOtherParent_AddAfterSubscribe_DifferentPartitions_Works()
     {
         var moved = new LinkTestConcept("moved");
         var originPartition = new TestPartition("g") { Links = [new LinkTestConcept("l") { Containment_0_1 = moved }] };

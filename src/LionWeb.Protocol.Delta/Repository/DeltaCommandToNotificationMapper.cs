@@ -65,12 +65,12 @@ public class DeltaCommandToNotificationMapper
             AddChild a => OnAddChild(a),
             DeleteChild a => OnDeleteChild(a),
             ReplaceChild a => OnReplaceChild(a),
-            MoveChildFromOtherContainment a => OnMoveChildFromOtherContainment(a),
+            MoveChildFromContainmentInOtherParent a => OnMoveChildFromContainmentInOtherParent(a),
             MoveChildFromOtherContainmentInSameParent a => OnMoveChildFromOtherContainmentInSameParent(a),
-            MoveChildInSameContainment a => OnMoveChildInSameContainment(a),
-            MoveAndReplaceChildFromOtherContainment a => OnMoveAndReplaceChildFromOtherContainment(a),
+            MoveChildInSameContainmentInSameParent a => OnMoveChildInSameContainmentInSameParent(a),
+            MoveAndReplaceChildFromContainmentInOtherParent a => OnMoveAndReplaceChildFromContainmentInOtherParent(a),
             MoveAndReplaceChildFromOtherContainmentInSameParent a => OnMoveAndReplaceChildFromOtherContainmentInSameParent(a),
-            MoveAndReplaceChildInSameContainment a => OnMoveAndReplaceChildInSameContainment(a),
+            MoveAndReplaceChildInSameContainmentInSameParent a => OnMoveAndReplaceChildInSameContainmentInSameParent(a),
             AddAnnotation a => OnAddAnnotation(a),
             DeleteAnnotation a => OnDeleteAnnotation(a),
             ReplaceAnnotation a => OnReplaceAnnotation(a),
@@ -193,8 +193,8 @@ public class DeltaCommandToNotificationMapper
         );
     }
 
-    private ChildMovedFromOtherContainmentNotification OnMoveChildFromOtherContainment(
-        MoveChildFromOtherContainment command)
+    private ChildMovedFromContainmentInOtherParentNotification OnMoveChildFromContainmentInOtherParent(
+        MoveChildFromContainmentInOtherParent command)
     {
         var movedChild = ToNode(command.MovedChild);
         var oldContainment = GetContainmentAndParent(movedChild, nameof(command.MovedChild), out var oldParent);
@@ -203,7 +203,7 @@ public class DeltaCommandToNotificationMapper
         var newContainment = ToContainment(command.NewContainment, newParent);
         var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
 
-        return new ChildMovedFromOtherContainmentNotification(
+        return new ChildMovedFromContainmentInOtherParentNotification(
             newParent,
             newContainment,
             newIndex,
@@ -215,8 +215,8 @@ public class DeltaCommandToNotificationMapper
         );
     }
 
-    private ChildMovedAndReplacedFromOtherContainmentNotification OnMoveAndReplaceChildFromOtherContainment(
-        MoveAndReplaceChildFromOtherContainment command)
+    private ChildMovedAndReplacedFromContainmentInOtherParentNotification OnMoveAndReplaceChildFromContainmentInOtherParent(
+        MoveAndReplaceChildFromContainmentInOtherParent command)
     {
         var movedChild = ToNode(command.MovedChild);
         var newParent = ToNode(command.NewParent);
@@ -225,7 +225,7 @@ public class DeltaCommandToNotificationMapper
         var oldContainment = ToContainment(command.OldContainment, oldParent);
         var replacedChild = ToNode(command.ReplacedChild);
 
-        return new ChildMovedAndReplacedFromOtherContainmentNotification(
+        return new ChildMovedAndReplacedFromContainmentInOtherParentNotification(
             newParent,
             newContainment,
             command.NewIndex,
@@ -279,13 +279,13 @@ public class DeltaCommandToNotificationMapper
         );
     }
 
-    private ChildMovedAndReplacedInSameContainmentNotification OnMoveAndReplaceChildInSameContainment(MoveAndReplaceChildInSameContainment command)
+    private ChildMovedAndReplacedInSameContainmentInSameParentNotification OnMoveAndReplaceChildInSameContainmentInSameParent(MoveAndReplaceChildInSameContainmentInSameParent command)
     {
         var movedChild = ToNode(command.MovedChild);
         var containment = GetContainmentAndParent(movedChild, nameof(command.MovedChild), out var parent);
         var oldIndex = GetChildIndex(parent, containment, movedChild);
 
-        return new ChildMovedAndReplacedInSameContainmentNotification(
+        return new ChildMovedAndReplacedInSameContainmentInSameParentNotification(
             NewIndex(command.OldIndex, command.IndexOffset),
             movedChild,
             parent,
@@ -297,13 +297,13 @@ public class DeltaCommandToNotificationMapper
         );
     }
 
-    private ChildMovedInSameContainmentNotification OnMoveChildInSameContainment(MoveChildInSameContainment command)
+    private ChildMovedInSameContainmentInSameParentNotification OnMoveChildInSameContainmentInSameParent(MoveChildInSameContainmentInSameParent command)
     {
         var movedChild = ToNode(command.MovedChild);
         var containment = GetContainmentAndParent(movedChild, nameof(command.MovedChild), out var parent);
         var oldIndex = GetChildIndex(parent, containment, movedChild);
         var newIndex = NewIndex(command.OldIndex, command.IndexOffset);
-        return new ChildMovedInSameContainmentNotification(
+        return new ChildMovedInSameContainmentInSameParentNotification(
             newIndex,
             movedChild,
             parent,

@@ -177,12 +177,12 @@ public interface IDeltaError
 
 [JsonDerivedType(typeof(AddChild), nameof(AddChild))]
 [JsonDerivedType(typeof(DeleteChild), nameof(DeleteChild))]
-[JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainment), nameof(MoveAndReplaceChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildFromContainmentInOtherParent), nameof(MoveAndReplaceChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainmentInSameParent), nameof(MoveAndReplaceChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainment), nameof(MoveAndReplaceChildInSameContainment))]
-[JsonDerivedType(typeof(MoveChildFromOtherContainment), nameof(MoveChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainmentInSameParent), nameof(MoveAndReplaceChildInSameContainmentInSameParent))]
+[JsonDerivedType(typeof(MoveChildFromContainmentInOtherParent), nameof(MoveChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveChildFromOtherContainmentInSameParent), nameof(MoveChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveChildInSameContainment), nameof(MoveChildInSameContainment))]
+[JsonDerivedType(typeof(MoveChildInSameContainmentInSameParent), nameof(MoveChildInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ReplaceChild), nameof(ReplaceChild))]
 
 #endregion
@@ -249,12 +249,12 @@ public interface IDeltaError
 
 [JsonDerivedType(typeof(ChildAdded), nameof(ChildAdded))]
 [JsonDerivedType(typeof(ChildDeleted), nameof(ChildDeleted))]
-[JsonDerivedType(typeof(ChildMovedAndReplacedFromOtherContainment), nameof(ChildMovedAndReplacedFromOtherContainment))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedFromContainmentInOtherParent), nameof(ChildMovedAndReplacedFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(ChildMovedAndReplacedFromOtherContainmentInSameParent), nameof(ChildMovedAndReplacedFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(ChildMovedAndReplacedInSameContainment), nameof(ChildMovedAndReplacedInSameContainment))]
-[JsonDerivedType(typeof(ChildMovedFromOtherContainment), nameof(ChildMovedFromOtherContainment))]
+[JsonDerivedType(typeof(ChildMovedAndReplacedInSameContainmentInSameParent), nameof(ChildMovedAndReplacedInSameContainmentInSameParent))]
+[JsonDerivedType(typeof(ChildMovedFromContainmentInOtherParent), nameof(ChildMovedFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(ChildMovedFromOtherContainmentInSameParent), nameof(ChildMovedFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(ChildMovedInSameContainment), nameof(ChildMovedInSameContainment))]
+[JsonDerivedType(typeof(ChildMovedInSameContainmentInSameParent), nameof(ChildMovedInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ChildReplaced), nameof(ChildReplaced))]
 
 #endregion

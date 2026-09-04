@@ -241,7 +241,7 @@ public record ChildReplacedNotification(
 /// <param name="OldParent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedFromOtherContainmentNotification(
+public record ChildMovedFromContainmentInOtherParentNotification(
     IWritableNode NewParent,
     Containment NewContainment,
     Index NewIndex,
@@ -293,7 +293,7 @@ public record ChildMovedFromOtherContainmentInSameParentNotification(
 /// <param name="Parent"></param>
 /// <param name="Containment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedInSameContainmentNotification(
+public record ChildMovedInSameContainmentInSameParentNotification(
     Index NewIndex,
     IWritableNode MovedChild,
     IWritableNode Parent,
@@ -317,7 +317,7 @@ public record ChildMovedInSameContainmentNotification(
 /// <param name="OldParent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedAndReplacedFromOtherContainmentNotification(
+public record ChildMovedAndReplacedFromContainmentInOtherParentNotification(
     IWritableNode NewParent,
     Containment NewContainment,
     Index NewIndex,
@@ -389,7 +389,7 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
 /// <param name="Parent"></param>
 /// <param name="Containment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedAndReplacedInSameContainmentNotification(
+public record ChildMovedAndReplacedInSameContainmentInSameParentNotification(
     Index NewIndex,
     IWritableNode MovedChild,
     IWritableNode Parent,

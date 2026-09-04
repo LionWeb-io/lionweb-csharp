@@ -69,14 +69,14 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
             case ChildReplacedNotification e:
                 OnLocalChildReplaced(e);
                 break;
-            case ChildMovedAndReplacedFromOtherContainmentNotification e:
-                OnLocalChildMovedAndReplacedFromOtherContainment(e);
+            case ChildMovedAndReplacedFromContainmentInOtherParentNotification e:
+                OnLocalChildMovedAndReplacedFromContainmentInOtherParent(e);
                 break;
             case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e:
                 OnLocalChildMovedAndReplacedFromOtherContainmentInSameParent(e);
                 break;
-            case ChildMovedAndReplacedInSameContainmentNotification e:
-                OnLocalChildMovedAndReplacedInSameContainment(e);
+            case ChildMovedAndReplacedInSameContainmentInSameParentNotification e:
+                OnLocalChildMovedAndReplacedInSameContainmentInSameParent(e);
                 break;
 
             case AnnotationAddedNotification e:
@@ -131,16 +131,16 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
         _sharedNodeMap.RegisterNode(childReplaced.NewChild);
     }
 
-    private void OnLocalChildMovedAndReplacedFromOtherContainment(
-        ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplaced) =>
+    private void OnLocalChildMovedAndReplacedFromContainmentInOtherParent(
+        ChildMovedAndReplacedFromContainmentInOtherParentNotification childMovedAndReplaced) =>
         _sharedNodeMap.UnregisterNode(childMovedAndReplaced.ReplacedChild);
 
     private void OnLocalChildMovedAndReplacedFromOtherContainmentInSameParent(
         ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
         _sharedNodeMap.UnregisterNode(notification.ReplacedChild);
 
-    private void OnLocalChildMovedAndReplacedInSameContainment(
-        ChildMovedAndReplacedInSameContainmentNotification childMovedAndReplaced) =>
+    private void OnLocalChildMovedAndReplacedInSameContainmentInSameParent(
+        ChildMovedAndReplacedInSameContainmentInSameParentNotification childMovedAndReplaced) =>
         _sharedNodeMap.UnregisterNode(childMovedAndReplaced.ReplacedChild);
 
     #endregion

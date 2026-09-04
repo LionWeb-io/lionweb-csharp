@@ -57,12 +57,12 @@ public class NotificationToDeltaEventMapper
             ChildAddedNotification a => OnChildAdded(a),
             ChildDeletedNotification a => OnChildDeleted(a),
             ChildReplacedNotification a => OnChildReplaced(a),
-            ChildMovedFromOtherContainmentNotification a => OnChildMovedFromOtherContainment(a),
+            ChildMovedFromContainmentInOtherParentNotification a => OnChildMovedFromContainmentInOtherParent(a),
             ChildMovedFromOtherContainmentInSameParentNotification a => OnChildMovedFromOtherContainmentInSameParent(a),
-            ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedInSameContainmentInSameParentNotification a => OnChildMovedInSameContainmentInSameParent(a),
+            ChildMovedAndReplacedFromContainmentInOtherParentNotification a => OnChildMovedAndReplacedFromContainmentInOtherParent(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
-            ChildMovedAndReplacedInSameContainmentNotification a => OnChildMovedAndReplacedInSameContainment(a),
+            ChildMovedAndReplacedInSameContainmentInSameParentNotification a => OnChildMovedAndReplacedInSameContainmentInSameParent(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
             AnnotationReplacedNotification a => OnAnnotationReplaced(a),
@@ -171,8 +171,8 @@ public class NotificationToDeltaEventMapper
             []
         ) { SequenceNumber = NextEventSequenceNumber() };
 
-    private ChildMovedFromOtherContainment
-        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedNotification) =>
+    private ChildMovedFromContainmentInOtherParent
+        OnChildMovedFromContainmentInOtherParent(ChildMovedFromContainmentInOtherParentNotification childMovedNotification) =>
         new(
             childMovedNotification.NewParent.GetId(),
             childMovedNotification.NewContainment.ToMetaPointer(),
@@ -185,9 +185,9 @@ public class NotificationToDeltaEventMapper
             []
         ) { SequenceNumber = NextEventSequenceNumber() };
 
-    private ChildMovedAndReplacedFromOtherContainment
-        OnChildMovedAndReplacedFromOtherContainment(
-            ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) =>
+    private ChildMovedAndReplacedFromContainmentInOtherParent
+        OnChildMovedAndReplacedFromContainmentInOtherParent(
+            ChildMovedAndReplacedFromContainmentInOtherParentNotification childMovedAndReplacedNotification) =>
         new(
             childMovedAndReplacedNotification.NewParent.GetId(),
             childMovedAndReplacedNotification.NewContainment.ToMetaPointer(),
@@ -231,8 +231,8 @@ public class NotificationToDeltaEventMapper
             []
         ) { SequenceNumber = NextEventSequenceNumber() };
 
-    private ChildMovedAndReplacedInSameContainment OnChildMovedAndReplacedInSameContainment(
-        ChildMovedAndReplacedInSameContainmentNotification childMovedNotification) =>
+    private ChildMovedAndReplacedInSameContainmentInSameParent OnChildMovedAndReplacedInSameContainmentInSameParent(
+        ChildMovedAndReplacedInSameContainmentInSameParentNotification childMovedNotification) =>
         new(
             childMovedNotification.MovedChild.GetId(),
             childMovedNotification.Parent.GetId(),
@@ -245,8 +245,8 @@ public class NotificationToDeltaEventMapper
             []
         ) { SequenceNumber = NextEventSequenceNumber() };
 
-    private ChildMovedInSameContainment OnChildMovedInSameContainment(
-        ChildMovedInSameContainmentNotification childMovedNotification) =>
+    private ChildMovedInSameContainmentInSameParent OnChildMovedInSameContainmentInSameParent(
+        ChildMovedInSameContainmentInSameParentNotification childMovedNotification) =>
         new(
             childMovedNotification.MovedChild.GetId(),
             childMovedNotification.Parent.GetId(),

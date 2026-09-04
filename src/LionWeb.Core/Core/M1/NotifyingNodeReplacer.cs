@@ -146,12 +146,12 @@ internal class NotifyingNodeReplacer<T>(INode self, T replacement) : NodeReplace
         {
             case not null when _oldParent == _parent && _oldContainment == _containment:
                 var (newIndex, indexOffset) = MoveAndReplaceInSameList();
-                return new ChildMovedAndReplacedInSameContainmentNotification(newIndex, replacement, _parent, _containment, self, _replacementIndex, indexOffset, _notificationId);
+                return new ChildMovedAndReplacedInSameContainmentInSameParentNotification(newIndex, replacement, _parent, _containment, self, _replacementIndex, indexOffset, _notificationId);
             case not null when _oldParent == _parent && _oldContainment != _containment:
                 return new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(_containment, _replacedIndex, replacement, _parent, _oldContainment, _replacementIndex, self,
                     _notificationId);
             case not null when _oldParent != _parent:
-                return new ChildMovedAndReplacedFromOtherContainmentNotification(_parent, _containment, _replacedIndex, replacement, _oldParent, _oldContainment, _replacementIndex, self,
+                return new ChildMovedAndReplacedFromContainmentInOtherParentNotification(_parent, _containment, _replacedIndex, replacement, _oldParent, _oldContainment, _replacementIndex, self,
                     _notificationId);
             default:
                 throw new ArgumentException();

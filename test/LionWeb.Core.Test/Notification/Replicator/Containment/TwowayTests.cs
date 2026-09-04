@@ -259,10 +259,10 @@ public class TwowayTests : TwowayReplicatorTestsBase
 
     #endregion
 
-    #region ChildMovedFromOtherContainment
+    #region ChildMovedFromContainmentInOtherParent
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_Multiple()
+    public void ChildMovedFromContainmentInOtherParent_Multiple()
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
@@ -279,7 +279,7 @@ public class TwowayTests : TwowayReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_Single()
+    public void ChildMovedFromContainmentInOtherParent_Single()
     {
         var moved = new LinkTestConcept("moved");
         var node = new TestPartition("a") { Links =  [new LinkTestConcept("l") { Containment_1 = moved }, new LinkTestConcept("b")] };
@@ -334,10 +334,10 @@ public class TwowayTests : TwowayReplicatorTestsBase
 
     #endregion
 
-    #region ChildMovedInSameContainment
+    #region ChildMovedInSameContainmentInSameParent
 
     [TestMethod]
-    public void ChildMovedInSameContainment_Forward()
+    public void ChildMovedInSameContainmentInSameParent_Forward()
     {
         var moved = new LinkTestConcept("moved");
         var node = new TestPartition("a") { Links =  [moved, new LinkTestConcept("l")] };
@@ -353,7 +353,7 @@ public class TwowayTests : TwowayReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedInSameContainment_Backward()
+    public void ChildMovedInSameContainmentInSameParent_Backward()
     {
         var moved = new LinkTestConcept("moved");
         var node = new TestPartition("a") { Links =  [new LinkTestConcept("l"), moved] };

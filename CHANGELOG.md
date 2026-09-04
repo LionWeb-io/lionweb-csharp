@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - tbd
+* Renamed delta command `MoveChildFromOtherContainment` -> `MoveChildFromContainmentInOtherParent`.
+* Renamed delta event `ChildMovedFromOtherContainment` -> `ChildMovedFromContainmentInOtherParent`
+  and notification `ChildMovedFromOtherContainmentNotification` -> `ChildMovedFromContainmentInOtherParentNotification`.
+* Renamed delta command `MoveAndReplaceChildFromOtherContainment` -> `MoveAndReplaceChildFromContainmentInOtherParent`.
+* Renamed delta event `ChildMovedAndReplacedFromOtherContainment` -> `ChildMovedAndReplacedFromContainmentInOtherParent`
+  and notification `ChildMovedAndReplacedFromOtherContainmentNotification` -> `ChildMovedAndReplacedFromContainmentInOtherParentNotification`.
+* Renamed delta command `MoveChildInSameContainment` -> `MoveChildInSameContainmentInSameParent`.
+* Renamed delta event `ChildMovedInSameContainment` -> `ChildMovedInSameContainmentInSameParent`
+  and notification `ChildMovedInSameContainmentNotification` -> `ChildMovedInSameContainmentInSameParentNotification`.
+* Renamed delta command `MoveAndReplaceChildInSameContainment` -> `MoveAndReplaceChildInSameContainmentInSameParent`.
+* Renamed delta event `ChildMovedAndReplacedInSameContainment` -> `ChildMovedAndReplacedInSameContainmentInSameParent`
+  and notification `ChildMovedAndReplacedInSameContainmentNotification` -> `ChildMovedAndReplacedInSameContainmentInSameParentNotification`.
+
 ## [0.6.0] - tbd
 ### Added
 * Added `IGlobalM2Cache`, defaults to unset. If available, used by `M2Extensions`.

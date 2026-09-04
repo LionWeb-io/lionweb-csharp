@@ -125,11 +125,11 @@ public class AllNotificationTestsBase : NotificationTestsBase
         [CreateChildAddedNotification()],
         [CreateChildDeletedNotification()],
         [CreateChildMovedAndReplacedFromOtherContainmentInSameParentNotification()],
-        [CreateChildMovedAndReplacedFromOtherContainmentNotification()],
-        [CreateChildMovedAndReplacedInSameContainmentNotification()],
+        [CreateChildMovedAndReplacedFromContainmentInOtherParentNotification()],
+        [CreateChildMovedAndReplacedInSameContainmentInSameParentNotification()],
         [CreateChildMovedFromOtherContainmentInSameParentNotification()],
-        [CreateChildMovedFromOtherContainmentNotification()],
-        [CreateChildMovedInSameContainmentNotification()],
+        [CreateChildMovedFromContainmentInOtherParentNotification()],
+        [CreateChildMovedInSameContainmentInSameParentNotification()],
         [CreateChildReplacedNotification()],
     ];
 
@@ -143,22 +143,22 @@ public class AllNotificationTestsBase : NotificationTestsBase
         CreateChildMovedAndReplacedFromOtherContainmentInSameParentNotification() =>
         new(Containment(), 1, LinkNode(), LinkNode(), OtherContainment(), 0, LinkNode(), NotificationId());
 
-    protected static ChildMovedAndReplacedFromOtherContainmentNotification
-        CreateChildMovedAndReplacedFromOtherContainmentNotification() =>
+    protected static ChildMovedAndReplacedFromContainmentInOtherParentNotification
+        CreateChildMovedAndReplacedFromContainmentInOtherParentNotification() =>
         new(LinkNode(), Containment(), 1, LinkNode(), LinkNode(), OtherContainment(), 0, LinkNode(), NotificationId());
 
-    protected static ChildMovedAndReplacedInSameContainmentNotification
-        CreateChildMovedAndReplacedInSameContainmentNotification() =>
+    protected static ChildMovedAndReplacedInSameContainmentInSameParentNotification
+        CreateChildMovedAndReplacedInSameContainmentInSameParentNotification() =>
         new(1, LinkNode(), LinkNode(), Containment(), LinkNode(), 0, 1, NotificationId());
 
     protected static ChildMovedFromOtherContainmentInSameParentNotification
         CreateChildMovedFromOtherContainmentInSameParentNotification() =>
         new(Containment(), 1, LinkNode(), LinkNode(), OtherContainment(), 0, NotificationId());
 
-    protected static ChildMovedFromOtherContainmentNotification CreateChildMovedFromOtherContainmentNotification() =>
+    protected static ChildMovedFromContainmentInOtherParentNotification CreateChildMovedFromContainmentInOtherParentNotification() =>
         new(LinkNode(), Containment(), 1, LinkNode(), LinkNode(), OtherContainment(), 0, NotificationId());
 
-    protected static ChildMovedInSameContainmentNotification CreateChildMovedInSameContainmentNotification() =>
+    protected static ChildMovedInSameContainmentInSameParentNotification CreateChildMovedInSameContainmentInSameParentNotification() =>
         new(1, LinkNode(), LinkNode(), Containment(), 0, 1, NotificationId());
 
     protected static ChildReplacedNotification CreateChildReplacedNotification() =>
