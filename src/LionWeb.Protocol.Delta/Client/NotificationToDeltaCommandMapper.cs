@@ -216,7 +216,7 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
-    private MoveAndReplaceChildInSameContainment OnChildMovedAndReplacedInSameContainment(
+    private MoveAndReplaceChildInSameContainmentInSameParent OnChildMovedAndReplacedInSameContainment(
         ChildMovedAndReplacedInSameContainmentNotification childMovedNotification) =>
         new(
             childMovedNotification.Parent.GetId(),

@@ -179,7 +179,7 @@ public interface IDeltaError
 [JsonDerivedType(typeof(DeleteChild), nameof(DeleteChild))]
 [JsonDerivedType(typeof(MoveAndReplaceChildFromContainmentInOtherParent), nameof(MoveAndReplaceChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainmentInSameParent), nameof(MoveAndReplaceChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainment), nameof(MoveAndReplaceChildInSameContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainmentInSameParent), nameof(MoveAndReplaceChildInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(MoveChildFromContainmentInOtherParent), nameof(MoveChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveChildFromOtherContainmentInSameParent), nameof(MoveChildFromOtherContainmentInSameParent))]
 [JsonDerivedType(typeof(MoveChildInSameContainmentInSameParent), nameof(MoveChildInSameContainmentInSameParent))]
