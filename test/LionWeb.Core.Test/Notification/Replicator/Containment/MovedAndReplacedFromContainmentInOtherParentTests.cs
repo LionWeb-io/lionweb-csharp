@@ -23,7 +23,7 @@ using Languages.Generated.V2024_1.TestLanguage;
 using M1;
 
 [TestClass]
-public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
+public class MovedAndReplacedFromContainmentInOtherParentTests : ReplicatorTestsBase
 {
     [TestMethod]
     public void Single()
@@ -50,7 +50,7 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
         originalParent.Containment_0_1 = moved;
 
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
 
         AssertEquals([originalPartition], [clonedPartition]);
 
@@ -78,7 +78,7 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
         replaced.ReplaceWith(moved);
 
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
@@ -100,7 +100,7 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
         replaced.ReplaceWith(moved);
 
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
@@ -117,8 +117,8 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
-            newIndex, moved, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, oldIndex, replaced, new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
+        var notification = new ChildMovedAndReplacedFromContainmentInOtherParentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_links, 
+            newIndex, moved, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, oldIndex, replaced, new NumericNotificationId("childMovedAndReplacedFromContainmentInOtherParent", 0));
         
         CreatePartitionReplicator(clonedPartition, notification);
 
@@ -140,9 +140,9 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
 
         var newIndex = 1;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_links,
+        var notification = new ChildMovedAndReplacedFromContainmentInOtherParentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_links,
             newIndex, moved, origin, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, oldIndex, nodeWithAnotherId,
-            new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
+            new NumericNotificationId("childMovedAndReplacedFromContainmentInOtherParent", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {
@@ -175,9 +175,9 @@ public class MovedAndReplacedFromOtherContainmentTests : ReplicatorTestsBase
 
         var newIndex = 0;
         var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_links,
+        var notification = new ChildMovedAndReplacedFromContainmentInOtherParentNotification(originalPartition, TestLanguageLanguage.Instance.TestPartition_links,
             newIndex, moved, line, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, oldIndex, nodeWithAnotherId,
-            new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
+            new NumericNotificationId("childMovedAndReplacedFromContainmentInOtherParent", 0));
 
         Assert.ThrowsExactly<InvalidNotificationException>(() =>
         {

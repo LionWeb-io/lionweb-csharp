@@ -94,7 +94,7 @@ public class MovedFromContainmentInOtherParentTests : ReplicatorTestsBase
 
         AssertUniqueNodeIds(originPartition, destinationPartition);
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
         AssertEquals(originalForest.Partitions, clonedForest.Partitions);
     }
 }
