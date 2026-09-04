@@ -396,7 +396,7 @@ public class MapperTests : DeltaTestsBase
         var parent = new LinkTestConcept("parent") { Containment_0_n = [moved, other, replaced] };
         List<IReadableNode> nodes = [parent];
 
-        Assert.IsEmpty(Test<MoveAndReplaceChildInSameContainment, ChildMovedAndReplacedInSameContainment>(nodes,
+        Assert.IsEmpty(Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainment>(nodes,
             new ChildMovedAndReplacedInSameContainmentNotification(2, moved, parent, Containment, replaced, 0, +2, _notificationIdProvider.Create())
         ));
         }
@@ -412,7 +412,7 @@ public class MapperTests : DeltaTestsBase
 
         Assert.ContainsSingle(
             e => e.Message.StartsWith("Invalid notification: Replaced node node with id replaced does not match with actual node with id other at index 1 in containment containment_0_n"),
-            Test<MoveAndReplaceChildInSameContainment, ChildMovedAndReplacedInSameContainment>(nodes,
+            Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainment>(nodes,
                 new ChildMovedAndReplacedInSameContainmentNotification(1, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
             ));
     }
@@ -426,7 +426,7 @@ public class MapperTests : DeltaTestsBase
         var parent = new LinkTestConcept("parent") { Containment_0_n = [other, replaced] };
         List<IReadableNode> nodes = [parent, moved];
 
-        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveAndReplaceChildInSameContainment, ChildMovedAndReplacedInSameContainment>(nodes,
+        Assert.ContainsSingle(e => e.Message == "Mapping failed: parent of MovedChild[moved] unset", Test<MoveAndReplaceChildInSameContainmentInSameParent, ChildMovedAndReplacedInSameContainment>(nodes,
             new ChildMovedAndReplacedInSameContainmentNotification(1, moved, parent, Containment, replaced, 0, +1, _notificationIdProvider.Create())
         ));
     }
