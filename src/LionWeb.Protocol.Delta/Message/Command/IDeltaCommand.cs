@@ -59,12 +59,12 @@ using System.Text.Json.Serialization;
 
 [JsonDerivedType(typeof(AddChild), nameof(AddChild))]
 [JsonDerivedType(typeof(DeleteChild), nameof(DeleteChild))]
-[JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainment), nameof(MoveAndReplaceChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildFromContainmentInOtherParent), nameof(MoveAndReplaceChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainmentInSameParent), nameof(MoveAndReplaceChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainment), nameof(MoveAndReplaceChildInSameContainment))]
-[JsonDerivedType(typeof(MoveChildFromOtherContainment), nameof(MoveChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainmentInSameParent), nameof(MoveAndReplaceChildInSameContainmentInSameParent))]
+[JsonDerivedType(typeof(MoveChildFromContainmentInOtherParent), nameof(MoveChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveChildFromOtherContainmentInSameParent), nameof(MoveChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveChildInSameContainment), nameof(MoveChildInSameContainment))]
+[JsonDerivedType(typeof(MoveChildInSameContainmentInSameParent), nameof(MoveChildInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ReplaceChild), nameof(ReplaceChild))]
 
 #endregion
@@ -139,12 +139,12 @@ public interface IDeltaCommand : IDeltaContent
 
 [JsonDerivedType(typeof(AddChild), nameof(AddChild))]
 [JsonDerivedType(typeof(DeleteChild), nameof(DeleteChild))]
-[JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainment), nameof(MoveAndReplaceChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildFromContainmentInOtherParent), nameof(MoveAndReplaceChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveAndReplaceChildFromOtherContainmentInSameParent), nameof(MoveAndReplaceChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainment), nameof(MoveAndReplaceChildInSameContainment))]
-[JsonDerivedType(typeof(MoveChildFromOtherContainment), nameof(MoveChildFromOtherContainment))]
+[JsonDerivedType(typeof(MoveAndReplaceChildInSameContainmentInSameParent), nameof(MoveAndReplaceChildInSameContainmentInSameParent))]
+[JsonDerivedType(typeof(MoveChildFromContainmentInOtherParent), nameof(MoveChildFromContainmentInOtherParent))]
 [JsonDerivedType(typeof(MoveChildFromOtherContainmentInSameParent), nameof(MoveChildFromOtherContainmentInSameParent))]
-[JsonDerivedType(typeof(MoveChildInSameContainment), nameof(MoveChildInSameContainment))]
+[JsonDerivedType(typeof(MoveChildInSameContainmentInSameParent), nameof(MoveChildInSameContainmentInSameParent))]
 [JsonDerivedType(typeof(ReplaceChild), nameof(ReplaceChild))]
 
 #endregion

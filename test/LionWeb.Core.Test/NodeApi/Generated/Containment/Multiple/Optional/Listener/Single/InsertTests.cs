@@ -252,7 +252,7 @@ public class InsertTests
 
         parent.InsertLinks(2, [child]);
 
-        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromContainmentInOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
@@ -276,7 +276,7 @@ public class InsertTests
 
         parent.Set(TestLanguageLanguage.Instance.TestPartition_links, new List<INode> { childA, childB, child });
 
-        var notifications = observer.AssertOfType<ChildMovedFromOtherContainmentNotification>(1);
+        var notifications = observer.AssertOfType<ChildMovedFromContainmentInOtherParentNotification>(1);
         Assert.AreSame(oldParent, notifications[0].OldParent);
         Assert.AreSame(TestLanguageLanguage.Instance.TestPartition_links, notifications[0].OldContainment);
         Assert.AreEqual(0, notifications[0].OldIndex);
@@ -348,7 +348,7 @@ public class InsertTests
 
         parentNode.InsertContainment_1_n(2, values);
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(2);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(2);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parentNode, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);
@@ -377,7 +377,7 @@ public class InsertTests
 
         parentNode.Set(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, new List<INode> { childA, valueA, childB, valueB });
 
-        var notifications = observer.AssertOfType<ChildMovedInSameContainmentNotification>(2);
+        var notifications = observer.AssertOfType<ChildMovedInSameContainmentInSameParentNotification>(2);
         Assert.AreEqual(0, notifications[0].OldIndex);
         Assert.AreSame(parentNode, notifications[0].Parent);
         Assert.AreSame(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, notifications[0].Containment);

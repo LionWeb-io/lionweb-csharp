@@ -44,16 +44,16 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ChildAddedNotification a => OnChildAdded(a),
             ChildDeletedNotification a => OnChildDeleted(a),
             ChildReplacedNotification a => OnChildReplaced(a),
-            ChildMovedFromOtherContainmentNotification a => OnChildMovedFromOtherContainment(a),
+            ChildMovedFromContainmentInOtherParentNotification a => OnChildMovedFromContainmentInOtherParent(a),
             ChildMovedFromOtherContainmentInSameParentNotification a => OnChildMovedFromOtherContainmentInSameParent(a),
-            ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedInSameContainmentInSameParentNotification a => OnChildMovedInSameContainmentInSameParent(a),
+            ChildMovedAndReplacedFromContainmentInOtherParentNotification a => OnChildMovedAndReplacedFromContainmentInOtherParent(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
-            ChildMovedAndReplacedInSameContainmentNotification a => OnChildMovedAndReplacedInSameContainment(a),
+            ChildMovedAndReplacedInSameContainmentInSameParentNotification a => OnChildMovedAndReplacedInSameContainmentInSameParent(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
             AnnotationReplacedNotification a => OnAnnotationReplaced(a),
-            AnnotationMovedAndReplacedInSameParentNotification a => OnAnnotationMovedAndReplacedInSameParentNotification(a),
+            AnnotationMovedAndReplacedInSameParentNotification a => OnAnnotationMovedAndReplacedInSameParent(a),
             AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedAndReplacedFromOtherParentNotification a => OnAnnotationMovedAndReplacedFromOtherParent(a),
             AnnotationMovedInSameParentNotification a => OnAnnotationMovedInSameParent(a),
@@ -167,14 +167,14 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
-    private ChildMovedFromOtherContainmentNotification OnChildMovedFromOtherContainment(
-        ChildMovedFromOtherContainmentNotification notification)
+    private ChildMovedFromContainmentInOtherParentNotification OnChildMovedFromContainmentInOtherParent(
+        ChildMovedFromContainmentInOtherParentNotification notification)
     {
         var movedChild = LookUpNode(notification.MovedChild);
         var newParent = LookUpNode(notification.NewParent);
         var oldParent = LookUpNode(notification.OldParent);
 
-        return new ChildMovedFromOtherContainmentNotification(
+        return new ChildMovedFromContainmentInOtherParentNotification(
             newParent,
             notification.NewContainment,
             notification.NewIndex,
@@ -186,15 +186,15 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
-    private ChildMovedAndReplacedFromOtherContainmentNotification OnChildMovedAndReplacedFromOtherContainment(
-        ChildMovedAndReplacedFromOtherContainmentNotification notification)
+    private ChildMovedAndReplacedFromContainmentInOtherParentNotification OnChildMovedAndReplacedFromContainmentInOtherParent(
+        ChildMovedAndReplacedFromContainmentInOtherParentNotification notification)
     {
         var newParent = LookUpNode(notification.NewParent);
         var movedChild = LookUpNode(notification.MovedChild);
         var oldParent = LookUpNode(notification.OldParent);
         var replacedChild = LookUpNode(notification.ReplacedChild);
 
-        return new ChildMovedAndReplacedFromOtherContainmentNotification(
+        return new ChildMovedAndReplacedFromContainmentInOtherParentNotification(
             newParent,
             notification.NewContainment,
             notification.NewIndex,
@@ -244,13 +244,13 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
-    private ChildMovedInSameContainmentNotification OnChildMovedInSameContainment(
-        ChildMovedInSameContainmentNotification notification)
+    private ChildMovedInSameContainmentInSameParentNotification OnChildMovedInSameContainmentInSameParent(
+        ChildMovedInSameContainmentInSameParentNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
         var movedChild = LookUpNode(notification.MovedChild);
 
-        return new ChildMovedInSameContainmentNotification(
+        return new ChildMovedInSameContainmentInSameParentNotification(
             notification.NewIndex,
             movedChild,
             parent,
@@ -261,13 +261,13 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
-    private ChildMovedAndReplacedInSameContainmentNotification OnChildMovedAndReplacedInSameContainment(ChildMovedAndReplacedInSameContainmentNotification notification)
+    private ChildMovedAndReplacedInSameContainmentInSameParentNotification OnChildMovedAndReplacedInSameContainmentInSameParent(ChildMovedAndReplacedInSameContainmentInSameParentNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
         var movedChild = LookUpNode(notification.MovedChild);
         var replacedChild = LookUpNode(notification.ReplacedChild);
 
-        return new ChildMovedAndReplacedInSameContainmentNotification(
+        return new ChildMovedAndReplacedInSameContainmentInSameParentNotification(
             notification.NewIndex,
             movedChild,
             parent,
@@ -373,7 +373,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
-    private INotification OnAnnotationMovedAndReplacedInSameParentNotification(AnnotationMovedAndReplacedInSameParentNotification notification)
+    private INotification OnAnnotationMovedAndReplacedInSameParent(AnnotationMovedAndReplacedInSameParentNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
         var movedAnnotation = LookUpNode(notification.MovedAnnotation);

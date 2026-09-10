@@ -102,7 +102,7 @@ public record ReplaceChild(
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
-public record MoveChildFromOtherContainment(
+public record MoveChildFromContainmentInOtherParent(
     TargetNode NewParent,
     MetaPointer NewContainment,
     Index NewIndex,
@@ -125,7 +125,7 @@ public record MoveChildFromOtherContainmentInSameParent(
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
-public record MoveChildInSameContainment(
+public record MoveChildInSameContainmentInSameParent(
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,
@@ -135,7 +135,7 @@ public record MoveChildInSameContainment(
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
-public record MoveAndReplaceChildFromOtherContainment(
+public record MoveAndReplaceChildFromContainmentInOtherParent(
     TargetNode NewParent,
     MetaPointer NewContainment,
     Index NewIndex,
@@ -160,7 +160,7 @@ public record MoveAndReplaceChildFromOtherContainmentInSameParent(
     AdditionalInfo[]? AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
-public record MoveAndReplaceChildInSameContainment(
+public record MoveAndReplaceChildInSameContainmentInSameParent(
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,

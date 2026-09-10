@@ -178,8 +178,8 @@ public class ReverseTests_Containment
 
     private void AssertChildMoved(LinkTestConcept parent, LinkTestConcept child, int oldIndex, int newIndex, INotification notification)
     {
-        Assert.IsInstanceOfType<ChildMovedInSameContainmentNotification>(notification);
-        var notificationE = (ChildMovedInSameContainmentNotification)notification;
+        Assert.IsInstanceOfType<ChildMovedInSameContainmentInSameParentNotification>(notification);
+        var notificationE = (ChildMovedInSameContainmentInSameParentNotification)notification;
         Assert.AreSame(parent, notificationE.Parent);
         Assert.AreSame(child, notificationE.MovedChild);
         Assert.AreSame(_containment_0_n, notificationE.Containment);

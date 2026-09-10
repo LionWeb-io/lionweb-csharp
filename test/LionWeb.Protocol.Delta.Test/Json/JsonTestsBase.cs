@@ -166,7 +166,7 @@ public abstract class JsonTestsBase
         new(Chunk(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
-    protected static MoveChildFromOtherContainment CreateMoveChildFromOtherContainment() =>
+    protected static MoveChildFromContainmentInOtherParent CreateMoveChildFromContainmentInOtherParent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
@@ -174,18 +174,17 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), MetaPointer(), Index(), TargetNode(), CommandId(),
             AdditionalInfos());
 
-    protected static MoveChildInSameContainment CreateMoveChildInSameContainment() =>
+    protected static MoveChildInSameContainmentInSameParent CreateMoveChildInSameContainmentInSameParent() =>
         new(TargetNode(), MetaPointer(), Index(), IndexOffset(), TargetNode(), CommandId(), AdditionalInfos());
 
-    protected static MoveAndReplaceChildFromOtherContainment CreateMoveAndReplaceChildFromOtherContainment() =>
+    protected static MoveAndReplaceChildFromContainmentInOtherParent CreateMoveAndReplaceChildFromContainmentInOtherParent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(),
             TargetNode(), CommandId(), AdditionalInfos());
 
-    protected static MoveAndReplaceChildFromOtherContainmentInSameParent
-        CreateMoveAndReplaceChildFromOtherContainmentInSameParent() =>
+    protected static MoveAndReplaceChildFromOtherContainmentInSameParent CreateMoveAndReplaceChildFromOtherContainmentInSameParent() =>
         new(TargetNode(), MetaPointer(), Index(), MetaPointer(), Index(),TargetNode(), TargetNode(), CommandId(), AdditionalInfos());
 
-    protected static MoveAndReplaceChildInSameContainment CreateMoveAndReplaceChildInSameContainment() =>
+    protected static MoveAndReplaceChildInSameContainmentInSameParent CreateMoveAndReplaceChildInSameContainmentInSameParent() =>
         new(TargetNode(), MetaPointer(), Index(), IndexOffset(), TargetNode(), TargetNode(), CommandId(),
             AdditionalInfos());
 
@@ -256,12 +255,12 @@ public abstract class JsonTestsBase
         [CreateAddChild(), typeof(AddChild)],
         [CreateDeleteChild(), typeof(DeleteChild)],
         [CreateReplaceChild(), typeof(ReplaceChild)],
-        [CreateMoveChildFromOtherContainment(), typeof(MoveChildFromOtherContainment)],
+        [CreateMoveChildFromContainmentInOtherParent(), typeof(MoveChildFromContainmentInOtherParent)],
         [CreateMoveChildFromOtherContainmentInSameParent(), typeof(MoveChildFromOtherContainmentInSameParent)],
-        [CreateMoveChildInSameContainment(), typeof(MoveChildInSameContainment)],
-        [CreateMoveAndReplaceChildFromOtherContainment(), typeof(MoveAndReplaceChildFromOtherContainment)],
+        [CreateMoveChildInSameContainmentInSameParent(), typeof(MoveChildInSameContainmentInSameParent)],
+        [CreateMoveAndReplaceChildFromContainmentInOtherParent(), typeof(MoveAndReplaceChildFromContainmentInOtherParent)],
         [CreateMoveAndReplaceChildFromOtherContainmentInSameParent(), typeof(MoveAndReplaceChildFromOtherContainmentInSameParent)],
-        [CreateMoveAndReplaceChildInSameContainment(), typeof(MoveAndReplaceChildInSameContainment)],
+        [CreateMoveAndReplaceChildInSameContainmentInSameParent(), typeof(MoveAndReplaceChildInSameContainmentInSameParent)],
         [CreateAddAnnotation(), typeof(AddAnnotation)],
         [CreateDeleteAnnotation(), typeof(DeleteAnnotation)],
         [CreateReplaceAnnotation(), typeof(ReplaceAnnotation)],
@@ -335,7 +334,7 @@ public abstract class JsonTestsBase
             SequenceNumber = Sequence()
         };
 
-    protected static ChildMovedFromOtherContainment CreateChildMovedFromOtherContainment() =>
+    protected static ChildMovedFromContainmentInOtherParent CreateChildMovedFromContainmentInOtherParent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(),
             AdditionalInfos()) { SequenceNumber = Sequence() };
 
@@ -345,22 +344,21 @@ public abstract class JsonTestsBase
             SequenceNumber = Sequence()
         };
 
-    protected static ChildMovedInSameContainment CreateChildMovedInSameContainment() =>
+    protected static ChildMovedInSameContainmentInSameParent CreateChildMovedInSameContainmentInSameParent() =>
         new(TargetNode(), TargetNode(), MetaPointer(), Index(), IndexOffset(), Origin(), AdditionalInfos())
         {
             SequenceNumber = Sequence()
         };
 
-    protected static ChildMovedAndReplacedFromOtherContainment CreateChildMovedAndReplacedFromOtherContainment() =>
+    protected static ChildMovedAndReplacedFromContainmentInOtherParent CreateChildMovedAndReplacedFromContainmentInOtherParent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(),
             Descendants(), Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
-    protected static ChildMovedAndReplacedFromOtherContainmentInSameParent
-        CreateChildMovedAndReplacedFromOtherContainmentInSameParent() =>
+    protected static ChildMovedAndReplacedFromOtherContainmentInSameParent CreateChildMovedAndReplacedFromOtherContainmentInSameParent() =>
         new(MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(),
             Origin(), AdditionalInfos()) { SequenceNumber = Sequence() };
 
-    protected static ChildMovedAndReplacedInSameContainment CreateChildMovedAndReplacedInSameContainment() =>
+    protected static ChildMovedAndReplacedInSameContainmentInSameParent CreateChildMovedAndReplacedInSameContainmentInSameParent() =>
         new(TargetNode(), TargetNode(), MetaPointer(), Index(), IndexOffset(), TargetNode(), Descendants(), Origin(),
             AdditionalInfos()) { SequenceNumber = Sequence() };
 
@@ -454,12 +452,12 @@ public abstract class JsonTestsBase
         [CreateChildAdded(), typeof(ChildAdded)],
         [CreateChildDeleted(), typeof(ChildDeleted)],
         [CreateChildReplaced(), typeof(ChildReplaced)],
-        [CreateChildMovedFromOtherContainment(), typeof(ChildMovedFromOtherContainment)],
+        [CreateChildMovedFromContainmentInOtherParent(), typeof(ChildMovedFromContainmentInOtherParent)],
         [CreateChildMovedFromOtherContainmentInSameParent(), typeof(ChildMovedFromOtherContainmentInSameParent)],
-        [CreateChildMovedInSameContainment(), typeof(ChildMovedInSameContainment)],
-        [CreateChildMovedAndReplacedFromOtherContainment(), typeof(ChildMovedAndReplacedFromOtherContainment)],
+        [CreateChildMovedInSameContainmentInSameParent(), typeof(ChildMovedInSameContainmentInSameParent)],
+        [CreateChildMovedAndReplacedFromContainmentInOtherParent(), typeof(ChildMovedAndReplacedFromContainmentInOtherParent)],
         [CreateChildMovedAndReplacedFromOtherContainmentInSameParent(), typeof(ChildMovedAndReplacedFromOtherContainmentInSameParent)],
-        [CreateChildMovedAndReplacedInSameContainment(), typeof(ChildMovedAndReplacedInSameContainment)],
+        [CreateChildMovedAndReplacedInSameContainmentInSameParent(), typeof(ChildMovedAndReplacedInSameContainmentInSameParent)],
         [CreateAnnotationAdded(), typeof(AnnotationAdded)],
         [CreateAnnotationDeleted(), typeof(AnnotationDeleted)],
         [CreateAnnotationReplaced(), typeof(AnnotationReplaced)],

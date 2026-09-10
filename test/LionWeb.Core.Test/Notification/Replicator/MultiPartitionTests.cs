@@ -25,10 +25,10 @@ public class MultiPartitionTests : ReplicatorTestsBase
 {
     #region Children
 
-    #region ChildMovedFromOtherContainment
+    #region ChildMovedFromContainmentInOtherParent
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_Multiple_SamePartition()
+    public void ChildMovedFromContainmentInOtherParent_Multiple_SamePartition()
     {
         var moved = new LinkTestConcept("moved");
         var origin = new LinkTestConcept("origin") { Containment_1_n = [moved] };
@@ -45,7 +45,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         var deletions = observer.Notifications.OfType<ChildDeletedNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.DeletedChild)).ToList();
-        var moves = observer.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var moves = observer.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
@@ -55,10 +55,10 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
     [TestMethod]
     [Ignore("Requires implementation of rewriting logic")]
-    public void ChildMovedFromOtherContainment_Multiple_DifferentPartition_Add()
+    public void ChildMovedFromContainmentInOtherParent_Multiple_DifferentPartition_Add()
     {
         // This change adds a new node to the original partition (node).
-        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // It should NOT be seen as ChildMovedFromContainmentInOtherParent but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
         var moved = new LinkTestConcept("moved");
@@ -78,9 +78,9 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         node.AddLinks([moved]);
 
-        var originMoves = originObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var originMoves = originObserver.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
-        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
@@ -91,10 +91,10 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
     [TestMethod]
     [Ignore("Requires implementation of rewriting logic")]
-    public void ChildMovedFromOtherContainment_Multiple_DifferentPartition_Insert()
+    public void ChildMovedFromContainmentInOtherParent_Multiple_DifferentPartition_Insert()
     {
         // This change adds a new node to the original partition (node).
-        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // It should NOT be seen as ChildMovedFromContainmentInOtherParent but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.
 
         var moved = new LinkTestConcept("moved");
@@ -114,9 +114,9 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         node.InsertLinks(0, [moved]);
 
-        var originMoves = originObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var originMoves = originObserver.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
-        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
@@ -126,7 +126,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_Single_SamePartition()
+    public void ChildMovedFromContainmentInOtherParent_Single_SamePartition()
     {
         var moved = new LinkTestConcept("moved");
         var node = new TestPartition("a") { Links =  [new LinkTestConcept("l") { Containment_1 = moved }, new LinkTestConcept("ll")] };
@@ -142,7 +142,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         var deletions = observer.Notifications.OfType<ChildDeletedNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.DeletedChild)).ToList();
-        var moves = observer.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var moves = observer.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
@@ -152,10 +152,10 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
     [TestMethod]
     [Ignore("Requires implementation of rewriting logic")]
-    public void ChildMovedFromOtherContainment_Single_DifferentPartition()
+    public void ChildMovedFromContainmentInOtherParent_Single_DifferentPartition()
     {
         // This change adds a new node to the original partition (node).
-        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // It should NOT be seen as ChildMovedFromContainmentInOtherParent but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
         var moved = new LinkTestConcept("moved");
@@ -174,9 +174,9 @@ public class MultiPartitionTests : ReplicatorTestsBase
 
         node.Links[0].Containment_0_1 = moved;
 
-        var originMoves = originObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var originMoves = originObserver.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
-        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromOtherContainmentNotification>()
+        var destinationMoves = destinationObserver.Notifications.OfType<ChildMovedFromContainmentInOtherParentNotification>()
             .Select(e => (e.NotificationId.ToString(), (IReadableNode)e.MovedChild)).ToList();
 
         AssertEquals([node], [clone]);
@@ -227,7 +227,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
     public void AnnotationMovedFromOtherParent_Multiple_DifferentPartition_Add()
     {
         // This change adds a new node to the original partition (node).
-        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // It should NOT be seen as ChildMovedFromContainmentInOtherParent but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
         var moved = new TestAnnotation("moved");
@@ -264,7 +264,7 @@ public class MultiPartitionTests : ReplicatorTestsBase
     public void AnnotationMovedFromOtherParent_Multiple_DifferentPartition_Insert()
     {
         // This change adds a new node to the original partition (node).
-        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // It should NOT be seen as ChildMovedFromContainmentInOtherParent but as ChildAdded, because parent of a moved child is not known.   
         // Therefore, rewriting of notification is needed.   
 
         var moved = new TestAnnotation("moved");

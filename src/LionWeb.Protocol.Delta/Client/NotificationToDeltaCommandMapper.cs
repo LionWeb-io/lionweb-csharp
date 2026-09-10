@@ -51,13 +51,12 @@ public class NotificationToDeltaCommandMapper
             ChildAddedNotification a => OnChildAdded(a),
             ChildDeletedNotification a => OnChildDeleted(a),
             ChildReplacedNotification a => OnChildReplaced(a),
-            ChildMovedFromOtherContainmentNotification a => OnChildMovedFromOtherContainment(a),
-            ChildMovedFromOtherContainmentInSameParentNotification a =>
-                OnChildMovedFromOtherContainmentInSameParent(a),
-            ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedFromContainmentInOtherParentNotification a => OnChildMovedFromContainmentInOtherParent(a),
+            ChildMovedFromOtherContainmentInSameParentNotification a => OnChildMovedFromOtherContainmentInSameParent(a),
+            ChildMovedInSameContainmentInSameParentNotification a => OnChildMovedInSameContainmentInSameParent(a),
+            ChildMovedAndReplacedFromContainmentInOtherParentNotification a => OnChildMovedAndReplacedFromContainmentInOtherParent(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
-            ChildMovedAndReplacedInSameContainmentNotification a => OnChildMovedAndReplacedInSameContainment(a),
+            ChildMovedAndReplacedInSameContainmentInSameParentNotification a => OnChildMovedAndReplacedInSameContainmentInSameParent(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
             AnnotationReplacedNotification a => OnAnnotationReplaced(a),
@@ -158,8 +157,8 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
-    private MoveChildFromOtherContainment
-        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedNotification) =>
+    private MoveChildFromContainmentInOtherParent
+        OnChildMovedFromContainmentInOtherParent(ChildMovedFromContainmentInOtherParentNotification childMovedNotification) =>
         new(
             childMovedNotification.NewParent.GetId(),
             childMovedNotification.NewContainment.ToMetaPointer(),
@@ -172,9 +171,9 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
-    private MoveAndReplaceChildFromOtherContainment
-        OnChildMovedAndReplacedFromOtherContainment(
-            ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) =>
+    private MoveAndReplaceChildFromContainmentInOtherParent
+        OnChildMovedAndReplacedFromContainmentInOtherParent(
+            ChildMovedAndReplacedFromContainmentInOtherParentNotification childMovedAndReplacedNotification) =>
         new(
             childMovedAndReplacedNotification.NewParent.GetId(),
             childMovedAndReplacedNotification.NewContainment.ToMetaPointer(),
@@ -216,8 +215,8 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
-    private MoveAndReplaceChildInSameContainment OnChildMovedAndReplacedInSameContainment(
-        ChildMovedAndReplacedInSameContainmentNotification childMovedNotification) =>
+    private MoveAndReplaceChildInSameContainmentInSameParent OnChildMovedAndReplacedInSameContainmentInSameParent(
+        ChildMovedAndReplacedInSameContainmentInSameParentNotification childMovedNotification) =>
         new(
             childMovedNotification.Parent.GetId(),
             childMovedNotification.Containment.ToMetaPointer(),
@@ -229,8 +228,8 @@ public class NotificationToDeltaCommandMapper
             []
         );
 
-    private MoveChildInSameContainment OnChildMovedInSameContainment(
-        ChildMovedInSameContainmentNotification childMovedNotification) =>
+    private MoveChildInSameContainmentInSameParent OnChildMovedInSameContainmentInSameParent(
+        ChildMovedInSameContainmentInSameParentNotification childMovedNotification) =>
         new(
             childMovedNotification.Parent.GetId(),
             childMovedNotification.Containment.ToMetaPointer(),
