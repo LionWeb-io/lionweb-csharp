@@ -233,7 +233,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     {
         var signOnResponse =
             await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId,
-                IdUtils.NewId(), repositoryId, []));
+                repositoryId, QueryId(), []));
         _repositoryId = repositoryId;
         ParticipationId = signOnResponse.ParticipationId;
         return signOnResponse;

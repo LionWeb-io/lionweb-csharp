@@ -83,9 +83,12 @@ public class WebSocketClient
         });
     }
 
-    protected async Task Send(string msg) =>
+    protected async Task Send(string msg)
+    {
+        Log($"Sending to repo: {msg}");
         await _clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text,
             true, CancellationToken.None);
+    }
 
     protected virtual void Log(string message, bool header = false) =>
         Console.WriteLine(header

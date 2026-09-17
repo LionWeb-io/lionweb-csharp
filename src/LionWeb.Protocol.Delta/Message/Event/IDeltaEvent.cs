@@ -122,7 +122,8 @@ public interface IDeltaEvent : IDeltaContent
 
     CommandSource[] OriginCommands { get; }
 
-    [JsonIgnore] HashSet<TargetNode> AffectedNodes { get; }
+    [JsonIgnore] 
+    HashSet<TargetNode> AffectedNodes { get; }
 }
 
 /// <remarks>

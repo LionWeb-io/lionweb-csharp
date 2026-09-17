@@ -8,6 +8,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.7.0] - tbd
 ### Added
 ### Fixed
+* `LionWebClient.SignOn()` mixed up repositoryId and queryId parameters.
 ### Changed
 * Renamed delta command `MoveChildFromOtherContainment` -> `MoveChildFromContainmentInOtherParent`.
 * Renamed delta event `ChildMovedFromOtherContainment` -> `ChildMovedFromContainmentInOtherParent`
