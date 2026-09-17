@@ -29,7 +29,7 @@ public record ChangeClassifier(
     TargetNode Node,
     MetaPointer NewClassifier,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), INodeCommand;
 
 #endregion
@@ -50,14 +50,14 @@ public record AddProperty(
     MetaPointer Property,
     PropertyValue NewValue,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IPropertyCommand;
 
 public record DeleteProperty(
     TargetNode Node,
     MetaPointer Property,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IPropertyCommand;
 
 public record ChangeProperty(
@@ -65,7 +65,7 @@ public record ChangeProperty(
     MetaPointer Property,
     PropertyValue NewValue,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IPropertyCommand;
 
 #endregion
@@ -80,7 +80,7 @@ public record AddChild(
     MetaPointer Containment,
     Index Index,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record DeleteChild(
@@ -89,7 +89,7 @@ public record DeleteChild(
     Index Index,
     TargetNode DeletedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record ReplaceChild(
@@ -99,7 +99,7 @@ public record ReplaceChild(
     Index Index,
     TargetNode ReplacedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveChildFromContainmentInOtherParent(
@@ -111,7 +111,7 @@ public record MoveChildFromContainmentInOtherParent(
     Index OldIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveChildFromOtherContainmentInSameParent(
@@ -122,7 +122,7 @@ public record MoveChildFromOtherContainmentInSameParent(
     Index OldIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveChildInSameContainmentInSameParent(
@@ -132,7 +132,7 @@ public record MoveChildInSameContainmentInSameParent(
     IndexOffset IndexOffset,
     TargetNode MovedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveAndReplaceChildFromContainmentInOtherParent(
@@ -145,7 +145,7 @@ public record MoveAndReplaceChildFromContainmentInOtherParent(
     TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveAndReplaceChildFromOtherContainmentInSameParent(
@@ -157,7 +157,7 @@ public record MoveAndReplaceChildFromOtherContainmentInSameParent(
     TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 public record MoveAndReplaceChildInSameContainmentInSameParent(
@@ -168,7 +168,7 @@ public record MoveAndReplaceChildInSameContainmentInSameParent(
     TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IContainmentCommand;
 
 #endregion
@@ -182,7 +182,7 @@ public record AddAnnotation(
     DeltaSerializationChunk NewAnnotation,
     Index Index,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record DeleteAnnotation(
@@ -190,7 +190,7 @@ public record DeleteAnnotation(
     Index Index,
     TargetNode DeletedAnnotation,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record ReplaceAnnotation(
@@ -199,7 +199,7 @@ public record ReplaceAnnotation(
     Index Index,
     TargetNode ReplacedAnnotation,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record MoveAnnotationFromOtherParent(
@@ -209,7 +209,7 @@ public record MoveAnnotationFromOtherParent(
     Index OldIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record MoveAnnotationInSameParent(
@@ -218,7 +218,7 @@ public record MoveAnnotationInSameParent(
     IndexOffset IndexOffset,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationFromOtherParent(
@@ -229,7 +229,7 @@ public record MoveAndReplaceAnnotationFromOtherParent(
     TargetNode ReplacedAnnotation,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationInSameParent(
@@ -239,7 +239,7 @@ public record MoveAndReplaceAnnotationInSameParent(
     TargetNode ReplacedAnnotation,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IAnnotationCommand;
 
 #endregion
@@ -255,7 +255,7 @@ public record AddReference(
     TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IReferenceCommand;
 
 public record DeleteReference(
@@ -265,7 +265,7 @@ public record DeleteReference(
     TargetNode? DeletedReference,
     ResolveInfo? DeletedResolveInfo,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IReferenceCommand;
 
 public record ChangeReference(
@@ -277,7 +277,7 @@ public record ChangeReference(
     TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IReferenceCommand;
 
 #endregion

@@ -34,7 +34,7 @@ public interface IDeltaQueryResponse : IDeltaQuery;
 
 public abstract record DeltaQueryBase(
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaContentBase(AdditionalInfos)
 {
     /// <inheritdoc />
@@ -86,7 +86,7 @@ public record ContinuedQueryResponse(
     ContinuedChunkCompleted ContinuedChunkCompleted,
     ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IDeltaQueryResponse, IDeltaContinued;
 
 #region Subscription
@@ -99,12 +99,12 @@ public record SubscribeToChangingPartitionsRequest(
     bool Creation,
     bool Deletion,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record SubscribeToChangingPartitionsResponse(
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
@@ -114,13 +114,13 @@ public record SubscribeToChangingPartitionsResponse(
 public record SubscribeToPartitionContentsRequest(
     TargetNode Partition,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record SubscribeToPartitionContentsResponse(
     DeltaSerializationChunk Contents,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
@@ -130,12 +130,12 @@ public record SubscribeToPartitionContentsResponse(
 public record UnsubscribeFromPartitionContentsRequest(
     TargetNode Partition,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record UnsubscribeFromPartitionContentsResponse(
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
@@ -153,7 +153,7 @@ public record SignOnRequest(
     ClientId ClientId,
     RepositoryId RepositoryId,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest
 {
     /// <inheritdoc />
@@ -164,7 +164,7 @@ public record SignOnRequest(
 public record SignOnResponse(
     ParticipationId ParticipationId,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryResponse;
 
 #endregion
@@ -173,12 +173,12 @@ public record SignOnResponse(
 
 public record SignOffRequest(
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest;
 
 public record SignOffResponse(
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryResponse
 {
     /// <inheritdoc />
@@ -197,7 +197,7 @@ public record ReconnectRequest(
     ParticipationId ParticipationId,
     EventSequenceNumber LastReceivedSequenceNumber,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryRequest
 {
     /// <inheritdoc />
@@ -208,7 +208,7 @@ public record ReconnectRequest(
 public record ReconnectResponse(
     EventSequenceNumber LastSentSequenceNumber,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IParticipationDeltaQuery, IDeltaQueryResponse
 {
     /// <inheritdoc />
@@ -229,13 +229,13 @@ public interface IMiscellaneousDeltaQuery : IDeltaQuery;
 public record GetAvailableIdsRequest(
     int count,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
 
 public record GetAvailableIdsResponse(
     FreeId[] Ids,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse
 {
     /// <inheritdoc />
@@ -286,14 +286,14 @@ public record GetAvailableIdsResponse(
 public record ListPartitionsRequest(
     DepthLimit DepthLimit,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
 
 public record ListPartitionsResponse(
     DeltaSerializationChunk Partitions,
     SplitFlag Split,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), IMiscellaneousDeltaQuery, IDeltaQueryResponse, IDeltaSplittable;
 
 #endregion
@@ -306,12 +306,12 @@ public interface ICustomDeltaQuery : ICustomDeltaContent, IDeltaQuery
 
 public abstract record CustomQueryRequestBase(
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ICustomDeltaQuery, IDeltaQueryRequest;
 
 public abstract record CustomQueryResponseBase(
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaQueryBase(QueryId, AdditionalInfos), ICustomDeltaQuery, IDeltaQueryResponse;
 
 #endregion
@@ -322,7 +322,7 @@ public record ErrorResponse(
     ErrorCode ErrorCode,
     string Message,
     QueryId QueryId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaContentBase(AdditionalInfos), IDeltaQueryResponse, IDeltaError
 {
     /// <inheritdoc />

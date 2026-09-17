@@ -32,7 +32,8 @@ public record ClassifierChanged(
     MetaPointer NewClassifier,
     MetaPointer OldClassifier,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), INodeEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), INodeEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -72,7 +73,8 @@ public record PropertyAdded(
     MetaPointer Property,
     PropertyValue NewValue,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -84,7 +86,8 @@ public record PropertyDeleted(
     MetaPointer Property,
     PropertyValue OldValue,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -97,7 +100,8 @@ public record PropertyChanged(
     PropertyValue NewValue,
     PropertyValue OldValue,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IPropertyEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -123,7 +127,8 @@ public record ChildAdded(
     MetaPointer Containment,
     Index Index,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -137,7 +142,8 @@ public record ChildDeleted(
     MetaPointer Containment,
     Index Index,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -219,7 +225,8 @@ public record ChildReplaced(
     MetaPointer Containment,
     Index Index,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -309,7 +316,8 @@ public record ChildMovedFromContainmentInOtherParent(
     MetaPointer OldContainment,
     Index OldIndex,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -332,7 +340,8 @@ public record ChildMovedFromOtherContainmentInSameParent(
     MetaPointer OldContainment,
     Index OldIndex,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -350,8 +359,8 @@ public record ChildMovedInSameContainmentInSameParent(
     Index OldIndex,
     IndexOffset IndexOffset,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos),
-    IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -369,7 +378,8 @@ public record ChildMovedAndReplacedFromContainmentInOtherParent(
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -485,7 +495,8 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -594,7 +605,8 @@ public record ChildMovedAndReplacedInSameContainmentInSameParent(
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -699,7 +711,8 @@ public record AnnotationAdded(
     DeltaSerializationChunk NewAnnotation,
     Index Index,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -712,7 +725,8 @@ public record AnnotationDeleted(
     TargetNode Parent,
     Index Index,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -786,7 +800,8 @@ public record AnnotationReplaced(
     TargetNode Parent,
     Index Index,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -862,7 +877,8 @@ public record AnnotationMovedFromOtherParent(
     TargetNode OldParent,
     Index OldIndex,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -879,7 +895,8 @@ public record AnnotationMovedInSameParent(
     Index OldIndex,
     IndexOffset IndexOffset,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -895,7 +912,8 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -996,7 +1014,8 @@ public record AnnotationMovedAndReplacedInSameParent(
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1098,7 +1117,8 @@ public record ReferenceAdded(
     TargetNode? NewReference,
     ResolveInfo? NewResolveInfo,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1112,7 +1132,8 @@ public record ReferenceDeleted(
     TargetNode? DeletedReference,
     ResolveInfo? DeletedResolveInfo,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1128,7 +1149,8 @@ public record ReferenceChanged(
     TargetNode? OldReference,
     ResolveInfo? OldResolveInfo,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
+    AdditionalInfo[] AdditionalInfos
+) : DeltaEventBase(OriginCommands, AdditionalInfos), IReferenceEvent
 {
     /// <inheritdoc />
     [JsonIgnore]

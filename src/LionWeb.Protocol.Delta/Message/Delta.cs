@@ -326,7 +326,7 @@ public interface IDeltaError
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "messageKind", IgnoreUnrecognizedTypeDiscriminators = false, UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public interface IDeltaContent
 {
-    AdditionalInfo[]? AdditionalInfos { get; }
+    AdditionalInfo[] AdditionalInfos { get; }
 
     [JsonIgnore]
     ParticipationId InternalParticipationId { get; set; }
@@ -363,7 +363,7 @@ public interface IDeltaComposite : IDeltaContent
     IEnumerable<IDeltaContent> CompositeParts { get; }
 }
 
-public abstract record DeltaContentBase(AdditionalInfo[]? AdditionalInfos) : IDeltaContent
+public abstract record DeltaContentBase(AdditionalInfo[] AdditionalInfos) : IDeltaContent
 {
     [JsonIgnore]
     public ParticipationId InternalParticipationId { get; set; }
@@ -371,7 +371,7 @@ public abstract record DeltaContentBase(AdditionalInfo[]? AdditionalInfos) : IDe
     [JsonIgnore]
     public abstract string Id { get; }
 
-    public virtual AdditionalInfo[]? AdditionalInfos { get; init; } = AdditionalInfos;
+    public virtual AdditionalInfo[] AdditionalInfos { get; init; } = AdditionalInfos;
 
     /// <inheritdoc />
     public virtual bool Equals(DeltaContentBase? other)

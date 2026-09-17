@@ -206,7 +206,7 @@ public interface INonContinuedDeltaEvent : IDeltaEvent;
 
 public abstract record DeltaEventBase(
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaContentBase(AdditionalInfos), IDeltaEvent
 {
     /// <inheritdoc />
@@ -275,7 +275,7 @@ public record ContinuedEvent(
     ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
     EventSequenceNumber continuedEventSequenceNumber,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaEventBase(OriginCommands, AdditionalInfos), IDeltaContinued
 {
     public override HashSet<TargetNode> AffectedNodes { get; }
@@ -287,7 +287,7 @@ public record CompositeEvent : DeltaEventBase, INonContinuedDeltaEvent, IDeltaCo
 {
     public CompositeEvent(INonContinuedDeltaEvent[] Parts,
         CommandSource[] OriginCommands,
-        AdditionalInfo[]? AdditionalInfos
+        AdditionalInfo[] AdditionalInfos
     ) : base(OriginCommands, AdditionalInfos)
     {
         this.Parts = Parts;
@@ -362,7 +362,7 @@ public record CompositeEvent : DeltaEventBase, INonContinuedDeltaEvent, IDeltaCo
 
 public record NoOpEvent(
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaEventBase(OriginCommands, AdditionalInfos), INonContinuedDeltaEvent
 {
     /// <inheritdoc />
@@ -374,7 +374,7 @@ public record ErrorEvent(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaEventBase(OriginCommands, AdditionalInfos), INonContinuedDeltaEvent, IDeltaError
 {
     /// <inheritdoc />
@@ -384,7 +384,7 @@ public record ErrorEvent(
 
 public abstract record CustomEventBase(
     CommandSource[] OriginCommands,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaEventBase(OriginCommands, AdditionalInfos), ICustomDeltaContent;
 
 #endregion
