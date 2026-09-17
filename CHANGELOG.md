@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.7.0] - tbd
+### Added
+### Fixed
+### Changed
 * Renamed delta command `MoveChildFromOtherContainment` -> `MoveChildFromContainmentInOtherParent`.
 * Renamed delta event `ChildMovedFromOtherContainment` -> `ChildMovedFromContainmentInOtherParent`
   and notification `ChildMovedFromOtherContainmentNotification` -> `ChildMovedFromContainmentInOtherParentNotification`.
@@ -18,6 +21,10 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Renamed delta command `MoveAndReplaceChildInSameContainment` -> `MoveAndReplaceChildInSameContainmentInSameParent`.
 * Renamed delta event `ChildMovedAndReplacedInSameContainment` -> `ChildMovedAndReplacedInSameContainmentInSameParent`
   and notification `ChildMovedAndReplacedInSameContainmentNotification` -> `ChildMovedAndReplacedInSameContainmentInSameParentNotification`.
+* Made all delta `AdditionalInfos` parameters non-nullable.
+### Removed
+### Deprecated
+### Security
 
 ## [0.6.0] - 2026-09-09
 ### Added

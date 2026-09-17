@@ -183,7 +183,7 @@ public interface INonContinuedCommand : IDeltaCommand;
 
 public abstract record DeltaCommandBase(
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaContentBase(AdditionalInfos), IDeltaCommand
 {
     /// <inheritdoc />
@@ -235,13 +235,13 @@ public record ContinuedCommand(
     ContinuedChunkCompleted ContinuedChunkCompleted,
     ContinuedChunkSequenceNumber ContinuedChunkSequenceNumber,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), IDeltaContinued;
 
 public record CompositeCommand(
     INonContinuedCommand[] Parts,
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), INonContinuedCommand, IDeltaComposite
 {
     /// <inheritdoc />
@@ -290,5 +290,5 @@ public record CompositeCommand(
 
 public abstract record CustomCommandBase(
     CommandId CommandId,
-    AdditionalInfo[]? AdditionalInfos
+    AdditionalInfo[] AdditionalInfos
 ) : DeltaCommandBase(CommandId, AdditionalInfos), ICustomDeltaContent;
