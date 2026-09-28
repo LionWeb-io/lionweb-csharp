@@ -32,7 +32,7 @@ public class SharedNodeMap : IDisposable
     {
         foreach (var node in M1Extensions.Descendants(newNode, true, true))
         {
-            if (!TryAdd(node.GetId(), node))
+            if (!TryAdd(node.GetId(), node) && !ReferenceEquals(node, newNode))
                 throw new DuplicateNodeIdException(node, this[node.GetId()]);
         }
     }

@@ -236,6 +236,21 @@ public class ReplaceTests_Containment
     }
 
     [TestMethod]
+    public void PartOfTree()
+    {
+        var newCoord = new LinkTestConcept("coord1");
+        var coord = new LinkTestConcept("coord0") {Containment_0_n = [newCoord]};
+        var circle = new LinkTestConcept("circ0") { Containment_0_1 = coord };
+
+        coord.ReplaceWith(newCoord);
+
+        Assert.AreEqual(circle, newCoord.GetParent());
+        Assert.IsNull(coord.GetParent());
+        Assert.AreEqual(newCoord, circle.Containment_0_1);
+        Assert.IsEmpty(coord.Containment_0_n);
+    }
+
+    [TestMethod]
     public void NonFittingType()
     {
         var circle = new LinkTestConcept("circ0");
