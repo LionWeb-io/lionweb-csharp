@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Added
 ### Fixed
 * `LionWebClient.SignOn()` mixed up repositoryId and queryId parameters.
+* `M1Extensions.ReplaceWith()` threw `DuplicateNodeIdException` or emitted wrong `NodeReplacedNotification` if replacing a node with one of its children.
 ### Changed
 * Renamed delta command `MoveChildFromOtherContainment` -> `MoveChildFromContainmentInOtherParent`.
 * Renamed delta event `ChildMovedFromOtherContainment` -> `ChildMovedFromContainmentInOtherParent`

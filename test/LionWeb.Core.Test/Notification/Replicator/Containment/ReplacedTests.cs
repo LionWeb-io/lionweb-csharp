@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.Notification.Replicator.Containment;
 
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.TestLanguage;
 using M1;
@@ -59,6 +60,41 @@ public class ReplacedTests : ReplicatorTestsBase
 
         Assert.IsFalse(sharedNodeMap.ContainsKey(replaced.GetId()));
         Assert.IsTrue(sharedNodeMap.ContainsKey(added.GetId()));
+    }
+
+    [TestMethod]
+    public void Single_PartOfTree()
+    {
+        var replaced = new LinkTestConcept("replaced") { Name = "replaced" }.WithAnnotation(new TestAnnotation("oldParent"));
+        var originalParent = new LinkTestConcept("a") { Containment_0_1 = replaced };
+        var originalPartition = new TestPartition("partition") { Links = [originalParent] };
+        var originalForest = new Forest();
+        var clonedForest = new Forest();
+
+        var sharedNodeMap = new PartitionSharedNodeMap();
+        var notificationMapper = new NotificationMapper(sharedNodeMap);
+        ((IForest)originalForest).GetNotificationSender()!.ConnectTo(notificationMapper);
+        
+        var replicator = ForestReplicator.Create(clonedForest, sharedNodeMap);
+        notificationMapper.ConnectTo(replicator);
+
+        originalForest.AddPartitions([originalPartition]);
+
+        var clonedPartition = (TestPartition)clonedForest.Partitions.First();
+        var clonedReplaced = clonedPartition.Links.First().Containment_0_1;
+        var ann = (TestAnnotation)clonedReplaced.GetAnnotations().First();
+        
+        var added = new LinkTestConcept("added") { Name = "added" };
+
+        ann.Containment = added;
+
+        var notificationObserver = new NotificationObserver();
+        clonedPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        clonedReplaced.ReplaceWith(added);
+
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromContainmentInOtherParentNotification>(notificationObserver.Notifications[0]);
     }
 
     [TestMethod]
