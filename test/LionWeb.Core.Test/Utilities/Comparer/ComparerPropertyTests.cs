@@ -36,6 +36,16 @@ public class ComparerPropertyTests : ComparerTestsBase
     }
 
     [TestMethod]
+    public void Same_String_Empty()
+    {
+        var left = lF.NewDocumentation("a");
+        left.Text = "";
+        var right = rF.NewDocumentation("b");
+        right.SetText("");
+        AreEqual(left, right);
+    }
+
+    [TestMethod]
     public void Same_String()
     {
         var left = lF.NewLine("a");
@@ -90,6 +100,21 @@ public class ComparerPropertyTests : ComparerTestsBase
     }
 
     [TestMethod]
+    public void Different_String_LeftEmpty()
+    {
+        var left = lF.NewDocumentation("a");
+        left.Text = "";
+        var right = rF.NewDocumentation("b");
+        right.SetText("bye");
+
+        var parent = new NodeDifference(left, right);
+        AreDifferent(left, right,
+            parent,
+            new PropertyValueDifference(left, "", leftDocumentationText, right, "bye") { Parent = parent }
+        );
+    }
+
+    [TestMethod]
     public void Different_String_RightUnset()
     {
         var left = lF.NewLine("a");
@@ -115,6 +140,21 @@ public class ComparerPropertyTests : ComparerTestsBase
         AreDifferent(left, right,
             parent,
             new UnsetFeatureRightDifference(left, leftDocumentationText, right) { Parent = parent }
+        );
+    }
+
+    [TestMethod]
+    public void Different_String_RightEmpty()
+    {
+        var left = lF.NewDocumentation("a");
+        left.Text = "hi";
+        var right = rF.NewDocumentation("b");
+        right.SetText("");
+
+        var parent = new NodeDifference(left, right);
+        AreDifferent(left, right,
+            parent,
+            new PropertyValueDifference(left, "hi", leftDocumentationText, right, "") { Parent = parent }
         );
     }
 
