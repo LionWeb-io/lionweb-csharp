@@ -110,7 +110,7 @@ public class LenientNode : NodeBase, INode
 
         if (TryGet(feature, out result))
         {
-            if (feature.Optional)
+            if (feature.Optional || result is string)
             {
                 return true;
             }
