@@ -15,13 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification;
+namespace LionWeb.Core.Test.Utilities;
 
 using Core.Utilities;
 using Languages.Generated.V2026_1.TestLanguage;
 
 [TestClass]
-public class IdComparerTests : NotificationTestsBase
+public class IdComparerTests
 {
     [TestMethod]
     public void TestNodeIdComparer_Fails()

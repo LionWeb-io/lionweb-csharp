@@ -15,21 +15,26 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Notification;
+namespace LionWeb.Core.Utilities;
 
-using Core.Utilities;
 using M3;
 
+/// <summary>
+/// Variant of <see cref="Comparer"/> that flags different node ids with <see cref="NodeIdDifference"/>.
+/// </summary>
 public class IdComparer : Comparer
 {
+    /// <inheritdoc />
     public IdComparer(IList<INode?> left, IList<INode?> right) : base(left, right)
     {
     }
 
+    /// <inheritdoc />
     public IdComparer(IList<IReadableNode?> left, IList<IReadableNode?> right) : base(left, right)
     {
     }
 
+    /// <inheritdoc />
     protected override List<IDifference> CompareNode(IReadableNode? leftOwner, IReadableNode? left, Link? containment, IReadableNode? rightOwner,
         IReadableNode? right)
     {
@@ -43,6 +48,7 @@ public class IdComparer : Comparer
     }
 }
 
+/// <paramref name="Left"/> and <paramref name="Right"/> have a different <see cref="IReadableNode.GetId"/>.
 public record NodeIdDifference(IReadableNode Left, IReadableNode Right) : DifferenceBase
 {
     /// <inheritdoc />
