@@ -1,0 +1,665 @@
+{
+  "serializationFormatVersion": "2023.1",
+  "languages": [
+    {
+      "key": "TestLanguage",
+      "version": "0"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "partition",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "TestPartition"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": "Changed partition"
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "TestPartition-links"
+          },
+          "children": [
+            "linkA",
+            "linkB",
+            "newChild"
+          ]
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "TestPartition-data"
+          },
+          "children": []
+        }
+      ],
+      "references": [],
+      "annotations": [],
+      "parent": null
+    },
+    {
+      "id": "linkA",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "LinkTestConcept"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": null
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-otherContainment_0_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1"
+          },
+          "children": []
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_1"
+          },
+          "targets": []
+        }
+      ],
+      "annotations": [],
+      "parent": "partition"
+    },
+    {
+      "id": "linkB",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "LinkTestConcept"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": null
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_1"
+          },
+          "children": [
+            "childB0"
+          ]
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-otherContainment_0_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1"
+          },
+          "children": []
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_1"
+          },
+          "targets": [
+            {
+              "resolveInfo": null,
+              "reference": "linkA"
+            }
+          ]
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1"
+          },
+          "targets": []
+        }
+      ],
+      "annotations": [
+        "ann"
+      ],
+      "parent": "partition"
+    },
+    {
+      "id": "childB0",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "LinkTestConcept"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": null
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-otherContainment_0_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1"
+          },
+          "children": []
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_1"
+          },
+          "targets": []
+        }
+      ],
+      "annotations": [],
+      "parent": "linkB"
+    },
+    {
+      "id": "ann",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "TestAnnotation"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": null
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "TestAnnotation-containment"
+          },
+          "children": [
+            "dataNode"
+          ]
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "TestAnnotation-ref"
+          },
+          "targets": []
+        }
+      ],
+      "annotations": [],
+      "parent": "linkB"
+    },
+    {
+      "id": "dataNode",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "DataTypeTestConcept"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-booleanValue_0_1"
+          },
+          "value": "true"
+        },
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-booleanValue_1"
+          },
+          "value": "false"
+        },
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-stringValue_0_1"
+          },
+          "value": null
+        },
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-enumValue_0_1"
+          },
+          "value": null
+        },
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-integerValue_0_1"
+          },
+          "value": null
+        },
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-integerValue_1"
+          },
+          "value": null
+        },
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-stringValue_1"
+          },
+          "value": null
+        },
+        {
+          "property": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "DataTypeTestConcept-enumValue_1"
+          },
+          "value": null
+        }
+      ],
+      "containments": [],
+      "references": [],
+      "annotations": [],
+      "parent": "ann"
+    },
+    {
+      "id": "newChild",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "LinkTestConcept"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": null
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_n"
+          },
+          "children": [
+            "newSubChild"
+          ]
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-otherContainment_0_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_1"
+          },
+          "children": []
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_1"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1"
+          },
+          "targets": []
+        }
+      ],
+      "annotations": [],
+      "parent": "partition"
+    },
+    {
+      "id": "newSubChild",
+      "classifier": {
+        "language": "TestLanguage",
+        "version": "0",
+        "key": "LinkTestConcept"
+      },
+      "properties": [
+        {
+          "property": {
+            "language": "LionCore-builtins",
+            "version": "2023.1",
+            "key": "LionCore-builtins-INamed-name"
+          },
+          "value": null
+        }
+      ],
+      "containments": [
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_n"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-otherContainment_0_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_1"
+          },
+          "children": []
+        },
+        {
+          "containment": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-containment_0_1"
+          },
+          "children": []
+        }
+      ],
+      "references": [
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_n"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_0_1"
+          },
+          "targets": []
+        },
+        {
+          "reference": {
+            "language": "TestLanguage",
+            "version": "0",
+            "key": "LinkTestConcept-reference_1"
+          },
+          "targets": []
+        }
+      ],
+      "annotations": [],
+      "parent": "newChild"
+    }
+  ]
+}
