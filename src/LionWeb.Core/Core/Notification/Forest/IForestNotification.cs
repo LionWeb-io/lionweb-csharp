@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Notification.Forest;
 
-using Pipe;
+using Utilities;
 
 /// All LionWeb notifications relating to a forest.
 public interface IForestNotification : INotification

@@ -15,9 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Pipe;
-
-using Utilities;
+namespace LionWeb.Core.Utilities;
 
 /// <inheritdoc />
 /// Maintains the same node id for cloned nodes.

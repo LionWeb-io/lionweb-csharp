@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Notification.Partition;
 
 using M3;
-using Pipe;
+using Utilities;
 using SemanticPropertyValue = object;
 
 /// All LionWeb notifications relating to a partition.

@@ -26,6 +26,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   and notification `ChildMovedAndReplacedInSameContainmentNotification` -> `ChildMovedAndReplacedInSameContainmentInSameParentNotification`.
 * Made all delta `AdditionalInfos` parameters non-nullable.
 * Moved `IdComparer` to `LionWeb.Core.Utilities` as it's generally useful.
+* Moved `SameIdCloner` to `LionWeb.Core.Utilities` as it's generally useful.
 ### Removed
 ### Deprecated
 ### Security

@@ -20,7 +20,7 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
-using Core.Notification.Pipe;
+using Core.Utilities;
 using M1;
 
 /// <summary>
